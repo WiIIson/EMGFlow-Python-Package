@@ -79,17 +79,49 @@ The data files contain noise in the 50 Hz range due to the 50 Hz AC power being 
 
 https://socthesis.fas.harvard.edu/files/socseniorthesis/files/pres-litreview.pdf
 
+
+Possible packages
 - [NeuroKit2](https://pypi.org/project/neurokit2/)
 - [pyemgpipeline](https://pypi.org/project/pyemgpipeline/)
     - https://www.theoj.org/joss-papers/joss.04156/10.21105.joss.04156.pdf
 - [MNE](https://mne.tools/stable/index.html)
+    - https://github.com/mne-tools/mne-python
 - [BioSPPy](https://github.com/PIA-Group/BioSPPy)
+    - https://biosppy.readthedocs.io/en/latest/
 - [PySiology](https://github.com/Gabrock94/Pysiology)
 - [PsPM](https://github.com/bachlab/PsPM)
+    - This package is for MatLab, not Python
 - [pyphysio](https://github.com/MPBA/pyphysio)
+    - https://www.sciencedirect.com/science/article/pii/S2352711019301839
 - [py-ECG-Detectors](https://github.com/berndporr/py-ecg-detectors)
 - [BIOPEAKS](https://github.com/JanCBrammer/biopeaks)
 - [EMG-Signal-Processing-Library](https://github.com/cancui/EMG-Signal-Processing-Library)
+
+Literature review
+- Need to use packages to do things more simply
+- Created by people with experience in the area
+- Makes the work easier for people doing things in the same area
+- Develops a common practice for working with the field
+
+Processing physiological data is a complicated process that involves many complicated steps to perform. Fortunately, there are many different packages that can be used to make this work easier, condensing these processes down into simple function calls. These packages were created by people with experience in the area to help developers working on similar problems keep a more streamlined and understandable workflow. These packages help develop common practices for the types of problems they deal with, and provide support for errors encountered when working with them.
+
+NeuroKit2 is a toolkit for working with neurophysiological signals. It provides many different functions needed to process these signals. NeuroKit2 is intended to help alleviate the "reproducibility crisis" of neuroscience - a problem caused by the complexity, ambiguity and inaccessibility of development pipelines, by offering a free, comprehensive solution. This includes a series of functions that help every step of the way when working with ECG, RSP, EMG, EDA and EOG signals, also providing functions that can summarise the signals it works with, and extract features.
+
+PyEMGPipeline is a more specialized package that helps with EMG signal processing. The package is divided into processors, wrappers and plots. The processors are a collection of functions that can be used in different steps of processing the signals during a workflow. The wrappers are classes that represent different forms of the data being worked with, providing class methods and parameters that make accessing and interacting with the data easier. The plots are a collection of functions that make plotting the data easier, and can make adjusting related parameters easier.
+
+MNE is a large scale package with broad applications for exploring, analyzing and displaying physiological data. This includes MEG, EEG, sEEG, ECoG, and many more kinds of signals. MNE provides a large amount of support, with tutorials, how-to examples, and a large amount of documentation for all of the classes, functions and methods in the package. It also has an online forum where users can share problems and troubleshooting tips. The MNE package is also available to use in MatLab and C.
+
+BioSPPy is a small package designed for processing biological signals in Python. It has a collection of functions that can process signals such as PPG, ECG, EDA, EEG, EMG and respiration signals. It can also be used to analyze these signals using pattern recognition.
+
+Pysiology is a smaller package that helps in the analysis of EMG, ECG and GSR signals.
+
+pyphysio contains algorithms that aid in the analysis of physiological signals, such as ECG, BVP, EDA, inertial and fNIRS signals. pyphysio was created to help combat the lack of open-source signal processing tools available, which negatively impacts the control developers have over their data. pyphysio offers more transparent and customizable functions, and can serve as a basis for machine learning modules. The algorithms in the package include: estimators that change signals to one of a different type, filters that filter a given signal, indicators that produce values from the signal, segmentators that produce a series of segments from a signal, and tools that produce arbitrary data from a signal.
+
+py-ECG-detectors is a small library that helps with the detection and analysis of heartbeats. It provides 8 different algorithms that can detect heartbeats in ECGs, as well as a large collection of tools to analyse the heartrate.
+
+BIOPEAKS is a Python library that provides a graphical user interface for the feature extraction of ECG, PPG and respiration physiological signals. It is able to read files in biosignal, or plain text format, and allows for the interactive visualization of these signals. It can perform automatic feature detection and filtering, as well as providing manual methods of editing the signals. This analysis can be done across multiple files, with the package allowing for batch processing. Once the editing is completed, the interface allows for the exporting of the data for further analysis.
+
+EMG-Signal-Processing-Library is a specialized library for processing EMG signals. It has the capabilities for processing EMG signals in real-time, using algorithms that can run in constant time with respect to the sampling rate of the signals they are working with. The library also has an implementation in C.
 
 ---
 
