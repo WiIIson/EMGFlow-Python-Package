@@ -78,8 +78,8 @@ if __name__ == '__main__':
     
     in_data = 'DataOut/'
     sampling_rate = 2000
-    #Hzs = [ 50, 150, 250, 350, 400, 450, 550, 650, 750, 850, 950]
-    Hzs = [217, 317, 417, 517, 617, 717, 817, 917]
+    Hzs = [ 50, 150, 250, 350, 400, 450, 550, 650, 750, 850, 950]
+    #Hzs = [217, 317, 417, 517, 617, 717, 817, 917]
     threshold = 5           # Threshold for an outlier
     col = 'EMG_zyg'
     
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     print("The outliers are:")
     print(outliers)
     
-    #out_path = 'Plots/Outliers/50s/'
-    out_path = 'Plots/Outliers/17s/'
+    out_path = 'Plots/Outliers/50s/'
+    #out_path = 'Plots/Outliers/17s/'
     
     plotOutliers(outliers, out_path, col, sampling_rate)
