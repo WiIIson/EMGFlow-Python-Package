@@ -34,34 +34,41 @@ def applyNotchFilters(data, col, Hzs, Qs, sampling_rate):
 # Apply filters to the raw data at the given Hz (with
 # corresponding Q-factor) and save the modified data
 # to a new folder
-def filterSignals(in_data, out_data, sampling_rate, Hzs, Qs):
+def filterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None):
 
     # Iterate through each RAW folder
     for raw in os.listdir(in_data):
         if re.search('^Raw_PID_[0-9]{2}-[0-9]{2}$', raw):
-            path2 = in_data + raw + '/'
-            out2 = out_data + raw + '/'
-        
-            # Iterate through each person folder
-            for person in os.listdir(path2):
-                print("Writing files for subject", person, "...")
-                path3 = path2 + person + '/'
-                out3 = out2 + person
+            in_raw = in_path + raw + '/'
+            out_raw = out_path + raw + '/'
             
+            # Iterate through each person folder
+            for person in os.listdir(in_raw):
+                print("Writing files for subject", person, "...")
+                in_person = in_raw + person + '/'
+                out_person = out_raw + person
+                
                 # Iterate through each phsiological data file
-                for file in os.listdir(path3):
-                    path4 = path3 + file
-                    out4 = out3 + '/' + file
+                for file in os.listdir(in_person):
+                    in_file = in_person + file
+                    out_file = out_person + '/' + file
                     
                     # Get data and apply notch filter
-                    data = pd.read_csv(path4)
+                    data = pd.read_csv(in_file)
                     for i in range(len(Qs)):
                         data['EMG_zyg'] = applyNotchFilter(data['EMG_zyg'], Hzs[i], Qs[i], sampling_rate)
                         data['EMG_cor'] = applyNotchFilter(data['EMG_cor'], Hzs[i], Qs[i], sampling_rate)
-                
+                    
+                    # Apply 'special cases' notch filters
+                    if special_cases is not None:
+                        if person in special_cases.keys():
+                            (p_Hzs, p_Qs) = special_cases[person]
+                            data = applyNotchFilters(data, 'EMG_zyg', p_Hzs, p_Qs, sampling_rate)
+                            data = applyNotchFilters(data, 'EMG_cor', p_Hzs, p_Qs, sampling_rate)
+                    
                     # Save results
-                    os.makedirs(out3, exist_ok=True)    # Create subirectories if they do not exist
-                    data.to_csv(out4)                   # Save output
+                    os.makedirs(out_person, exist_ok=True)    # Create subirectories if they do not exist
+                    data.to_csv(out_file)                     # Save output
     
     print("Done.")
 

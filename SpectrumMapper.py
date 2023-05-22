@@ -98,8 +98,8 @@ def plotSpectrums(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases=
                 fig.savefig(out_data + person + '_' + col + '_plot.jpg')
 
     print("Done.")
-    
-    
+
+
 
 if __name__ == '__main__':
 
@@ -113,8 +113,8 @@ if __name__ == '__main__':
     
     special_cases = {
         # subjectNum: (Hzs, Qs),
-        "08": ([317],[25]),
-        "11": ([317],[25])
+        "08": ([317],[50]),
+        "11": ([317],[50])
     }
     
     plotSpectrums(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases)
