@@ -5,7 +5,7 @@ import re
 
 
 
-# Apply a notch filter to input data
+# Apply a single notch filter to input data
 def applyNotchFilter(data, freq, Q, sampling_rate):
     # Normalize filtering frequency
     nyq_freq = sampling_rate / 2
@@ -71,24 +71,38 @@ def filterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None)
                     data.to_csv(out_file)                     # Save output
     
     print("Done.")
+    return
 
 
 
 if __name__ == '__main__':
     
-    # The folders listed in path1 and out1 must exist before
-    # running the script. The output will be generated in the
-    # out1 (output) folder listed, with the same file format
-    # contained in the path1 (input) folder
+    # The folders listed in in_data and out_data must exist before
+    # running the script, and should not have any subdirectories.
+    # The output will be generated in the
+    # out_data (output) folder listed, with the same file format
+    # contained in the in_data (input) folder
     
-    in_data = 'Data/'           # Input data folder
-    out_data = 'DataOut/'       # Output data folder
-    sampling_rate = 2000        # Sampling rate
+    in_data = 'Data/RawData/'       # Input data folder
+    out_data = 'Data/CleanData/'    # Output data folder
+    sampling_rate = 2000            # Sampling rate
     
     # The Hzs and Qs values can be adjusted to change the filters
     # that are applied to the data
     
-    Hzs = [50, 150, 250, 350, 400, 450, 550, 650, 750, 850, 950]
-    Qs =  [ 1,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
+    Hzs = [50, 150, 250, 350, 450, 550, 650, 750, 850, 950]
+    Qs =  [ 5,  25,  25,  25,  25,  25,  25,  25,  25,  25]
     
-    filterSignals(in_data, out_data, sampling_rate, Hzs, Qs)
+    # The special cases are additional notch filters to be applied
+    # only to specific subjects
+    
+    special_cases = {
+        # subjectNum: ([Hzs ...],
+        #              [ Qs ...])
+        '08': ([317],
+               [ 25]),
+        '11': ([317],
+               [ 25])
+    }
+    
+    filterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)

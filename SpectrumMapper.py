@@ -35,7 +35,7 @@ def zoomIn(data, a, b):
 #
 # Note: Make sure that subjectNumber follows the convention
 #       01, 02, 03, ... 10, ... 99
-def plotSpectrums(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases=None):
+def SubjectSample(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases=None):
     
     # Create output folder if it does not exist already
     os.makedirs(out_data, exist_ok=True)
@@ -98,6 +98,7 @@ def plotSpectrums(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases=
                 fig.savefig(out_data + person + '_' + col + '_plot.jpg')
 
     print("Done.")
+    return
 
 
 
@@ -111,10 +112,11 @@ if __name__ == '__main__':
     #Qs =  [ 1,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
     Qs =  [5,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
     
+    # Special filtering for subjects 8 and 11
     special_cases = {
         # subjectNum: (Hzs, Qs),
-        "08": ([317],[50]),
+        "08": ([317, 50, 430],[50, 1, 5]),
         "11": ([317],[50])
     }
     
-    plotSpectrums(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases)
+    SubjectSample(in_data, col, out_data, sampling_rate, Hzs, Qs, special_cases)
