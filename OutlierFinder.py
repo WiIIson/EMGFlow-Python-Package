@@ -133,11 +133,13 @@ def FindOutliers2(in_data, sampling_rate, threshold):
                     diffs_zyg = abs(y_values_zyg - maxima_zyg['Power'])
                     diffs_cor = abs(y_values_cor - maxima_cor['Power'])
                     
-                    # Get median and max
+                    # Get median
                     med_fit_zyg = np.median(diffs_zyg)
-                    max_fit_zyg = np.max(diffs_zyg)
                     med_fit_cor = np.median(diffs_cor)
-                    max_fit_cor = np.max(diffs_cor)
+                    
+                    # Get max (only care about positive values)
+                    max_fit_zyg = np.max(maxima_zyg['Power'] - y_values_zyg)
+                    max_fit_cor = np.max(maxima_cor['Power'] - y_values_cor)
                     
                     if (max_fit_zyg > med_fit_zyg * threshold) or (max_fit_cor > med_fit_cor * threshold):
                         print('\tOutlier detected...')
@@ -160,11 +162,13 @@ def FindOutliers2(in_data, sampling_rate, threshold):
                         axs[0,1].scatter(maxima_zyg['Frequency'], list(diffs_zyg))
                         axs[0,1].axhline(y=med_fit_zyg, c='g')
                         axs[0,1].axhline(y=med_fit_zyg * threshold, c='r')
+                        axs[0,1].axhline(y=max_fit_zyg, c='b')
                         
                         axs[1,1].set_title('Cor outliers')
                         axs[1,1].scatter(maxima_cor['Frequency'], list(diffs_cor))
                         axs[1,1].axhline(y=med_fit_cor, c='g')
                         axs[1,1].axhline(y=med_fit_cor * threshold, c='r')
+                        axs[1,1].axhline(y=max_fit_cor, c='b')
                         
                         fig.savefig('Plots/Debug/' + file[-12:-4] + '.jpg')
     
@@ -221,7 +225,7 @@ if __name__ == '__main__':
     
     in_data = 'Data/CleanData/'
     sampling_rate = 2000
-    threshold = 5
+    threshold = 15
     
     outliers = FindOutliers2(in_data, sampling_rate, threshold)
     

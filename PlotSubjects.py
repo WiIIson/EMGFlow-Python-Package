@@ -79,12 +79,60 @@ def plotSubjects(in_data, out_data, sampling_rate, Hzs, Qs, subjects, special_ca
                         
     print("Done.")
     return
+
+
+# Plots all physiological files from every subject
+# showing the PSD of the ZYG and COR columns
+def plotData(in_data, out_data, sampling_rate):
     
+    # Create output folder if it does not exist already
+    os.makedirs(out_data, exist_ok=True)
+        
+    # Iterate through each RAW folder
+    for raw in os.listdir(in_data):
+        if re.search('^Raw_PID_[0-9]{2}-[0-9]{2}$', raw):
+            in_raw = in_data + raw + '/'
+            
+            # Iterate through each person folder
+            for person in os.listdir(in_raw):
+                in_person = in_raw + person + '/'
+                
+                # Iterate through each phsiological data file
+                for file in os.listdir(in_person):
+                    print('Plotting', file, '...')
+                    in_file = in_person + file
+                    
+                    # Get data
+                    data = pd.read_csv(in_file)
+                    
+                    # Create graphs
+                    psd_zyg = nk.signal_psd(data['EMG_zyg'], sampling_rate=sampling_rate)
+                    psd_cor = nk.signal_psd(data['EMG_cor'], sampling_rate=sampling_rate)
+                    psd_zyg = zoomIn(psd_zyg, 20, 450)
+                    psd_cor = zoomIn(psd_cor, 20, 450)
+                    
+                    # Create plots
+                    fig, axs = plt.subplots(1, 2, figsize=(15,15))
+                    axs[0].plot(psd_zyg['Frequency'], psd_zyg['Power'])
+                    axs[1].plot(psd_cor['Frequency'], psd_cor['Power'])
+                    
+                    # Create labels
+                    axs[0].set_title('EMG_zyg')
+                    axs[0].set_ylabel('Power (mV^2/Hz)')
+                    axs[0].set_xlabel('Frequency (Hz)')
+                    axs[1].set_title('EMG_cor')
+                    axs[1].set_ylabel('Power (mV^2/Hz)')
+                    axs[1].set_xlabel('Frequency (Hz)')
+                    fig.suptitle('Subject: ' + person + ', File: ' + file)
+                    fig.savefig(out_data + '_' + file + '_plot.jpg')
+    
+    print('Done.')
+    return
     
     
 if __name__ == '__main__':
     
-    in_data = 'Data/'
+    in_data = 'Data/CleanData/'
     out_data = 'Plots/SubjectExplore/'
     sampling_rate = 2000
     Hzs = [50, 150, 250, 350, 400, 450, 550, 650, 750, 850, 950]
@@ -108,4 +156,6 @@ if __name__ == '__main__':
                [ 50])
     }
     
-    plotSubjects(in_data, out_data, sampling_rate, Hzs, Qs, subjects)
+    #plotSubjects(in_data, out_data, sampling_rate, Hzs, Qs, subjects)
+    
+    plotData(in_data, out_data, sampling_rate)
