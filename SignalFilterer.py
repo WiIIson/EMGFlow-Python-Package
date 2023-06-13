@@ -90,8 +90,8 @@ if __name__ == '__main__':
     # The Hzs and Qs values can be adjusted to change the filters
     # that are applied to the data
     
-    Hzs = [50, 150, 250, 350, 450, 550, 650, 750, 850, 950]
-    Qs =  [ 5,  25,  25,  25,  25,  25,  25,  25,  25,  25]
+    Hzs = [50, 150, 250, 350, 450, 400, 550, 650, 750, 850, 950]
+    Qs =  [ 5,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
     
     # The special cases are additional notch filters to be applied
     # only to specific subjects
@@ -99,28 +99,10 @@ if __name__ == '__main__':
     special_cases = {
         # subjectNum: ([Hzs ...],
         #              [ Qs ...])
-        '01': ([400],
-               [25]),
-        '02': ([400],
-               [25]),
-        '03': ([400],
-               [25]),
-        '08': ([317, 400],
-               [ 25,  25]),
-        '10': ([400],
-               [25]),
-        '11': ([317, 400],
-               [ 25,  25]),
-        '13': ([400],
-               [25]),
-        '26': ([400],
-               [25]),
-        '30': ([400],
-               [25]),
-        '37': ([400],
-               [25]),
-        '38': ([400],
-               [25]),
+        '08': ([317],
+               [ 25]),
+        '11': ([317],
+               [ 25])
     }
     
     filterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)

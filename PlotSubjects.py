@@ -124,7 +124,7 @@ def plotData(in_data, out_data, sampling_rate):
                     axs[1].set_ylabel('Power (mV^2/Hz)')
                     axs[1].set_xlabel('Frequency (Hz)')
                     fig.suptitle('Subject: ' + person + ', File: ' + file)
-                    fig.savefig(out_data + '_' + file + '_plot.jpg')
+                    fig.savefig(out_data + file + '_plot.jpg')
     
     print('Done.')
     return
