@@ -7,11 +7,14 @@ import re
 import matplotlib.pyplot as plt
 from scipy.signal import argrelextrema
 
-from SpectrumMapper import zoomIn
+from PlotSubjects import ZoomIn
 
 import warnings
 warnings.filterwarnings('ignore')
 
+#
+# =============================================================================
+#
 
 # Get a list of filenames of outliers from the cleaned data using
 # a threshold value (that many times the median)
@@ -20,7 +23,7 @@ def FindOutliers(in_data, sampling_rate, threshold):
     
     # Iterate through each RAW folder
     for raw in os.listdir(in_data):
-        if re.search('^Raw_PID_[0-9]{2}-[0-9]{2}$', raw):
+        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
             in_raw = in_data + raw + '/'
             
             # Iterate through each person folder
@@ -38,8 +41,8 @@ def FindOutliers(in_data, sampling_rate, threshold):
                     # Make PSDs
                     psd_zyg = nk.signal_psd(data['EMG_zyg'], sampling_rate=sampling_rate)
                     psd_cor = nk.signal_psd(data['EMG_cor'], sampling_rate=sampling_rate)
-                    psd_zyg_med = zoomIn(psd_zyg, 20, 450)
-                    psd_cor_med = zoomIn(psd_cor, 20, 450)
+                    psd_zyg_med = ZoomIn(psd_zyg, 20, 450)
+                    psd_cor_med = ZoomIn(psd_cor, 20, 450)
                     
                     # Get medians
                     med_zyg = np.median(psd_zyg_med['Power'])
@@ -59,14 +62,9 @@ def FindOutliers(in_data, sampling_rate, threshold):
     print("Done.")
     return outliers
 
-
 #
-# ==================================================
+# =============================================================================
 #
-
-# Definition for a rational function where p and q are polynomials
-# of degree p_deg and q_deg
-
 
 # Get a list of filenames of outliers from the cleaned data using
 # a threshold value (that many times the median)
@@ -84,7 +82,7 @@ def FindOutliers2(in_data, sampling_rate, threshold):
     
     # Iterate through each RAW folder
     for raw in os.listdir(in_data):
-        if re.search('^Raw_PID_[0-9]{2}-[0-9]{2}$', raw):
+        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
             in_raw = in_data + raw + '/'
             
             # Iterate through each person folder
@@ -102,8 +100,8 @@ def FindOutliers2(in_data, sampling_rate, threshold):
                     # Make PSDs
                     psd_zyg = nk.signal_psd(data['EMG_zyg'], sampling_rate=sampling_rate)
                     psd_cor = nk.signal_psd(data['EMG_cor'], sampling_rate=sampling_rate)
-                    psd_zyg = zoomIn(psd_zyg, 20, 450)
-                    psd_cor = zoomIn(psd_cor, 20, 450)
+                    psd_zyg = ZoomIn(psd_zyg, 20, 450)
+                    psd_cor = ZoomIn(psd_cor, 20, 450)
                     
                     # Get local maxima
                     n = 200
@@ -175,7 +173,9 @@ def FindOutliers2(in_data, sampling_rate, threshold):
     print("Done.")
     return outliers
 
-
+#
+# =============================================================================
+#
 
 # Creates plots using a list of outlier file locations, saves
 # the plots to out_path
@@ -194,8 +194,8 @@ def PlotOutliers(outliers, out_path, sampling_rate):
         # Prepare PSD graphs
         psd_zyg = nk.signal_psd(data['EMG_zyg'], sampling_rate=sampling_rate)
         psd_cor = nk.signal_psd(data['EMG_cor'], sampling_rate=sampling_rate)
-        psd_zyg = zoomIn(psd_zyg, 20, 450)
-        psd_cor = zoomIn(psd_cor, 20, 450)
+        psd_zyg = ZoomIn(psd_zyg, 20, 450)
+        psd_cor = ZoomIn(psd_cor, 20, 450)
         
         # Create plots
         fig, axs = plt.subplots(1, 2, figsize=(15,15))
@@ -219,11 +219,13 @@ def PlotOutliers(outliers, out_path, sampling_rate):
     print('Done.')
     return
 
-
+#
+# =============================================================================
+#
 
 if __name__ == '__main__':
     
-    in_data = 'Data/CleanData/'
+    in_data = 'Data/Clean-Data/'
     sampling_rate = 2000
     threshold = 15
     
@@ -231,18 +233,4 @@ if __name__ == '__main__':
     
     print('Outliers found:', len(outliers))
     
-    #out_path = 'Plots/Outliers/'
-    
     #PlotOutliers(outliers, out_path, sampling_rate)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

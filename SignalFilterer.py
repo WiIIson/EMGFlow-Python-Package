@@ -3,10 +3,18 @@ import pandas as pd
 import os
 import re
 
-
+#
+# =============================================================================
+#
 
 # Apply a single notch filter to input data
-def applyNotchFilter(data, freq, Q, sampling_rate):
+#
+# data              Data notch filter is being applied to
+# freq              Frequency to apply notch filter to
+# Q                 Q-factor of notch filter
+# sampling_rate     Sampling rate of data
+def ApplyNotchFilter(data, freq, Q, sampling_rate):
+    
     # Normalize filtering frequency
     nyq_freq = sampling_rate / 2
     norm_freq = freq / nyq_freq
@@ -17,28 +25,44 @@ def applyNotchFilter(data, freq, Q, sampling_rate):
     
     return filtered_data
 
+#
+# =============================================================================
+#
 
-
-# Applies a sequence of notch filters for given frequencies
-# and Q-factors
-def applyNotchFilters(data, col, Hzs, Qs, sampling_rate):
+# Applies a sequence of notch filters for given frequencies and Q-factors to a
+# column of the provided data
+#
+# data              Data notch filter is being applied to
+# col               Column of [data] notch filter is being applied to
+# freq              Frequency to apply notch filter to
+# Q                 Q-factor of notch filter
+# sampling_rate     Sampling rate of data   
+def ApplyNotchFilters(data, col, Hzs, Qs, sampling_rate):
+    
     if len(Hzs) == len(Qs):
         for i in range(len(Qs)):
-            data[col] = applyNotchFilter(data[col], Hzs[i], Qs[i], sampling_rate)
+            data[col] = ApplyNotchFilter(data[col], Hzs[i], Qs[i], sampling_rate)
         return data
     else:
         raise Exception("Error: Provided", len(Hzs), "frequencies and", len(Qs), "Q-factors.")
 
+#
+# =============================================================================
+#
 
-
-# Apply filters to the raw data at the given Hz (with
-# corresponding Q-factor) and save the modified data
-# to a new folder
-def filterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None):
+# Applies notch filters to provided raw data and saves resulting cleaned data
+#
+# in_path           Filepath for raw data folder
+# out_path          Filepath for clean data folder
+# sampling_rate     Sampling rate of files
+# Hzs               Frequencies to apply notch filters to
+# Qs                Q-factors of notch filters
+# special_cases     Additional optional special case notch filters
+def NotchFilterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None):
 
     # Iterate through each RAW folder
     for raw in os.listdir(in_data):
-        if re.search('^Raw_PID_[0-9]{2}-[0-9]{2}$', raw):
+        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
             in_raw = in_path + raw + '/'
             out_raw = out_path + raw + '/'
             
@@ -56,24 +80,34 @@ def filterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None)
                     # Get data and apply notch filter
                     data = pd.read_csv(in_file)
                     for i in range(len(Qs)):
-                        data['EMG_zyg'] = applyNotchFilter(data['EMG_zyg'], Hzs[i], Qs[i], sampling_rate)
-                        data['EMG_cor'] = applyNotchFilter(data['EMG_cor'], Hzs[i], Qs[i], sampling_rate)
+                        data['EMG_zyg'] = ApplyNotchFilter(data['EMG_zyg'], Hzs[i], Qs[i], sampling_rate)
+                        data['EMG_cor'] = ApplyNotchFilter(data['EMG_cor'], Hzs[i], Qs[i], sampling_rate)
                     
                     # Apply 'special cases' notch filters
                     if special_cases is not None:
                         if person in special_cases.keys():
                             (p_Hzs, p_Qs) = special_cases[person]
-                            data = applyNotchFilters(data, 'EMG_zyg', p_Hzs, p_Qs, sampling_rate)
-                            data = applyNotchFilters(data, 'EMG_cor', p_Hzs, p_Qs, sampling_rate)
+                            data = ApplyNotchFilters(data, 'EMG_zyg', p_Hzs, p_Qs, sampling_rate)
+                            data = ApplyNotchFilters(data, 'EMG_cor', p_Hzs, p_Qs, sampling_rate)
                     
                     # Save results
                     os.makedirs(out_person, exist_ok=True)    # Create subirectories if they do not exist
-                    data.to_csv(out_file)                     # Save output
+                    data.to_csv(out_file, index=False)        # Save output
     
     print("Done.")
     return
 
+#
+# =============================================================================
+#
 
+# Put bandpass filter function here 
+def BandpassFilterSignals():
+    return
+
+#
+# =============================================================================
+#
 
 if __name__ == '__main__':
     
@@ -83,8 +117,8 @@ if __name__ == '__main__':
     # out_data (output) folder listed, with the same file format
     # contained in the in_data (input) folder
     
-    in_data = 'Data/RawData/'       # Input data folder
-    out_data = 'Data/CleanData/'    # Output data folder
+    in_data = 'Data/Raw-Data/'       # Input data folder
+    out_data = 'Data/Clean-Data/'    # Output data folder
     sampling_rate = 2000            # Sampling rate
     
     # The Hzs and Qs values can be adjusted to change the filters
@@ -105,4 +139,4 @@ if __name__ == '__main__':
                [ 25])
     }
     
-    filterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)
+    NotchFilterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)
