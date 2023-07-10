@@ -8,7 +8,7 @@
 %% Loading Raw Data:
 
 % Load data:
-fileName = '.\Data\Clean-Data\Raw_PID_01-10\01\01-01-01.csv';
+fileName = '.\Data\Clean-Data\Clean_PID_01-10\01\01-01-02.csv';
 csvData = readtable(fileName);
 
 % Create empty struct:
@@ -57,4 +57,4 @@ pdtData.physioDataInfo.pdtFileCreationDate = datestr(now);
 pdtData.physioDataInfo.pdtFileCreationUser = getenv('USERNAME');
 
 % Save pdtData struct as a .physioData file:
-save('signal1.physioData', '-struct', 'pdtData');
+save('signal2.physioData', '-struct', 'pdtData');

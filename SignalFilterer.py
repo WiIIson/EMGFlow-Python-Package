@@ -1,7 +1,9 @@
-import scipy.signal
+import scipy
 import pandas as pd
+import numpy as np
 import os
 import re
+import cv2
 
 #
 # =============================================================================
@@ -39,6 +41,8 @@ def ApplyNotchFilter(data, freq, Q, sampling_rate):
 # sampling_rate     Sampling rate of data   
 def ApplyNotchFilters(data, col, Hzs, Qs, sampling_rate):
     
+    data = data.copy()
+    
     if len(Hzs) == len(Qs):
         for i in range(len(Qs)):
             data[col] = ApplyNotchFilter(data[col], Hzs[i], Qs[i], sampling_rate)
@@ -58,7 +62,7 @@ def ApplyNotchFilters(data, col, Hzs, Qs, sampling_rate):
 # Hzs               Frequencies to apply notch filters to
 # Qs                Q-factors of notch filters
 # special_cases     Additional optional special case notch filters
-def NotchFilterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None):
+def NotchFilterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=None):    
 
     # Iterate through each RAW folder
     for raw in os.listdir(in_data):
@@ -101,9 +105,88 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, Hzs, Qs, special_cases=
 # =============================================================================
 #
 
-# Put bandpass filter function here 
-def BandpassFilterSignals():
-    return
+# Apply a bandpass filter to data given the upper and lower frequency
+#
+# data              Data to apply the bandpass filter to
+# col               Column of [data] to apply the bandpass filter to
+# high              Upper frequency of the bandpass filter
+# low               Lower frequency of the bandpass filter
+# sampling_rate     Sampling rate of [data]
+def ApplyBandpassFilter(data, col, low, high, sampling_rate):
+    data = data.copy()
+    # Here, the "5" is the order of the butterworth filter
+    # (how quickly the signal is cut off)
+    b, a = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band')
+    data[col] = scipy.signal.lfilter(b, a, data[col])
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply a full wave rectifier to data
+#
+# data  Data to apply the FWR to
+# col   Column of [data] to apply the FWR to
+def ApplyFWR(data, col):
+    data = data.copy()
+    data[col] = np.abs(data[col])
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply a boxcar smoothing filter to data given a window size
+#
+# Performs a rolling average using the window size
+#
+# data          Data to apply the filter to
+# col           Column of [data] to apply the filter to
+# window_size   Size of the window
+def ApplyBoxcarSmooth(data, col, window_size):
+    data = data.copy()
+    window = np.ones(window_size) / float(window_size)
+    data[col] = np.convolve(data[col], window, 'same')
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply an RMS smoothing filter to data given a window size
+#
+# Squares the data, performs a rolling average using the
+# window size, then takes the root
+#
+# data          Data to apply the filter to
+# col           Column of [data] to apply the filter to
+# window_size   Size of the window
+def ApplyRMSSmooth(data, col, window_size):
+    data = data.copy()
+    data[col] = np.power(data[col], 2)
+    window = np.ones(window_size) / float(window_size)
+    data[col] = np.sqrt(np.convolve(data[col], window, 'same'))
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply a loess smoothing filter to data
+#
+# Performs a rolling average average using the window size,
+# weighted using a Gaussian distribution of a given sigma
+#
+# data
+# col
+# window_size
+# sigma
+def ApplyLoessSmooth(data, col, window_size, sigma=1):
+    data = data.copy()
+    window = cv2.getGaussianKernel(window_size, sigma).transpose()[0]
+    data[col] = np.convolve(data[col], window, 'same')
+    return data
 
 #
 # =============================================================================
@@ -139,4 +222,4 @@ if __name__ == '__main__':
                [ 25])
     }
     
-    NotchFilterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)
+    #NotchFilterSignals(in_data, out_data, sampling_rate, Hzs, Qs, special_cases)
