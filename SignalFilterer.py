@@ -146,7 +146,9 @@ def ApplyFWR(data, col):
 # window_size   Size of the window
 def ApplyBoxcarSmooth(data, col, window_size):
     data = data.copy()
+    # Construct kernel
     window = np.ones(window_size) / float(window_size)
+    # Convolve
     data[col] = np.convolve(data[col], window, 'same')
     return data
 
@@ -164,8 +166,11 @@ def ApplyBoxcarSmooth(data, col, window_size):
 # window_size   Size of the window
 def ApplyRMSSmooth(data, col, window_size):
     data = data.copy()
+    # Square
     data[col] = np.power(data[col], 2)
+    # Construct kernel
     window = np.ones(window_size) / float(window_size)
+    # Convolve and square root
     data[col] = np.sqrt(np.convolve(data[col], window, 'same'))
     return data
 
@@ -173,19 +178,64 @@ def ApplyRMSSmooth(data, col, window_size):
 # =============================================================================
 #
 
-# Apply a loess smoothing filter to data
+# Apply a Gaussian smoothing filter to data
 #
-# Performs a rolling average average using the window size,
-# weighted using a Gaussian distribution of a given sigma
+# Performs a rolling average average using the window size
+# using a Gaussian weight
 #
-# data
-# col
-# window_size
-# sigma
-def ApplyLoessSmooth(data, col, window_size, sigma=1):
+# data          Data to apply the filter to
+# col           Column of [data] to apply the filter to
+# window_size   Size of the window
+# sigma         Sigma value of the Gaussian filter
+def ApplyGaussianSmooth(data, col, window_size, sigma=1):
     data = data.copy()
+    # Construct kernel
     window = cv2.getGaussianKernel(window_size, sigma).transpose()[0]
+    # Convolve
     data[col] = np.convolve(data[col], window, 'same')
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply a Loess smoothing filter to data
+#
+# Performs a rolling average using the window size
+# using a tri-cubic weight
+#
+# data          Data to apply the filter to
+# col           Column of [data] to apply the filter to
+# window_size   Size of the window
+def ApplyLoessSmooth(data, col, window_size):
+    data = data.copy()
+    # Construct kernel
+    window = np.linspace(-1,1,window_size+1,endpoint=False)[1:]
+    window = np.array(list(map(lambda x: (1 - np.abs(x) ** 3) ** 3, window)))
+    window = window / np.sum(window)
+    # Convolve
+    data[col] = np.convolve(data[col], window, 'same')
+    return data
+
+#
+# =============================================================================
+#
+
+# Apply a spline smoothing approximation to data
+#
+# Finds a 5th degree spline and smooths it to fit
+#
+#
+def ApplySplineSmooth(data, col, s):
+    data = data.copy()
+    # Get x/y data
+    x = data['Time']
+    y = data[col]
+    # Create spline
+    tck = scipy.interpolate.splrep(x, y, s=s, k=5)
+    # Predict new y-values
+    y_new = scipy.interpolate.BSpline(*tck)(x)
+    data[col] = y_new
     return data
 
 #
