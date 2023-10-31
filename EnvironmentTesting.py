@@ -15,10 +15,10 @@ Hzs = [50, 150, 250, 350, 450, 400, 550, 650, 750, 850, 950]
 Qs =  [ 5,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
 
 # Sample subjects
-s10_1 = 'Data/Raw-Data/Raw_PID_01-10/10/10-01-01.csv'
-s10_2 = 'Data/Raw-Data/Raw_PID_01-10/10/10-02-01.csv'
-s10_3 = 'Data/Raw-Data/Raw_PID_01-10/10/10-03-01.csv'
-s24_7 = 'Data/Raw-Data/Raw_PID_21-30/24/24-07-03.csv'
+s10_1 = 'Data/01_Raw/Raw_PID_01-10/10/10-01-01.csv'
+s10_2 = 'Data/01_Raw/Raw_PID_01-10/10/10-02-01.csv'
+s10_3 = 'Data/01_Raw/Raw_PID_01-10/10/10-03-01.csv'
+s24_7 = 'Data/01_Raw/Raw_PID_21-30/24/24-07-03.csv'
 
 #
 # =============================================================================
@@ -28,40 +28,21 @@ s24_7 = 'Data/Raw-Data/Raw_PID_21-30/24/24-07-03.csv'
 test_data = pd.read_csv(s10_1)
 test_data = SignalFilterer.ApplyNotchFilters(test_data, 'EMG_zyg', Hzs, Qs, sr)
 test_data = SignalFilterer.ApplyBandpassFilter(test_data, 'EMG_zyg', 20, 450, sr)
-test_data = SignalFilterer.ApplyFWR(test_data, 'EMG_zyg')
+#test_data = SignalFilterer.ApplyFWR(test_data, 'EMG_zyg')
+#test_data = SignalFilterer.ApplyRMSSmooth(test_data, 'EMG_zyg', 50)
+#test_data = SignalFilterer.ApplyBandpassFilter(test_data, 'EMG_zyg', 20, 450, sr)
 
-# Apply different smoothing filters and create plots
-fig, axs = plt.subplots(1, 5, figsize=(15*5,15), sharey=True)
 
-RMS_smooth = SignalFilterer.ApplyRMSSmooth(test_data, 'EMG_zyg', 50)
-axs[0].plot(RMS_smooth['Time'], RMS_smooth['EMG_zyg'])
-axs[0].set_title('EMG_zyg - RMS smoothing filter')
-axs[0].set_ylabel('Voltage (mV)')
-axs[0].set_xlabel('Time (s)')
+plt.plot(test_data['Time'], test_data['EMG_zyg'])
+plt.ylabel('Power (mV)')
+plt.xlabel('Time (s)')
+plt.show()
 
-boxcar_smooth = SignalFilterer.ApplyBoxcarSmooth(test_data, 'EMG_zyg', 50)
-axs[1].plot(boxcar_smooth['Time'], boxcar_smooth['EMG_zyg'])
-axs[1].set_title('EMG_zyg - Boxcar smoothing filter')
-axs[1].set_ylabel('Voltage (mV)')
-axs[1].set_xlabel('Time (s)')
+psd_zyg = nk.signal_psd(test_data['EMG_zyg'], sampling_rate=sr)
 
-gaussian_smooth = SignalFilterer.ApplyGaussianSmooth(test_data, 'EMG_zyg', 50)
-axs[2].plot(gaussian_smooth['Time'], gaussian_smooth['EMG_zyg'])
-axs[2].set_title('EMG_zyg - Gaussian smoothing filter')
-axs[2].set_ylabel('Voltage (mV)')
-axs[2].set_xlabel('Time (s)')
+val = SignalFilterer.CalcSpecFlux(test_data, test_data, 'EMG_zyg', 'EMG_zyg', sr, sr)
+print(val)
 
-loess_smooth = SignalFilterer.ApplyLoessSmooth(test_data, 'EMG_zyg', 50)
-axs[3].plot(loess_smooth['Time'], loess_smooth['EMG_zyg'])
-axs[3].set_title('EMG_zyg - Loess smoothing filter')
-axs[3].set_ylabel('Voltage (mV)')
-axs[3].set_xlabel('Time (s)')
-
-spline_smooth = SignalFilterer.ApplySplineSmooth(test_data, 'EMG_zyg', 1)
-axs[4].plot(spline_smooth['Time'], spline_smooth['EMG_zyg'])
-axs[4].set_title('EMG_zyg - Spline smoothing filter')
-axs[4].set_ylabel('Voltage (mV)')
-axs[4].set_xlabel('Time (s)')
-
-fig.suptitle('EMG_zyg - Smoothing comparisons')
-fig.savefig('Plots/SmoothingMethods/Comparison.jpg')
+print(np.array(psd_zyg['Power']) + 4)
+plt.plot(psd_zyg['Frequency'], psd_zyg['Power'])
+plt.show()

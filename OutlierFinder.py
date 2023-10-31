@@ -16,6 +16,13 @@ warnings.filterwarnings('ignore')
 # =============================================================================
 #
 
+# A collection of functions for finding outliers while
+# testing
+
+#
+# =============================================================================
+#
+
 # Get a list of filenames of outliers from the cleaned data using
 # a threshold value (that many times the median)
 def FindOutliers(in_data, sampling_rate, threshold):

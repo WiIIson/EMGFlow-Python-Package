@@ -14,6 +14,12 @@ warnings.filterwarnings('ignore')
 # =============================================================================
 #
 
+# A collection of functions for plotting subject data
+
+#
+# =============================================================================
+#
+
 # Zooms in on a set frequency range in a PSD plot
 #
 # data  PSD data to zoom in on
@@ -23,6 +29,29 @@ def ZoomIn(data, a, b):
     data = data[data['Frequency'] >= a]
     data = data[data['Frequency'] <= b]
     return data
+
+#
+# =============================================================================
+#
+
+def PlotInspectSignal(data, col, sampling_rate):
+    fig, axs = plt.subplots(1, 2, figsize=(15*2,15))
+
+    axs[0].plot(data['Time'], data[col])
+    axs[0].set_title(col + ' - Clean')
+    axs[0].set_ylabel('Voltage (mV)')
+    axs[0].set_xlabel('Time (s)')
+
+    psd_col = nk.signal_psd(data[col], sampling_rate=sampling_rate, normalize=False)
+
+    axs[1].plot(psd_col['Frequency'], psd_col['Power'])
+    axs[1].set_title(col + ' - PSD')
+    axs[1].set_ylabel('Voltage (mV)')
+    axs[1].set_xlabel('Frequency (Hz)')
+
+    fig.suptitle('Inspection of ' + col)
+    plt.show()
+    return
 
 #
 # =============================================================================
@@ -151,7 +180,7 @@ def PlotCompareSubject(in_data, out_data, sampling_rate, Hzs, Qs, subjects, spec
                         data = pd.read_csv(in_file)
                         
                         # Create subplots
-                        fig, axs = plt.subplots(2, 2, figsize=(15,15))
+                        fig, axs = plt.subplots(2, 2, figsize=(15*2,15))
                         
                         # Plot 'before' PSD graphs
                         psd_zyg = nk.signal_psd(data['EMG_zyg'], sampling_rate=sampling_rate)
@@ -233,7 +262,7 @@ def PlotAllSubject(in_data, out_data, sampling_rate, zoom=True):
                         psd_cor = ZoomIn(psd_cor, 20, 450)
                     
                     # Create plots
-                    fig, axs = plt.subplots(1, 2, figsize=(15,15))
+                    fig, axs = plt.subplots(1, 2, figsize=(15*2,15))
                     axs[0].plot(psd_zyg['Frequency'], psd_zyg['Power'])
                     axs[1].plot(psd_cor['Frequency'], psd_cor['Power'])
                     
