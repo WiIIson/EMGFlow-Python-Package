@@ -25,24 +25,18 @@ s24_7 = 'Data/01_Raw/Raw_PID_21-30/24/24-07-03.csv'
 #
 
 # Load and clean data
-test_data = pd.read_csv(s10_1)
-test_data = SignalFilterer.ApplyNotchFilters(test_data, 'EMG_zyg', Hzs, Qs, sr)
-test_data = SignalFilterer.ApplyBandpassFilter(test_data, 'EMG_zyg', 20, 450, sr)
-#test_data = SignalFilterer.ApplyFWR(test_data, 'EMG_zyg')
-#test_data = SignalFilterer.ApplyRMSSmooth(test_data, 'EMG_zyg', 50)
-#test_data = SignalFilterer.ApplyBandpassFilter(test_data, 'EMG_zyg', 20, 450, sr)
+test_data1 = pd.read_csv(s10_1)
+test_data2 = pd.read_csv(s10_3)
 
 
-plt.plot(test_data['Time'], test_data['EMG_zyg'])
-plt.ylabel('Power (mV)')
-plt.xlabel('Time (s)')
-plt.show()
+ans1 = SignalFilterer.CalcSpecFlux(test_data1, 0.5, 'EMG_cor', sr)
 
-psd_zyg = nk.signal_psd(test_data['EMG_zyg'], sampling_rate=sr)
+print(ans1)
 
-val = SignalFilterer.CalcSpecFlux(test_data, test_data, 'EMG_zyg', 'EMG_zyg', sr, sr)
-print(val)
+ans2 = SignalFilterer.CalcSpecFlux(test_data2, 0.5, 'EMG_cor', sr)
 
-print(np.array(psd_zyg['Power']) + 4)
-plt.plot(psd_zyg['Frequency'], psd_zyg['Power'])
-plt.show()
+print(ans2)
+
+ans3 = SignalFilterer.CalcSpecFlux(test_data1, test_data2, 'EMG_cor', sr)
+
+print(ans3)

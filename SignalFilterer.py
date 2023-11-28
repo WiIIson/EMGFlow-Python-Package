@@ -72,57 +72,6 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
 # =============================================================================
 #
 
-# Applies notch filters to provided raw data and saves resulting
-# notch-filtered data
-#
-# in_path           Filepath for raw data folder
-# out_path          Filepath for notch-filtered data folder
-# sampling_rate     Sampling rate of files
-# notch_vals        Notch filter parameters: (Hz, Q) tuples, Hz = frequency,
-#                   Q = Q-score
-# special_cases     Additional optional special case notch filters
-def PADS_NotchFilterSignals(in_path, out_path, sampling_rate, notch_vals, special_cases=None):    
-
-    # Iterate through each RAW folder
-    for raw in os.listdir(in_path):
-        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
-            in_raw = in_path + raw + '/'
-            out_raw = out_path + raw + '/'
-            
-            # Iterate through each person folder
-            for person in os.listdir(in_raw):
-                print("Writing files for subject", person, "...")
-                in_person = in_raw + person + '/'
-                out_person = out_raw + person
-                
-                # Iterate through each phsiological data file
-                for file in os.listdir(in_person):
-                    in_file = in_person + file
-                    out_file = out_person + '/' + file
-                    
-                    # Get data and apply notch filter
-                    data = pd.read_csv(in_file)
-                    data = ApplyNotchFilters(data, 'EMG_zyg', sampling_rate, notch_vals)
-                    data = ApplyNotchFilters(data, 'EMG_cor', sampling_rate, notch_vals)
-                    
-                    # Apply 'special cases' notch filters
-                    if special_cases is not None:
-                        if person in special_cases.keys():
-                            p_notch_vals = special_cases[person]
-                            data = ApplyNotchFilters(data, 'EMG_zyg', sampling_rate, p_notch_vals)
-                            data = ApplyNotchFilters(data, 'EMG_cor', sampling_rate, p_notch_vals)
-                    
-                    # Save results
-                    os.makedirs(out_person, exist_ok=True)    # Create subirectories if they do not exist
-                    data.to_csv(out_file, index=False)        # Save output
-    
-    print('Done.')
-    return
-
-#
-# =============================================================================
-#
-
 # Apply notch filters to all signals contained within a
 # folder for specified columns and 
 #
@@ -134,7 +83,10 @@ def PADS_NotchFilterSignals(in_path, out_path, sampling_rate, notch_vals, specia
 # expression        Regular expression, if left none will apply notch filters
 #                   to all files, but if entered, will only apply to files
 #                   whose names match the pattern
-def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expression=None):
+# exp_copy          If True, copies files that don't match [expression] to
+#                   the output folder
+# file_ext          File extension to use (defaults to csv)
+def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     
     # Convert paths to absolute
     if not os.path.isabs(in_path):
@@ -149,7 +101,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
             if os.path.exists(in_path + file + '\\'):
                 subDir = MapFiles(in_path + file + '\\')
                 filedirs.update(subDir)
-            elif (file[-3:] == 'csv') and ((expression is None) or (re.match(expression, file))):
+            elif (file[-len(file_ext):] == file_ext) and ((expression is None) or exp_copy or (re.match(expression, file))):
                 filedirs[file] = in_path + file
         return filedirs
     
@@ -158,7 +110,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     
     # Apply transformations
     for file in tqdm(filedirs):
-        if (file[-3:] == 'csv') and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             # Read file
             data = pd.read_csv(filedirs[file])
             
@@ -176,6 +128,14 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
             out_folder = out_file[:len(out_file) - len(file)]
             
             # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = pd.read_csv(filedirs[file])
+            out_file = out_path + filedirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
     
@@ -206,47 +166,19 @@ def ApplyBandpassFilter(data, col, sampling_rate, low, high):
 
 # Clean signals by applying a bandpass filter
 #
-# in_path           Filepath for notch-filtered data folder
-# out_path          Filepath for clean data folder
-# sampling_rate     Sampling rate of files
+# in_path           Path to folder containing input data
+# out_path          Path to folder for output data
+# sampling_rate     Sampling rate of data
 # low               Lower frequency limit for bandpass filter
 # high              Upper frequency limit for bandpass filter
-def PADS_BandpassFilterSignals(in_path, out_path, sampling_rate, low, high):    
-
-    # Iterate through each RAW folder
-    for raw in os.listdir(in_path):
-        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
-            in_raw = in_path + raw + '/'
-            out_raw = out_path + raw + '/'
-            
-            # Iterate through each person folder
-            for person in os.listdir(in_raw):
-                print("Writing files for subject", person, "...")
-                in_person = in_raw + person + '/'
-                out_person = out_raw + person
-                
-                # Iterate through each phsiological data file
-                for file in os.listdir(in_person):
-                    in_file = in_person + file
-                    out_file = out_person + '/' + file
-                    
-                    # Get data, apply bandpass filter and RMS cleaning
-                    data = pd.read_csv(in_file)
-                    data = ApplyBandpassFilter(data, 'EMG_zyg', sampling_rate, low, high)
-                    data = ApplyBandpassFilter(data, 'EMG_cor', sampling_rate, low, high)
-                    
-                    # Save results
-                    os.makedirs(out_person, exist_ok=True)    # Create subirectories if they do not exist
-                    data.to_csv(out_file, index=False)        # Save output
-    
-    print('Done.')
-    return
-
-#
-# =============================================================================
-#
-
-def BandpassFilterSignals(in_path, out_path, sampling_rate, low, high, cols=None, expression=None, quiet=False):
+# cols              Columns bandpass filter is applied to
+# expression        Regular expression, if left none will apply
+#                   to all files, but if entered, will only apply to files
+#                   whose names match the pattern
+# exp_copy          If True, copies files that don't match [expression] to
+#                   the output folder
+# file_ext          File extension to use (defaults to csv)
+def BandpassFilterSignals(in_path, out_path, sampling_rate, low, high, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     
     # Convert paths to absolute
     if not os.path.isabs(in_path):
@@ -261,29 +193,45 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low, high, cols=None
             if os.path.exists(in_path + file + '\\'):
                 subDir = MapFiles(in_path + file + '\\')
                 filedirs.update(subDir)
-            elif (file[-3:] == 'csv') and ((expression is None) or (re.match(expression, file))):
+            elif (file[-len(file_ext):] == file_ext) and ((expression is None) or exp_copy or (re.match(expression, file))):
                 filedirs[file] = in_path + file
         return filedirs
     
     # Get dictionary of file locations
     filedirs = MapFiles(in_path)
     
-    for file in os.listdir(in_path):
-        
-        # Handle file
-        if os.path.exists(in_path + file + '/'):
-            BandpassFilterSignals(in_path + file + '/', out_path + file + '/', sampling_rate, low, high)
-        
-        # Handle CSV
-        elif file[-3:] == 'csv':
-            # Apply filters to file
-            data = pd.read_csv(in_path + file)
-            data = ApplyBandpassFilter(data, 'EMG_zyg', sampling_rate, low, high)
-            data = ApplyBandpassFilter(data, 'EMG_cor', sampling_rate, low, high)
+    # Apply transformations
+    for file in tqdm(filedirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
-            # Save results
-            os.makedirs(out_path, exist_ok=True)
-            data.to_csv(out_path + file, index=False)
+            # Read file
+            data = pd.read_csv(filedirs[file])
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                cols.remove('Time')
+              
+            # Apply filter to columns
+            for col in cols:
+                data = ApplyBandpassFilter(data, col, sampling_rate, low, high)
+            
+            # Construct out path
+            out_file = out_path + filedirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = pd.read_csv(filedirs[file])
+            out_file = out_path + filedirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
     return
 
 #
@@ -387,65 +335,70 @@ def ApplyLoessSmooth(data, col, window_size):
 # =============================================================================
 #
 
-# Clean signals by applying an RMS smoothing filter
-#
-# in_path           Filepath for notch-filtered data folder
-# out_path          Filepath for clean data folder
-# sampling_rate     Sampling rate of files
-# low               Lower frequency limit for bandpass filter
-# high              Upper frequency limit for bandpass filter
-def PADS_RMSFilterSignals(in_path, out_path, sampling_rate, window_size):    
+# Applies a smoothing filter to a provided subfolder
 
-    # Iterate through each RAW folder
-    for raw in os.listdir(in_path):
-        if re.search('PID_[0-9]{2}-[0-9]{2}$', raw):
-            in_raw = in_path + raw + '/'
-            out_raw = out_path + raw + '/'
-            
-            # Iterate through each person folder
-            for person in os.listdir(in_raw):
-                print("Writing files for subject", person, "...")
-                in_person = in_raw + person + '/'
-                out_person = out_raw + person
-                
-                # Iterate through each phsiological data file
-                for file in os.listdir(in_person):
-                    in_file = in_person + file
-                    out_file = out_person + '/' + file
-                    
-                    # Get data, apply bandpass filter and RMS cleaning
-                    data = pd.read_csv(in_file)
-                    data = ApplyRMSSmooth(data, 'EMG_zyg', window_size)
-                    data = ApplyRMSSmooth(data, 'EMG_cor', window_size)
-                    
-                    # Save results
-                    os.makedirs(out_person, exist_ok=True)    # Create subirectories if they do not exist
-                    data.to_csv(out_file, index=False)        # Save output
+def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms'):  
     
-    print('Done.')
-    return
-
-#
-# =============================================================================
-#
-
-def RMSFilterSignals(in_path, out_path, sampling_rate, window_size):  
-    for file in os.listdir(in_path):
-        
-        # Handle file
-        if os.path.exists(in_path + file + '/'):
-            RMSFilterSignals(in_path + file + '/', out_path + file + '/', sampling_rate, window_size)
-        
-        # Handle CSV
-        elif file[-3:] == 'csv':
-            # Apply filters to file
-            data = pd.read_csv(in_path + file)
-            data = ApplyRMSSmooth(data, 'EMG_zyg', window_size)
-            data = ApplyRMSSmooth(data, 'EMG_cor', window_size)
+    # Convert paths to absolute
+    if not os.path.isabs(in_path):
+        in_path = os.path.abspath(in_path) + '\\'
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path) + '\\'
+    
+    # Generates a dictionary of file names and locations
+    def MapFiles(in_path, expression=expression):
+        filedirs = {}
+        for file in os.listdir(in_path):
+            if os.path.exists(in_path + file + '\\'):
+                subDir = MapFiles(in_path + file + '\\')
+                filedirs.update(subDir)
+            elif (file[-len(file_ext):] == file_ext) and ((expression is None) or exp_copy or (re.match(expression, file))):
+                filedirs[file] = in_path + file
+        return filedirs
+    
+    # Get dictionary of file locations
+    filedirs = MapFiles(in_path)
+    
+    # Apply transformations
+    for file in tqdm(filedirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
-            # Save results
-            os.makedirs(out_path, exist_ok=True)
-            data.to_csv(out_path + file, index=False)
+            # Read file
+            data = pd.read_csv(filedirs[file])
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                cols.remove('Time')
+              
+            # Apply filter to columns
+            for col in cols:
+                if method == 'rms':
+                    data = ApplyRMSSmooth(data, col, window_size)
+                elif method == 'boxcar':
+                    data = ApplyBoxcarSmooth(data, col, window_size)
+                elif method == 'guass':
+                    data = ApplyGaussianSmooth(data, col, window_size)
+                elif method == 'loess':
+                    data = ApplyLoessSmooth(data, col, window_size)
+                else:
+                    raise Exception('Invalid smoothing method used: ', method, ', use "rms", "boxcar", "gauss" or "loess"')
+                
+            # Construct out path
+            out_file = out_path + filedirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+        
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = pd.read_csv(filedirs[file])
+            out_file = out_path + filedirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
     return
 
 #
@@ -486,16 +439,35 @@ def MergePerceptual(in_path, out_path):
 #
 
 # Calculate the spectral flux of a signal
-def CalcSpecFlux(Signal, col, sr, p=0.5):
+
+# diff       Divisor of the calculation, if given a percentage, it will
+#           calculate the spectral flux  of the spectral density up to that
+#           percent by the spectral density past that percent. If given
+#           another signal, it will take the spectral density of the first
+#           signal by the second signal
+# diff_sr    Sampling rate of div if div is a signal
+def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
     
-    # Find column divider index
-    div = int(len(Signal[col]) * p)
+    # Separate Signal1 by div and find spectral flux
+    if isinstance(diff, float):
+        # Find column divider index
+        diff_ind = int(len(Signal1[col]) * diff)
+        # Take the PSD of each signal
+        psd1 = nk.signal_psd(Signal1[col][:diff_ind], sampling_rate=sr)
+        psd2 = nk.signal_psd(Signal1[col][diff_ind:], sampling_rate=sr)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
+        
+    # Find spectral flux of Signal1 by div
+    elif isinstance(diff, pd.DataFrame):
+        # Verify div sampling rate
+        if diff_sr == None: diff_sr = sr
+        # Take the PSD of each signal
+        psd1 = nk.signal_psd(Signal1[col], sampling_rate=sr)
+        psd2 = nk.signal_psd(diff[col], sampling_rate=diff_sr)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
-    # Take the PSD of each signal
-    psd1 = nk.signal_psd(Signal[col][:div], sampling_rate=sr)
-    psd2 = nk.signal_psd(Signal[col][div:], sampling_rate=sr)
-    # Calculate the spectral flux
-    flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     return flux
 
 #
@@ -1060,39 +1032,176 @@ def PADS_AnalyzeSignals(in_bandpass, in_smooth, in_perceptual, out_path, samplin
 #
 
 # Analyze signals by performing a collection of analyses on them
-def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, perceptual=None):
+
+# short_name <- if true uses filename as File_ID instead of filepath
+
+def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     
+    # Convert paths to absolute
+    if not os.path.isabs(in_bandpass):
+        in_bandpass = os.path.abspath(in_bandpass) + '\\'
+    if not os.path.isabs(in_smooth):
+        in_bandpass = os.path.abspath(in_smooth) + '\\'
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path) + '\\'
     
-    def MapFiles(in_path):
+    # Generates a dictionary of file names and locations
+    def MapFiles(in_path, expression=expression):
         filedirs = {}
         for file in os.listdir(in_path):
-            if os.path.exists(in_path + file + '/'):
-                subDir = MapFiles(in_path + file + '/')
+            if os.path.exists(in_path + file + '\\'):
+                subDir = MapFiles(in_path + file + '\\')
                 filedirs.update(subDir)
-            elif file[-3:] == 'csv':
+            elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
                 filedirs[file] = in_path + file
         return filedirs
+    
+    # Directories don't have to have the same file structure, but
+    # Must have files with the same name
+    filedirs_b = MapFiles(in_bandpass, expression=expression)
+    filedirs_s = MapFiles(in_smooth, expression=expression)
+    
+    # List of measure names
+    measure_names = [
+        'Min',
+        'Max',
+        'Mean',
+        'SD',
+        'Skew',
+        'Kurtosis',
         
-    #for file in os.listdir(in_smooth):
-    #    
-    #    # Handle file
-    #    if os.path.exists(in_smooth + file + '/'):
-    #        RMSFilterSignals(in_bandpass + file + '/', in_smooth + file + '/', out_path + file + '/')
-    #    
-    #    # Handle CSV
-    #    elif file[-3:] == 'csv':
-    #        
-    #        
-    #        # Save results
-    #        os.makedirs(out_path, exist_ok=True)
-    #        data.to_csv(out_path + file, index=False)
-    #return
+        'IEMG',
+        'MAV',
+        'MMAV1',
+        'SSI',
+        'VAR',
+        'VOrder',
+        'RMS',
+        'WL',
+        'LOG',
+        'MFL',
+        'AP',
+        
+        'Max_Freq',
+        'Twitch_Ratio',
+        'Twitch_Index',
+        'Twitch_Slope_Fast',
+        'Twitch_Slope_Slow',
+        'Spec_Centroid',
+        'Spec_Flatness',
+        'Spec_Spread',
+        'Spec_Decrease',
+        'Spec_Entropy',
+        'Spec_Rolloff',
+        'Spec_Bandwidth'
+    ]
+    
+    # Read the first file to get column names
+    if cols == None:
+        path1 = next(iter(filedirs_s.values()))
+        data1 = pd.read_csv(path1)
+        cols = list(data1.columns)
+        cols.remove('Time')
+    
+    
+    # Create row labels
+    df_names = ['File_ID']
+    for col in cols:
+        for measure in measure_names:
+            df_names.append(col + '_' + measure)
+    
+    SignalDF = pd.DataFrame(columns=df_names)
+    
+    # Apply transformations
+    for file in tqdm(filedirs_b):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
-    filedirs = MapFiles(in_bandpass)
+            # Read file
+            data_b = pd.read_csv(filedirs_b[file])
+            data_s = pd.read_csv(filedirs_s[file])
+                    
+            # Calculate ID
+            if short_name:
+                File_ID = file
+            else:
+                File_ID = filedirs_s[file]
+             
+            df_vals = [File_ID]
+            # Evaluate the measures of each column
+            for col in cols:
+                
+                # Calculate time-series measures
+                Min = np.min(data_s[col])
+                Max = np.max(data_s[col])
+                Mean = np.mean(data_s[col])
+                SD = np.std(data_s[col])
+                Skew = scipy.stats.skew(data_s[col])
+                Kurtosis = scipy.stats.kurtosis(data_s[col])
+                IEMG = CalcIEMG(data_s, col, sampling_rate)
+                MAV = CalcMAV(data_s, col)
+                MMAV1 = CalcMMAV1(data_s, col)
+                SSI = CalcSSI(data_s, col, sampling_rate)
+                VAR = CalcVAR(data_s, col)
+                VOrder = CalcVOrder(data_s, col)
+                RMS = CalcRMS(data_s, col)
+                WL = CalcWL(data_s, col)
+                LOG = CalcLOG(data_s, col)
+                MFL = CalcMFL(data_s, col)
+                AP = CalcAP(data_s, col)
     
-    for key in filedirs:
-        print(key, ":", filedirs[key])
-    
+                # Calculate spectral features
+                psd = nk.signal_psd(data_b[col], sampling_rate=sampling_rate)
+                Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
+                Twitch_Ratio = CalcTwitchRatio(psd)
+                Twitch_Index = CalcTwitchIndex(psd)
+                Fast_Twitch_Slope, Slow_Twitch_Slope = CalcTwitchSlope(psd)
+                Spectral_Centroid = CalcSC(psd)
+                Spectral_Flatness = CalcSF(psd)
+                Spectral_Spread = CalcSS(psd)
+                Spectral_Decrease = CalcSDec(psd)
+                Spectral_Entropy = CalcSEntropy(psd)
+                Spectral_Rolloff = CalcSRoll(psd)
+                Spectral_Bandwidth = CalcSBW(psd, 2)
+                
+                # Append to list of values
+                col_vals = [
+                    Min,
+                    Max,
+                    Mean,
+                    SD,
+                    Skew,
+                    Kurtosis,
+                    IEMG,
+                    MAV,
+                    MMAV1,
+                    SSI,
+                    VAR,
+                    VOrder,
+                    RMS,
+                    WL,
+                    LOG,
+                    MFL,
+                    AP,
+                    Max_Freq,
+                    Twitch_Ratio,
+                    Twitch_Index,
+                    Fast_Twitch_Slope,
+                    Slow_Twitch_Slope,
+                    Spectral_Centroid,
+                    Spectral_Flatness,
+                    Spectral_Spread,
+                    Spectral_Decrease,
+                    Spectral_Entropy,
+                    Spectral_Rolloff,
+                    Spectral_Bandwidth
+                ]
+                
+                df_vals = df_vals + col_vals
+            
+            # Add values to the dataframe
+            SignalDF.loc[len(SignalDF.index)] = df_vals
+            
+    SignalDF.to_csv(out_path + 'Features.csv', index=False)
     return
 #
 # =============================================================================
@@ -1113,46 +1222,24 @@ if __name__ == '__main__':
     smooth_path = 'Data/04_Smooth/'
     feature_path = 'Data/05_Feature/'
     perceptual_file = 'Data/05_Feature/Perceptual_Data.csv'
+    test_path = 'Data/Test/'
     
     sampling_rate = 2000            # Sampling rate
-    
-    # Frequencies to filter, and their respective intensities
-    Hzs = [50, 150, 250, 350, 450, 400, 550, 650, 750, 850, 950]
-    Qs =  [ 5,  25,  25,  25,  25,  25,  25,  25,  25,  25,  25]
-    
-    # Bind Hz and Q values to (Hz, Q) tuples
-    notch_vals = []
-    for i in range(len(Hzs)):
-        notch_val = (Hzs[i], Qs[i])
-        notch_vals.append(notch_val)
-        
-    # The special cases are additional notch filters to be applied
-    # only to specific subjects
-    
-    special_cases = {
-        # subjectNum: ([Hzs ...],
-        #              [ Qs ...])
-        '08': ([317],
-               [ 25]),
-        '11': ([317],
-               [ 25])
-    }
-    
+    notch_vals = [(50,5), (150,25), (250,25), (350,25), (400,25), (450,25), (550,25), (650,25), (750,25), (850,25), (950,25)]
     notch_sc = [(317, 25)]
-    reg = ['^08', '^11']
+    reg = "^(08|11)"
     
     cols = ['EMG_zyg', 'EMG_cor']
     
     # Old PADS pipeline
     #MergePerceptual(perceptual_path, feature_path)
-    #PADS_NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, special_cases)
-    #PADS_BandpassFilterSignals(notch_path, bandpass_path, sampling_rate, 20, 450)
     #PADS_RMSFilterSignals(bandpass_path, smooth_path, sampling_rate, 50)
     #PADS_AnalyzeSignals(bandpass_path, smooth_path, perceptual_file, feature_path, sampling_rate)
     
-    # Package pipeline
-    NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
-    NotchFilterSignals(notch_path, notch_s_path, sampling_rate, notch_sc, cols, expression="^(08|11)")
-    #BandpassFilterSignals(notch_s_path, bandpass_path, sampling_rate, 20, 450)
-    #RMSFilterSignals(bandpass_path, smooth_path, sampling_rate, 50)
-    #AnalyzeSignals(bandpass_path, smooth_path, perceptual_file, feature_path, sampling_rate)
+    # PADS pipeline
+    #NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols, exp_copy=True)
+    #NotchFilterSignals(notch_path, notch_s_path, sampling_rate, notch_sc, cols, expression=reg, exp_copy=True)
+    #BandpassFilterSignals(notch_s_path, bandpass_path, sampling_rate, 20, 450, cols, exp_copy=True)
+    #SmoothFilterSignals(bandpass_path, smooth_path, sampling_rate, 50, exp_copy=True)
+    AnalyzeSignals(bandpass_path, smooth_path, feature_path, sampling_rate, cols=cols)
+    
