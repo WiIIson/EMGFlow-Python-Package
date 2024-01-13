@@ -12,42 +12,44 @@ from SignalFilterer import ConvertMapFiles
 # =============================================================================
 #
 
-# A collection of functions for plotting subject data
-
-#
-# =============================================================================
-#
-
-# Zooms in on a set frequency range in a PSD plot
-#
-# data  PSD data to zoom in on
-# a     Lower frequency range
-# b     Upper frequency range
-def ZoomIn(data, a, b):
-    data = data[data['Frequency'] >= a]
-    data = data[data['Frequency'] <= b]
-    return data
+"""
+A collection of functions for plotting subject data
+"""
 
 #
 # =============================================================================
 #
 
 # NOTE: Make this plot both the PSD **AND** signal
-
-
-# Plot PSD of provided columns in the data
-#
-# in_path           Filepath for data to plot
-# out_path          Output for plots
-# sampling_rate     Sampling rate of EMG data
-# cols              Columns to plot
-# p                 Set to a percentage to introduce random sampling
-#                   of files
-# expression        If left none, will plot from all samples, but if set,
-#                   will only plot from files whose names match the
-#                   regular expression
-# file_ext          File extension to read
 def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression=None, file_ext='csv'):
+    """
+    Generate plots of the PSDs of each column of Signals in a directory
+
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read Signal files.
+    out_path : str
+        Filepath to an output directory.
+    sampling_rate : float
+        Sampling rate of the Signals.
+    cols : list, optional
+        List of columns of the Signal to plot. The default is None, in which case every column except
+        'time' is plotted.
+    p : float, optional
+        Random sampling probability. If given a percentage, will have that probability to plot
+        each Signal. The default is None, in which case all Signals are plotted.
+    expression : str, optional
+        A regular expression. If provided, will only generate plots for files whose names match the regular
+        expression. The default is None.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+
+    Returns
+    -------
+    None.
+
+    """
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
@@ -60,7 +62,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Randomly create signal plots if requested
-            if (p is not None) and (random.random() < p):
+            if (p is None) or (random.random() < p):
                 
                 # Read file
                 data = pd.read_csv(filedirs[file])
@@ -68,7 +70,8 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 # If no columns selected, apply filter to all columns except time
                 if cols is None:
                     cols = list(data.columns)
-                    cols.remove('Time')
+                    if 'Time' in cols:
+                        cols.remove('Time')
                 
                 # Create plot
                 fig, axs = plt.subplots(1, len(cols), figsize=(15*len(cols),15))
@@ -91,18 +94,34 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
 # =============================================================================
 #
 
-# Compare the PSDs of two stages of processing
-#
-# in_path1          Filepath for first data folder
-# in_path2          Filepath for second data folder
-# out_path          Output for plots
-# sampling_rate     Sampling rate of EMG data
-# cols              Columns to plot
-# expression        If left none, will plot from all samples, but if set,
-#                   will only plot from files whose names match the
-#                   regular expression
-# file_ext          File extension to read
 def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, expression=None, file_ext='csv'):
+    """
+    Generate plots of the PSDs comparing different processing stages.
+
+    Parameters
+    ----------
+    in_path1 : str
+        Filepath to a directory containing the first set of Signals for comparison.
+    in_path2 : TYPE
+        Filepath to a directory containing the second set of Signals for comparison.
+    out_path : str
+        Filepath to an output directory.
+    sampling_rate : float
+        Sampling rate of the Signals.
+    cols : list, optional
+        List of columns of the Signal to plot. The default is None, in which case every column except
+        'time' is plotted.
+    expression : str, optional
+        A regular expression. If provided, will only generate plots for files whose names match the regular
+        expression. The default is None.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+
+    Returns
+    -------
+    None.
+
+    """
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
@@ -123,7 +142,8 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data1.columns)
-                cols.remove('Time')
+                if 'Time' in cols:
+                    cols.remove('Time')
             
             # Create plot
             fig, axs = plt.subplots(2, len(cols), figsize=(15*len(cols),30))
@@ -165,4 +185,4 @@ if __name__ == '__main__':
     sampling_rate = 2000
     
     #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
-    PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+    #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)

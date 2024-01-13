@@ -3,7 +3,7 @@ requires = ["hatchling", "neurokit2", "pandas", "numpy", "scipy", "matplotlib", 
 build-backend = "hatchling.build"
 
 [project]
-name = "MyST"
+name = "EMGFlow"
 version = "0.0.1"
 authors = [
     { name="William Conley", email="william@cconley.ca" },
