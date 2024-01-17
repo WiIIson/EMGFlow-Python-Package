@@ -172,6 +172,7 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 # =============================================================================
 #
 
+"""
 if __name__ == '__main__':
     
     raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
@@ -186,3 +187,4 @@ if __name__ == '__main__':
     
     #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
     #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+"""

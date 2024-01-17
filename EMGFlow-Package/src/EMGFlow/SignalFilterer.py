@@ -1486,6 +1486,7 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
 # =============================================================================
 #    
 
+"""
 if __name__ == '__main__':
     
     # The folders listed in in_data and out_data must exist before
@@ -1521,5 +1522,4 @@ if __name__ == '__main__':
     #BandpassFilterSignals(notch_s_path, bandpass_path, sampling_rate, 20, 450, cols, exp_copy=True)
     #SmoothFilterSignals(bandpass_path, smooth_path, sampling_rate, 50, exp_copy=True)
     #AnalyzeSignals(bandpass_path, smooth_path, feature_path, sampling_rate, cols=cols)
-    
-    
+"""

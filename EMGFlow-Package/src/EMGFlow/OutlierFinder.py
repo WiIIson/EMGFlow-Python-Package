@@ -160,6 +160,7 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
 # =============================================================================
 #
 
+"""
 if __name__ == '__main__':
     
     raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
@@ -175,5 +176,4 @@ if __name__ == '__main__':
     outliers = DetectOutliers(notch_path, sampling_rate, 15, cols=['EMG_zyg', 'EMG_cor'])
     
     PlotSpectrum(outliers, plot_path, sampling_rate, cols=['EMG_zyg', 'EMG_cor'])
-    
-    
+"""  
