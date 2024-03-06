@@ -4,9 +4,16 @@ import os
 import re
 import matplotlib.pyplot as plt
 import random
+import webbrowser
 from tqdm import tqdm
 
-from SignalFilterer import ConvertMapFiles
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
+from shiny import App, render, ui, reactive
+import nest_asyncio
+nest_asyncio.apply()
+
+from SignalFilterer import ConvertMapFiles, MapFilesFuse
 
 #
 # =============================================================================
@@ -20,7 +27,6 @@ A collection of functions for plotting subject data
 # =============================================================================
 #
 
-# NOTE: Make this plot both the PSD **AND** signal
 def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression=None, file_ext='csv'):
     """
     Generate plots of the PSDs of each column of Signals in a directory
@@ -172,19 +178,145 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 # =============================================================================
 #
 
+# Plot multiple signals over top of each other
+def PlotOverlaySignals(in_paths, out_path, sampling_rate, col, units, names, expression=None, file_ext='csv'):    
+    # Convert file paths
+    filedirs = []
+    for path in in_paths:
+        filedirs.append(ConvertMapFiles(path))
+    
+    for file in tqdm(filedirs[0]):
+        
+        
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+            
+            # Read data from each file directory
+            for fdir in filedirs:
+                data = pd.read_csv(fdir[file])
+                plt.plot(data['Time'], data[col])
+                
+        
+            plt.xlabel('Time (S)')
+            plt.ylabel('Activity (' + units + ')')
+            plt.title(file + ' muscle activity in ' + col)
+            plt.legend(names)
+            plt.savefig(out_path + file[:-len(file_ext)] + 'jpg')
+    
+    return
+
+#
+# =============================================================================
+#
+
+# Creates a shiny app object that can be ran
+def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ext='csv'):
+    # Convert file paths to directories
+    filedirs = []
+    for path in in_paths:
+        filedirs.append(ConvertMapFiles(path))
+        
+    # Convert file directories to data frame
+    df = MapFilesFuse(filedirs, names)
+    
+    # Set style
+    plt.style.use('fivethirtyeight')
+    
+    # Create shiny dashboard
+    
+    # =============
+    # UI definition
+    # =============
+    app_ui = ui.page_fluid(
+        ui.layout_sidebar(
+            ui.panel_sidebar(
+                ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
+                ui.input_select('file_type', 'File:', choices=df['File'])
+            ),
+            ui.panel_main(
+                ui.output_plot('plt_signal'),
+            ),
+        ),
+    )
+    
+    # =================
+    # Server definition
+    # =================
+    def server(input, output, session):
+        @render.plot
+        def plt_signal():
+            filename = input.file_type()
+            column = input.sig_type()
+            
+            # Plot data
+            fig, ax = plt.subplots()
+            if column == 'All':
+                # Read/plot each file
+                for file_loc in list(df.loc[filename])[1:]:
+                    sigDF = pd.read_csv(file_loc)
+                    ax.plot(sigDF['Time'], sigDF[col], alpha=0.5)
+                # Set legend for multiple plots
+                ax.legend(names)
+            else: 
+                # Read/plot single file
+                file_location = df.loc[filename][column]
+                sigDF = pd.read_csv(file_location)
+                ax.plot(sigDF['Time'], sigDF[col])
+            
+            ax.set_ylabel('Voltage (mV)')
+            ax.set_xlabel('Time (s)')
+            ax.set_title('Plot of ' + column + ' for ' + filename)
+            
+            return fig
+    
+    app = App(app_ui, server)
+    webbrowser.open('http://127.0.0.1:8000')
+    app.run()
+    return
+
+#
+# =============================================================================
+#
+
+
+#if __name__ == '__main__':
+    
+raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
+notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
+notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
+bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
+smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
+feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
+plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
+
+sampling_rate = 2000
+
+#PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
+#PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+#PlotOverlaySignals_v2([notch_s_path, bandpass_path, smooth_path], sampling_rate, 'EMG_zyg', 'mV', ['notch', 'bandpass', 'smooth'])
+
+in_paths = [notch_s_path, bandpass_path, smooth_path]
+names = ['notch', 'bandpass', 'smooth']
+
+
+
+
+GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)
+
 """
-if __name__ == '__main__':
+EXAMPLE:
     
-    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
-    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
-    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
-    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
-    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
-    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
-    plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
-    
-    sampling_rate = 2000
-    
-    #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
-    #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+
+app_ui = ui.page_fluid(
+    ui.h2("Hello, shiny!"),
+    ui.input_slider("n", "N", 0, 100, 20),
+    ui.output_text_verbatim('txt'),
+)
+
+def server(input, output, session):
+    @output
+    @render.text
+    def txt():
+    return f"n*2 is {input.n() * 2}"
+
+
 """

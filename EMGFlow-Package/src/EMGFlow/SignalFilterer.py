@@ -85,12 +85,66 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
         filedirs = MapFiles(in_path=fileObj, file_ext=file_ext, expression=expression)
     # User provided a processed file directory
     elif type(fileObj) is dict:
-        filedirs = fileObj
+        # If expression is provided, filters the dictionary
+        # for all entries matching it
+        fd = fileObj.copy()
+        if expression != None:
+            for file in fd:
+                if not (re.match(expression, fd[file])):
+                    del fd[file]
+        filedirs = fd
     # Provided file location format is unsupported
     else:
         raise Exception("Unsupported file location format:", type(fileObj))
     
     return filedirs
+
+#
+# =============================================================================
+#
+
+
+def MapFilesFuse(filedirs, names):
+    """
+    Generate a dictionary of file names and locations from different forms of input.
+
+    Parameters
+    ----------
+    filedirs : dict list
+        List of file location directories
+    names : str
+        List of names to use for file directory columns. Same order as file directories.
+
+    Raises
+    ------
+    Exception
+        If an unsupported file location format is provided, an exception is raised.
+
+    Returns
+    -------
+    filedirs : pd.DataFrame
+        A DataFrame of file names, and their locations in each file directory.
+    
+    """
+    
+    data = []
+    # Assumes all files listed in first file directory
+    # exists in the others
+    for file in filedirs[0].keys():
+        # Create row
+        row = [file, file]
+        for i, filedir in enumerate(filedirs):
+            if file not in filedir:
+                # Raise exception if file does not exist
+                raise Exception('File ' + file + ' does not exist in file directory ' + names[i])
+            row.append(filedir[file])
+        # Add row to data frame
+        data.append(row)
+    # Create data frame
+    df = pd.DataFrame(data, columns=['ID', 'File'] + names)
+    df.set_index('ID',inplace=True)
+    
+    return df
 
 #
 # =============================================================================
@@ -185,7 +239,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
         apply the filter to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter).
     cols : list, optional
         List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to
-        every column except for 'time'.
+        every column except for 'Time'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
     exp_copy : TYPE, optional
@@ -284,7 +338,7 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
 # =============================================================================
 #
 
-def BandpassFilterSignals(in_path, out_path, sampling_rate, low, high, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     """
     Apply bandpass filters to all Signals in a folder. Writes filtered Signals to an output folder, and generates a file structure
     matching the input folder.
@@ -298,12 +352,12 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low, high, cols=None
     sampling_rate : float
         Sampling rate of the Signal.
     low : float
-        Lower frequency limit of the bandpass filter.
+        Lower frequency limit of the bandpass filter. The default is 20.
     high : float
-        Upper frequency limit of the bandpass filter.
+        Upper frequency limit of the bandpass filter. The default is 450.
     cols : list, optional
         List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to
-        every column except for 'time'.
+        every column except for 'Time'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
     exp_copy : bool, optional
@@ -1336,13 +1390,13 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
     
     # List of measure names
     measure_names = [
+        # Time-series features
         'Min',
         'Max',
         'Mean',
         'SD',
         'Skew',
         'Kurtosis',
-        
         'IEMG',
         'MAV',
         'MMAV',
@@ -1356,6 +1410,7 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
         'AP',
         'Spectral_Flux',
         
+        # Spectral features
         'Max_Freq',
         'Twitch_Ratio',
         'Twitch_Index',
@@ -1482,44 +1537,3 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
             
     SignalDF.to_csv(out_path + 'Features.csv', index=False)
     return
-#
-# =============================================================================
-#    
-
-"""
-if __name__ == '__main__':
-    
-    # The folders listed in in_data and out_data must exist before
-    # running the script, and should not have any subdirectories.
-    # The output will be generated in the
-    # out_data (output) folder listed, with the same file format
-    # contained in the in_data (input) folder
-    
-    test_file = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/Raw_PID_01-10/01/01-01-01.csv'
-    
-    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
-    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
-    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
-    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
-    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
-    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
-    
-    sampling_rate = 2000            # Sampling rate
-    notch_vals = [(50,5), (150,25), (250,25), (350,25), (400,25), (450,25), (550,25), (650,25), (750,25), (850,25), (950,25)]
-    notch_sc = [(317, 25)]
-    reg = "^(08|11)"
-    
-    cols = ['EMG_zyg', 'EMG_cor']
-    
-    # Old PADS pipeline
-    #MergePerceptual(perceptual_path, feature_path)
-    #PADS_RMSFilterSignals(bandpass_path, smooth_path, sampling_rate, 50)
-    #PADS_AnalyzeSignals(bandpass_path, smooth_path, perceptual_file, feature_path, sampling_rate)
-    
-    # PADS pipeline
-    #NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols, exp_copy=True)
-    #NotchFilterSignals(notch_path, notch_s_path, sampling_rate, notch_sc, cols, expression=reg, exp_copy=True)
-    #BandpassFilterSignals(notch_s_path, bandpass_path, sampling_rate, 20, 450, cols, exp_copy=True)
-    #SmoothFilterSignals(bandpass_path, smooth_path, sampling_rate, 50, exp_copy=True)
-    #AnalyzeSignals(bandpass_path, smooth_path, feature_path, sampling_rate, cols=cols)
-"""
