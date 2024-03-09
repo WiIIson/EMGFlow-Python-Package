@@ -1,7 +1,6 @@
 import scipy
 import pandas as pd
 import numpy as np
-import neurokit2 as nk
 import os
 import re
 import cv2
@@ -14,6 +13,66 @@ from tqdm import tqdm
 """
 A collection of functions for filtering Signals.
 """
+
+#
+# =============================================================================
+#
+
+"""
+    Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
+    used as a Long Term Average Spectrum (LTAS).
+
+    Parameters
+    ----------
+    Signal : DataFrame
+        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+    sampling_rate : float
+        Sampling rate of the Signal.
+    normalize : bool, optional
+        If True, will normalize the result. If False, will not. The default is True.
+
+    Returns
+    -------
+    psd : DataFrame
+        A DataFrame containing a 'Frequency' and 'Power' column. The Power column
+        indicates the intensity of each frequency in the Signal provided. Results
+        will be normalized if 'normalize' is set to True.
+"""
+def EMG2PSD(Signal, sr=1000, normalize=True):
+    # Initial parameters
+    Signal = Signal - np.mean(Signal)
+    N = len(Signal)
+    
+    # Calculate minimum frequency given sampling rate
+    min_frequency = (2 * sr) / (N / 2)
+    
+    # Calculate window size givern sampling rate
+    nperseg = int((2 / min_frequency) * sr)
+    nfft = nperseg * 2
+    
+    # Apply welch method with hanning window
+    frequency, power = scipy.signal.welch(
+        Signal,
+        fs=sr,
+        scaling='density',
+        detrend=False,
+        nfft=nfft,
+        average='mean',
+        nperseg=nperseg,
+        window='hann'
+    )
+    
+    # Normalize if set to true
+    if normalize is True:
+        power /= np.max(power)
+        
+    # Create dataframe of results
+    psd = pd.DataFrame({'Frequency': frequency, 'Power': power})
+    # Filter given 
+    psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency,
+                                   psd['Frequency'] <= np.inf)]
+    
+    return psd
 
 #
 # =============================================================================
@@ -711,8 +770,8 @@ def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
-        psd1 = nk.signal_psd(Signal1[col][:diff_ind], sampling_rate=sr)
-        psd2 = nk.signal_psd(Signal1[col][diff_ind:], sampling_rate=sr)
+        psd1 = EMG2PSD(Signal1[col][:diff_ind], sampling_rate=sr)
+        psd2 = EMG2PSD(Signal1[col][diff_ind:], sampling_rate=sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
@@ -722,8 +781,8 @@ def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
         # If no second sampling rate, assume same sampling rate as first Signal
         if diff_sr == None: diff_sr = sr
         # Take the PSD of each signal
-        psd1 = nk.signal_psd(Signal1[col], sampling_rate=sr)
-        psd2 = nk.signal_psd(diff[col], sampling_rate=diff_sr)
+        psd1 = EMG2PSD(Signal1[col], sampling_rate=sr)
+        psd2 = EMG2PSD(diff[col], sampling_rate=diff_sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
@@ -1481,7 +1540,7 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
                 Spectral_Flux = CalcSpecFlux(data_s, 0.5, col, sampling_rate)
     
                 # Calculate spectral features
-                psd = nk.signal_psd(data_b[col], sampling_rate=sampling_rate)
+                psd = EMG2PSD(data_b[col], sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 Twitch_Ratio = CalcTwitchRatio(psd)
                 Twitch_Index = CalcTwitchIndex(psd)

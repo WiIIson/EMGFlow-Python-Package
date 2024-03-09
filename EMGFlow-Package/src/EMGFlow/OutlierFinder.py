@@ -1,4 +1,3 @@
-import neurokit2 as nk
 import pandas as pd
 import numpy as np
 import scipy.optimize
@@ -7,7 +6,7 @@ import re
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from SignalFilterer import MapFiles
+from SignalFilterer import MapFiles, EMG2PSD
 from PlotSignals import PlotSpectrum
 
 #
@@ -113,7 +112,7 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
             # Iterate over columns
             for i in range(len(cols)):
                 col = cols[i]
-                psd = nk.signal_psd(data[col], sampling_rate=sampling_rate)
+                psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
                 psd = ZoomIn(psd, 20, 450)
                 
                 n = 200     # Width of band to check for local maxima in PSD

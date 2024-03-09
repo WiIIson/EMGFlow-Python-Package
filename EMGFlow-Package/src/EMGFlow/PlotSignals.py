@@ -1,4 +1,3 @@
-import neurokit2 as nk
 import pandas as pd
 import os
 import re
@@ -9,11 +8,13 @@ from tqdm import tqdm
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
+import palettable
+
 from shiny import App, render, ui, reactive
 import nest_asyncio
 nest_asyncio.apply()
 
-from SignalFilterer import ConvertMapFiles, MapFilesFuse
+from SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD
 
 #
 # =============================================================================
@@ -85,7 +86,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 # Plot each column
                 for i in range(len(cols)):
                     col = cols[i]
-                    psd = nk.signal_psd(data[col], sampling_rate=sampling_rate)
+                    psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
                     axs[i].plot(psd['Frequency'], psd['Power'])
                     axs[i].set_ylabel('Power magnitude')
                     axs[i].set_xlabel('Frequency')
@@ -158,12 +159,12 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             for i in range(len(cols)):
                 col = cols[i]
                 
-                psd1 = nk.signal_psd(data1[col], sampling_rate=sampling_rate)
+                psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
                 axs[0,i].plot(psd1['Frequency'], psd1['Power'])
                 axs[0,i].set_ylabel('Power magnitude')
                 axs[0,i].set_title(col)
                 
-                psd2 = nk.signal_psd(data2[col], sampling_rate=sampling_rate)
+                psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
                 axs[1,i].plot(psd2['Frequency'], psd2['Power'])
                 axs[1,i].set_ylabel('Power magnitude')
                 axs[1,i].set_xlabel('Frequency')
@@ -218,6 +219,10 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
     # Convert file directories to data frame
     df = MapFilesFuse(filedirs, names)
     
+    # Determine colour scheme
+    ncols = len(in_paths)
+    
+    
     # Set style
     plt.style.use('fivethirtyeight')
     
@@ -233,7 +238,7 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
                 ui.input_select('file_type', 'File:', choices=df['File'])
             ),
             ui.panel_main(
-                ui.output_plot('plt_signal'),
+                ui.output_plot('plt_signal', toolbar=True),
             ),
         ),
     )
@@ -268,7 +273,7 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
             
             return fig
     
-    app = App(app_ui, server)
+    app = App(app_ui, server, backend='webagg')
     webbrowser.open('http://127.0.0.1:8000')
     app.run()
     return
