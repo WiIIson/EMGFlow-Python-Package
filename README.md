@@ -1,9 +1,15 @@
+<img src="HexSticker.png"  width="100" height="110" style="float: right;">
 # EMGFlow
 
-The open workflow for EMG signal processing and feature extraction.
-![Logo](HexSticker.png)
 
-**EMGFlow** is an Python package for researchers and clinicians to engage in signal processing using the data you have your way. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+
+The open workflow for EMG signal processing and feature extraction.
+
+**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing using the data you have your way. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+
+---
+
+## Example
 
 As a quick example, the following will create a feature file, starting with a folder of raw data:
 ```python
@@ -33,7 +39,33 @@ AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
 # Will create a "Features.csv" file in feature_path with results
 ```
 
+---
+
+## Installation
+
 EMGFlow can be installed from PyPI:
 ```python
 pip install EMGFlow
+```
+
+Once installed, the package can be loaded as follows:
+```python
+import EMGFlow
+```
+
+---
+
+## Citations
+
+This package can be cited as follows:
+
+```bibtex
+@software{Conley_EMGFlow_2024,
+  author = {Conley, William},
+  month = {03},
+  title = {{EMGFlow Package}},
+  url = {https://github.com/WiIIson/EMGFlow-Python-Package},
+  version = {0.0.1},
+  year = {2024}
+}
 ```
