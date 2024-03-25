@@ -3,6 +3,8 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Conley"
   given-names: "William"
+- family-names: "Livingstone"
+  given-names: "Steven"
 title: "EMGFlow Package"
 version: 0.0.1
 date-released: 2024-03-11

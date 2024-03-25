@@ -154,25 +154,3 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
                 outliers[file] = filedirs[file]
                 
     return outliers
-
-#
-# =============================================================================
-#
-
-"""
-if __name__ == '__main__':
-    
-    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
-    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
-    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
-    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
-    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
-    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
-    plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/New/'
-    
-    sampling_rate = 2000
-    
-    outliers = DetectOutliers(notch_path, sampling_rate, 15, cols=['EMG_zyg', 'EMG_cor'])
-    
-    PlotSpectrum(outliers, plot_path, sampling_rate, cols=['EMG_zyg', 'EMG_cor'])
-"""  

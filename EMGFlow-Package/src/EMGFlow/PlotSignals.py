@@ -219,12 +219,15 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
     # Convert file directories to data frame
     df = MapFilesFuse(filedirs, names)
     
+    
     # Determine colour scheme
     ncols = len(in_paths)
     
-    
     # Set style
     plt.style.use('fivethirtyeight')
+    
+    # Get colours
+    colours = plt.rcParams['axes.prop_cycle'].by_key()['color']
     
     # Create shiny dashboard
     
@@ -238,7 +241,7 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
                 ui.input_select('file_type', 'File:', choices=df['File'])
             ),
             ui.panel_main(
-                ui.output_plot('plt_signal', toolbar=True),
+                ui.output_plot('plt_signal'),
             ),
         ),
     )
@@ -256,7 +259,7 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
             fig, ax = plt.subplots()
             if column == 'All':
                 # Read/plot each file
-                for file_loc in list(df.loc[filename])[1:]:
+                for file_loc in reversed(list(df.loc[filename])[1:]):
                     sigDF = pd.read_csv(file_loc)
                     ax.plot(sigDF['Time'], sigDF[col], alpha=0.5)
                 # Set legend for multiple plots
@@ -265,15 +268,21 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
                 # Read/plot single file
                 file_location = df.loc[filename][column]
                 sigDF = pd.read_csv(file_location)
-                ax.plot(sigDF['Time'], sigDF[col])
+                # Get colour data
+                i = (names.index(column) + 1) % len(colours)
+                print(names)
+                print(column)
+                # Plot file
+                ax.plot(sigDF['Time'], sigDF[col], color=colours[i-1], alpha=0.5)
+                
             
             ax.set_ylabel('Voltage (mV)')
             ax.set_xlabel('Time (s)')
-            ax.set_title('Plot of ' + column + ' for ' + filename)
+            ax.set_title(column + ' filter: ' + filename)
             
             return fig
     
-    app = App(app_ui, server, backend='webagg')
+    app = App(app_ui, server)
     webbrowser.open('http://127.0.0.1:8000')
     app.run()
     return
@@ -283,45 +292,42 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
 #
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
     
-raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
-notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
-notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
-bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
-smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
-feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
-plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
-
-sampling_rate = 2000
-
-#PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
-#PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
-#PlotOverlaySignals_v2([notch_s_path, bandpass_path, smooth_path], sampling_rate, 'EMG_zyg', 'mV', ['notch', 'bandpass', 'smooth'])
-
-in_paths = [notch_s_path, bandpass_path, smooth_path]
-names = ['notch', 'bandpass', 'smooth']
-
-
-
-
-GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)
-
-"""
-EXAMPLE:
+    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
+    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
+    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
+    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
+    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
+    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
+    plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
     
-
-app_ui = ui.page_fluid(
-    ui.h2("Hello, shiny!"),
-    ui.input_slider("n", "N", 0, 100, 20),
-    ui.output_text_verbatim('txt'),
-)
-
-def server(input, output, session):
-    @output
-    @render.text
-    def txt():
-    return f"n*2 is {input.n() * 2}"
-
-
-"""
+    sampling_rate = 2000
+    
+    #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
+    #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+    #PlotOverlaySignals_v2([notch_s_path, bandpass_path, smooth_path], sampling_rate, 'EMG_zyg', 'mV', ['notch', 'bandpass', 'smooth'])
+    
+    in_paths = [smooth_path, bandpass_path, notch_s_path]
+    names = ['Smooth', 'Bandpass', 'Notch']
+    
+    GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)
+    
+    """
+    EXAMPLE:
+        
+    
+    app_ui = ui.page_fluid(
+        ui.h2("Hello, shiny!"),
+        ui.input_slider("n", "N", 0, 100, 20),
+        ui.output_text_verbatim('txt'),
+    )
+    
+    def server(input, output, session):
+        @output
+        @render.text
+        def txt():
+        return f"n*2 is {input.n() * 2}"
+    
+    
+    """
