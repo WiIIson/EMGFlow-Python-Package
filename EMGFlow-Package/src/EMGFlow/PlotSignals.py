@@ -246,6 +246,9 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
         ),
     )
     
+    legnames = names.copy()
+    legnames.reverse()
+    
     # =================
     # Server definition
     # =================
@@ -263,17 +266,15 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
                     sigDF = pd.read_csv(file_loc)
                     ax.plot(sigDF['Time'], sigDF[col], alpha=0.5)
                 # Set legend for multiple plots
-                ax.legend(names)
-            else: 
+                ax.legend(legnames)
+            else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
                 sigDF = pd.read_csv(file_location)
                 # Get colour data
                 i = (names.index(column) + 1) % len(colours)
-                print(names)
-                print(column)
                 # Plot file
-                ax.plot(sigDF['Time'], sigDF[col], color=colours[i-1], alpha=0.5)
+                ax.plot(sigDF['Time'], sigDF[col], color=colours[len(names) - i], alpha=0.5)
                 
             
             ax.set_ylabel('Voltage (mV)')
@@ -313,21 +314,6 @@ if __name__ == '__main__':
     
     GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)
     
-    """
-    EXAMPLE:
-        
-    
-    app_ui = ui.page_fluid(
-        ui.h2("Hello, shiny!"),
-        ui.input_slider("n", "N", 0, 100, 20),
-        ui.output_text_verbatim('txt'),
-    )
-    
-    def server(input, output, session):
-        @output
-        @render.text
-        def txt():
-        return f"n*2 is {input.n() * 2}"
     
     
-    """
+    
