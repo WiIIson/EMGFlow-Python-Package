@@ -648,7 +648,7 @@ Components of a "`Signal` file":
 
 All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
 
-For more specifics about the features extracted by this function, see [[06 ExtractFeatures Feature Documentation]]
+For more specifics about the features extracted by this function, see [[05 ExtractFeatures Feature Documentation]]
 
 ```python
 AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):

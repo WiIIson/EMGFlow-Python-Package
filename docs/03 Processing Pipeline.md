@@ -31,7 +31,7 @@ Notch filtering is controlled by the function `NotchFilterSignals()`, with the f
 
 `NotchFilterSignals()` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings.  However, other regions use 50Hz frequencies.
 
-For more information about further customizations and detail about `NotchFilterSignals()`, see [[05 SignalFilterer Documentation]]
+For more information about further customizations and detail about `NotchFilterSignals()`, see [[04 SignalFilterer Documentation]]
 
 ### `BandpassFilterSignals()`
 
@@ -60,7 +60,7 @@ Bandpass filtering is controlled by the function `BandpassFilterSignals()`, with
 
 `BandpassFilterSignals()` uses bandpass thresholds of 20Hz and 450Hz, as this is default for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscels, so `BandpassFilterSignals()` provides the option to change the thresholds.
 
-For more information about further customizations and detail about `BandpassFilterSignals()`, see [[05 SignalFilterer Documentation]]
+For more information about further customizations and detail about `BandpassFilterSignals()`, see [[04 SignalFilterer Documentation]]
 
 ### `SmoothFilterSignals()`
 
@@ -87,7 +87,7 @@ Smoothing is controlled by the function `SmoothFilterSignals()`, with the follow
 
 `SmoothFilterSignals()` by default uses the RMS smoothing method, as it is the best choice for filtering EMG signals (RENSHAW et al., 2010). Regardless, EMGFlow provides different methods for smoothing signals which can be used instead.
 
-For more information about further customizations and detail about `SmoothFilterSignals()`, see [[05 SignalFilterer Documentation]]
+For more information about further customizations and detail about `SmoothFilterSignals()`, see [[04 SignalFilterer Documentation]]
 
 ### `AnalyzeSignals()`
 
@@ -136,9 +136,9 @@ And the following spectral features:
 
 This function requires a path to smoothed and unsmoothed data. This is because while time-series features are extracted from smoothed data, spectral features are not. High-frequency components of the signal can be lost in the smoothing, and we want to ensure the spectral features are as accurate as possible.
 
-For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [[05 SignalFilterer Documentation]].
+For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [[04 SignalFilterer Documentation]].
 
-For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [[06 ExtractFeatures Feature Documentation]].
+For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [[05 ExtractFeatures Feature Documentation]].
 
 ---
 ## Outlier Detection
@@ -158,7 +158,7 @@ Outlier detection is handled by the function `DetectOutliers()`. This function f
 
 This function outputs a dictionary of file names and locations for each signal marked as an outlier.
 
-For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [[07 OutlierFinder Documentation]]
+For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [[06 OutlierFinder Documentation]]
 
 ---
 
@@ -179,7 +179,7 @@ The plotting module `PlotSignals` provides functions to help visualize individua
 
 `sampling_rate` refers to the sampling rate of the data. The function will assume that each signal, and each column, is using the same sampling rate.
 
-For more information about further customizations and specifications that can be made to `PlotSpectrum()`, see [[08 PlotSignals Documentation]]
+For more information about further customizations and specifications that can be made to `PlotSpectrum()`, see [[07 PlotSignals Documentation]]
 ### `PlotCompareSignals()`
 
 `PlotCompareSignals()` compares plots of signals for two different stages of processing.
@@ -196,7 +196,7 @@ For more information about further customizations and specifications that can be
 
 `sampling_rate` refers to the sampling rate of the data. The function will assume that each signal, and each column, is using the same sampling rate.
 
-For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [[08 PlotSignals Documentation]]
+For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [[07 PlotSignals Documentation]]
 
 ---
 

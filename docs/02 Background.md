@@ -10,7 +10,7 @@ The EMGFlow package is a collection of functions that simplify the processing of
 
 ### What Are EMG Signals?
 
-EMG (Electromyography) signals represent the activity of a muscle. The most common approach to recording thes signals is by taking readings through electrodes that are attached onto the skin, above the muscle of interest. These recordings represent the strength of the electric signal over time, sometimes with multiple columns for the measurements from the different electrodes (_Electromyography (EMG)_, 2023).
+EMG (Electromyography) signals represent the activity of a muscle. The most common approach to recording these signals is by taking readings through electrodes that are attached onto the skin, above the muscle of interest. These recordings represent the strength of the electric signal over time, sometimes with multiple columns for the measurements from the different electrodes (_Electromyography (EMG)_, 2023).
 
 ### What Does EMG Signal Processing Involve?
 
@@ -48,9 +48,9 @@ Filtering signals involves the application of filters to the frequencies of a si
 **Signal**
 In EMGFlow, a Signal is represented by a Pandas DataFrame. Signals are typically stored as a CSV file, and read in directly.
 - Contains a `Time` column (in seconds) for time since start of recording
-- Additional named columns are assumed to be Signal recordings that show Signal strength
-- Signal strength units don't matter - calculation results will be proportional to the units used, but it is better to use the same units for each column and file
-- The `Time` column is not used in calculations, and isn't needed as long as the sampling rate is known
+- Additional named columns are assumed to be Signal recordings that show Signal strength.
+- Signal strength units don't matter - calculation results will be proportional to the units used, but it is better to use the same units for each column and file.
+- The `Time` column is not used in calculations, and isn't needed as long as the sampling rate is known. Note that any column named "Time" will be assumed to be the `Time` column, and may be ignored.
 
 **Sampling Rate**
 The sampling rate (referred to as `sampling_rate` or `sr`) is the rate at which the data was recorded. This is easily found by taking the inverse of the rate at which `Time` column increases (in seconds).
