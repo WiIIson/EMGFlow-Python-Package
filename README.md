@@ -50,6 +50,21 @@ AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
 
 ---
 
+## Documentation
+
+General:
+- [EMG processing background](docs/02%20Background.md)
+- [EMGFlow processing pipeline overview](docs/03%20Processing%20Pipeline.md)
+- [SignalFilterer module EMG processing documentation](docs/04%20SignalFilterer%20Documentation.md)
+- [SignalFilterer module feature extraction documentation](docs/05%20ExtractFeatures%20Feature%20Documentation.md)
+- [OutlierFinder module documentation](docs/06%20OutlierFinder%20Documentation.md)
+- [PlotSignals module documentation](docs/07%20PlotSignals%20Documentation.md)
+
+Examples:
+- [Processing pipeline examples](docs/01%20Examples.md)
+
+---
+
 ## Installation
 
 EMGFlow can be installed from PyPI:
@@ -70,7 +85,7 @@ This package can be cited as follows:
 
 ```bibtex
 @software{Conley_EMGFlow_2024,
-  author = {Conley, William},
+  author = {Conley, William and Livingstone, Steven R},
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},

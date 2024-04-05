@@ -2,6 +2,112 @@
 
 ---
 
+## `PlotSpectrum`
+
+**Description:**
+
+Creates plots of PSDs of each column in the Signal files in a directory
+
+The plots are saved as PNG files in the output directory
+
+```python
+PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression=None file_ext='csv')
+```
+
+**Parameters:**
+
+
+`in_path`: str
+- String of a filepath to read Signal files from.
+
+`out_path`: str
+- String of a filepath to output plots to.
+
+`sampling_rate`: int/float
+- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+
+`cols`: str (None)
+- List of string column names. If provided, will only create plots for the specified columns. If left `None`, will create plots for each column except for the `'Time'` column.
+
+`p`: float (None)
+- Random sampling probability, if set to a float between 0 and 1, will randomly plot signals at probability `p`
+
+`expression`: str (None)
+- String regular expression. If provided, will only create visualizations for `Signal` files whose names match the regular expression, and will ignore everything else.
+
+`file_ext`: str ("csv")
+- String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+
+**Returns:**
+
+`PlotSpectrum`: None
+
+**Example:**
+
+```python
+raw_path = '/data/raw/'
+plot_path = '/plots/'
+
+sr = 2000
+
+PlotSpectrum(raw_path, plot_path, sr)
+```
+
+---
+
+## `PlotCompareSignals`
+
+**Description:**
+
+Creates plots of PSDs from two different stages in the processing pipeline.
+
+The plots are saved as PNG files in the output directory
+
+```python
+PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, expression=None, file_ext='csv')
+```
+
+**Parameters:**
+
+`in_path1`: str
+- String of a filepath to read Signal files from.
+
+`in_path2`: str
+- String of a filepath to read Signal files from.
+
+`out_path`: str
+- String of a filepath to output plots to.
+
+`sampling_rate`: int/float
+- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+
+`cols`: str (None)
+- List of string column names. If provided, will only create plots for the specified columns. If left `None`, will create plots for each column except for the `'Time'` column.
+
+`expression`: str (None)
+- String regular expression. If provided, will only create visualizations for `Signal` files whose names match the regular expression, and will ignore everything else.
+
+`file_ext`: str ("csv")
+- String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+
+**Returns:**
+
+`PlotCompareSignals`: None
+
+**Example:**
+
+```python
+raw_path = '/data/raw/'
+notch_path = '/data/notch/'
+plot_path = '/plots/'
+
+sr = 2000
+
+PlotSpectrum(raw_path, notch_path, plot_path, sr)
+```
+
+---
+
 ## `GenPlotDash`
 
 **Description:**

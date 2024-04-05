@@ -6,11 +6,7 @@ import random
 import webbrowser
 from tqdm import tqdm
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-
-import palettable
-
-from shiny import App, render, ui, reactive
+from shiny import App, render, ui
 import nest_asyncio
 nest_asyncio.apply()
 
@@ -86,7 +82,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 # Plot each column
                 for i in range(len(cols)):
                     col = cols[i]
-                    psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                    psd = EMG2PSD(data[col], sr=sampling_rate)
                     axs[i].plot(psd['Frequency'], psd['Power'])
                     axs[i].set_ylabel('Power magnitude')
                     axs[i].set_xlabel('Frequency')
@@ -159,12 +155,12 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             for i in range(len(cols)):
                 col = cols[i]
                 
-                psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
+                psd1 = EMG2PSD(data1[col], sr=sampling_rate)
                 axs[0,i].plot(psd1['Frequency'], psd1['Power'])
                 axs[0,i].set_ylabel('Power magnitude')
                 axs[0,i].set_title(col)
                 
-                psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
+                psd2 = EMG2PSD(data2[col], sr=sampling_rate)
                 axs[1,i].plot(psd2['Frequency'], psd2['Power'])
                 axs[1,i].set_ylabel('Power magnitude')
                 axs[1,i].set_xlabel('Frequency')
@@ -172,36 +168,6 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             # Set title and save figure
             fig.suptitle(file + ' Power Spectrum Density')
             fig.savefig(out_path + file[:-len(file_ext)] + 'jpg')
-    
-    return
-
-#
-# =============================================================================
-#
-
-# Plot multiple signals over top of each other
-def PlotOverlaySignals(in_paths, out_path, sampling_rate, col, units, names, expression=None, file_ext='csv'):    
-    # Convert file paths
-    filedirs = []
-    for path in in_paths:
-        filedirs.append(ConvertMapFiles(path))
-    
-    for file in tqdm(filedirs[0]):
-        
-        
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
-            
-            # Read data from each file directory
-            for fdir in filedirs:
-                data = pd.read_csv(fdir[file])
-                plt.plot(data['Time'], data[col])
-                
-        
-            plt.xlabel('Time (S)')
-            plt.ylabel('Activity (' + units + ')')
-            plt.title(file + ' muscle activity in ' + col)
-            plt.legend(names)
-            plt.savefig(out_path + file[:-len(file_ext)] + 'jpg')
     
     return
 
@@ -218,10 +184,6 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
         
     # Convert file directories to data frame
     df = MapFilesFuse(filedirs, names)
-    
-    
-    # Determine colour scheme
-    ncols = len(in_paths)
     
     # Set style
     plt.style.use('fivethirtyeight')
@@ -287,33 +249,3 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
     webbrowser.open('http://127.0.0.1:8000')
     app.run()
     return
-
-#
-# =============================================================================
-#
-
-
-if __name__ == '__main__':
-    
-    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
-    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
-    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
-    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
-    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
-    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
-    plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
-    
-    sampling_rate = 2000
-    
-    #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
-    #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
-    #PlotOverlaySignals_v2([notch_s_path, bandpass_path, smooth_path], sampling_rate, 'EMG_zyg', 'mV', ['notch', 'bandpass', 'smooth'])
-    
-    in_paths = [smooth_path, bandpass_path, notch_s_path]
-    names = ['Smooth', 'Bandpass', 'Notch']
-    
-    GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)
-    
-    
-    
-    
