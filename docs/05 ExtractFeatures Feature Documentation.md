@@ -1,4 +1,13 @@
-# `ExtractFeatures` Feature Documentation
+# `SignalFilterer` Module Feature Extraction Documentation
+
+---
+
+## Importing
+
+The following functions require the `EMGFlow.SignalFilterer` module, which can be imported with:
+```python
+import EMGFlow.SignalFilterer as ESIG
+```
 
 ---
 
@@ -91,7 +100,7 @@ $$\text{IEMG}=s_r\sum_{i=1}^N|x_i|$$
 
 ```python
 # Calculate the IEMG of SignalDF, for column 'column1'
-IEMG = CalcIEMG(SignalDF, 'column1', 2000)
+IEMG = ESIG.CalcIEMG(SignalDF, 'column1', 2000)
 ```
 
 ---
@@ -131,7 +140,7 @@ $$\text{MAV}=\frac{1}{N}\sum_{i=1}^N|x_i|$$
 
 ```python
 # Calculate the MAV of SignalDF, for column 'column1'
-MAV = CalcMAV(SignalDF, 'column1', 2000)
+MAV = ESIG.CalcMAV(SignalDF, 'column1', 2000)
 ```
 
 
@@ -171,7 +180,7 @@ $$w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{ot
 
 ```python
 # Calculate the MMAV of SignalDF, for column 'column1'
-MMAV = CalcMMAV(SignalDF, 'column1', 2000)
+MMAV = ESIG.CalcMMAV(SignalDF, 'column1', 2000)
 ```
 
 ---
@@ -217,7 +226,7 @@ $$\text{SSI}=s_r^2\sum_{i=1}^N|x_i|^2$$
 
 ```python
 # Calculate the SSI of SignalDF, for column 'column1'
-SSI = CalcSSI(SignalDF, 'column1', 2000)
+SSI = ESIG.CalcSSI(SignalDF, 'column1', 2000)
 ```
 
 ---
@@ -256,7 +265,7 @@ $$\text{VAR}=\frac{1}{N-1}\sum_{i=1}^Nx_i^2$$
 
 ```python
 # Calculate the VAR of SignalDF, for column 'column1'
-VAR = CalcVAR(SignalDF, 'column1')
+VAR = ESIG.CalcVAR(SignalDF, 'column1')
 ```
 
 ---
@@ -297,7 +306,7 @@ $$\text{vORDER}=\sqrt{\text{VAR}}$$
 
 ```python
 # Calculate the V-Order of SignalDF, for column 'column1'
-VOrder = CalcVOrder(SignalDF, 'column1')
+VOrder = ESIG.CalcVOrder(SignalDF, 'column1')
 ```
 
 ---
@@ -337,7 +346,7 @@ $$\text{RMS}=\sqrt{\frac{1}{N}\sum_{i=1}^N}|x_i|^2$$
 
 ```python
 # Calculate the RMS of SignalDF, for column 'column1'
-RMS = CalcRMS(SignalDF, 'column1')
+RMS = ESIG.CalcRMS(SignalDF, 'column1')
 ```
 
 ---
@@ -377,7 +386,7 @@ $$\text{WL}=\sum_{i=1}^{N-1}|x_{i+1}-x_i|$$
 
 ```python
 # Calculate the WL of SignalDF, for column 'column1'
-WL = CalcWL(SignalDF, 'column1')
+WL = ESIG.CalcWL(SignalDF, 'column1')
 ```
 
 ---
@@ -426,7 +435,7 @@ $$f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \e
 
 ```python
 # Calculate the WL of SignalDF, for column 'column1'
-WAMP = CalcWAMP(SignalDF, 'column1', 55)
+WAMP = ESIG.CalcWAMP(SignalDF, 'column1', 55)
 ```
 
 ---
@@ -466,7 +475,7 @@ $$\text{LOG}=e^{\frac{1}{N}\sum_{i=1}^N\log(|x_k|)}$$
 
 ```python
 # Calculate the LOG of SignalDF, for column 'column1'
-LOG = CalcLOG(SignalDF, 'column1')
+LOG = ESIG.CalcLOG(SignalDF, 'column1')
 ```
 
 ---
@@ -506,7 +515,7 @@ $$\text{MFL}=\log\left(\sqrt{\sum_{i=1}^{N-1}(x_{i+1}-x_i)^2}\right)$$
 
 ```python
 # Calculate the MFL of SignalDF, for column 'column1'
-MFL = CalcMFL(SignalDF, 'column1')
+MFL = ESIG.CalcMFL(SignalDF, 'column1')
 ```
 
 ---
@@ -546,7 +555,7 @@ $$\text{AP}=\frac{1}{N}\sum_{i=1}^Nx_i^2$$
 
 ```python
 # Calculate the AP of SignalDF, for column 'column1'
-AP = CalcMFL(SignalDF, 'column1')
+AP = ESIG.CalcMFL(SignalDF, 'column1')
 ```
 
 ---
@@ -600,7 +609,7 @@ $$\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2$$
 
 ```python
 # Calculate the Spectral Flux of Signal1DF, for column 'column1'
-AP = CalcSpecFlux(Signal1DF, Signal2DF, 'column1', 2000)
+AP = ESIG.CalcSpecFlux(Signal1DF, Signal2DF, 'column1', 2000)
 ```
 
 ---
@@ -645,8 +654,8 @@ $$\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}$$
 
 ```python
 # Calculate the Twitch Ratio of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-TR = CalcTwitchRatio(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+TR = ESIG.CalcTwitchRatio(psd)
 ```
 
 ---
@@ -691,8 +700,8 @@ $$\text{TR}=\frac{\max\left(\sum_{i=f_0}^{f_t} p_i\right)}{\max\left(\sum_{i=f_t
 
 ```python
 # Calculate the Twitch Index of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-TI = CalcTwitchIndex(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+TI = ESIG.CalcTwitchIndex(psd)
 ```
 
 ---
@@ -732,8 +741,8 @@ Twitch Slope is an adaptation of spectral slope (Eyben et al., 2016).
 
 ```python
 # Calculate the Twitch Index of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-TS_Fast, TS_Slow = CalcTwitchSlope(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+TS_Fast, TS_Slow = ESIG.CalcTwitchSlope(psd)
 ```
 
 ---
@@ -772,8 +781,8 @@ $$\text{SC}=\frac{\sum_{i=f_0}^{f_N}i\cdot p_i}{\sum_{i=f_0}^{f_N} p_i}$$
 
 ```python
 # Calculate the SC of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SC = CalcSC(psd)
+psd = (SignalDF['column1'], 2000)
+SC = ESIG.CalcSC(psd)
 ```
 
 ---
@@ -811,8 +820,8 @@ $$\text{SF}=\frac{\prod_{i=0}^{N-1}|p_i|^{\frac{1}{N}}}{\frac{1}{N}\sum_{i=0}^{N
 
 ```python
 # Calculate the SF of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SC = CalcSF(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SC = ESIG.CalcSF(psd)
 ```
 
 ---
@@ -849,8 +858,8 @@ $$\text{SS}=\frac{\sum_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum_{m=0}^{N-1}
 
 ```python
 # Calculate the SS of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SS = CalcSS(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SS = ESIG.CalcSS(psd)
 ```
 
 ---
@@ -886,8 +895,8 @@ $$\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}
 
 ```python
 # Calculate the SDec of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SDec = CalcSDec(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SDec = ESIG.CalcSDec(psd)
 ```
 
 ---
@@ -924,8 +933,8 @@ $$\text{Spectral Entropy}=-\sum_{i=1}^mp(dB_i)\log_2(p(dB_i))$$
 
 ```python
 # Calculate the SEntropy of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SEntropy = CalcSEntropy(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SEntropy = ESIG.CalcSEntropy(psd)
 ```
 
 ---
@@ -963,8 +972,8 @@ The actual threshold for SRoll can be set manually, but literature suggests that
 
 ```python
 # Calculate the SRoll of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SRoll = CalcSRoll(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SRoll = ESIG.CalcSRoll(psd)
 ```
 
 ---
@@ -1005,8 +1014,8 @@ $$\text{SBW}=\left( \sum X(m)\cdot (m-\text{SC})^p \right)^{\frac{1}{p}}$$
 
 ```python
 # Calculate the SBW of SignalDF, for column 'column1'
-psd = nk.signal_psd(SignalDF['column1'], 2000)
-SBW = CalcSBW(psd)
+psd = ESIG.EMG2PSD(SignalDF['column1'], 2000)
+SBW = ESIG.CalcSBW(psd)
 ```
 
 ---

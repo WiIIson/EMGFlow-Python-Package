@@ -1,50 +1,74 @@
 # EMGFlow
 
-The EMG Workflow Toolkit (EMGFlow) was created to provide a more streamlined way to perform the processing of EMG signals in Python. The package provides modules for different steps in inspection, preprocessing, and analysis.
+The open workflow for EMG signal processing and feature extraction.
 
-The EMGFlow package stands out among others as it does not follow a strict pipeline, allowing users to use what functions they need, rather than forcing users to follow a specific series of functions.
+**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing using the data you have your way. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
 
-## EMGFlow - Signals
+EMGFLow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
-The EMGFlow package handles the processing of EMG signals. In EMGFlow, a 'Signal' is just a Pandas dataframe. Such a dataframe should have a 'Time' column, and additional columns that contain the signal strengths recorded at said time.
-- The number of columns does not matter - you can have one recording column or more
-- A column named 'Time' will be treated as recorded time and ignored. Any other columns can be analyzed (or not)
-- The 'Time' column is not necessary to process signals, so you don't have to add one as long as you know the sampling rate
+## Example
 
-## EMGFlow - Sampling Rate
-
-When processing signals in EMGFlow, the other thing you need to know is the sampling rate of your data. The sampling rate is how many samples of the signals are taken per second. This is easily calculated by finding the inverse of the time between your samples.
-- Don't combine signals that have different sampling rates
-- Signals with different sampling rates can be compared after analysis
-
----
-
-# EMGFlow.SignalFilterer
-
-The `SignalFilterer` module provides functions for the processing of signals. These functions make up the main part of the package, and provide customization options for specific needs
-
-In EMGFlow, a "signal" is defined as a Pandas dataframe. This dataframe will have one or more columns for strength of the different signals being recorded (e.g., mV), and a `Time` column for the time since the start of recording that the reading was taken. 
-
-## EMGFlow.SignalFilterer.MapFiles
-
+As a quick example, the following will create a feature file, starting with a folder of raw data:
 ```python
-EMGFlow.SignalFilterer.Mapfiles(in_path, file_ext='csv', expression=None)
+import EMGFlow.SignalFilterer as ESIG
+
+# Paths for data files
+raw_path = '/data/raw/'          # Raw file contains raw data
+notch_path = '/data/notch/'
+band_path = '/data/bandpass/'    # Additional files are empty
+smooth_path = '/data/smoothed/'
+feature_path = '/data/feature/'
+
+# Sampling rate for all files
+sampling_rate = 2000
+
+# Filter parameters
+notch_vals = [(50, 5)]  # Notch filters to apply (Q, Hz)
+band_low = 20           # Low threshold for bandpass filter
+band_high = 140         # High threshold for bandpass filter
+smooth_window = 50      # Window size for smoothing filter
+
+# Signal analysis
+ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals)
+ESIG.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high)
+ESIG.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window)
+ESIG.AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
+# Will create a "Features.csv" file in feature_path with results
 ```
 
-Returns a dictionary of filename/filepath key/value items for files found in subdirectories of a folder.
+---
 
-Parameters:
+## Documentation
 
-&nbsp;&nbsp;&nbsp;&nbsp;in_path: String,
+To see full documentation, see the [GitHub page](https://github.com/WiIIson/EMGFlow-Python-Package/tree/main).
 
 ---
 
-# OutlierFinder Module
+## Installation
 
-The `OutlierFinder` module provides functions for the detection of outliers in signals. This can help decide if special cases need to be taken into consideration when applying filters to signals.
+EMGFlow can be installed from PyPI:
+```python
+pip install EMGFlow
+```
+
+Once installed, the package can be loaded as follows:
+```python
+import EMGFlow
+```
 
 ---
 
-# PlotSignals Module
+## Citations
 
-The `PlotSignals` module provides functions for generating visualizations of signals.
+This package can be cited as follows:
+
+```bibtex
+@software{Conley_EMGFlow_2024,
+  author = {Conley {\tt william@cconley.ca}, William and Livingstone, Steven R},
+  month = {03},
+  title = {{EMGFlow Package}},
+  url = {https://github.com/WiIIson/EMGFlow-Python-Package},
+  version = {0.0.1},
+  year = {2024}
+}
+```

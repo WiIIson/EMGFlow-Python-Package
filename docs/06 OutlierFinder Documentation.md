@@ -1,4 +1,13 @@
-# OutlierFinder Documentation
+# `OutlierFinder` Module Documentation
+
+---
+
+## Importing
+
+The following functions require the `EMGFlow.OutlierFinder` module, which can be imported with:
+```python
+import EMGFlow.OutlierFinder as EOLF
+```
 
 ---
 
@@ -55,5 +64,5 @@ in_path = '/data/notch/'
 sr = 2000
 threshold = 5
 
-DetectOutliers(in_path, sr, threshold)
+EOLF.DetectOutliers(in_path, sr, threshold)
 ```

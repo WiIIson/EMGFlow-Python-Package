@@ -1,4 +1,48 @@
-# SignalFilterer Documentation
+# `SignalFilterer` Module Filtering Documentation
+
+---
+
+## Importing
+
+The following functions require the `EMGFlow.SignalFilterer` module, which can be imported with:
+```python
+import EMGFlow.SignalFilterer as ESIG
+```
+
+---
+
+## `EMG2PSD`
+
+**Description**
+
+Creates a PSD (power spectrum density) of a Signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
+
+```python
+EMG2PSD(Signal, sr=1000, normalize=True)
+```
+
+**Parameters**
+
+`Signal`: pd.DataFrame 
+- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.`
+
+`sr`: int/float (1000)
+- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+
+`normalize`: bool (True)
+- Normalizes the result of the PSD by its maximum strength.
+
+**Returns**
+
+`EMG2PSD`: pd.DataFrame
+- Returns a dictionary of frequencies and related strengths with the columns "Frequency" and "Power".
+
+**Example**
+
+```python
+sr = 2000
+PSD = ESIG.EMG2PSD(SignalDF, sr)
+```
 
 ---
 
@@ -32,11 +76,11 @@ MapFiles(in_path, file_ext='csv', expression=None)
 
 ```python
 # Map all csv files in 'dataFiles' folder and subfolders
-file_loc1 = MapFiles('/data/')
+file_loc1 = ESIG.MapFiles('/data/')
 
 # Map all csv files in 'dataFiles' folder and subfolders
 # that start with 'DATA_'
-file_loc2 = MapFiles('/data/', expression='^DATA_')
+file_loc2 = ESIG.MapFiles('/data/', expression='^DATA_')
 ```
 
 ---
@@ -77,10 +121,10 @@ Raises an error if provided an unsupported file type for `fileObj` is provided.
 
 ```python
 # Read in file locations normally
-file_loc1 = ConvertMapFiles('/data/')
+file_loc1 = ESIG.ConvertMapFiles('/data/')
 
 # Filter an existing dataframe with a regular expression
-file_loc2 = ConvertMapFiles(file_loc1, expression='^01')
+file_loc2 = ESIG.ConvertMapFiles(file_loc1, expression='^01')
 ```
 
 ---
@@ -119,16 +163,16 @@ Raises an error if files contained in the first element of `filedirs` is not con
 
 ```python
 # Create file directory dictionaries
-dir_raw = ConvertMapFiles('/data/raw/')
-notch_path = ConvertMapFiles('/data/notch/')
-band_path = ConvertMapFiles('/data/bandpass/')
+dir_raw = ESIG.ConvertMapFiles('/data/raw/')
+notch_path = ESIG.ConvertMapFiles('/data/notch/')
+band_path = ESIG.ConvertMapFiles('/data/bandpass/')
 
 # Create dictionary list and names
 filedirs = [dir_raw, notch_path, band_path]
 names = ['raw', 'notch', 'bandpass']
 
 # Create data frame
-df_dirs = MapFilesFuse(filedirs, names)
+df_dirs = ESIG.MapFilesFuse(filedirs, names)
 ```
 
 ---
@@ -173,7 +217,7 @@ ApplyNotchFilters(Signal, col, sampling_rate, notch_vals)
 # Apply a notch filter at 150Hz and Q-score of 5, and at
 # 250Hz and a Q-score of 5
 sr = 2000
-SignalFiltered = ApplyNotchFilters(SignalDF, 'column1', sr, [(150, 5), (250, 5)])
+SignalFiltered = ESIG.ApplyNotchFilters(SignalDF, 'column1', sr, [(150, 5), (250, 5)])
 ```
 
 ---
@@ -243,12 +287,12 @@ cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch_vals filters to all files in raw_path,
 # and write them to notch_path
-NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 
 # Apply an additional special case filter to files beginning
 # with '08' or '11', and write them to notch_spec, making
 # sure to copy the other files as well
-NotchFilterSignals(notch_path, notch_spec, sampling_rate, notch_vals_spec, cols, exp_copy=True)
+ESIG.NotchFilterSignals(notch_path, notch_spec, sampling_rate, notch_vals_spec, cols, exp_copy=True)
 ```
 
 ---
@@ -295,7 +339,7 @@ ApplyBandpassFilter(Signal, col, sampling_rate, low, high)
 ```python
 # Apply a notch filter from 20Hz to 250Hz
 sr = 2000
-SignalFiltered = ApplyNotchFilters(SignalDF, 'column1', sr, 20, 250)
+SignalFiltered = ESIG.ApplyNotchFilters(SignalDF, 'column1', sr, 20, 250)
 ```
 
 ---
@@ -369,7 +413,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch_vals filters to all files in notch_path,
 # and write them to bandpass_path
-BandpassFilterSignals(notch_path, bandpass_path, sampling_rate, low, high, cols)
+ESIG.BandpassFilterSignals(notch_path, bandpass_path, sampling_rate, low, high, cols)
 ```
 
 ---
@@ -405,7 +449,7 @@ ApplyFWR(Signal, col)
 **Example**
 
 ```python
-FWR_DF = ApplyFWR(SignalDF, 'column1')
+FWR_DF = ESIG.ApplyFWR(SignalDF, 'column1')
 ```
 
 ---
@@ -448,6 +492,13 @@ $$s_i=\frac{\sum_{j=i-\mu}^{i+\mu}x_j}{2\mu+1}$$
 `ApplyBoxcarSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
 
+**Example**
+
+```python
+width = 20
+SmoothDF = ESIG.ApplyBoxCarSmooth(SignalDF, 'column1', width)
+```
+
 ---
 
 ## `ApplyRMSSmooth`
@@ -487,6 +538,13 @@ $$s_i=\sqrt{\frac{\sum_{j=i-\mu}^{i+\mu}x_j^2}{2\mu+1}}$$
 
 `ApplyRMSSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Example**
+
+```python
+width = 20
+SmoothDF = ESIG.ApplyRMSSmooth(SignalDF, 'column1', width)
+```
 
 ---
 
@@ -532,6 +590,13 @@ $$s_j=\sum_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\si
 `ApplyGaussianSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
 
+**Example**
+
+```python
+width = 20
+SmoothDF = ESIG.ApplyGaussianSmooth(SignalDF, 'column1', width)
+```
+
 ---
 
 ## `ApplyLoessSmooth`
@@ -573,6 +638,13 @@ $$w_i=\left(1-\left(\frac{d_i}{\max(d_i)}\right)^3\right)^3$$
 
 `ApplyLoessSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Example**
+
+```python
+width = 20
+SmoothDF = ESIG.ApplyLoessSmooth(SignalDF, 'column1', width)
+```
 
 ---
 
@@ -633,6 +705,20 @@ Other smoothing functions are also available for use if needed.
 `SmoothFilterSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
 
+**Example**
+
+```python
+bandpass_path = '/data/bandpass/'
+smooth_path = '/data/smooth/'
+sampling_rate = 2000
+size = 20
+cols = ['EMG_zyg', 'EMG_cor']
+
+# Apply RMS filters with window size 20 to all files in
+# notch_path, and write them to bandpass_path
+ESIG.SmoothFilterSignals(bandpass_path, smooth_path, sampling_rate, size, cols)
+```
+
 ---
 
 ## `AnalyzeSignals`
@@ -691,6 +777,25 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 `AnalyzeSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be in CSV format. Each row is a different file analyzed, marked by the file ID. Additional columns show the values of the features extracted by the function.
+
+**Example**
+
+```python
+bandpass_path = '/data/bandpass/'
+smooth_path = '/data/smooth/'
+feature_path = '/data/features/'
+sampling_rate = 2000
+cols = ['EMG_zyg', 'EMG_cor']
+
+# Extracts all features from the files in bandpass_path and
+# smooth_path. Assumes the same files are in both paths.
+ESIG.AnalyzeSignals(bandpass_path, smooth_path, feature_path, sampling_rate, cols)
+
+# Alternatively the same path can be provided twice to extract
+# the different feature types from the same files, but spectral
+# features may not be as accurate.
+ESIG.AnalyzeSignals(smooth_path, smooth_path, feature_path, sampling_rate, cols)
+```
 
 ---
 

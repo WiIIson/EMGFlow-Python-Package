@@ -1,16 +1,28 @@
 [build-system]
-requires = ["hatchling", "neurokit2", "pandas", "numpy", "scipy", "matplotlib", "opencv-python", "tqdm"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "0.0.1"
+version = "1.0.2"
+dependencies = [
+    "pandas",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "opencv-python", 
+    "tqdm",
+    "webbrowser",
+    "shiny",
+    "nest-asyncio"
+]
+requires-python = ">=3.8"
 authors = [
     { name="William Conley", email="william@cconley.ca" },
+    { name="Steven Livingstone" },
 ]
 description = "A general EMG processing and feature extraction package."
 readme = "README.md"
-requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",

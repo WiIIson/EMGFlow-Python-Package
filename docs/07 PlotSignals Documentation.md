@@ -1,4 +1,13 @@
-# PlotSignals Documentation
+# `PlotSignals` Module Documentation
+
+---
+
+## Importing
+
+The following functions require the `EMGFlow.PlotSignals` module, which can be imported with:
+```python
+import EMGFlow.PlotSignals as EPLT
+```
 
 ---
 
@@ -50,7 +59,7 @@ plot_path = '/plots/'
 
 sr = 2000
 
-PlotSpectrum(raw_path, plot_path, sr)
+EPLT.PlotSpectrum(raw_path, plot_path, sr)
 ```
 
 ---
@@ -103,7 +112,7 @@ plot_path = '/plots/'
 
 sr = 2000
 
-PlotSpectrum(raw_path, notch_path, plot_path, sr)
+EPLT.PlotSpectrum(raw_path, notch_path, plot_path, sr)
 ```
 
 ---
@@ -160,5 +169,5 @@ col = 'col1'
 units = 'mV'
 names = ['raw', 'notch', 'bandpass']
 
-GenPlotDash(s_paths, sr, col, units, names)
+EPLT.GenPlotDash(s_paths, sr, col, units, names)
 ```
