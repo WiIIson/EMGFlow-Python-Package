@@ -56,6 +56,13 @@ Once installed, the package can be loaded as follows:
 import EMGFlow
 ```
 
+EMGFlow's functions are divided into 3 different modules, which can be imported with shorthands as follows:
+```python
+import EMGFlow.SignalFilterer as ESIG
+import EMGFlow.OutlierFinder as EOLF
+import EMGFlow.PlotSignals as EPLT
+```
+
 ---
 
 ## Citations
@@ -68,7 +75,7 @@ This package can be cited as follows:
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {0.0.1},
+  version = {1.0.1},
   year = {2024}
 }
 ```
