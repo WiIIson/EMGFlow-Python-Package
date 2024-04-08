@@ -7,8 +7,6 @@ import webbrowser
 from tqdm import tqdm
 
 from shiny import App, render, ui
-import nest_asyncio
-nest_asyncio.apply()
 
 from SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD
 
@@ -249,3 +247,24 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
     webbrowser.open('http://127.0.0.1:8000')
     app.run()
     return
+
+if __name__ == '__main__':
+
+    raw_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/01_Raw/'
+    notch_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch/'
+    notch_s_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/02_Notch_Special/'
+    bandpass_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/03_Bandpass/'
+    smooth_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/04_Smooth/'
+    feature_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/05_Feature/'
+    plot_path = 'C:/Users/willi/Documents/UOIT/UOIT-Thesis/Data/00_Plot/'
+
+    sampling_rate = 2000
+
+    #PlotSpectrumSample(raw_path, plot_path, sampling_rate, 0.1)
+    #PlotCompareSignals(raw_path, notch_path, plot_path, sampling_rate)
+    #PlotOverlaySignals_v2([notch_s_path, bandpass_path, smooth_path], sampling_rate, 'EMG_zyg', 'mV', ['notch', 'bandpass', 'smooth'])
+
+    in_paths = [smooth_path, bandpass_path, notch_s_path]
+    names = ['Smooth', 'Bandpass', 'Notch']
+
+    GenPlotDash(in_paths, sampling_rate, 'EMG_zyg', 'mV', names)

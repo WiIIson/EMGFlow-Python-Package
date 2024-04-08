@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
     "pandas",
     "numpy",
@@ -14,12 +14,11 @@ dependencies = [
     "tqdm",
     "webbrowser",
     "shiny",
-    "nest-asyncio"
 ]
 requires-python = ">=3.8"
 authors = [
-    { name="William Conley", email="william@cconley.ca" },
-    { name="Steven Livingstone" },
+    "William Conley <william@cconley.ca>",
+    "Steven Livingstone"
 ]
 description = "A general EMG processing and feature extraction package."
 readme = "README.md"

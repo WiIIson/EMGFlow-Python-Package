@@ -1,4 +1,4 @@
-<img src="HexSticker.png"  width="100" height="110" style="float: right">
+<img src="HexSticker.png"  width="100" height="110" align="right">
 
 # EMGFlow
 
@@ -15,8 +15,6 @@ As well as which files you see:
 ![Example 2](ThesisClip_02.gif)
 
 ---
-
-## Example
 
 ## Example
 
