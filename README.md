@@ -1,6 +1,4 @@
-<img src="HexSticker.png"  width="100" height="110" align="right">
-
-# EMGFlow
+# EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
 
 The open workflow for EMG signal processing and feature extraction.
 
