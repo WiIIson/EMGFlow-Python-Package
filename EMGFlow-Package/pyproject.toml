@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "1.0.3"
+version = "1.0.6"
 dependencies = [
     "pandas",
     "numpy",
@@ -17,8 +17,7 @@ dependencies = [
 ]
 requires-python = ">=3.8"
 authors = [
-    "William Conley <william@cconley.ca>",
-    "Steven Livingstone"
+    {name = "William Conley and Steven Livingstone", email = "william@cconley.ca"}
 ]
 description = "A general EMG processing and feature extraction package."
 readme = "README.md"
@@ -27,3 +26,6 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: OS Independent",
 ]
+
+[project.urls]
+Home = "https://github.com/WiIIson/EMGFlow-Python-Package"
