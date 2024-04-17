@@ -6,7 +6,7 @@ import re
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from SignalFilterer import MapFiles, EMG2PSD
+from .SignalFilterer import MapFiles, EMG2PSD
 
 #
 # =============================================================================

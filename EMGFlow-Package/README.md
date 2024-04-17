@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/WiIIson/EMGFlow-Python-Package/main/HexSticker.png"  width="100" height="110" style="float: right;">
+
 # EMGFlow
 
 The open workflow for EMG signal processing and feature extraction.
@@ -75,7 +77,7 @@ This package can be cited as follows:
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.0.6},
+  version = {1.0.9},
   year = {2024}
 }
 ```

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "1.0.6"
+version = "1.0.9"
 dependencies = [
     "pandas",
     "numpy",
@@ -12,7 +12,6 @@ dependencies = [
     "matplotlib",
     "opencv-python", 
     "tqdm",
-    "webbrowser",
     "shiny",
 ]
 requires-python = ">=3.8"
