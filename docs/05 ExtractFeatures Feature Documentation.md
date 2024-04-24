@@ -37,7 +37,9 @@ Skew and kurtosis are lesser known statistical measurements.
 Skewness describes the symmetry of a dataset, considered more skewed the less symmetrical the left and right distributions of the median are.
 
 Skew is calculated as follows:
-$$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
+```math
+s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}
+```
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
 - $M_o$ <-- Mode
@@ -50,7 +52,9 @@ $$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
 Kurtosis describes the amount of data in the tails of a bell curve of a distribution.
 
 Kurtosis is calculated as follows:
-$$k=\frac{1}{N}\sum_{i=1}^N\left(\frac{x_i-\mu}{\sigma}\right)^4$$
+```math
+k=\frac{1}{N}\sum_{i=1}^N\left(\frac{x_i-\mu}{\sigma}\right)^4
+```
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
 - $N$ <-- Number of data points
@@ -74,7 +78,9 @@ CalcIEMG(Signal, col, sr)
 In the reference, the IEMG does not account for the sampling rate. Two signal recordings with the same shape but different sampling rate would have different results since we are integrating with respect to time. As such, the calculation made here will include multiplying by sampling rate.
 
 The IEMG is calculated as follows:
-$$\text{IEMG}=s_r\sum_{i=1}^N|x_i|$$
+```math
+\text{IEMG}=s_r\sum_{i=1}^N|x_i|
+```
 - $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
@@ -118,7 +124,9 @@ CalcMAV(Signal, col)
 **Theory**
 
 The MAV is calculated as follows:
-$$\text{MAV}=\frac{1}{N}\sum_{i=1}^N|x_i|$$
+```math
+\text{MAV}=\frac{1}{N}\sum_{i=1}^N|x_i|
+```
 - $N$ <-- Number of data points
 
 (Tkach et al., 2010)
@@ -157,8 +165,12 @@ Calculates the Modified Mean Absolute Value (MMAV) of the signal. The MMAV is an
 The MMAV is identical to MAV, except it introduces a weight to the calculation. Values are given a weight of 1 when they are between the 25th and 74th percentile, and 0.5 outside. The article describing the MMAV also listed another modification, MMAV2, but the description appeared to be flawed, and as such the measure was not included.
 
 The MMAV is calculated as follows:
-$$\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|$$
-$$w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.$$
+```math
+\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
+```
+```math
+w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.
+```
 - $N$ <-- Number of data points
 
 (Chowdhury et al., 2013)
@@ -200,7 +212,9 @@ CalcSSI(Signal, col, sr)
 In the reference, the SSI does not account for the sampling rate. Two signal recordings with the same shape but different sampling rate would have different results since we are integrating with respect to time. As such, the calculation made here will include multiplying by sampling rate.
 
 The SSI is calculated as follows:
-$$\text{SSI}=s_r^2\sum_{i=1}^N|x_i|^2$$
+```math
+\text{SSI}=s_r^2\sum_{i=1}^N|x_i|^2
+```
 - $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
@@ -244,7 +258,9 @@ CalcVAR(Signal, col)
 **Theory**
 
 The VAR is calculated as follows:
-$$\text{VAR}=\frac{1}{N-1}\sum_{i=1}^Nx_i^2$$
+```math
+\text{VAR}=\frac{1}{N-1}\sum_{i=1}^Nx_i^2
+```
 
 (Spiewak et al., 2018)
 
@@ -285,7 +301,9 @@ CalcVOrder(Signal, col)
 The V-Order is calculated using the $v$-operator, essentially working like a Euclidean distance to the $v$th order. One study indicates that the best value for $v$ is 2, meaning the V-Order is just the square root of the VAR feature.
 
 The V-Order is calculated as follows:
-$$\text{vORDER}=\sqrt{\text{VAR}}$$
+```math
+\text{vORDER}=\sqrt{\text{VAR}}
+```
 
 (Tkach et al., 2010)
 
@@ -324,7 +342,9 @@ CalcRMS(Signal, col)
 **Theory**
 
 The RMS is calculated as follows:
-$$\text{RMS}=\sqrt{\frac{1}{N}\sum_{i=1}^N}|x_i|^2$$
+```math
+\text{RMS}=\sqrt{\frac{1}{N}\sum_{i=1}^N}|x_i|^2
+```
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -364,7 +384,9 @@ CalcWL(Signal, col)
 **Theory**
 
 The WL is calculated as follows:
-$$\text{WL}=\sum_{i=1}^{N-1}|x_{i+1}-x_i|$$
+```math
+\text{WL}=\sum_{i=1}^{N-1}|x_{i+1}-x_i|
+```
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -408,8 +430,12 @@ Thresholds for the WAMP are commonly chosen within the 50-100 mV range. The WAMP
 When choosing a value, pass it in terms of the same units being used in the data.
 
 The WAMP is calculated as follows:
-$$\text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)$$
-$$f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \end{matrix}\right.$$
+```math
+\text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)
+```
+```math
+f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \end{matrix}\right.
+```
 - $N$ <-- Number of data points
 - $\epsilon$ <-- Voltage change threshold
 
@@ -453,7 +479,9 @@ CalcLOG(Signal, col)
 **Theory**
 
 The LOG is calculated as follows:
-$$\text{LOG}=e^{\frac{1}{N}\sum_{i=1}^N\log(|x_k|)}$$
+```math
+\text{LOG}=e^{\frac{1}{N}\sum_{i=1}^N\log(|x_k|)}
+```
 - $N$ <-- Number of data points
 
 (Tkach et al., 2010)
@@ -493,7 +521,9 @@ CalcMFL(Signal, col)
 **Theory**
 
 The MFL is calculated as follows:
-$$\text{MFL}=\log\left(\sqrt{\sum_{i=1}^{N-1}(x_{i+1}-x_i)^2}\right)$$
+```math
+\text{MFL}=\log\left(\sqrt{\sum_{i=1}^{N-1}(x_{i+1}-x_i)^2}\right)
+```
 - $N$ <-- Number of data points
 
 (Too et al., 2019)
@@ -533,7 +563,9 @@ CalcAP(Signal, col)
 **Theory**
 
 The AP is calculated as follows:
-$$\text{AP}=\frac{1}{N}\sum_{i=1}^Nx_i^2$$
+```math
+\text{AP}=\frac{1}{N}\sum_{i=1}^Nx_i^2
+```
 - $N$ <-- Number of data points
 
 (Too et al., 2019)
@@ -633,7 +665,9 @@ This metric uses a proposed muscle separation theory put forward by this project
 Twitch Ratio is an adaptation of Alpha Ratio (Eyben et al., 2016).
 
 Twitch Ratio is calculated as follows:
-$$\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}$$
+```math
+\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}
+```
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_t$ <-- Threshold frequency of the PSD
@@ -679,7 +713,9 @@ This metric uses a proposed muscle separation theory put forward by this project
 Twitch Index is an adaptation of the Hammarberg index (Eyben et al., 2016).
 
 Twitch Index is calculated as follows:
-$$\text{TR}=\frac{\max\left(\sum_{i=f_0}^{f_t} p_i\right)}{\max\left(\sum_{i=f_t}^{f_N}p_i\right)}$$
+```math
+\text{TR}=\frac{\max\left(\sum_{i=f_0}^{f_t} p_i\right)}{\max\left(\sum_{i=f_t}^{f_N}p_i\right)}
+```
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_t$ <-- Threshold frequency of the PSD
@@ -762,7 +798,9 @@ CalcSC(psd)
 **Theory**
 
 SC is calculated as follows:
-$$\text{SC}=\frac{\sum_{i=f_0}^{f_N}i\cdot p_i}{\sum_{i=f_0}^{f_N} p_i}$$
+```math
+\text{SC}=\frac{\sum_{i=f_0}^{f_N}i\cdot p_i}{\sum_{i=f_0}^{f_N} p_i}
+```
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_N$ <-- Maximum frequency of the PSD
@@ -802,7 +840,9 @@ CalcSF(psd)
 **Theory**
 
 SF is calculated as follows:
-$$\text{SF}=\frac{\prod_{i=0}^{N-1}|p_i|^{\frac{1}{N}}}{\frac{1}{N}\sum_{i=0}^{N-1}|p_i|}$$
+```math
+\text{SF}=\frac{\prod_{i=0}^{N-1}|p_i|^{\frac{1}{N}}}{\frac{1}{N}\sum_{i=0}^{N-1}|p_i|}
+```
 - $p_i$ <-- $i$th element of PSD strength
 - $N$ <-- Number of elements in PSD
 
@@ -841,8 +881,10 @@ CalcSS(psd)
 **Theory**
 
 SS is calculated as follows:
-$$\text{SS}=\frac{\sum_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum_{m=0}^{N-1}
-|X(m)|}$$
+```math
+\text{SS}=\frac{\sum_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum_{m=0}^{N-1}
+|X(m)|}
+```
 
 (Nagineni et al., 2018)
 
@@ -879,7 +921,9 @@ CalcSDec(psd)
 **Theory**
 
 SDec is calculated as follows:
-$$\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}$$
+```math
+\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}
+```
 
 (Nagineni et al., 2018)
 
@@ -916,7 +960,9 @@ CalcSEntropy(psd)
 **Theory**
 
 Spectral Entropy is calculated as follows:
-$$\text{Spectral Entropy}=-\sum_{i=1}^mp(dB_i)\log_2(p(dB_i))$$
+```math
+\text{Spectral Entropy}=-\sum_{i=1}^mp(dB_i)\log_2(p(dB_i))
+```
 
 (Llanos et al., 2017)
 
@@ -995,7 +1041,9 @@ CalcSBW(psd, p=2)
 SBW has a parameter $p$ that can be adjusted to different values. Using a value of 2 will result in the standard deviation around the centroid.
 
 SBW is calculated as follows:
-$$\text{SBW}=\left( \sum X(m)\cdot (m-\text{SC})^p \right)^{\frac{1}{p}}$$
+```math
+\text{SBW}=\left( \sum X(m)\cdot (m-\text{SC})^p \right)^{\frac{1}{p}}
+```
 
 (Verma, 2021)
 
