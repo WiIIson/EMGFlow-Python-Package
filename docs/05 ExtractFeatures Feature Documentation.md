@@ -158,7 +158,7 @@ The MMAV is identical to MAV, except it introduces a weight to the calculation. 
 
 The MMAV is calculated as follows:
 $$\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|$$
-$$w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right.$$
+$$w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.$$
 - $N$ <-- Number of data points
 
 (Chowdhury et al., 2013)
@@ -409,7 +409,7 @@ When choosing a value, pass it in terms of the same units being used in the data
 
 The WAMP is calculated as follows:
 $$\text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)$$
-$$f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right.$$
+$$f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \end{matrix}\right.$$
 - $N$ <-- Number of data points
 - $\epsilon$ <-- Voltage change threshold
 
@@ -579,7 +579,9 @@ CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None)
 Spectral Flux is used to compare two different signals together. The applications of this are more difficult to implement, so there is no one function to handle this.
 
 Spectral Flux is calculated as follows:
-$$\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2$$
+```math
+\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2
+```
 
 (Giannakopoulos & Pikrakis, 2014)
 

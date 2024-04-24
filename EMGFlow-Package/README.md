@@ -77,7 +77,7 @@ This package can be cited as follows:
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.0.9},
+  version = {1.0.10},
   year = {2024}
 }
 ```

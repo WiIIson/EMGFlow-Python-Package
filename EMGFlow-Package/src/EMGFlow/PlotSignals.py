@@ -8,6 +8,9 @@ from tqdm import tqdm
 
 from shiny import App, render, ui
 
+import nest_asyncio
+nest_asyncio.apply()
+
 from SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD
 
 #
