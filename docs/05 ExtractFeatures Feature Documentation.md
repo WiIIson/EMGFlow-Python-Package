@@ -660,7 +660,7 @@ CalcTwitchRatio(psd, freq=60)
 
 **Theory**
 
-This metric uses a proposed muscle separation theory put forward by this project. This measure is typically used in audio feature extraction, separating the high and low frequencies. This kind of separation is not typically done in EMG feature extraction. However, literature suggests that there are both high and low frequency muscle activations (Penney, 2022) that can be separated by an approximately 60Hz threshold (Hegedus et al., 2020). Since these muscles are present in the face (McComas, 1998), this experimental feature is being added by applying this audio feature in a new context.
+This metric uses a proposed muscle separation theory put forward by this project. This measure is typically used in audio feature extraction, separating the high and low frequencies. This kind of separation is not typically done in EMG feature extraction. However, literature suggests that there are both high and low frequency muscle activations that can be separated by an approximately 60Hz threshold (Hegedus et al., 2020). Since these muscles are present in the face (McComas, 1998), this experimental feature is being added by applying this audio feature in a new context.
 
 Twitch Ratio is an adaptation of Alpha Ratio (Eyben et al., 2016).
 
@@ -1045,7 +1045,7 @@ SBW is calculated as follows:
 \text{SBW}=\left( \sum X(m)\cdot (m-\text{SC})^p \right)^{\frac{1}{p}}
 ```
 
-(Verma, 2021)
+(Tjoa, 2022)
 
 **Parameters**
 
@@ -1086,8 +1086,6 @@ McComas, A. J. (1998). Oro-facial muscles: Internal structure, function and agei
 
 Nagineni, S., Taran, S., & Bajaj, V. (2018). Features based on variational mode decomposition for identification of neuromuscular disorder using EMG signals. _Health Information Science and Systems_, _6_(1), 13. [https://doi.org/10.1007/s13755-018-0050-4](https://doi.org/10.1007/s13755-018-0050-4)
 
-Penney, S. (2022). _Fast-Twitch Vs. Slow-Twitch Muscle Fiber Types + Training Tips | NASM_. [https://blog.nasm.org/fitness/fast-twitch-vs-slow-twitch](https://blog.nasm.org/fitness/fast-twitch-vs-slow-twitch)
-
 Roldán Jiménez, C., Bennett, P., Ortiz García, A., & Cuesta Vargas, A. I. (2019). Fatigue Detection during Sit-To-Stand Test Based on Surface Electromyography and Acceleration: A Case Study. _Sensors (Basel, Switzerland)_, _19_(19), 4202. [https://doi.org/10.3390/s19194202](https://doi.org/10.3390/s19194202)
 
 Spiewak, C., Islam, M. R., Assad-Uz-Zaman, M., & Rahman, M. (2018). A Comprehensive Study on EMG Feature Extraction and Classifiers. _Open Access Journal of Biomedical Engineering and Its Applications_, _1_. [https://doi.org/10.32474/OAJBEB.2018.01.000104](https://doi.org/10.32474/OAJBEB.2018.01.000104)
@@ -1097,5 +1095,3 @@ Tjoa, S. (2022). _Spectral Features_. Music Information Retrieval. [https://musi
 Tkach, D., Huang, H., & Kuiken, T. A. (2010). Study of stability of time-domain features for electromyographic pattern recognition. _Journal of NeuroEngineering and Rehabilitation_, _7_, 21. [https://doi.org/10.1186/1743-0003-7-21](https://doi.org/10.1186/1743-0003-7-21)
 
 Too, J., Abdullah, A. R., Mohd Saad, N., & Tee, W. (2019). EMG Feature Selection and Classification Using a Pbest-Guide Binary Particle Swarm Optimization. _Computation_, _7_(1), Article 1. [https://doi.org/10.3390/computation7010012](https://doi.org/10.3390/computation7010012)
-
-Verma, Y. (2021, September 19). _A Tutorial on Spectral Feature Extraction for Audio Analytics_. Analytics India Magazine. [https://analyticsindiamag.com/a-tutorial-on-spectral-feature-extraction-for-audio-analytics/](https://analyticsindiamag.com/a-tutorial-on-spectral-feature-extraction-for-audio-analytics/)
