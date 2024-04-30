@@ -7,7 +7,7 @@
 A simple example outlining the four main steps of the EMG processing pipeline.
 
 ```python
-import EMGFlow.SignalFilterer as ESIG
+import EMGFlow
 
 # Paths for data files
 raw_path = '/data/raw/'
@@ -26,13 +26,13 @@ band_high = 140
 smooth_window = 50
 
 # Column to apply to
-col = 'col1'
+cols = ['col1']
 
 # Signal analysis
-ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, col)
-ESIG.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, col)
-ESIG.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, col)
-ESIG.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, [col])
+EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ## Advanced Example
@@ -40,7 +40,7 @@ ESIG.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, [col])
 A more advanced example applying conditional filters based on file names.
 
 ```python
-import EMGFlow.SignalFilterer as ESIG
+import EMGFlow
 
 # Paths for data files
 raw_path = '/data/raw/'
@@ -64,13 +64,14 @@ notch_vals_s = [(45, 1), (60, 5)]
 reg_str = '^(08|11)'
 
 # Column to apply to
-col = 'col1'
+cols = ['col1']
 
 # Signal analysis
-ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, col, expression=reg_str)
-ESIG.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, col, expression=reg_str)
-ESIG.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, col, expression=reg_str)
-ESIG.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, [col], expression=reg_str)
+EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+EMGFlow.NotchFilterSignals(notch_path, notch_path_s, sampling_rate, notch_vals_s, cols, expression=reg_str, exp_copy=True)
+EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ## Advanced Example
@@ -78,7 +79,7 @@ ESIG.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, [col], 
 A more advnaced example using custom feature extraction functions.
 
 ```python
-import EMGFlow.SignalFilterer as ESIG
+import EMGFlow
 import tqdm
 
 # Paths for data files
@@ -98,12 +99,12 @@ band_high = 140
 smooth_window = 50
 
 # Column to apply to
-col = 'col1'
+cols = ['col1']
 
 # Signal analysis
-ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, col)
-ESIG.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, col)
-ESIG.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, col)
+EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
 
 # ---
 
@@ -130,13 +131,13 @@ for file in tqdm.tqdm(filedirs_b):
 		data_s = pd.read_csv(filedirs_s[file])
 		# Calculate time-series measures
 		File_ID = file
-		IEMG = ESIG.CalcIEMG(data_s, col, sampling_rate)
-		MAV = ESIG.CalcMAV(data_s, col)
-		MMAV = ESIG.CalcMMAV(data_s, col)
+		IEMG = EMGFlow.CalcIEMG(data_s, col, sampling_rate)
+		MAV = EMGFlow.CalcMAV(data_s, col)
+		MMAV = EMGFlow.CalcMMAV(data_s, col)
 		# ...
 		# Calculate spectral measures
-		psd = ESIG.EMG2PSD(data_b[col], sampling_rate)
-		Spec_Centroid = ESIG.CalcSC(psd)
+		psd = EMGFlow.EMG2PSD(data_b[col], sampling_rate)
+		Spec_Centroid = EMGFlow.CalcSC(psd)
 		# ...
 		
 		# Create list of measures

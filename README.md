@@ -15,7 +15,7 @@ The simple navigation menu allows you to switch between which files you see as w
 
 As a quick example, the following will create a feature file, starting with a folder of raw data:
 ```python
-import EMGFlow.SignalFilterer as ESIG
+import EMGFlow
 
 # Paths for data files
 raw_path = '/data/raw/'          # Raw file contains raw data
@@ -34,10 +34,10 @@ band_high = 140         # High threshold for bandpass filter
 smooth_window = 50      # Window size for smoothing filter
 
 # Signal analysis
-ESIG.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals)
-ESIG.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high)
-ESIG.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window)
-ESIG.AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
+EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals)
+EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window)
+EMGFlow.AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
 # Will create a "Features.csv" file in feature_path with results
 ```
 
@@ -70,13 +70,6 @@ Once installed, the package can be loaded as follows:
 import EMGFlow
 ```
 
-EMGFlow's functions are divided into 3 different modules, which can be imported with shorthands as follows:
-```python
-import EMGFlow.SignalFilterer as ESIG
-import EMGFlow.OutlierFinder as EOLF
-import EMGFlow.PlotSignals as EPLT
-```
-
 ---
 
 ## Citations
@@ -89,7 +82,7 @@ This package can be cited as follows:
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.0.9},
+  version = {1.0.12},
   year = {2024}
 }
 ```

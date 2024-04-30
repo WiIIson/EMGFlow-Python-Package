@@ -1,1 +1,3 @@
-from .SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD
+from .SignalFilterer import *
+from .OutlierFinder import *
+from .PlotSignals import *
