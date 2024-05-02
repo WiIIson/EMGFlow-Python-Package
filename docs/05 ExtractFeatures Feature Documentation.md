@@ -29,12 +29,12 @@ Skewness describes the symmetry of a dataset, considered more skewed the less sy
 
 Skew is calculated as follows:
 ```math
-s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}
+s=\frac{\frac{\mu-M\\_o}{\sigma}}{\frac{3(\mu-M\\_d)}{\sigma}}
 ```
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
-- $M_o$ <-- Mode
-- $M_d$ <-- Median
+- $M\\_o$ <-- Mode
+- $M\\_d$ <-- Median
 
 **Skew** is calculated with `scipy.stats.skew`
 
@@ -44,7 +44,7 @@ Kurtosis describes the amount of data in the tails of a bell curve of a distribu
 
 Kurtosis is calculated as follows:
 ```math
-k=\frac{1}{N}\sum_{i=1}^N\left(\frac{x_i-\mu}{\sigma}\right)^4
+k=\frac{1}{N}\sum\\_{i=1}^N\left(\frac{x\\_i-\mu}{\sigma}\right)^4
 ```
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
@@ -70,9 +70,9 @@ In the reference, the IEMG does not account for the sampling rate. Two signal re
 
 The IEMG is calculated as follows:
 ```math
-\text{IEMG}=s_r\sum_{i=1}^N|x_i|
+\text{IEMG}=s\\_r\sum\\_{i=1}^N|x\\_i|
 ```
-- $s_r$ <-- Sampling rate
+- $s\\_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -122,7 +122,7 @@ CalcMAV(Signal, col)
 
 The MAV is calculated as follows:
 ```math
-\text{MAV}=\frac{1}{N}\sum_{i=1}^N|x_i|
+\text{MAV}=\frac{1}{N}\sum\\_{i=1}^N|x\\_i|
 ```
 - $N$ <-- Number of data points
 
@@ -170,10 +170,10 @@ The MMAV is identical to MAV, except it introduces a weight to the calculation. 
 
 The MMAV is calculated as follows:
 ```math
-\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
+\text{MMAV}=\frac{1}{N}\sum\\_{i=1}^N|x\\_iw\\_i|
 ```
 ```math
-w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.
+w\\_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.
 ```
 - $N$ <-- Number of data points
 
@@ -221,9 +221,9 @@ In the reference, the SSI does not account for the sampling rate. Two signal rec
 
 The SSI is calculated as follows:
 ```math
-\text{SSI}=s_r^2\sum_{i=1}^N|x_i|^2
+\text{SSI}=s\\_r^2\sum\\_{i=1}^N|x\\_i|^2
 ```
-- $s_r$ <-- Sampling rate
+- $s\\_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -273,7 +273,7 @@ CalcVAR(Signal, col)
 
 The VAR is calculated as follows:
 ```math
-\text{VAR}=\frac{1}{N-1}\sum_{i=1}^Nx_i^2
+\text{VAR}=\frac{1}{N-1}\sum\\_{i=1}^Nx\\_i^2
 ```
 
 (Spiewak et al., 2018)
@@ -365,7 +365,7 @@ CalcRMS(Signal, col)
 
 The RMS is calculated as follows:
 ```math
-\text{RMS}=\sqrt{\frac{1}{N}\sum\\_{i=1}^N}|x\\_i|^2
+\text{RMS}=\sqrt{\frac{1}{N}\sum\\_{i=1}^N|x\\_i|^2}
 ```
 - $N$ <-- Number of data points
 
@@ -411,7 +411,7 @@ CalcWL(Signal, col)
 
 The WL is calculated as follows:
 ```math
-\text{WL}=\sum_{i=1}^{N-1}|x_{i+1}-x_i|
+\text{WL}=\sum\\_{i=1}^{N-1}|x\\_{i+1}-x\\_i|
 ```
 - $N$ <-- Number of data points
 
@@ -461,7 +461,7 @@ When choosing a value, pass it in terms of the same units being used in the data
 
 The WAMP is calculated as follows:
 ```math
-\text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)
+\text{WAMP}=\sum\\_{i=1}^{N-1}f(|x\\_{i+1}-x\\_i|)
 ```
 ```math
 f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \end{matrix}\right.
@@ -514,7 +514,7 @@ CalcLOG(Signal, col)
 
 The LOG is calculated as follows:
 ```math
-\text{LOG}=e^{\frac{1}{N}\sum_{i=1}^N\log(|x_k|)}
+\text{LOG}=e^{\frac{1}{N}\sum\\_{i=1}^N\log(|x\\_k|)}
 ```
 - $N$ <-- Number of data points
 
@@ -560,7 +560,7 @@ CalcMFL(Signal, col)
 
 The MFL is calculated as follows:
 ```math
-\text{MFL}=\log\left(\sqrt{\sum_{i=1}^{N-1}(x_{i+1}-x_i)^2}\right)
+\text{MFL}=\log\left(\sqrt{\sum\\_{i=1}^{N-1}(x\\_{i+1}-x\\_i)^2}\right)
 ```
 - $N$ <-- Number of data points
 
@@ -606,7 +606,7 @@ CalcAP(Signal, col)
 
 The AP is calculated as follows:
 ```math
-\text{AP}=\frac{1}{N}\sum_{i=1}^Nx_i^2
+\text{AP}=\frac{1}{N}\sum\\_{i=1}^Nx\\_i^2
 ```
 - $N$ <-- Number of data points
 
@@ -658,7 +658,7 @@ Spectral Flux is used to compare two different signals together. The application
 
 Spectral Flux is calculated as follows:
 ```math
-\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2
+\text{FL}\\_{i,i-1}=\sum\\_{k=1}^{Wf\\_L}(\text{EN}\\_i(k)-\text{EN}\\_{i-1}(k))^2
 ```
 
 (Giannakopoulos & Pikrakis, 2014)
@@ -724,12 +724,12 @@ Twitch Ratio is an adaptation of Alpha Ratio (Eyben et al., 2016).
 
 Twitch Ratio is calculated as follows:
 ```math
-\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}
+\text{TR}=\frac{\sum\\_{i=f\\_0}^{f\\_t} p\\_i}{\sum\\_{i=f\\_t}^{f\\_N}p\\_i}
 ```
-- $p_i$ <-- Power of normalized PSD at frequency $i$
-- $f_0$ <-- Minimum frequency of the PSD
-- $f_t$ <-- Threshold frequency of the PSD
-- $f_N$ <-- Maximum frequency of the PSD
+- $p\\_i$ <-- Power of normalized PSD at frequency $i$
+- $f\\_0$ <-- Minimum frequency of the PSD
+- $f\\_t$ <-- Threshold frequency of the PSD
+- $f\\_N$ <-- Maximum frequency of the PSD
 
 **Parameters**
 
@@ -778,12 +778,12 @@ Twitch Index is an adaptation of the Hammarberg index (Eyben et al., 2016).
 
 Twitch Index is calculated as follows:
 ```math
-\text{TR}=\frac{\max\left(\sum_{i=f_0}^{f_t} p_i\right)}{\max\left(\sum_{i=f_t}^{f_N}p_i\right)}
+\text{TR}=\frac{\max\left(\sum\\_{i=f\\_0}^{f\\_t} p\\_i\right)}{\max\left(\sum\\_{i=f\\_t}^{f\\_N}p\\_i\right)}
 ```
-- $p_i$ <-- Power of normalized PSD at frequency $i$
-- $f_0$ <-- Minimum frequency of the PSD
-- $f_t$ <-- Threshold frequency of the PSD
-- $f_N$ <-- Maximum frequency of the PSD
+- $p\\_i$ <-- Power of normalized PSD at frequency $i$
+- $f\\_0$ <-- Minimum frequency of the PSD
+- $f\\_t$ <-- Threshold frequency of the PSD
+- $f\\_N$ <-- Maximum frequency of the PSD
 
 **Parameters**
 
@@ -875,11 +875,11 @@ CalcSC(psd)
 
 SC is calculated as follows:
 ```math
-\text{SC}=\frac{\sum_{i=f_0}^{f_N}i\cdot p_i}{\sum_{i=f_0}^{f_N} p_i}
+\text{SC}=\frac{\sum\\_{i=f\\_0}^{f\\_N}i\cdot p\\_i}{\sum\\_{i=f\\_0}^{f\\_N} p\\_i}
 ```
-- $p_i$ <-- Power of normalized PSD at frequency $i$
-- $f_0$ <-- Minimum frequency of the PSD
-- $f_N$ <-- Maximum frequency of the PSD
+- $p\\_i$ <-- Power of normalized PSD at frequency $i$
+- $f\\_0$ <-- Minimum frequency of the PSD
+- $f\\_N$ <-- Maximum frequency of the PSD
 
 (Roldán Jiménez et al., 2019)
 
@@ -921,9 +921,9 @@ CalcSF(psd)
 
 SF is calculated as follows:
 ```math
-\text{SF}=\frac{\prod_{i=0}^{N-1}|p_i|^{\frac{1}{N}}}{\frac{1}{N}\sum_{i=0}^{N-1}|p_i|}
+\text{SF}=\frac{\prod\\_{i=0}^{N-1}|p\\_i|^{\frac{1}{N}}}{\frac{1}{N}\sum\\_{i=0}^{N-1}|p\\_i|}
 ```
-- $p_i$ <-- $i$th element of PSD strength
+- $p\\_i$ <-- $i$th element of PSD strength
 - $N$ <-- Number of elements in PSD
 
 (Nagineni et al., 2018)
@@ -966,7 +966,7 @@ CalcSS(psd)
 
 SS is calculated as follows:
 ```math
-\text{SS}=\frac{\sum_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum_{m=0}^{N-1}
+\text{SS}=\frac{\sum\\_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum\\_{m=0}^{N-1}
 |X(m)|}
 ```
 
@@ -1010,7 +1010,7 @@ CalcSDec(psd)
 
 SDec is calculated as follows:
 ```math
-\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}
+\text{SDec}=\frac{\sum\\_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum\\_{m=1}^{N-1}|X(m)|}
 ```
 
 (Nagineni et al., 2018)
@@ -1053,7 +1053,7 @@ CalcSEntropy(psd)
 
 Spectral Entropy is calculated as follows:
 ```math
-\text{Spectral Entropy}=-\sum_{i=1}^mp(dB_i)\log_2(p(dB_i))
+\text{Spectral Entropy}=-\sum\\_{i=1}^mp(dB\\_i)\log\\_2(p(dB\\_i))
 ```
 
 (Llanos et al., 2017)
