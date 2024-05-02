@@ -138,6 +138,15 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
     file_ext : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if in_path1 and in_path2 don't contain the same files.
+    Exception
+        An exception is raised if sampling_rate is less or equal to 0.
+    Exception
+        An exception is raised if a column in cols is not in a dataframe.
+
     Returns
     -------
     None.
@@ -151,6 +160,9 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
     # Get dictionary of file locations
     filedirs1 = ConvertMapFiles(in_path1, file_ext=file_ext, expression=expression)
     filedirs2 = ConvertMapFiles(in_path2, file_ext=file_ext, expression=expression)
+    
+    if set(filedirs1.keys()) != set(filedirs2.keys()):
+        raise Exception("File mismatch between provided directories")
     
     # Make plots
     for file in tqdm(filedirs1):
@@ -173,6 +185,9 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             for i in range(len(cols)):
                 col = cols[i]
                 
+                if col not in list(data1.columns.values) or col not in list(data2.columns.values):
+                    raise Exception("Column " + col + " not in Signal " + file)
+                
                 psd1 = EMG2PSD(data1[col], sr=sampling_rate)
                 axs[0,i].plot(psd1['Frequency'], psd1['Power'])
                 axs[0,i].set_ylabel('Power magnitude')
@@ -194,7 +209,46 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 #
 
 # Creates a shiny app object that can be ran
-def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ext='csv'):
+def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
+    """
+    Generate a shiny dashboard of different processing stages for a given column.
+
+    Parameters
+    ----------
+    in_paths : str list
+        List of string filepaths to a directories containing Signal files.
+        Directories should contain the same file names, but don't have to keep
+        the same hierarchy.
+    col : str
+        String column name to display the visualization.
+    units : str
+        Units to use for the y axis of the plot, should be same units used for
+        column values.
+    names : str list
+        List of names to display as the legend for the different paths provided.
+    expression : str, optional
+        String regular expression. If provided, will only create visualizations
+        for Signal files whose names match the regular expression, and will
+        ignore everything else. The default is None.
+    file_ext : str, optional
+        String extension of the files to read. Any file in in_path with this
+        extension will be considered to be a Signal file, and treated as such.
+        The default is 'csv'.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if the directories in in_paths don't contain the
+        same files.
+    Exception
+        An exception is raised if the col is not found in a dataframe.
+
+    Returns
+    -------
+    None.
+
+    """
+    
     # Convert file paths to directories
     filedirs = []
     for path in in_paths:
@@ -244,6 +298,10 @@ def GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, fil
                 # Read/plot each file
                 for file_loc in reversed(list(df.loc[filename])[1:]):
                     sigDF = pd.read_csv(file_loc)
+                    
+                    if col not in list(sigDF.columns.values):
+                        raise Exception("Column " + col + " not in Signal " + filename)
+                    
                     ax.plot(sigDF['Time'], sigDF[col], alpha=0.5)
                 # Set legend for multiple plots
                 ax.legend(legnames)
