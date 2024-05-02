@@ -35,7 +35,7 @@ DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None
 - Maximum frequency range to search for outliers in.
 
 `metric`: int/float
-- Aggregation metric used to calculate outliers. Can be any function that takes a list of values, and returns a single value. Recommended functions are: `np.median` and `np.mean`.
+- Aggregation metric used to calculate outliers. Can be any function that takes a list of numeric values, and returns a single value. Recommended functions are: `np.median` and `np.mean`.
 
 `expression`: str (None)
 - String regular expression. If provided, will only search for outliers in `Signal` files whose names match the regular expression, and will ignore everything else.
@@ -47,6 +47,20 @@ DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None
 
 `DetectOutliers`: dict
 - Returns a dictionary of file names and locations keys/values.
+
+**Error**
+
+Raises an error if `sampling_rate` is less or equal to 0.
+
+Raises an error if `threshold` is less or equal to 0.
+
+Raises an error is `low` is greater than `high`.
+
+Raises an error if `low` or `high` are negative.
+
+Raises an error if `metric` is not a valid summary function.
+
+Raises an error if a column in `cols` is not in a data file.
 
 **Example:**
 

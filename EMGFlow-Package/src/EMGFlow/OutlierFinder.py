@@ -53,12 +53,35 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     file_ext : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if sampling_rate is less or equal to 0.
+    Exception
+        An exception is raised if threshold is less or equal to 0.
+    Exception
+        An exception is raised if low is greater than high.
+    Exception
+        An exception is raised if low or high are negative.
+    Exception
+        An exception is raised if metric is not a valid summary function.
+    Exception
+        An exception is raised if a column in cols is not in the data file.
+
     Returns
     -------
     dict
         Dictionary of file names/locations as keys/values for each file detected that contains an outlier.
 
     """
+    
+    if threshold <= 0:
+        raise Exception("threshold must be greater than 0")
+    
+    try:
+        metric([1,2,3,4,5])
+    except:
+        raise Exception("Invalid summary metric provided, must take a single numeric list input")
     
     p_deg = 1   # Degree of equation on the top of the fraction
     q_deg = 2   # Degree of equation on the bottom of the fraction
@@ -68,6 +91,12 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
         low = 0
     if high is None:
         high = sampling_rate/2
+    
+    if low >= high:
+        raise Exception("low (" + str(low) + ") must be greater than high (" + str(high), ")")
+    
+    if low < 0 or high < 0:
+        raise Exception("low and high must be positive values")
     
     # Create rational function equation
     def Rational(x, *params):
@@ -111,8 +140,12 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
             # Iterate over columns
             for i in range(len(cols)):
                 col = cols[i]
+                
+                if col not in list(data.columns.values):
+                    raise Exception("Column " + col + " not in Signal " + file)
+                
                 psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
-                psd = ZoomIn(psd, 20, 450)
+                psd = ZoomIn(psd, low, high)
                 
                 n = 200     # Width of band to check for local maxima in PSD
                 

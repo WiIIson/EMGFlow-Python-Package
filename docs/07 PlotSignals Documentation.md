@@ -41,6 +41,12 @@ GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ex
 
 `GenPlotDash`: None
 
+**Error**
+
+Raises an error if the directories in `in_paths` don't contain the same files.
+
+Raises an error if `col` is not found in a dataframe.
+
 **Example:**
 
 ```python
@@ -99,6 +105,14 @@ PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression=Non
 
 `PlotSpectrum`: None
 
+**Error**
+
+Raises an error if `sampling_rate` is less or equal to 0.
+
+Raises an error if a column in `cols` is not in a dataframe.
+
+Raises an error if `p` is not None and not between 0 and 1.
+
 **Example:**
 
 ```python
@@ -150,6 +164,14 @@ PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, expre
 **Returns:**
 
 `PlotCompareSignals`: None
+
+**Error**
+
+Raises an error if `in_path1` and `in_path2` don't contain the same files.
+
+Raises an error if `sampling_rate` is less or equal to 0.
+
+Raises an error if a column in `cols` is not in a dataframe.
 
 **Example:**
 

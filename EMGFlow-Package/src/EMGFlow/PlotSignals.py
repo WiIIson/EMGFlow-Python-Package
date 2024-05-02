@@ -49,11 +49,24 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
     file_ext : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if sampling_rate is less or equal to 0.
+    Exception
+        An exception is raised if a column is not in a dataframe.
+    Exception
+        An exception is raised if p is not None and not between 0 and 1.
+    
+
     Returns
     -------
     None.
 
     """
+    
+    if (p is not None) and (p < 0 or p > 1):
+        raise Exception("p must be between 0 or 1, or None")
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
@@ -83,6 +96,10 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 # Plot each column
                 for i in range(len(cols)):
                     col = cols[i]
+                    
+                    if col not in list(data.columns.values):
+                        raise Exception("Column " + col + " not in Signal " + file)
+                    
                     psd = EMG2PSD(data[col], sr=sampling_rate)
                     axs[i].plot(psd['Frequency'], psd['Power'])
                     axs[i].set_ylabel('Power magnitude')
