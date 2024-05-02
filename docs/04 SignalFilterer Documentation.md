@@ -501,7 +501,7 @@ ApplyBoxcarSmooth(Signal, col, window_size)
 
 For a window size $\mu$, the boxcar smoothing algorithm is:
 ```math
-s_i=\frac{\sum_{j=i-\mu}^{i+\mu}x_j}{2\mu+1}
+s\\_i=\frac{\sum\\_{j=i-\mu}^{i+\mu}x\\_j}{2\mu+1}
 ```
 (O’Haver, 2023)
 
@@ -555,7 +555,7 @@ ApplyRMSSmooth(Signal, col, window_size)
 
 For a window size $\mu$, the RMS smoothing algorithm is:
 ```math
-s_i=\sqrt{\frac{\sum_{j=i-\mu}^{i+\mu}x_j^2}{2\mu+1}}
+s\\_i=\sqrt{\frac{\sum\\_{j=i-\mu}^{i+\mu}x\\_j^2}{2\mu+1}}
 ```
 
 (Dwivedi et al., 2023)
@@ -610,7 +610,7 @@ ApplyGaussianSmooth(Signal, col, window_size, sigma=1)
 
 For a window size $\mu$, the Gaussian smoothing algorithm is:
 ```math
-s_j=\sum_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\sigma^2}}
+s\\_j=\sum\\_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\sigma^2}}
 ```
 - $\sigma$ is the standard deviation parameter we want to look at
 
@@ -669,12 +669,12 @@ ApplyLoessSmooth(Signal, col, window_size)
 
 For a window size $\mu$, the Loess smoothing algorithm is:
 ```math
-s_j=\sum_{i=j-\mu}^{j+\mu}w_ix_i
+s\\_j=\sum\\_{i=j-\mu}^{j+\mu}w\\_ix\\_i
 ```
 ```math
-w_i=\left(1-\left(\frac{d_i}{\max(d_i)}\right)^3\right)^3
+w\\_i=\left(1-\left(\frac{d\\_i}{\max(d\\_i)}\right)^3\right)^3
 ```
-- $d$ represents a series of evenly spaced numbers such that $`-1<d_i<1`$
+- $d$ represents a series of evenly spaced numbers such that $-1<d\_i<1$
 
 (Figueira, 2021)
 
