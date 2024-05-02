@@ -723,9 +723,7 @@ This metric uses a proposed muscle separation theory put forward by this project
 Twitch Ratio is an adaptation of Alpha Ratio (Eyben et al., 2016).
 
 Twitch Ratio is calculated as follows:
-```math
-\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}
-```
+$$`\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}`$$
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_t$ <-- Threshold frequency of the PSD
