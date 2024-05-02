@@ -93,6 +93,12 @@ The IEMG is calculated as follows:
 `CalcIEMG`: float
 - Returns the value of the IEMG.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `sr` is less or equal to 0.
+
 **Example**
 
 ```python
@@ -135,6 +141,10 @@ The MAV is calculated as follows:
 `CalcMAV`: float
 - Returns the value of the MAV.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -150,6 +160,9 @@ MAV = EMGFlow.CalcMAV(SignalDF, 'column1', 2000)
 **Description**
 
 Calculates the Modified Mean Absolute Value (MMAV) of the signal. The MMAV is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+```python
+CalcMMAV(Signal, col)
+```
 
 **Theory**
 
@@ -178,6 +191,10 @@ w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{oth
 
 `CalcMMAV`: float
 - Returns the value of the MMAV.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
 
 **Example**
 
@@ -227,6 +244,12 @@ The SSI is calculated as follows:
 `CalcSSI`: float
 - Returns the value of the SSI.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `sr` is less or equal to 0
+
 **Example**
 
 ```python
@@ -267,6 +290,10 @@ The VAR is calculated as follows:
 
 `CalcVAR`: float
 - Returns the value of the VAR.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
 
 **Example**
 
@@ -311,6 +338,10 @@ The V-Order is calculated as follows:
 `CalcVOrder`: float
 - Returns the value of the V-Order.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -353,6 +384,10 @@ The RMS is calculated as follows:
 `CalcRMS`: float
 - Returns the value of the RMS.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -394,6 +429,10 @@ The WL is calculated as follows:
 
 `CalcWL`: float
 - Returns the value of the WL.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
 
 **Example**
 
@@ -448,6 +487,10 @@ f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \en
 `CalcWAMP`: int
 - Returns the value of the WAMP.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -489,6 +532,10 @@ The LOG is calculated as follows:
 
 `CalcLOG`: float
 - Returns the value of the LOG.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
 
 **Example**
 
@@ -532,6 +579,10 @@ The MFL is calculated as follows:
 `CalcMFL`: float
 - Returns the value of the MFL.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -573,6 +624,10 @@ The AP is calculated as follows:
 
 `CalcAP`: float
 - Returns the value of the AP.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
 
 **Example**
 
@@ -630,6 +685,18 @@ Spectral Flux is calculated as follows:
 `CalcSpecFlux`: float
 - Returns the value of the Spectral Flux.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error is `sr` is less or equal to 0.
+
+Raises an error if `diff` is a float and not between 0 and 1.
+
+Raises an error if `diff` is a data frame and does not contain a column `col`.
+
+Raises an error if `diff_sr` is less or equal to 0.
+
 **Example**
 
 ```python
@@ -676,6 +743,12 @@ Twitch Ratio is calculated as follows:
 
 `CalcTwitchRatio`: float
 - Returns the value of the Twitch Ratio
+
+**Error**
+
+Raises an error if `freq` is less or equal to 0.
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
 
 **Example**
 
@@ -725,6 +798,12 @@ Twitch Index is calculated as follows:
 `CalcTwitchRatio`: float
 - Returns the value of the Twitch Ratio
 
+**Error**
+
+Raises an error if `freq` is less or equal to 0.
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
 **Example**
 
 ```python
@@ -765,6 +844,12 @@ Twitch Slope is an adaptation of spectral slope (Eyben et al., 2016).
 
 `CalcTwitchSlope`: float, float
 - Returns both of the values of the Twitch Ratio.
+
+**Error**
+
+Raises an error if `freq` is less or equal to 0.
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
 
 **Example**
 
@@ -808,6 +893,10 @@ SC is calculated as follows:
 `CalcSC`: float
 - Returns the value of the SC.
 
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
 **Example**
 
 ```python
@@ -849,6 +938,10 @@ SF is calculated as follows:
 `CalcSF`: float
 - Returns the value of the SF.
 
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
 **Example**
 
 ```python
@@ -889,6 +982,10 @@ SS is calculated as follows:
 `CalcSS`: float
 - Returns the value of the SS.
 
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
 **Example**
 
 ```python
@@ -927,6 +1024,10 @@ SDec is calculated as follows:
 
 `CalcSDec`: float
 - Returns the value of the SDec.
+
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
 
 **Example**
 
@@ -968,6 +1069,10 @@ Spectral Entropy is calculated as follows:
 `CalcSEntropy`: float
 - Returns the value of the SEntropy.
 
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
 **Example**
 
 ```python
@@ -1006,6 +1111,12 @@ The actual threshold for SRoll can be set manually, but literature suggests that
 
 `CalcSRoll`: float
 - Returns the value of the SRoll.
+
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
+Raises an error if `percent` is not between 0 and 1.
 
 **Example**
 
@@ -1050,6 +1161,12 @@ SBW is calculated as follows:
 
 `CalcSBW`: float
 - Returns the value of the SBW.
+
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
+Raises an error if `p` is not greater than 0.
 
 **Example**
 

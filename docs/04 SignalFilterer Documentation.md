@@ -9,13 +9,13 @@
 Creates a PSD (power spectrum density) of a Signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
 
 ```python
-EMG2PSD(Signal, sr=1000, normalize=True)
+EMG2PSD(Sig_vals, sr=1000, normalize=True)
 ```
 
 **Parameters**
 
-`Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.`
+`Sig_vals`: float list
+- A list of float values. A column of a Signal.
 
 `sr`: int/float (1000)
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
@@ -28,11 +28,15 @@ EMG2PSD(Signal, sr=1000, normalize=True)
 `EMG2PSD`: pd.DataFrame
 - Returns a dictionary of frequencies and related strengths with the columns "Frequency" and "Power".
 
+**Error**
+
+Raises an error if the sampling rate is less or equal to 0.
+
 **Example**
 
 ```python
 sr = 2000
-PSD = EMGFlow.EMG2PSD(SignalDF, sr)
+PSD = EMGFlow.EMG2PSD(SignalDF['col1'], sr)
 ```
 
 ---
@@ -82,7 +86,7 @@ file_loc2 = EMGFlow.MapFiles('/data/', expression='^DATA_')
 
 A more advanced version of `MapFiles` that can coerce other data types into the `MapFiles` format.
 
-If provided a dictionary (assumed to be a file location map), it will return it, filtered by `expression` if provided)
+If provided a dictionary (assumed to be a file location map), it will return it, filtered by `expression` if provided.
 
 ```python
 ConvertMapFiles(fileObj, file_ext='csv', experssion=None)
@@ -202,6 +206,12 @@ ApplyNotchFilters(Signal, col, sampling_rate, notch_vals)
 `ApplyNotchFilters`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filters applied to the correct column.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if the sampling rate is less or equal to 0.
+
 **Example**
 
 ```python
@@ -260,6 +270,14 @@ NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expresion
 
 `NotchFilterSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
+
+**Error**
+
+Raises an error if `col` is not found in any of the Signal files found.
+
+Raises an error if the sampling rate is less or equal to 0.
+
+Raises a warning if `expression` causes all files to be filtered out
 
 **Example**
 
@@ -324,6 +342,12 @@ ApplyBandpassFilter(Signal, col, sampling_rate, low, high)
 
 `ApplyBandpassFilter`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filters applied to the correct column.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if the sampling rate is less or equal to 0.
 
 **Example**
 
@@ -392,6 +416,14 @@ These values can also be set manually for specific needs. There is some disagree
 `BandpassFilterSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
 
+**Error**
+
+Raises an error if `col` is not found in any of the Signal files found.
+
+Raises an error if the sampling rate is less or equal to 0.
+
+Raises a warning if `expression` causes all files to be filtered out
+
 **Example**
 
 ```python
@@ -437,6 +469,10 @@ ApplyFWR(Signal, col)
 `ApplyFWR`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
 
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
 **Example**
 
 ```python
@@ -464,7 +500,9 @@ ApplyBoxcarSmooth(Signal, col, window_size)
 **Theory**
 
 For a window size $\mu$, the boxcar smoothing algorithm is:
-$$s_i=\frac{\sum_{j=i-\mu}^{i+\mu}x_j}{2\mu+1}$$
+```math
+s_i=\frac{\sum_{j=i-\mu}^{i+\mu}x_j}{2\mu+1}
+```
 (O’Haver, 2023)
 
 **Parameters**
@@ -482,6 +520,12 @@ $$s_i=\frac{\sum_{j=i-\mu}^{i+\mu}x_j}{2\mu+1}$$
 
 `ApplyBoxcarSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `window_size` is less or equal to 0.
 
 **Example**
 
@@ -510,7 +554,9 @@ ApplyRMSSmooth(Signal, col, window_size)
 **Theory**
 
 For a window size $\mu$, the RMS smoothing algorithm is:
-$$s_i=\sqrt{\frac{\sum_{j=i-\mu}^{i+\mu}x_j^2}{2\mu+1}}$$
+```math
+s_i=\sqrt{\frac{\sum_{j=i-\mu}^{i+\mu}x_j^2}{2\mu+1}}
+```
 
 (Dwivedi et al., 2023)
 
@@ -529,6 +575,12 @@ $$s_i=\sqrt{\frac{\sum_{j=i-\mu}^{i+\mu}x_j^2}{2\mu+1}}$$
 
 `ApplyRMSSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `window_size` is less or equal to 0.
 
 **Example**
 
@@ -557,7 +609,9 @@ ApplyGaussianSmooth(Signal, col, window_size, sigma=1)
 **Theory**
 
 For a window size $\mu$, the Gaussian smoothing algorithm is:
-$$s_j=\sum_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\sigma^2}}$$
+```math
+s_j=\sum_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\sigma^2}}
+```
 - $\sigma$ is the standard deviation parameter we want to look at
 
 (Fisher et al., 2003)
@@ -580,6 +634,12 @@ $$s_j=\sum_{i=j-\mu}^{j+\mu}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\mu-i)^2}{2\si
 
 `ApplyGaussianSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `window_size` is less or equal to 0.
 
 **Example**
 
@@ -608,9 +668,13 @@ ApplyLoessSmooth(Signal, col, window_size)
 **Theory**
 
 For a window size $\mu$, the Loess smoothing algorithm is:
-$$s_j=\sum_{i=j-\mu}^{j+\mu}w_ix_i$$
-$$w_i=\left(1-\left(\frac{d_i}{\max(d_i)}\right)^3\right)^3$$
-- $d$ represents a series of evenly spaced numbers such that $-1<d_i<1$
+```math
+s_j=\sum_{i=j-\mu}^{j+\mu}w_ix_i
+```
+```math
+w_i=\left(1-\left(\frac{d_i}{\max(d_i)}\right)^3\right)^3
+```
+- $d$ represents a series of evenly spaced numbers such that $`-1<d_i<1`$
 
 (Figueira, 2021)
 
@@ -629,6 +693,12 @@ $$w_i=\left(1-\left(\frac{d_i}{\max(d_i)}\right)^3\right)^3$$
 
 `ApplyLoessSmooth`: pd.DataFrame
 - Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+Raises an error if `window_size` is less or equal to 0.
 
 **Example**
 
@@ -653,7 +723,7 @@ Components of a "`Signal` file":
 All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
 
 ```python
-SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms')
+SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1)
 ```
 
 **Theory**
@@ -669,9 +739,6 @@ Other smoothing functions are also available for use if needed.
 
 `out_path`: str
 - String filepath to a directory for output `Signal` files.
-
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `window_size`: int
 - Size of the window in the smoothing filter.
@@ -689,25 +756,37 @@ Other smoothing functions are also available for use if needed.
 - String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
 
 `method`: str ("rms")
-- Smoothing method to be used. Defaults to "rms", but can also be set to "boxcar, "gauss" or "loess"
+- Smoothing method to be used. Defaults to "rms", but can also be set to "boxcar, "gauss" or "loess".
+
+`sigma`: float (1)
+- Value of `sigma` used with a Gaussian filter. Only affects output when using a Gaussian filter.
 
 **Returns**
 
 `SmoothFilterSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
 
+**Error**
+
+Raises an error if an invalid smoothing method is passed to `method`.
+
+Raises an error if any of the Signal files don't contain a column listed in `cols`.
+
+Raises an error if `window_size` is less or equal to 0.
+
+Raises a warning if `expression` causes all files to be filtered out
+
 **Example**
 
 ```python
 bandpass_path = '/data/bandpass/'
 smooth_path = '/data/smooth/'
-sampling_rate = 2000
 size = 20
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Apply RMS filters with window size 20 to all files in
-# notch_path, and write them to bandpass_path
-EMGFlow.SmoothFilterSignals(bandpass_path, smooth_path, sampling_rate, size, cols)
+# Apply smoothing filter with window size 20 to all files in
+# bandpass_path, and write them to smooth_path
+EMGFlow.SmoothFilterSignals(bandpass_path, smooth_path, size, cols)
 ```
 
 ---
@@ -725,7 +804,7 @@ Components of a "`Signal` file":
 
 All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
 
-For more specifics about the features extracted by this function, see [[05 ExtractFeatures Feature Documentation]]
+For more specifics about the features extracted by this function, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
 
 ```python
 AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
@@ -768,6 +847,16 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 `AnalyzeSignals`: None
 - Does not return a value. Data is written to `out_path`. Data written will be in CSV format. Each row is a different file analyzed, marked by the file ID. Additional columns show the values of the features extracted by the function.
+
+**Error**
+
+Raises an error if `in_bandpass` and `in_smooth` don't contain the same files
+
+Raises an error if the files from `in_bandpass` and `in_smooth` don't contain `col`
+
+Raises an error if `sampling_rate` is less or equal to 0
+
+Raises a warning if `expression` causes all files to be filtered out
 
 **Example**
 

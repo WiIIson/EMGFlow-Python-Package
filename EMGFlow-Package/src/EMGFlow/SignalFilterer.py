@@ -5,6 +5,7 @@ import os
 import re
 import cv2
 from tqdm import tqdm
+import warnings
 
 #
 # =============================================================================
@@ -18,18 +19,24 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-"""
+def EMG2PSD(Sig_vals, sr=1000, normalize=True):
+    """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+    Sig_vals : float list
+        A list of float values. A column of a Signal.
     sampling_rate : float
         Sampling rate of the Signal.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is True.
+
+        Raises
+    ------
+    Exception
+        An exception is raised if the sampling rate is less or equal to 0
 
     Returns
     -------
@@ -37,11 +44,14 @@ A collection of functions for filtering Signals.
         A DataFrame containing a 'Frequency' and 'Power' column. The Power column
         indicates the intensity of each frequency in the Signal provided. Results
         will be normalized if 'normalize' is set to True.
-"""
-def EMG2PSD(Signal, sr=1000, normalize=True):
+    """
+    
+    if sr <= 0:
+        raise Exception("Sampling rate must be greater or equal to 0")
+    
     # Initial parameters
-    Signal = Signal - np.mean(Signal)
-    N = len(Signal)
+    Sig_vals = Sig_vals - np.mean(Sig_vals)
+    N = len(Sig_vals)
     
     # Calculate minimum frequency given sampling rate
     min_frequency = (2 * sr) / (N / 2)
@@ -52,7 +62,7 @@ def EMG2PSD(Signal, sr=1000, normalize=True):
     
     # Apply welch method with hanning window
     frequency, power = scipy.signal.welch(
-        Signal,
+        Sig_vals,
         fs=sr,
         scaling='density',
         detrend=False,
@@ -225,12 +235,25 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         A list of (Hz, Q) tuples corresponding to the notch filters being applied. Hz is the frequency to
         apply the filter to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter).
 
+    Raises
+    ------
+    Exception
+        An exception is raised if the column is not found in the Signal.
+    Exception
+        An exception is raised if the sampling rate is less or equal to 0.
+
     Returns
     -------
     DataFrame
         A copy of Signal after the notch filters are applied.
 
     """
+
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if sampling_rate <= 0:
+        raise Exception("Sampling rate must be greater or equal to 0")
 
     def ApplyNotchFilter(Signal, col, sampling_rate, notch):
         """
@@ -307,6 +330,13 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     file_ext : TYPE, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if the column is not found in any of the Signal files found.
+    Exception
+        An exception is raised if the sampling rate is less or equal to 0.
+
     Returns
     -------
     None.
@@ -322,6 +352,8 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
         filedirs = MapFiles(in_path, file_ext=file_ext)
     else:
         filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        if len(filedirs) == 0:
+            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
         
     
     # Apply transformations
@@ -379,12 +411,26 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     high : float
         Upper frequency limit of the bandpass filter.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if the column is not found in the Signal.
+    Exception
+        An exception is raised if the sampling rate is less or equal to 0.
+
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the bandpass filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if sampling_rate <= 0:
+        raise Exception("Sampling rate must be greater or equal to 0")
+    
     
     Signal = Signal.copy()
     # Here, the "5" is the order of the butterworth filter
@@ -424,7 +470,14 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
         which ignores files that don't match.
     file_ext : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
-        
+    
+    Raises
+    ------
+    Exception
+        An exception is raised if the column is not found in any of the Signal files found.
+    Exception
+        An exception is raised if the sampling rate is less or equal to 0.
+    
     Returns
     -------
     None.
@@ -440,6 +493,8 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
         filedirs = MapFiles(in_path, file_ext=file_ext)
     else:
         filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        if len(filedirs) == 0:
+            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
@@ -491,12 +546,20 @@ def ApplyFWR(Signal, col):
     col : str
         Column of the Signal to apply the filter to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if the column is not found in the Signal.
+
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the full wave rectifier filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     Signal = Signal.copy()
     Signal[col] = np.abs(Signal[col])
@@ -519,12 +582,26 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
     window_size : int, float
         Size of the window of the filter.
     
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if window_size is less or equal to 0.
+    
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the boxcar smoothing filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if window_size <= 0:
+        raise Exception("window_size cannot be 0 or negative")
+        
     
     Signal = Signal.copy()
     
@@ -552,12 +629,25 @@ def ApplyRMSSmooth(Signal, col, window_size):
     window_size : int, float
         Size of the window of the filter.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if window_size is less or equal to 0.
+
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the RMS smoothing filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if window_size <= 0:
+        raise Exception("window_size cannot be 0 or negative")
     
     Signal = Signal.copy()
     # Square
@@ -587,12 +677,25 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if window_size is less or equal to 0.
+
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the Gaussian smoothing filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if window_size <= 0:
+        raise Exception("window_size cannot be 0 or negative")
     
     Signal = Signal.copy()
     
@@ -620,12 +723,25 @@ def ApplyLoessSmooth(Signal, col, window_size):
     window_size : int, float
         Size of the window of the filter.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if window_size is less or equal to 0.
+
     Returns
     -------
     Signal : DataFrame
         A copy of Signal after the Loess smoothing filter is applied.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if window_size <= 0:
+        raise Exception("window_size cannot be 0 or negative")
     
     Signal = Signal.copy()
     
@@ -642,7 +758,7 @@ def ApplyLoessSmooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms'):  
+def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1):  
     """
     Apply smoothing filters to all Signals in a folder. Writes filtered Signals to an output folder, and generates a file structure
     matching the input folder. The method used to smooth the signals can be specified, but is RMS as default.
@@ -653,8 +769,6 @@ def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None
         Filepath to a directory to read Signal files.
     out_path : str
         Filepath to an output directory.
-    sampling_rate : float
-        Sampling rate of the Signal.
     window_size : int, float
         Size of the window of the filter.
     cols : list, optional
@@ -669,11 +783,17 @@ def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
     method : str, optional
         The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or 'loess'. The default is 'rms'.
+    sigma: float, optional
+        The value of sigma used for a Gaussian filter. Only affects output when using Gaussian filtering.
 
     Raises
     ------
     Exception
         An exception is raised if an invalid smoothing method is used. Valid methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
+    Exception
+        An exception is raised if col is not found in any of the Signal files.
+    Exception
+        An exception is raised if window_size is less or equal to 0.
 
     Returns
     -------
@@ -690,6 +810,8 @@ def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None
         filedirs = MapFiles(in_path, file_ext=file_ext)
     else:
         filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        if len(filedirs) == 0:
+            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
@@ -711,7 +833,7 @@ def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None
                 elif method == 'boxcar':
                     data = ApplyBoxcarSmooth(data, col, window_size)
                 elif method == 'guass':
-                    data = ApplyGaussianSmooth(data, col, window_size)
+                    data = ApplyGaussianSmooth(data, col, window_size, sigma)
                 elif method == 'loess':
                     data = ApplyLoessSmooth(data, col, window_size)
                 else:
@@ -738,60 +860,6 @@ def SmoothFilterSignals(in_path, out_path, sampling_rate, window_size, cols=None
 # =============================================================================
 #
 
-def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
-    """
-    Calculate the spectral flux of a Signal.
-
-    Parameters
-    ----------
-    Signal1 : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
-    diff : float, DataFrame
-        The divisor of the calculation. If a percentage is provided, it will calculate the
-        spectral flux of the percentage of the Signal with one minus the percentage of the Signal.
-    col : str
-        Column of the Signal to apply the summary to. If a second signal is provided for diff, a column
-        of the same name should be available for use.
-    sr : float
-        Sampling rate of the Signal.
-    diff_sr : float, optional
-        Sampling rate for the second Signal if provided. The default is None, in which case if
-        a second Signal is provided, the sampling rate is assumed to be the same as the first.
-
-    Returns
-    -------
-    flux : float
-        Spectral flux of the Signal.
-
-    """
-    
-    # Separate Signal1 by div and find spectral flux
-    if isinstance(diff, float):
-        # Find column divider index
-        diff_ind = int(len(Signal1[col]) * diff)
-        # Take the PSD of each signal
-        psd1 = EMG2PSD(Signal1[col][:diff_ind], sampling_rate=sr)
-        psd2 = EMG2PSD(Signal1[col][diff_ind:], sampling_rate=sr)
-        # Calculate the spectral flux
-        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
-        
-    # Find spectral flux of Signal1 by div
-    elif isinstance(diff, pd.DataFrame):
-        
-        # If no second sampling rate, assume same sampling rate as first Signal
-        if diff_sr == None: diff_sr = sr
-        # Take the PSD of each signal
-        psd1 = EMG2PSD(Signal1[col], sampling_rate=sr)
-        psd2 = EMG2PSD(diff[col], sampling_rate=diff_sr)
-        # Calculate the spectral flux
-        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
-    
-    return flux
-
-#
-# =============================================================================
-#
-
 def CalcIEMG(Signal, col, sr):
     """
     Calculate the Integreated EMG (IEMG) of a Signal.
@@ -805,12 +873,25 @@ def CalcIEMG(Signal, col, sr):
     sr : float
         Sampling rate of the Signal.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if sr is less or equal to 0.
+
     Returns
     -------
     IEMG : float
         IEMG of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if sr <= 0:
+        raise Exception("Sampling rate cannot be 0 or negative")
     
     IEMG = np.sum(np.abs(Signal[col]) * sr)
     return IEMG
@@ -831,12 +912,20 @@ def CalcMAV(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     MAV : float
         MAV of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     MAV = np.sum(np.abs(Signal[col])) / N
@@ -857,12 +946,20 @@ def CalcMMAV(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     MMAV : float
         MMAV of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     vals = list(np.abs(Signal[col]))
@@ -892,12 +989,25 @@ def CalcSSI(Signal, col, sr):
     sr : float
         Sampling rate of the Signal.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if sr is less or equal to 0.
+
     Returns
     -------
     SSI : float
         SSI of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    if sr <= 0:
+        raise Exception("Sampling rate cannot be 0 or negative")
     
     SSI = np.sum((np.abs(Signal[col]) * sr) ** 2)
     return SSI
@@ -917,12 +1027,20 @@ def CalcVAR(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     VAR : float
         VAR of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     VAR = 1/(N - 1) * np.sum(Signal[col] ** 2)
@@ -943,12 +1061,20 @@ def CalcVOrder(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     vOrder : float
         V-Order of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     vOrder = np.sqrt(CalcVAR(Signal, col))
     return vOrder
@@ -968,12 +1094,20 @@ def CalcRMS(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     RMS : float
         RMS of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal)
     RMS = np.sqrt((1/N) * np.sum(Signal[col] ** 2))
@@ -994,12 +1128,20 @@ def CalcWL(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     WL : float
         WL of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     vals = list(Signal[col])
@@ -1023,6 +1165,11 @@ def CalcWAMP(Signal, col, threshold):
         Column of the Signal to apply the summary to.
     threshold : float
         Threshold of the WAMP.
+        
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
 
     Returns
     -------
@@ -1030,6 +1177,9 @@ def CalcWAMP(Signal, col, threshold):
         WAMP of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     vals = list(Signal[col])
@@ -1052,12 +1202,20 @@ def CalcLOG(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     LOG : float
         LOG of the Signal.
     
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     N = len(Signal[col])
     ex = (1/N) * np.sum(np.log(Signal[col]))
@@ -1079,12 +1237,20 @@ def CalcMFL(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     MFL : float
         MFL of the Signal.
 
     """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
     
     vals = Signal[col]
     N = len(Signal[col])
@@ -1107,6 +1273,11 @@ def CalcAP(Signal, col):
     col : str
         Column of the Signal to apply the summary to.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
     Returns
     -------
     AP : float
@@ -1114,8 +1285,92 @@ def CalcAP(Signal, col):
 
     """
     
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
     AP = np.sum(Signal[col] ** 2) / len(Signal[col])
     return AP
+
+#
+# =============================================================================
+#
+
+def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
+    """
+    Calculate the spectral flux of a Signal.
+
+    Parameters
+    ----------
+    Signal1 : DataFrame
+        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+    diff : float, DataFrame
+        The divisor of the calculation. If a percentage is provided, it will calculate the
+        spectral flux of the percentage of the Signal with one minus the percentage of the Signal.
+    col : str
+        Column of the Signal to apply the summary to. If a second signal is provided for diff, a column
+        of the same name should be available for use.
+    sr : float
+        Sampling rate of the Signal.
+    diff_sr : float, optional
+        Sampling rate for the second Signal if provided. The default is None, in which case if
+        a second Signal is provided, the sampling rate is assumed to be the same as the first.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+    Exception
+        An exception is raised if sr is less or equal to 0.
+    Exception
+        An exception is raised if diff is a float and not between 0 and 1.
+    Exception
+        An exception is raised if diff is a dataframe and does not contain col.
+    Exception
+        An exception is raised if diff_sr is less or equal to 0.
+
+    Returns
+    -------
+    flux : float
+        Spectral flux of the Signal.
+
+    """
+    
+    if col not in list(Signal1.columns.values):
+        raise Exception("Column " + col + " not in Signal1")
+        
+    if sr <= 0:
+        raise Exception("Sampling rate cannot be 0 or negative")
+    
+    # Separate Signal1 by div and find spectral flux
+    if isinstance(diff, float):
+        if diff >= 1 or diff <= 0:
+            raise Exception("diff must be a float between 0 and 1")
+        
+        # Find column divider index
+        diff_ind = int(len(Signal1[col]) * diff)
+        # Take the PSD of each signal
+        psd1 = EMG2PSD(Signal1[col][:diff_ind], sampling_rate=sr)
+        psd2 = EMG2PSD(Signal1[col][diff_ind:], sampling_rate=sr)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
+        
+    # Find spectral flux of Signal1 by div
+    elif isinstance(diff, pd.DataFrame):
+        if col not in list(diff.columns.values):
+            raise Exception("Column " + col + " not in diff")
+        
+        # If no second sampling rate, assume same sampling rate as first Signal
+        if diff_sr == None: diff_sr = sr
+        
+        if diff_sr <= 0:
+            raise Exception("Sampling rate cannot be 0 or negative")
+        # Take the PSD of each signal
+        psd1 = EMG2PSD(Signal1[col], sampling_rate=sr)
+        psd2 = EMG2PSD(diff[col], sampling_rate=diff_sr)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
+    
+    return flux
 
 #
 # =============================================================================
@@ -1133,12 +1388,25 @@ def CalcTwitchRatio(psd, freq=60):
         Frequency threshold of the Twitch Ratio separating fast-twitching (high-frequency)
         muscles from slow-twitching (low-frequency) muscles.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if freq is less or equal to 0.
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     twitch_ratio : float
         Twitch Ratio of the PSD.
 
     """
+    
+    if freq <= 0:
+        raise Exception("freq cannot be less or equal to 0")
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -1163,12 +1431,25 @@ def CalcTwitchIndex(psd, freq=60):
         Frequency threshold of the Twitch Index separating fast-twitching (high-frequency)
         muscles from slow-twitching (low-frequency) muscles.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if freq is less or equal to 0.
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     twitch_index : float
         Twitch Index of the PSD.
 
     """
+    
+    if freq <= 0:
+        raise Exception("freq cannot be less or equal to 0")
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -1193,6 +1474,13 @@ def CalcTwitchSlope(psd, freq=60):
         Frequency threshold of the Twitch Slope separating fast-twitching (high-frequency)
         muscles from slow-twitching (low-frequency) muscles.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if freq is less or equal to 0.
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     fast_slope : float
@@ -1201,6 +1489,12 @@ def CalcTwitchSlope(psd, freq=60):
         Twitch Slope of the slow-twitching muscles.
 
     """
+    
+    if freq <= 0:
+        raise Exception("freq cannot be less or equal to 0")
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -1234,12 +1528,20 @@ def CalcSC(psd):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     SC : float
         SC of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     SC = np.sum(psd['Power']*psd['Frequency']) / np.sum(psd['Power'])
     return SC
@@ -1257,12 +1559,20 @@ def CalcSF(psd):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     SF : float
         SF of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     N = psd.shape[0]
     SF = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
@@ -1281,12 +1591,20 @@ def CalcSS(psd):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     SS : float
         SS of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     SC = CalcSC(psd)
     SS = np.sum(((psd['Frequency'] - SC) ** 2) * psd['Power']) / np.sum(psd['Power'])
@@ -1305,12 +1623,20 @@ def CalcSDec(psd):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     SDec : float
         SDec of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     N = psd.shape[0]
     vals = np.array(psd['Power'])
@@ -1330,12 +1656,20 @@ def CalcSEntropy(psd):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+
     Returns
     -------
     SEntropy : float
         Spectral Entropy of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     prob = psd['Power'] / np.sum(psd['Power'])
     SEntropy = -np.sum(prob * np.log(prob))
@@ -1356,12 +1690,25 @@ def CalcSRoll(psd, percent=0.85):
     percent : float, optional
         The percentage of power to look for the Spectral Rolloff after. The default is 0.85.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+    Exception
+        An exception is raised if percent is not between 0 and 1
+
     Returns
     -------
     float
         Spectral Rolloff of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    
+    if percent <= 0 or percent >= 1:
+        raise Exception("percent must be between 0 and 1")
     
     total_prob = 0
     total_power = np.sum(psd['Power'])
@@ -1389,12 +1736,25 @@ def CalcSBW(psd, p=2):
     p : int, optional
         Order of the SBW. The default is 2, which gives the standard deviation around the centroid.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+    Exception
+        An exception is raised if p is not greater than 0
+
     Returns
     -------
     SBW : float
         The SBW of the PSD.
 
     """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    
+    if p <= 0:
+        raise Exception("p must be greater than 0")
     
     cent = CalcSC(psd)
     SBW = (np.sum(psd['Power'] * (psd['Frequency'] - cent) ** p)) ** (1/p)
@@ -1431,6 +1791,13 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
         If true, makes the key column of the feature files the name of the file. If false, uses the file path to ensure unique
         keys. The default is True.
 
+    Raises
+    ------
+    Exception
+        An exception is raised if in_bandpass and in_smooth do not contain the same files
+    Exception
+        An exception is raised if p is not greater than 0
+
     Returns
     -------
     None.
@@ -1446,6 +1813,8 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
     # Must have files with the same name
     filedirs_b = MapFiles(in_bandpass, file_ext=file_ext, expression=expression)
     filedirs_s = MapFiles(in_smooth, file_ext=file_ext, expression=expression)
+    if len(filedirs_b) == 0 or len(filedirs_s) == 0:
+        warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # List of measure names
     measure_names = [
@@ -1508,7 +1877,12 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
             # Read file
             data_b = pd.read_csv(filedirs_b[file])
             data_s = pd.read_csv(filedirs_s[file])
-                    
+            
+            if col not in list(data_b.columns.values):
+                raise Exception("Bandpass file " + file + " does not contain column " + col)
+            if col not in list(data_s.columns.values):
+                raise Exception("Smooth file " + file + " does not contain column " + col)
+            
             # Calculate ID
             if short_name:
                 File_ID = file
