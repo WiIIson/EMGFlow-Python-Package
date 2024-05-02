@@ -674,7 +674,7 @@ s\\_j=\sum\\_{i=j-\mu}^{j+\mu}w\\_ix\\_i
 ```math
 w\\_i=\left(1-\left(\frac{d\\_i}{\max(d\\_i)}\right)^3\right)^3
 ```
-- $d$ represents a series of evenly spaced numbers such that $-1\\<d\\_i\\<1$
+- $d$ represents a series of evenly spaced numbers such that $-1\lt d\\_i\lt 1$
 
 (Figueira, 2021)
 
