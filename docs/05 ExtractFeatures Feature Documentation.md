@@ -33,8 +33,8 @@ s=\frac{\frac{\mu-M\\_o}{\sigma}}{\frac{3(\mu-M\\_d)}{\sigma}}
 ```
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
-- $M\\_o$ <-- Mode
-- $M\\_d$ <-- Median
+- $M_o$ <-- Mode
+- $M_d$ <-- Median
 
 **Skew** is calculated with `scipy.stats.skew`
 
@@ -72,7 +72,7 @@ The IEMG is calculated as follows:
 ```math
 \text{IEMG}=s\\_r\sum\\_{i=1}^N|x\\_i|
 ```
-- $s\\_r$ <-- Sampling rate
+- $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -223,7 +223,7 @@ The SSI is calculated as follows:
 ```math
 \text{SSI}=s\\_r^2\sum\\_{i=1}^N|x\\_i|^2
 ```
-- $s\\_r$ <-- Sampling rate
+- $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -726,10 +726,10 @@ Twitch Ratio is calculated as follows:
 ```math
 \text{TR}=\frac{\sum\\_{i=f\\_0}^{f\\_t} p\\_i}{\sum\\_{i=f\\_t}^{f\\_N}p\\_i}
 ```
-- $p\\_i$ <-- Power of normalized PSD at frequency $i$
-- $f\\_0$ <-- Minimum frequency of the PSD
-- $f\\_t$ <-- Threshold frequency of the PSD
-- $f\\_N$ <-- Maximum frequency of the PSD
+- $p_i$ <-- Power of normalized PSD at frequency $i$
+- $f_0$ <-- Minimum frequency of the PSD
+- $f_t$ <-- Threshold frequency of the PSD
+- $f_N$ <-- Maximum frequency of the PSD
 
 **Parameters**
 
@@ -780,10 +780,10 @@ Twitch Index is calculated as follows:
 ```math
 \text{TR}=\frac{\max\left(\sum\\_{i=f\\_0}^{f\\_t} p\\_i\right)}{\max\left(\sum\\_{i=f\\_t}^{f\\_N}p\\_i\right)}
 ```
-- $p\\_i$ <-- Power of normalized PSD at frequency $i$
-- $f\\_0$ <-- Minimum frequency of the PSD
-- $f\\_t$ <-- Threshold frequency of the PSD
-- $f\\_N$ <-- Maximum frequency of the PSD
+- $p_i$ <-- Power of normalized PSD at frequency $i$
+- $f_0$ <-- Minimum frequency of the PSD
+- $f_t$ <-- Threshold frequency of the PSD
+- $f_N$ <-- Maximum frequency of the PSD
 
 **Parameters**
 
@@ -877,9 +877,9 @@ SC is calculated as follows:
 ```math
 \text{SC}=\frac{\sum\\_{i=f\\_0}^{f\\_N}i\cdot p\\_i}{\sum\\_{i=f\\_0}^{f\\_N} p\\_i}
 ```
-- $p\\_i$ <-- Power of normalized PSD at frequency $i$
-- $f\\_0$ <-- Minimum frequency of the PSD
-- $f\\_N$ <-- Maximum frequency of the PSD
+- $p_i$ <-- Power of normalized PSD at frequency $i$
+- $f_0$ <-- Minimum frequency of the PSD
+- $f_N$ <-- Maximum frequency of the PSD
 
 (Roldán Jiménez et al., 2019)
 
@@ -923,7 +923,7 @@ SF is calculated as follows:
 ```math
 \text{SF}=\frac{\prod\\_{i=0}^{N-1}|p\\_i|^{\frac{1}{N}}}{\frac{1}{N}\sum\\_{i=0}^{N-1}|p\\_i|}
 ```
-- $p\\_i$ <-- $i$th element of PSD strength
+- $p_i$ <-- $i$th element of PSD strength
 - $N$ <-- Number of elements in PSD
 
 (Nagineni et al., 2018)
