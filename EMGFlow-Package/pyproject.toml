@@ -10,7 +10,7 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
-    "opencv-python", 
+    "opencv-python",
     "tqdm",
     "shiny",
     "nest-asyncio"
