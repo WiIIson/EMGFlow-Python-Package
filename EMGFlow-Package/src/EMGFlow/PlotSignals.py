@@ -11,7 +11,7 @@ from shiny import App, render, ui
 import nest_asyncio
 nest_asyncio.apply()
 
-from .SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD, ReadFileType
+from .PreprocessSignals import ConvertMapFiles, MapFilesFuse, EMG2PSD, ReadFileType
 
 #
 # =============================================================================

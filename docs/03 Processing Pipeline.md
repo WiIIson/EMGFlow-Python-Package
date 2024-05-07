@@ -34,7 +34,7 @@ Notch filtering is controlled by the function `NotchFilterSignals()`, with the f
 
 `NotchFilterSignals()` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings.  However, other regions use 50Hz frequencies.
 
-For more information about further customizations and detail about `NotchFilterSignals()`, see [SignalFilterer documentation](./04%20SignalFilterer%20Documentation.md).
+For more information about further customizations and detail about `NotchFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
 
 ### `BandpassFilterSignals()`
 
@@ -63,7 +63,7 @@ Bandpass filtering is controlled by the function `BandpassFilterSignals()`, with
 
 `BandpassFilterSignals()` uses bandpass thresholds of 20Hz and 450Hz, as this is default for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscels, so `BandpassFilterSignals()` provides the option to change the thresholds.
 
-For more information about further customizations and detail about `BandpassFilterSignals()`, see [SignalFilterer documentation](./04%20SignalFilterer%20Documentation.md).
+For more information about further customizations and detail about `BandpassFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
 
 ### `SmoothFilterSignals()`
 
@@ -90,7 +90,7 @@ Smoothing is controlled by the function `SmoothFilterSignals()`, with the follow
 
 `SmoothFilterSignals()` by default uses the RMS smoothing method, as it is the best choice for filtering EMG signals (RENSHAW et al., 2010). Regardless, EMGFlow provides different methods for smoothing signals which can be used instead.
 
-For more information about further customizations and detail about `SmoothFilterSignals()`, see [SignalFilterer documentation](./04%20SignalFilterer%20Documentation.md).
+For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
 
 ### `AnalyzeSignals()`
 
@@ -139,7 +139,7 @@ And the following spectral features:
 
 This function requires a path to smoothed and unsmoothed data. This is because while time-series features are extracted from smoothed data, spectral features are not. High-frequency components of the signal can be lost in the smoothing, and we want to ensure the spectral features are as accurate as possible.
 
-For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [SignalFilterer documentation](./04%20SignalFilterer%20Documentation.md).
+For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
 
 For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
 

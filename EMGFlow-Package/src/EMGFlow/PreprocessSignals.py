@@ -1877,7 +1877,7 @@ def CalcSBW(psd, p=2):
 # =============================================================================
 #
 
-def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
+def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
     Analyze Signals by performing a collection of analyses on them and saving a
     feature file.
@@ -2097,4 +2097,4 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
             SignalDF.loc[len(SignalDF.index)] = df_vals
             
     SignalDF.to_csv(out_path + 'Features.csv', index=False)
-    return
+    return SignalDF
