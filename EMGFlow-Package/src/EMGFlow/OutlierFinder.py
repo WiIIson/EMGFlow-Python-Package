@@ -6,7 +6,7 @@ import re
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from .SignalFilterer import MapFiles, EMG2PSD
+from .SignalFilterer import MapFiles, EMG2PSD, ReadFileType
 
 #
 # =============================================================================
@@ -22,8 +22,8 @@ A collection of functions for finding outliers while testing
 
 def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, file_ext='csv'):
     """
-    Looks at all Signals contained in a filepath, returns a dictionary of file names and locations
-    that have outliers.
+    Looks at all Signals contained in a filepath, returns a dictionary of file
+    names and locations that have outliers.
 
     Parameters
     ----------
@@ -32,26 +32,32 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     sampling_rate : float
         Sampling rate of the Signal.
     cols : TYPE
-        List of columns of the Signal to search for outliers in. The default is None, in which case outliers are
-        searched for in every column except for 'time'.
+        List of columns of the Signal to search for outliers in. The default is
+        None, in which case outliers are searched for in every column except
+        for 'time'.
     threshold : float
-        The number of times greater than the metric a value has to be to be considered an outlier.
+        The number of times greater than the metric a value has to be to be
+        considered an outlier.
     low : float, optional
-        Lower frequency limit of where to search for outliers. Should be the same as lower limit for bandpass
-        filtering, or some value that eliminates the irrelevant lower frequency ranges. The default is None, in which
-        case no lower threshold is used.
+        Lower frequency limit of where to search for outliers. Should be the
+        same as lower limit for bandpass filtering, or some value that
+        eliminates the irrelevant lower frequency ranges. The default is None,
+        in which case no lower threshold is used.
     high : float, optional
-        Upper frequency limit of where to search for outliers. Should be the same as upper limit for bandpass
-        filtering, or some value that eliminates the irrelevant upper frequency ranges. The default is None, in which
-        case no upper threshold is used.
+        Upper frequency limit of where to search for outliers. Should be the
+        same as upper limit for bandpass filtering, or some value that
+        eliminates the irrelevant upper frequency ranges. The default is None,
+        in which case no upper threshold is used.
     metric : function, optional
-        Some summary function that defines the metric used for finding outliers. The default is np.median, but others
-        such as np.mean can be used instead.
+        Some summary function that defines the metric used for finding
+        outliers. The default is np.median, but others such as np.mean can be
+        used instead.
     expression : str, optional
-        A regular expression. If provided, will only search for outliers in files whose names match the regular
-        expression. The default is None.
+        A regular expression. If provided, will only search for outliers in
+        files whose names match the regular expression. The default is None.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
 
     Raises
     ------
@@ -67,11 +73,17 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
         An exception is raised if metric is not a valid summary function.
     Exception
         An exception is raised if a column in cols is not in the data file.
+    Exception
+        Raises an exception if a file cannot not be read in in_path.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
     dict
-        Dictionary of file names/locations as keys/values for each file detected that contains an outlier.
+        Dictionary of file names/locations as keys/values for each file
+        detected that contains an outlier.
 
     """
     
@@ -126,7 +138,7 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
             print('Checking subject ' + file)
             
             # Read file
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:

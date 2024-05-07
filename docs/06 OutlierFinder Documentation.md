@@ -62,6 +62,10 @@ Raises an error if `metric` is not a valid summary function.
 
 Raises an error if a column in `cols` is not in a data file.
 
+Raises an error if a file cannot be read in `in_path`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
+
 **Example:**
 
 ```python

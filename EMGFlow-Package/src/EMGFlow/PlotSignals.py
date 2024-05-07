@@ -11,7 +11,7 @@ from shiny import App, render, ui
 import nest_asyncio
 nest_asyncio.apply()
 
-from .SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD
+from .SignalFilterer import ConvertMapFiles, MapFilesFuse, EMG2PSD, ReadFileType
 
 #
 # =============================================================================
@@ -57,6 +57,11 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
         An exception is raised if a column is not in a dataframe.
     Exception
         An exception is raised if p is not None and not between 0 and 1.
+    Exception
+        Raises an exception if a file cannot not be read in in_path.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
     
 
     Returns
@@ -82,7 +87,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
             if (p is None) or (random.random() < p):
                 
                 # Read file
-                data = pd.read_csv(filedirs[file])
+                data = ReadFileType(filedirs[file], file_ext)
                 
                 # If no columns selected, apply filter to all columns except time
                 if cols is None:
@@ -146,6 +151,12 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
         An exception is raised if sampling_rate is less or equal to 0.
     Exception
         An exception is raised if a column in cols is not in a dataframe.
+    Exception
+        Raises an exception if a file cannot not be read in in_path1 or
+        in_path2.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
@@ -169,8 +180,8 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data1 = pd.read_csv(filedirs1[file])
-            data2 = pd.read_csv(filedirs2[file])
+            data1 = ReadFileType(filedirs1[file], file_ext)
+            data2 = ReadFileType(filedirs2[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -242,6 +253,11 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
         same files.
     Exception
         An exception is raised if the col is not found in a dataframe.
+    Exception
+        Raises an exception if a file cannot not be read in a path in in_paths.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
@@ -297,7 +313,7 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
             if column == 'All':
                 # Read/plot each file
                 for file_loc in reversed(list(df.loc[filename])[1:]):
-                    sigDF = pd.read_csv(file_loc)
+                    sigDF = ReadFileType(file_loc, file_ext)
                     
                     if col not in list(sigDF.columns.values):
                         raise Exception("Column " + col + " not in Signal " + filename)
@@ -308,7 +324,7 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
-                sigDF = pd.read_csv(file_location)
+                sigDF = ReadFileType(file_location, file_ext)
                 # Get colour data
                 i = (names.index(column) + 1) % len(colours)
                 # Plot file

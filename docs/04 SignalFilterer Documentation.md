@@ -41,6 +41,45 @@ PSD = EMGFlow.EMG2PSD(SignalDF['col1'], sr)
 
 ---
 
+## `ReadFileType`
+
+**Description**
+
+`ReadFileType` is a safe wrapper for reading files of a given extension.
+
+```python
+ReadFileType(path, file_ext)
+```
+
+**Parameters**
+
+`path`: str
+- String filepath of file to read.
+
+`file_ext`: str
+- String extension of the files to read.
+
+**Returns**
+
+`ReadFileType`: pd.DataFrame
+- Returns a Pandas dataframe of the file contents.
+
+**Error**
+
+Raises an error if the file could not be read.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
+
+**Example**
+
+```python
+path = 'data/raw/file01.csv'
+ext = 'csv'
+df = ReadFileType(path, ext)
+```
+
+---
+
 ## `MapFiles`
 
 **Description**
@@ -212,6 +251,8 @@ Raises an error if `col` is not found in `Signal`.
 
 Raises an error if the sampling rate is less or equal to 0.
 
+Raises an error if a value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
+
 **Example**
 
 ```python
@@ -277,7 +318,13 @@ Raises an error if `col` is not found in any of the Signal files found.
 
 Raises an error if the sampling rate is less or equal to 0.
 
-Raises a warning if `expression` causes all files to be filtered out
+Raises an error if a value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
+
+Raises a warning if `expression` causes all files to be filtered out.
+
+Raises an error if a file cannot be read in `in_path`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example**
 
@@ -348,6 +395,8 @@ ApplyBandpassFilter(Signal, col, sampling_rate, low, high)
 Raises an error if `col` is not found in `Signal`.
 
 Raises an error if the sampling rate is less or equal to 0.
+
+Raises an error if `high` is not higher than `low`.
 
 **Example**
 
@@ -422,7 +471,13 @@ Raises an error if `col` is not found in any of the Signal files found.
 
 Raises an error if the sampling rate is less or equal to 0.
 
-Raises a warning if `expression` causes all files to be filtered out
+Raises a warning if `expression` causes all files to be filtered out.
+
+Raises an error if `high` is not higher than `low`.
+
+Raises an error if a file cannot be read in `in_path`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example**
 
@@ -527,6 +582,8 @@ Raises an error if `col` is not found in `Signal`.
 
 Raises an error if `window_size` is less or equal to 0.
 
+Raises a warning if `window_size` is greater than the length of `Signal`.
+
 **Example**
 
 ```python
@@ -581,6 +638,8 @@ s\\_i=\sqrt{\frac{\sum\\_{j=i-\mu}^{i+\mu}x\\_j^2}{2\mu+1}}
 Raises an error if `col` is not found in `Signal`.
 
 Raises an error if `window_size` is less or equal to 0.
+
+Raises a warning if `window_size` is greater than the length of `Signal`.
 
 **Example**
 
@@ -641,6 +700,8 @@ Raises an error if `col` is not found in `Signal`.
 
 Raises an error if `window_size` is less or equal to 0.
 
+Raises a warning if `window_size` is greater than the length of `Signal`.
+
 **Example**
 
 ```python
@@ -699,6 +760,8 @@ w\\_i=\left(1-\left(\frac{d\\_i}{\max(d\\_i)}\right)^3\right)^3
 Raises an error if `col` is not found in `Signal`.
 
 Raises an error if `window_size` is less or equal to 0.
+
+Raises a warning if `window_size` is greater than the length of `Signal`.
 
 **Example**
 
@@ -774,7 +837,13 @@ Raises an error if any of the Signal files don't contain a column listed in `col
 
 Raises an error if `window_size` is less or equal to 0.
 
-Raises a warning if `expression` causes all files to be filtered out
+Raises a warning if `expression` causes all files to be filtered out.
+
+Raises a warning if `window_size` is greater than the length of `Signal`.
+
+Raises an error if a file cannot be read in `in_path`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example**
 
@@ -850,13 +919,17 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 **Error**
 
-Raises an error if `in_bandpass` and `in_smooth` don't contain the same files
+Raises an error if `in_bandpass` and `in_smooth` don't contain the same files.
 
-Raises an error if the files from `in_bandpass` and `in_smooth` don't contain `col`
+Raises an error if the files from `in_bandpass` and `in_smooth` don't contain `col`.
 
-Raises an error if `sampling_rate` is less or equal to 0
+Raises an error if `sampling_rate` is less or equal to 0.
 
-Raises a warning if `expression` causes all files to be filtered out
+Raises a warning if `expression` causes all files to be filtered out.
+
+Raises an error if a file cannot be read in `in_bandpass` or `in_smooth`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example**
 

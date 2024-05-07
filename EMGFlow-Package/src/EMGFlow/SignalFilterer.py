@@ -88,6 +88,45 @@ def EMG2PSD(Sig_vals, sr=1000, normalize=True):
 # =============================================================================
 #
 
+def ReadFileType(path, file_ext):
+    """
+    Safe wrapper for reading files of a given extension.
+
+    Parameters
+    ----------
+    path : str
+        Path of file to read.
+    file_ext : str
+        File extension to read.
+
+    Raises
+    ------
+    Exception
+        Raises an exception if the file could not be read.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
+
+    Returns
+    -------
+    file : pd.DataFrame
+        Returns a Pandas data frame of the file contents.
+
+    """
+    
+    if file_ext == 'csv':
+        try:
+            file = pd.read_csv(path)
+        except:
+            raise Exception("CSV file could not be read: " + path)
+    else:
+        raise Exception("Unsupported file format provided: " + file_ext)
+        
+    return file
+
+#
+# =============================================================================
+#
 
 def MapFiles(in_path, file_ext='csv', expression=None):
     """
@@ -124,21 +163,26 @@ def MapFiles(in_path, file_ext='csv', expression=None):
 
 def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
     """
-    Generate a dictionary of file names and locations from different forms of input.
+    Generate a dictionary of file names and locations from different forms of
+    input.
 
     Parameters
     ----------
     fileObj : str
-        The file location object. This can be a string to a file location, or an already formed dictionary of file locations.
+        The file location object. This can be a string to a file location, or
+        an already formed dictionary of file locations.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
     expression : str, optional
-        A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only count files whose names
+        match the regular expression. The default is None.
 
     Raises
     ------
     Exception
-        If an unsupported file location format is provided, an exception is raised.
+        An exception is raised if an unsupported file location format is
+        provided.
 
     Returns
     -------
@@ -175,19 +219,24 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
 
 def MapFilesFuse(filedirs, names):
     """
-    Generate a dictionary of file names and locations from different forms of input.
+    Generate a dictionary of file names and locations from different forms of
+    input. Each directory should contain the same file at different stages with
+    the same name, and will create a dataframe of the location of this file in
+    each of the directories provided.
 
     Parameters
     ----------
     filedirs : dict list
         List of file location directories
     names : str
-        List of names to use for file directory columns. Same order as file directories.
+        List of names to use for file directory columns. Same order as file
+        directories.
 
     Raises
     ------
     Exception
-        If an unsupported file location format is provided, an exception is raised.
+        An exception is raised if a file contained in the first file directory
+        is not found in the other file directories.
 
     Returns
     -------
@@ -226,14 +275,17 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     sampling_rate : float
         Sampling rate of the Signal.
     notch_vals : list
-        A list of (Hz, Q) tuples corresponding to the notch filters being applied. Hz is the frequency to
-        apply the filter to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter).
+        A list of (Hz, Q) tuples corresponding to the notch filters being
+        applied. Hz is the frequency to apply the filter to, and Q is the
+        Q-score (an intensity score where a higher number means a less extreme
+        filter).
 
     Raises
     ------
@@ -241,6 +293,9 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         An exception is raised if the column is not found in the Signal.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
+    Exception
+        An exception is raised if a Hz value in notch_vals is greater than
+        sampling_rate/2 or less than 0
 
     Returns
     -------
@@ -271,6 +326,12 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
             Notch filter data. Should be a (Hz, Q) tuple where Hz is the frequency to apply the filter to, and Q.
             is the Q-score (an intensity score where a higher number means a less extreme filter).
 
+        Raises
+        ------
+        Exception
+            An exception is raised if the Hz value in notch is greater than
+            sampling_rate/2 or less than 0.
+
         Returns
         -------
         Signal_col : Series
@@ -281,6 +342,9 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         Signal = Signal.copy()
         
         (Hz, Q) = notch
+        
+        if Hz > sampling_rate / 2 or Hz < 0:
+            raise Exception("Notch filter frequency must be between 0 and " + str(sampling_rate / 2) + " (sampling_rate/2)")
         
         # Normalize filtering frequency
         nyq_freq = sampling_rate / 2
@@ -336,6 +400,14 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
         An exception is raised if the column is not found in any of the Signal files found.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
+    Exception
+        An exception is raised if a Hz value in notch_vals is greater than
+        sampling_rate/2 or less than 0
+    Exception
+        Raises an exception if a file cannot not be read in in_path.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
@@ -360,7 +432,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     for file in tqdm(filedirs):
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             # Read file
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -382,7 +454,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
             
         elif (file[-len(file_ext):] == file_ext) and exp_copy:
             # Copy the file even if it doesn't match if exp_copy is true
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             out_file = out_path + filedirs[file][len(in_path):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
@@ -417,6 +489,8 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
         An exception is raised if the column is not found in the Signal.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
+    Exception
+        An exception is raised if high is not higher than low.
 
     Returns
     -------
@@ -426,10 +500,13 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + col + " not in Signal.")
     
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater or equal to 0")
+        raise Exception("Sampling rate must be greater or equal to 0.")
+    
+    if high <= low:
+        raise Exception("'high' must be higher than 'low'.")
     
     
     Signal = Signal.copy()
@@ -477,6 +554,13 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
         An exception is raised if the column is not found in any of the Signal files found.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
+    Exception
+        An exception is raised if high is not higher than low.
+    Exception
+        Raises an exception if a file cannot not be read in in_path.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
     
     Returns
     -------
@@ -501,7 +585,7 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -523,7 +607,7 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
             
         elif (file[-len(file_ext):] == file_ext) and exp_copy:
             # Copy the file even if it doesn't match if exp_copy is true
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             out_file = out_path + filedirs[file][len(in_path):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
@@ -588,6 +672,8 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if window_size is less or equal to 0.
+    Warning
+        A warning is raised if window_size is greater than Signal length.
     
     Returns
     -------
@@ -595,6 +681,9 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
         A copy of Signal after the boxcar smoothing filter is applied.
 
     """
+    
+    if window_size > len(Signal.index):
+        warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
@@ -635,6 +724,8 @@ def ApplyRMSSmooth(Signal, col, window_size):
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if window_size is less or equal to 0.
+    Warning
+        A warning is raised if window_size is greater than Signal length.
 
     Returns
     -------
@@ -643,11 +734,16 @@ def ApplyRMSSmooth(Signal, col, window_size):
 
     """
     
+    if window_size > len(Signal.index):
+        warnings.warn("Warning: Selected window size is greater than Signal file.")
+    
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
+    
+    
     
     Signal = Signal.copy()
     # Square
@@ -683,6 +779,8 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if window_size is less or equal to 0.
+    Warning
+        A warning is raised if window_size is greater than Signal length.
 
     Returns
     -------
@@ -690,6 +788,9 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
         A copy of Signal after the Gaussian smoothing filter is applied.
 
     """
+    
+    if window_size > len(Signal.index):
+        warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
@@ -729,6 +830,8 @@ def ApplyLoessSmooth(Signal, col, window_size):
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if window_size is less or equal to 0.
+    Warning
+        A warning is raised if window_size is greater than Signal length.
 
     Returns
     -------
@@ -736,6 +839,9 @@ def ApplyLoessSmooth(Signal, col, window_size):
         A copy of Signal after the Loess smoothing filter is applied.
 
     """
+    
+    if window_size > len(Signal.index):
+        warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
@@ -794,6 +900,13 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
         An exception is raised if col is not found in any of the Signal files.
     Exception
         An exception is raised if window_size is less or equal to 0.
+    Warning
+        A warning is raised if window_size is greater than Signal length.
+    Exception
+        Raises an exception if a file cannot not be read in in_path.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
@@ -818,7 +931,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -849,7 +962,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
         
         elif (file[-len(file_ext):] == file_ext) and exp_copy:
             # Copy the file even if it doesn't match if exp_copy is true
-            data = pd.read_csv(filedirs[file])
+            data = ReadFileType(filedirs[file], file_ext)
             out_file = out_path + filedirs[file][len(in_path):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
@@ -1766,37 +1879,52 @@ def CalcSBW(psd, p=2):
 
 def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
-    Analyze Signals by performing a collection of analyses on them and saving a feature file.
+    Analyze Signals by performing a collection of analyses on them and saving a
+    feature file.
 
     Parameters
     ----------
     in_bandpass : str
-        File location for reading in bandpass files. These files are used for generating spectral features, as smoothed files can
-        impact the accuracy. If no bandpass files are available, the same file location can be used as for in_smooth.
+        File location for reading in bandpass files. These files are used for
+        generating spectral features, as smoothed files can impact the
+        accuracy. If no bandpass files are available, the same file location
+        can be used as for in_smooth.
     in_smooth : str
         File location for reading in smoothed files.
     out_path : str
         Output location for feature file.
     sampling_rate : float
-        Sampling rate for all Signals read (all files in in_bandpass and in_smooth).
+        Sampling rate for all Signals read (all files in in_bandpass and
+        in_smooth).
     cols : [str] list, optional
-        List of columns to analyze in each Signal (all files in in_bandpass and in_smooth). The default is None, in which case
-        all columns except for "Time" will be analyzed. All Signals should have the columns listed, or if None is used, all
-        Signals should have the same columns.
+        List of columns to analyze in each Signal (all files in in_bandpass and
+        in_smooth). The default is None, in which case all columns except for
+        "Time" will be analyzed. All Signals should have the columns listed, or
+        if None is used, all Signals should have the same columns.
     expression : str, optional
-        A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only count files whose names
+        match the regular expression. The default is None.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
     short_name : bool, optional
-        If true, makes the key column of the feature files the name of the file. If false, uses the file path to ensure unique
-        keys. The default is True.
+        If true, makes the key column of the feature files the name of the
+        file. If false, uses the file path to ensure unique keys. The default
+        is True.
 
     Raises
     ------
     Exception
-        An exception is raised if in_bandpass and in_smooth do not contain the same files
+        An exception is raised if in_bandpass and in_smooth do not contain the
+        same files
     Exception
         An exception is raised if p is not greater than 0
+    Exception
+        Raises an exception if a file cannot not be read in in_bandpass or
+        in_smooth.
+    Exception
+        Raises an exception if an unsupported file format was provided for
+        file_ext.
 
     Returns
     -------
@@ -1856,7 +1984,7 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
     # Read the first file to get column names
     if cols == None:
         path1 = next(iter(filedirs_s.values()))
-        data1 = pd.read_csv(path1)
+        data1 = ReadFileType(path1, file_ext)
         cols = list(data1.columns)
         if 'Time' in cols:
             cols.remove('Time')
@@ -1875,8 +2003,8 @@ def AnalyzeSignals(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, e
         if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data_b = pd.read_csv(filedirs_b[file])
-            data_s = pd.read_csv(filedirs_s[file])
+            data_b = ReadFileType(filedirs_b[file], file_ext)
+            data_s = ReadFileType(filedirs_s[file], file_ext)
             
             if col not in list(data_b.columns.values):
                 raise Exception("Bandpass file " + file + " does not contain column " + col)

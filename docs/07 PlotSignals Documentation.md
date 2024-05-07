@@ -47,6 +47,10 @@ Raises an error if the directories in `in_paths` don't contain the same files.
 
 Raises an error if `col` is not found in a dataframe.
 
+Raises an error if a file cannot be read from one of the folders in `in_paths`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
+
 **Example:**
 
 ```python
@@ -113,6 +117,10 @@ Raises an error if a column in `cols` is not in a dataframe.
 
 Raises an error if `p` is not None and not between 0 and 1.
 
+Raises an error if a file cannot be read in `in_path`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
+
 **Example:**
 
 ```python
@@ -172,6 +180,10 @@ Raises an error if `in_path1` and `in_path2` don't contain the same files.
 Raises an error if `sampling_rate` is less or equal to 0.
 
 Raises an error if a column in `cols` is not in a dataframe.
+
+Raises an error if a file cannot be read in `in_path1` or `in_path2`.
+
+Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example:**
 
