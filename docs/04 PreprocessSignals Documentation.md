@@ -106,6 +106,10 @@ MapFiles(in_path, file_ext='csv', expression=None)
 `MapFiles`: dict
 - Returns a dictionary of file names and locations keys/values.
 
+**Error**
+
+Raises an error if `expression` is not a valid regular expression.
+
 **Example**
 
 ```python
@@ -150,6 +154,8 @@ ConvertMapFiles(fileObj, file_ext='csv', experssion=None)
 **Error**
 
 Raises an error if provided an unsupported file type for `fileObj` is provided.
+
+Raises an error if `expression` is not a valid regular expression.
 
 **Example**
 
@@ -326,6 +332,8 @@ Raises an error if a file cannot be read in `in_path`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
 
+Raises an error if `expression` is not a valid regular expression.
+
 **Example**
 
 ```python
@@ -478,6 +486,8 @@ Raises an error if `high` is not higher than `low`.
 Raises an error if a file cannot be read in `in_path`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
+
+Raises an error if `expression` is not a valid regular expression.
 
 **Example**
 
@@ -844,6 +854,8 @@ Raises a warning if `window_size` is greater than the length of `Signal`.
 Raises an error if a file cannot be read in `in_path`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
+
+Raises an error if `expression` is not a valid regular expression.
 
 **Example**
 

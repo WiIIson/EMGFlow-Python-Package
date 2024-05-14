@@ -62,13 +62,21 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
-    
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     if (p is not None) and (p < 0 or p > 1):
         raise Exception("p must be between 0 or 1, or None")
@@ -99,17 +107,30 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 fig, axs = plt.subplots(1, len(cols), figsize=(15*len(cols),15))
                 
                 # Plot each column
-                for i in range(len(cols)):
-                    col = cols[i]
+                if len(cols) == 1:
+                    col = cols[0]
                     
                     if col not in list(data.columns.values):
                         raise Exception("Column " + col + " not in Signal " + file)
                     
-                    psd = EMG2PSD(data[col], sr=sampling_rate)
-                    axs[i].plot(psd['Frequency'], psd['Power'])
-                    axs[i].set_ylabel('Power magnitude')
-                    axs[i].set_xlabel('Frequency')
-                    axs[i].set_title(col)
+                    psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                    axs.plot(psd['Frequency'], psd['Power'])
+                    axs.set_ylabel('Power magnitude')
+                    axs.set_xlabel('Frequency')
+                    axs.set_title(col)
+                    
+                else:
+                    for i in range(len(cols)):
+                        col = cols[i]
+                        
+                        if col not in list(data.columns.values):
+                            raise Exception("Column " + col + " not in Signal " + file)
+                        
+                        psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                        axs[i].plot(psd['Frequency'], psd['Power'])
+                        axs[i].set_ylabel('Power magnitude')
+                        axs[i].set_xlabel('Frequency')
+                        axs[i].set_title(col)
                 
                 # Set title and save figure
                 fig.suptitle(file + ' Power Spectrum Density')
@@ -157,12 +178,21 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
@@ -192,22 +222,39 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             # Create plot
             fig, axs = plt.subplots(2, len(cols), figsize=(15*len(cols),30))
             
-            # Plot each column
-            for i in range(len(cols)):
-                col = cols[i]
+            if len(cols) == 1:
+                col = cols[0]
                 
                 if col not in list(data1.columns.values) or col not in list(data2.columns.values):
                     raise Exception("Column " + col + " not in Signal " + file)
                 
-                psd1 = EMG2PSD(data1[col], sr=sampling_rate)
-                axs[0,i].plot(psd1['Frequency'], psd1['Power'])
-                axs[0,i].set_ylabel('Power magnitude')
-                axs[0,i].set_title(col)
+                psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
+                axs[0].plot(psd1['Frequency'], psd1['Power'])
+                axs[0].set_ylabel('Power magnitude')
+                axs[0].set_title(col)
                 
-                psd2 = EMG2PSD(data2[col], sr=sampling_rate)
-                axs[1,i].plot(psd2['Frequency'], psd2['Power'])
-                axs[1,i].set_ylabel('Power magnitude')
-                axs[1,i].set_xlabel('Frequency')
+                psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
+                axs[1].plot(psd2['Frequency'], psd2['Power'])
+                axs[1].set_ylabel('Power magnitude')
+                axs[1].set_xlabel('Frequency')
+                
+            else:
+                # Plot each column
+                for i in range(len(cols)):
+                    col = cols[i]
+                    
+                    if col not in list(data1.columns.values) or col not in list(data2.columns.values):
+                        raise Exception("Column " + col + " not in Signal " + file)
+                    
+                    psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
+                    axs[0,i].plot(psd1['Frequency'], psd1['Power'])
+                    axs[0,i].set_ylabel('Power magnitude')
+                    axs[0,i].set_title(col)
+                    
+                    psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
+                    axs[1,i].plot(psd2['Frequency'], psd2['Power'])
+                    axs[1,i].set_ylabel('Power magnitude')
+                    axs[1,i].set_xlabel('Frequency')
             
             # Set title and save figure
             fig.suptitle(file + ' Power Spectrum Density')
@@ -220,7 +267,7 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 #
 
 # Creates a shiny app object that can be ran
-def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
+def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv', autorun=True):
     """
     Generate a shiny dashboard of different processing stages for a given column.
 
@@ -245,6 +292,10 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
         String extension of the files to read. Any file in in_path with this
         extension will be considered to be a Signal file, and treated as such.
         The default is 'csv'.
+    autorun : bool, optional
+        Boolean controlling behavior of the function. If true (default), will
+        automatically run the visual and open it in the default browser. If
+        false, will return the visualization object.
 
     Raises
     ------
@@ -258,12 +309,21 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
-    None.
+    If autorun is True, returns None. If False, returns a shiny.App instance.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert file paths to directories
     filedirs = []
@@ -338,6 +398,10 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv'):
             return fig
     
     app = App(app_ui, server)
-    webbrowser.open('http://127.0.0.1:8000')
-    app.run()
-    return
+    
+    if autorun:
+        webbrowser.open('http://127.0.0.1:8000')
+        app.run()
+        return
+    else:
+        return app

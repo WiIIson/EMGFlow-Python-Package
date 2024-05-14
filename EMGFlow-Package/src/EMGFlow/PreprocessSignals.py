@@ -19,7 +19,7 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def EMG2PSD(Sig_vals, sr=1000, normalize=True):
+def EMG2PSD(Sig_vals, sampling_rate=1000, normalize=True):
     """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).
@@ -31,9 +31,10 @@ def EMG2PSD(Sig_vals, sr=1000, normalize=True):
     sampling_rate : float
         Sampling rate of the Signal.
     normalize : bool, optional
-        If True, will normalize the result. If False, will not. The default is True.
+        If True, will normalize the result. If False, will not. The default is
+        True.
 
-        Raises
+    Raises
     ------
     Exception
         An exception is raised if the sampling rate is less or equal to 0
@@ -41,12 +42,13 @@ def EMG2PSD(Sig_vals, sr=1000, normalize=True):
     Returns
     -------
     psd : DataFrame
-        A DataFrame containing a 'Frequency' and 'Power' column. The Power column
-        indicates the intensity of each frequency in the Signal provided. Results
-        will be normalized if 'normalize' is set to True.
+        A DataFrame containing a 'Frequency' and 'Power' column. The Power
+        column indicates the intensity of each frequency in the Signal
+        provided. Results will be normalized if 'normalize' is set to True.
+    
     """
     
-    if sr <= 0:
+    if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
     
     # Initial parameters
@@ -54,16 +56,16 @@ def EMG2PSD(Sig_vals, sr=1000, normalize=True):
     N = len(Sig_vals)
     
     # Calculate minimum frequency given sampling rate
-    min_frequency = (2 * sr) / (N / 2)
+    min_frequency = (2 * sampling_rate) / (N / 2)
     
     # Calculate window size givern sampling rate
-    nperseg = int((2 / min_frequency) * sr)
+    nperseg = int((2 / min_frequency) * sampling_rate)
     nfft = nperseg * 2
     
     # Apply welch method with hanning window
     frequency, power = scipy.signal.welch(
         Sig_vals,
-        fs=sr,
+        fs=sampling_rate,
         scaling='density',
         detrend=False,
         nfft=nfft,
@@ -130,7 +132,8 @@ def ReadFileType(path, file_ext):
 
 def MapFiles(in_path, file_ext='csv', expression=None):
     """
-    Generate a dictionary of file names and locations from the subfiles of a folder.
+    Generate a dictionary of file names and locations from the subfiles of a
+    folder.
     
     Parameters
     ----------
@@ -139,7 +142,14 @@ def MapFiles(in_path, file_ext='csv', expression=None):
     file_ext : str, optional
         File extension for files to read. The default is 'csv'.
     expression : str, optional
-        A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only count files whose names
+        match the regular expression. The default is None.
+
+    Raises
+    ------
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
@@ -147,6 +157,12 @@ def MapFiles(in_path, file_ext='csv', expression=None):
         A dictionary of file name keys and file path location values.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     filedirs = {}
     for file in os.listdir(in_path):
@@ -183,6 +199,9 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
     Exception
         An exception is raised if an unsupported file location format is
         provided.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
@@ -190,6 +209,12 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
         A dictionary of file name keys and file path location values.
     
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # User provided a path to a folder
     if type(fileObj) is str:
@@ -270,7 +295,8 @@ def MapFilesFuse(filedirs, names):
 
 def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
     """
-    Apply a list of notch filters for given frequencies and Q-factors to a column of the provided data.
+    Apply a list of notch filters for given frequencies and Q-factors to a
+    column of the provided data.
 
     Parameters
     ----------
@@ -317,14 +343,16 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         Parameters
         ----------
         Signal : DataFrame
-            A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+            A Pandas DataFrame containing a 'Time' column, and additional
+            columns for signal data.
         col : str
             Column of the Signal to apply the filter to.
         sampling_rate : float
             Sampling rate of the Signal.
         notch : (int, int) tuple
-            Notch filter data. Should be a (Hz, Q) tuple where Hz is the frequency to apply the filter to, and Q.
-            is the Q-score (an intensity score where a higher number means a less extreme filter).
+            Notch filter data. Should be a (Hz, Q) tuple where Hz is the
+            frequency to apply the filter to, and Q. is the Q-score (an
+            intensity score where a higher number means a less extreme filter).
 
         Raises
         ------
@@ -369,8 +397,8 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
 
 def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     """
-    Apply notch filters to all Signals in a folder. Writes filtered Signals to an output folder, and generates a file structure
-    matching the input folder.
+    Apply notch filters to all Signals in a folder. Writes filtered Signals to
+    an output folder, and generates a file structure matching the input folder.
 
     Parameters
     ----------
@@ -381,23 +409,30 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     sampling_rate : float
         Sampling rate of the Signal.
     notch : list
-        A list of (Hz, Q) tuples corresponding to the notch filters being applied. Hz is the frequency to
-        apply the filter to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter).
+        A list of (Hz, Q) tuples corresponding to the notch filters being
+        applied. Hz is the frequency to apply the filter to, and Q is the
+        Q-score (an intensity score where a higher number means a less
+        extreme filter).
     cols : list, optional
-        List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to
-        every column except for 'Time'.
+        List of columns of the Signal to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose names
+        match the regular expression. The default is None.
     exp_copy : TYPE, optional
-        If true, copies files that don't match the regular expression to the output folder without filtering. The default is False,
-        which ignores files that don't match.
+        If true, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
     file_ext : TYPE, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if the column is not found in any of the Signal files found.
+        An exception is raised if the column is not found in any of the Signal
+        files found.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
     Exception
@@ -408,12 +443,21 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -473,7 +517,8 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     sampling_rate : float
@@ -505,6 +550,9 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
     
+    if high > sampling_rate/2 or low > sampling_rate/2:
+        raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
+    
     if high <= low:
         raise Exception("'high' must be higher than 'low'.")
     
@@ -522,7 +570,8 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
 
 def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     """
-    Apply bandpass filters to all Signals in a folder. Writes filtered Signals to an output folder, and generates a file structure
+    Apply bandpass filters to all Signals in a folder. Writes filtered Signals
+    to an output folder, and generates a file structure
     matching the input folder.
     
     Parameters
@@ -538,20 +587,25 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     high : float
         Upper frequency limit of the bandpass filter. The default is 450.
     cols : list, optional
-        List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to
-        every column except for 'Time'.
+        List of columns of the Signal to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose names
+        match the regular expression. The default is None.
     exp_copy : bool, optional
-        If true, copies files that don't match the regular expression to the output folder without filtering. The default is False,
-        which ignores files that don't match.
+        If true, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
     
     Raises
     ------
     Exception
-        An exception is raised if the column is not found in any of the Signal files found.
+        An exception is raised if the column is not found in any of the Signal
+        files found.
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
     Exception
@@ -561,12 +615,21 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
     
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -626,7 +689,8 @@ def ApplyFWR(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
 
@@ -655,12 +719,14 @@ def ApplyFWR(Signal, col):
 
 def ApplyBoxcarSmooth(Signal, col, window_size):
     """
-    Apply a boxcar smoothing filter to a Signal. Uses a rolling average with a window size.
+    Apply a boxcar smoothing filter to a Signal. Uses a rolling average with a
+    window size.
 
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     window_size : int, float
@@ -707,12 +773,14 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
 
 def ApplyRMSSmooth(Signal, col, window_size):
     """
-    Apply an RMS smoothing filter to a Signal. Uses a rolling average with a window size.
+    Apply an RMS smoothing filter to a Signal. Uses a rolling average with a
+    window size.
 
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     window_size : int, float
@@ -760,12 +828,14 @@ def ApplyRMSSmooth(Signal, col, window_size):
 
 def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
     """
-    Apply a Gaussian smoothing filter to a Signal. Uses a rolling average with a window size.
+    Apply a Gaussian smoothing filter to a Signal. Uses a rolling average with
+    a window size.
 
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     window_size : int, float
@@ -813,12 +883,14 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
 
 def ApplyLoessSmooth(Signal, col, window_size):
     """
-    Apply a Loess smoothing filter to a Signal. Uses a rolling average with a window size and tri-cubic weight.
+    Apply a Loess smoothing filter to a Signal. Uses a rolling average with a
+    window size and tri-cubic weight.
 
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the filter to.
     window_size : int, float
@@ -866,8 +938,10 @@ def ApplyLoessSmooth(Signal, col, window_size):
 
 def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1):  
     """
-    Apply smoothing filters to all Signals in a folder. Writes filtered Signals to an output folder, and generates a file structure
-    matching the input folder. The method used to smooth the signals can be specified, but is RMS as default.
+    Apply smoothing filters to all Signals in a folder. Writes filtered Signals
+    to an output folder, and generates a file structure matching the input
+    folder. The method used to smooth the signals can be specified, but is RMS
+    as default.
 
     Parameters
     ----------
@@ -878,24 +952,31 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
     window_size : int, float
         Size of the window of the filter.
     cols : list, optional
-        List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to
-        every column except for 'time'.
+        List of columns of the Signal to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'time'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose names
+        match the regular expression. The default is None.
     exp_copy : bool, optional
-        If true, copies files that don't match the regular expression to the output folder without filtering. The default is False,
-        which ignores files that don't match.
+        If true, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
     method : str, optional
-        The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or 'loess'. The default is 'rms'.
+        The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or
+        'loess'. The default is 'rms'.
     sigma: float, optional
-        The value of sigma used for a Gaussian filter. Only affects output when using Gaussian filtering.
+        The value of sigma used for a Gaussian filter. Only affects output when
+        using Gaussian filtering.
 
     Raises
     ------
     Exception
-        An exception is raised if an invalid smoothing method is used. Valid methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
+        An exception is raised if an invalid smoothing method is used. Valid
+        methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
     Exception
         An exception is raised if col is not found in any of the Signal files.
     Exception
@@ -907,12 +988,21 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -980,7 +1070,8 @@ def CalcIEMG(Signal, col, sr):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
     sr : float
@@ -1021,7 +1112,8 @@ def CalcMAV(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1055,7 +1147,8 @@ def CalcMMAV(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1096,7 +1189,8 @@ def CalcSSI(Signal, col, sr):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
     sr : float
@@ -1136,7 +1230,8 @@ def CalcVAR(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1170,7 +1265,8 @@ def CalcVOrder(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1203,7 +1299,8 @@ def CalcRMS(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1237,7 +1334,8 @@ def CalcWL(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1273,7 +1371,8 @@ def CalcWAMP(Signal, col, threshold):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
     threshold : float
@@ -1311,7 +1410,8 @@ def CalcLOG(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1346,7 +1446,8 @@ def CalcMFL(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1382,7 +1483,8 @@ def CalcAP(Signal, col):
     Parameters
     ----------
     Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     col : str
         Column of the Signal to apply the summary to.
 
@@ -1415,18 +1517,22 @@ def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
     Parameters
     ----------
     Signal1 : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns for signal data.
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
     diff : float, DataFrame
-        The divisor of the calculation. If a percentage is provided, it will calculate the
-        spectral flux of the percentage of the Signal with one minus the percentage of the Signal.
+        The divisor of the calculation. If a percentage is provided, it will
+        calculate the spectral flux of the percentage of the Signal with one
+        minus the percentage of the Signal.
     col : str
-        Column of the Signal to apply the summary to. If a second signal is provided for diff, a column
-        of the same name should be available for use.
+        Column of the Signal to apply the summary to. If a second signal is
+        provided for diff, a column of the same name should be available for
+        use.
     sr : float
         Sampling rate of the Signal.
     diff_sr : float, optional
-        Sampling rate for the second Signal if provided. The default is None, in which case if
-        a second Signal is provided, the sampling rate is assumed to be the same as the first.
+        Sampling rate for the second Signal if provided. The default is None,
+        in which case if a second Signal is provided, the sampling rate is
+        assumed to be the same as the first.
 
     Raises
     ------
@@ -1498,15 +1604,16 @@ def CalcTwitchRatio(psd, freq=60):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
     freq : float, optional
-        Frequency threshold of the Twitch Ratio separating fast-twitching (high-frequency)
-        muscles from slow-twitching (low-frequency) muscles.
+        Frequency threshold of the Twitch Ratio separating fast-twitching
+        (high-frequency) muscles from slow-twitching (low-frequency) muscles.
 
     Raises
     ------
     Exception
         An exception is raised if freq is less or equal to 0.
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1541,15 +1648,16 @@ def CalcTwitchIndex(psd, freq=60):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
     freq : float, optional
-        Frequency threshold of the Twitch Index separating fast-twitching (high-frequency)
-        muscles from slow-twitching (low-frequency) muscles.
+        Frequency threshold of the Twitch Index separating fast-twitching
+        (high-frequency) muscles from slow-twitching (low-frequency) muscles.
 
     Raises
     ------
     Exception
         An exception is raised if freq is less or equal to 0.
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1584,15 +1692,16 @@ def CalcTwitchSlope(psd, freq=60):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
     freq : float, optional
-        Frequency threshold of the Twitch Slope separating fast-twitching (high-frequency)
-        muscles from slow-twitching (low-frequency) muscles.
+        Frequency threshold of the Twitch Slope separating fast-twitching
+        (high-frequency) muscles from slow-twitching (low-frequency) muscles.
 
     Raises
     ------
     Exception
         An exception is raised if freq is less or equal to 0.
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1644,7 +1753,8 @@ def CalcSC(psd):
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1675,7 +1785,8 @@ def CalcSF(psd):
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1707,7 +1818,8 @@ def CalcSS(psd):
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1739,7 +1851,8 @@ def CalcSDec(psd):
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1772,7 +1885,8 @@ def CalcSEntropy(psd):
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
 
     Returns
     -------
@@ -1801,12 +1915,14 @@ def CalcSRoll(psd, percent=0.85):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
     percent : float, optional
-        The percentage of power to look for the Spectral Rolloff after. The default is 0.85.
+        The percentage of power to look for the Spectral Rolloff after. The
+        default is 0.85.
 
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
     Exception
         An exception is raised if percent is not between 0 and 1
 
@@ -1847,12 +1963,14 @@ def CalcSBW(psd, p=2):
     psd : DataFrame
         A Pandas DataFrame containing a 'Frequency' and 'Power' column.
     p : int, optional
-        Order of the SBW. The default is 2, which gives the standard deviation around the centroid.
+        Order of the SBW. The default is 2, which gives the standard deviation
+        around the centroid.
 
     Raises
     ------
     Exception
-        An exception is raised if psd does not only have columns 'Frequency' and 'Power'
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
     Exception
         An exception is raised if p is not greater than 0
 
@@ -1925,12 +2043,21 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
+    Exception
+        Raises an exception if expression is not None or a valid regular
+        expression.
 
     Returns
     -------
     None.
 
     """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):

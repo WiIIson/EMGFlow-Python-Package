@@ -11,7 +11,7 @@ Creates a HTML dashboard from a series of signal file paths to compare filtering
 The visualization is created in the default browser, and is opened automatically.
 
 ```python
-GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ext='csv')
+GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ext='csv', autorun=True)
 ```
 
 **Parameters:**
@@ -37,9 +37,12 @@ GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ex
 `file_ext`: str ("csv")
 - String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
 
+`autorun`: bool (True)
+- Boolean controlling the behavior of the function. If True (default), will automatically run the visualization in the default browser. If False, will return a shiny.App instance.
+
 **Returns:**
 
-`GenPlotDash`: None
+`GenPlotDash`: None or shiny.app
 
 **Error**
 
@@ -50,6 +53,8 @@ Raises an error if `col` is not found in a dataframe.
 Raises an error if a file cannot be read from one of the folders in `in_paths`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
+
+Raises an error if `expression` is not a valid regular expression.
 
 **Example:**
 
@@ -121,6 +126,8 @@ Raises an error if a file cannot be read in `in_path`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
 
+Raises an error if `expression` is not a valid regular expression.
+
 **Example:**
 
 ```python
@@ -184,6 +191,8 @@ Raises an error if a column in `cols` is not in a dataframe.
 Raises an error if a file cannot be read in `in_path1` or `in_path2`.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
+
+Raises an error if `expression` is not a valid regular expression.
 
 **Example:**
 
