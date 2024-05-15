@@ -1,5 +1,9 @@
 # EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
 
+![pypi](https://img.shields.io/pypi/v/emgflow.svg)
+[![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
+[![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
+
 The open workflow for EMG signal processing and feature extraction.
 
 **EMGFlow** is a Python package for researchers and clinicians to engage in signal processing using the data you have your way. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
