@@ -6,19 +6,19 @@ import matplotlib.pyplot as plt
 from EMGFlow.OutlierFinder import *
 from EMGFlow.PreprocessSignals import EMG2PSD
 
-def setup_test():
-    if os.path.exists('./Testing') == False:
-        os.mkdir('./Testing')
-        time_col = np.array(range(500)) / 100
-        emg_col = np.sin(time_col) + (np.random.rand(500)/10)
-        df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
-        df.to_csv('./Testing/Data.csv', index=False)
-    if os.path.exists('./Testing_out') == False:
-        os.mkdir('./Testing_out')
-    if os.path.exists('./Testing_plots') == False:
-        os.mkdir('./Testing_plots')
-
 class TestSimple(unittest.TestCase):
+    
+    def setUp(self):
+        if os.path.exists('./Testing') == False:
+            os.mkdir('./Testing')
+            time_col = np.array(range(500)) / 100
+            emg_col = np.sin(time_col) + (np.random.rand(500)/10)
+            df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
+            df.to_csv('./Testing/Data.csv', index=False)
+        if os.path.exists('./Testing_out') == False:
+            os.mkdir('./Testing_out')
+        if os.path.exists('./Testing_plots') == False:
+            os.mkdir('./Testing_plots')
     
     def test_DetectOutliers(self):
         
@@ -37,6 +37,11 @@ class TestSimple(unittest.TestCase):
         outliers = DetectOutliers('./Testing', 100, 5, window_size=5)
         self.assertIsInstance(outliers, dict)
 
-if __name__ == '__main__':
-    setup_test()
-    unittest.main()
+    def tearDown(self):
+        if os.path.exists('./Testing') == True:
+            os.remove('./Testing/Data.csv')
+            os.rmdir('./Testing')
+        if os.path.exists('./Testing_out') == True:
+            os.rmdir('./Testing_out')
+        if os.path.exists('./Testing_plots') == True:
+            os.rmdir('./Testing_plots')
