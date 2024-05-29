@@ -6,9 +6,9 @@
 
 The open workflow for EMG signal processing and feature extraction.
 
-**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing using the data you have your way. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
 
-EMGFLow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
+EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
 The simple navigation menu allows you to switch between which files you see as well as which layers are overlayed:
 ![Example 1](EMGFlow_GUI.gif)

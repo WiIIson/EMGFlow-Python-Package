@@ -58,7 +58,7 @@ k=\frac{1}{N}\sum\\_{i=1}^N\left(\frac{x\\_i-\mu}{\sigma}\right)^4
 
 **Description**
 
-Calculates the Integrated EMG (IEMG) of the signal. The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity.
+Calculates the Integrated EMG (IEMG) of the signal. The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity. In an EMG signal, the IEMG describes when the muscle begins contracting, and is related to the signal sequence firing point (Phinyomark et al., 2009).
 
 ```python
 CalcIEMG(Signal, col, sr)
@@ -112,7 +112,7 @@ IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 
 **Description**
 
-Calculates the Mean Absolute Value (MAV) of the signal.
+Calculates the Mean Absolute Value (MAV) of the signal. In an EMG signal, the MAV describes the muscle contraction level (Phinyomark et al., 2009).
 
 ```python
 CalcMAV(Signal, col)
@@ -209,7 +209,7 @@ MMAV = EMGFlow.CalcMMAV(SignalDF, 'column1', 2000)
 
 **Description**
 
-Calculates the Simple Square Integral (SSI) of the signal. See more about the SSI.
+Calculates the Simple Square Integral (SSI) of the signal. In an EMG signal, the SSI describes the energy of the signal (Phinyomark et al., 2009).
 
 ```python
 CalcSSI(Signal, col, sr)
@@ -263,7 +263,7 @@ SSI = EMGFlow.CalcSSI(SignalDF, 'column1', 2000)
 
 **Description**
 
-Calculates the Variance (VAR) of the signal. The variance provides information about the power of the EMG signal.
+Calculates the Variance (VAR) of the signal. In an EMG signal, the VAR describes the power of the signal (Phinyomark et al., 2009).
 
 ```python
 CalcVAR(Signal, col)
@@ -308,7 +308,7 @@ VAR = EMGFlow.CalcVAR(SignalDF, 'column1')
 
 **Description**
 
-Calculates the V-Order of a signal.
+Calculates the V-Order of a signal. The V-Order is an alteration of VAR that takes the square root of the result.
 
 ```python
 CalcVOrder(Signal, col)
@@ -355,7 +355,7 @@ VOrder = EMGFlow.CalcVOrder(SignalDF, 'column1')
 
 **Description**
 
-Calculates the Root Mean Square (RMS) of a signal. The RMS provides information about the constant force, and non-fatiguing contractions of the muscles.
+Calculates the Root Mean Square (RMS) of a signal. In an EMG signal, the RMS provides information about the constant force, and non-fatiguing contractions of the muscles (Phinyomark et al., 2009).
 
 ```python
 CalcRMS(Signal, col)
@@ -447,7 +447,7 @@ WL = EMGFlow.CalcWL(SignalDF, 'column1')
 
 **Description**
 
-Calculate the Willison Amplitude (WAMP) of a signal. The WAMP measures the number of times an EMG amplitude exceeds a given threshold.
+Calculate the Willison Amplitude (WAMP) of a signal. The WAMP measures the number of times an EMG amplitude exceeds a given threshold. In an EMG signal, the WAMP describes the firing of Motor Unit Action Potentials (MUAP), and muscle contraction level (Phinyomark et al., 2009).
 
 ```python
 CalcWAMP(Signal, col, threshold)
@@ -1285,6 +1285,8 @@ Llanos, F., Alexander, J. M., Stilp, C. E., & Kluender, K. R. (2017). Power spec
 McComas, A. J. (1998). Oro-facial muscles: Internal structure, function and ageing. _Gerodontology_, _15_(1), 3–14. [https://doi.org/10.1111/j.1741-2358.1998.00003.x](https://doi.org/10.1111/j.1741-2358.1998.00003.x)
 
 Nagineni, S., Taran, S., & Bajaj, V. (2018). Features based on variational mode decomposition for identification of neuromuscular disorder using EMG signals. _Health Information Science and Systems_, _6_(1), 13. [https://doi.org/10.1007/s13755-018-0050-4](https://doi.org/10.1007/s13755-018-0050-4)
+
+Phinyomark, A., Limsakul, C., & Phukpattaranont, P. (2009). A Novel Feature Extraction for Robust EMG Pattern Recognition. 1(1).
 
 Roldán Jiménez, C., Bennett, P., Ortiz García, A., & Cuesta Vargas, A. I. (2019). Fatigue Detection during Sit-To-Stand Test Based on Surface Electromyography and Acceleration: A Case Study. _Sensors (Basel, Switzerland)_, _19_(19), 4202. [https://doi.org/10.3390/s19194202](https://doi.org/10.3390/s19194202)
 
