@@ -706,6 +706,84 @@ AP = EMGFlow.CalcSpecFlux(Signal1DF, Signal2DF, 'column1', 2000)
 
 ---
 
+## CalcMDF
+
+**Description**
+
+Calculates the Median Frequency (MDF) of a Signal.
+
+**Theory**
+
+MDF is the frequency on the power spectrum that can divide it into two regions of equal total power.
+
+Since it may not be possible to perfectly divide the spectrum into two regions of exactly equal power, this function finds the frequency that divides it the best.
+
+**Parameters**
+
+`psd`: pd.DataFrame
+- Normalized PSD of a signal. Should have a "frequency" and "power" column.
+
+**Returns**
+
+`CalcMDF`: float
+- Returns the frequency of the MDF.
+
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
+**Example**
+
+```python
+# Calculate the MDF of SignalDF, for column 'column1'
+psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
+MDF = EMGFlow.CalcMDF(psd)
+```
+
+---
+
+## CalcMNF
+
+**Description**
+
+Calculates the Mean Frequency (MNF) of a Signal.
+
+**Theory**
+
+MNF is the mean frequency on the power spectrum, weighted by the power of each frequency.
+
+MNF is calculated as follows:
+
+```math
+\text{MNF}=\frac{\sum\\_i^N f\\_ip\\_i}{\sum\\_i^N p\\_i}$$
+```
+
+(Phinyomark et al., 2009)
+
+**Parameters**
+
+`psd`: pd.DataFrame
+- Normalized PSD of a signal. Should have a "frequency" and "power" column.
+
+**Returns**
+
+`CalcMDF`: float
+- Returns the frequency of the MNF.
+
+**Error**
+
+Raises an error if `psd` does not only have columns 'Frequency' and 'Power'.
+
+**Example**
+
+```python
+# Calculate the MNF of SignalDF, for column 'column1'
+psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
+MNF = EMGFlow.CalcMNF(psd)
+```
+
+---
+
 ## `CalcTwitchRatio`
 
 **Description**
@@ -742,7 +820,7 @@ Twitch Ratio is calculated as follows:
 **Returns**
 
 `CalcTwitchRatio`: float
-- Returns the value of the Twitch Ratio
+- Returns the value of the Twitch Ratio.
 
 **Error**
 

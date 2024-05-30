@@ -1595,6 +1595,76 @@ def CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None):
 # =============================================================================
 #
 
+def CalcMDF(psd):
+    """
+    Calculate the Median Frequency (MDF) of a PSD.
+
+    Parameters
+    ----------
+    psd : DataFrame
+        A Pandas DataFrame containing a 'Frequency' and 'Power' column.
+    
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
+
+    Returns
+    -------
+    med_freq : int, float
+        The MDF of the psd provided.
+    
+    """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    
+    prefix_sum = psd['Power'].cumsum()
+    suffix_sum = psd['Power'][::-1].cumsum()[::-1]
+    diff = np.abs(prefix_sum - suffix_sum)
+
+    min_ind = np.argmin(diff)
+    med_freq = psd.loc[min_ind]['Frequency']
+    
+    return med_freq
+    
+#
+# =============================================================================
+#
+
+def CalcMNF(psd):
+    """
+    Calculate the Mean Frequency (MNF) of a PSD.
+
+    Parameters
+    ----------
+    psd : DataFrame
+        A Pandas DataFrame containing a 'Frequency' and 'Power' column.
+    
+    Raises
+    ------
+    Exception
+        An exception is raised if psd does not only have columns 'Frequency'
+        and 'Power'
+
+    Returns
+    -------
+    mean_freq : int, float
+        The MNF of the psd provided.
+    
+    """
+    
+    if set(psd.columns.values) != {'Frequency', 'Power'}:
+        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    
+    mean_freq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
+    return mean_freq
+
+#
+# =============================================================================
+#
+
 def CalcTwitchRatio(psd, freq=60):
     """
     Calculate the Twitch Ratio of a PSD.
@@ -2095,6 +2165,8 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
         
         # Spectral features
         'Max_Freq',
+        'MDF',
+        'MNF',
         'Twitch_Ratio',
         'Twitch_Index',
         'Twitch_Slope_Fast',
@@ -2171,6 +2243,8 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
                 # Calculate spectral features
                 psd = EMG2PSD(data_b[col], sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
+                MDF = CalcMDF(psd)
+                MNF = CalcMNF(psd)
                 Twitch_Ratio = CalcTwitchRatio(psd)
                 Twitch_Index = CalcTwitchIndex(psd)
                 Fast_Twitch_Slope, Slow_Twitch_Slope = CalcTwitchSlope(psd)
@@ -2205,6 +2279,8 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
                     Spectral_Flux,
                     
                     Max_Freq,
+                    MDF,
+                    MNF,
                     Twitch_Ratio,
                     Twitch_Index,
                     Fast_Twitch_Slope,
