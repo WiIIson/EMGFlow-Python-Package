@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import os
 import re
-import cv2
 from tqdm import tqdm
 import warnings
 
@@ -859,6 +858,11 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
 
     """
     
+    # Helper function for creating a Gaussian kernel
+    def getGauss(n, sigma):
+        r = range(-int(n/2), int(n/2)+1)
+        return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
+    
     if window_size > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
@@ -872,7 +876,7 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
     
     Signal = ApplyFWR(Signal, col)
     # Construct kernel
-    window = cv2.getGaussianKernel(window_size, sigma).transpose()[0]
+    window = getGauss(window_size, sigma)
     # Convolve
     Signal[col] = np.convolve(Signal[col], window, 'same')
     return Signal
@@ -1625,7 +1629,7 @@ def CalcMDF(psd):
     diff = np.abs(prefix_sum - suffix_sum)
 
     min_ind = np.argmin(diff)
-    med_freq = psd.loc[min_ind]['Frequency']
+    med_freq = psd.loc[diff.index.values[min_ind]]['Frequency']
     
     return med_freq
     
