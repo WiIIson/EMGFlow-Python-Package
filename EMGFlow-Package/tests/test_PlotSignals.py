@@ -2,10 +2,13 @@ import unittest
 import pandas as pd
 import numpy as np
 import shiny
+import sys
+
+sys.path.append('..')
 
 #from EMGFlow.PlotSignals import *
 
-from ..src.EMGFlow.PlotSignals import *
+from src.EMGFlow.PlotSignals import *
 
 in_path = ''
 out_path = ''

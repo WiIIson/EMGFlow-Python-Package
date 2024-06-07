@@ -2,12 +2,15 @@ import unittest
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
+sys.path.append('..')
 
 #from EMGFlow.OutlierFinder import *
 #from EMGFlow.PreprocessSignals import EMG2PSD
 
-from ..src.EMGFlow.OutlierFinder import *
-from ..src.EMGFlow.PreprocessSignals import EMG2PSD
+from src.EMGFlow.OutlierFinder import *
+from src.EMGFlow.PreprocessSignals import EMG2PSD
 
 class TestSimple(unittest.TestCase):
     
