@@ -3,7 +3,9 @@ import pandas as pd
 import numpy as np
 import shiny
 
-from EMGFlow.PlotSignals import *
+#from EMGFlow.PlotSignals import *
+
+from ..src.EMGFlow.PlotSignals import *
 
 in_path = ''
 out_path = ''

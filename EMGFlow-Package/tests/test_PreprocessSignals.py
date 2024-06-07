@@ -3,7 +3,9 @@ import pandas as pd
 import numpy as np
 import os
 
-from EMGFlow.PreprocessSignals import *
+#from EMGFlow.PreprocessSignals import *
+
+from ..src.EMGFlow.PreprocessSignals import *
 
 test_df = pd.DataFrame({'r1':[1,2,4,2,5,3,1,5,7,3,7,8,4,2,5,3,5,3,2,1,6,3,6,1,2]})
 test_df_2 = pd.DataFrame({'r1':[1,-2,3,-4,5,6,-7]})
