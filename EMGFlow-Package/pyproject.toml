@@ -14,7 +14,7 @@ dependencies = [
     "shiny",
     "nest-asyncio"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     {name = "William Conley and Steven Livingstone", email = "william@cconley.ca"}
 ]
