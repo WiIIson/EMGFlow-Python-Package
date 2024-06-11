@@ -165,11 +165,12 @@ def MapFiles(in_path, file_ext='csv', expression=None):
     
     filedirs = {}
     for file in os.listdir(in_path):
-        if os.path.exists(in_path + file + '\\'):
-            subDir = MapFiles(in_path + file + '\\')
+        new_path = os.path.join(in_path, file)
+        if os.path.isdir(new_path):
+            subDir = MapFiles(new_path, file_ext=file_ext, expression=expression)
             filedirs.update(subDir)
         elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
-            filedirs[file] = in_path + file
+            filedirs[file] = new_path
     return filedirs
 
 #
@@ -218,7 +219,7 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
     # User provided a path to a folder
     if type(fileObj) is str:
         if not os.path.isabs(fileObj):
-            fileObj = os.path.abspath(fileObj) + '\\'
+            fileObj = os.path.abspath(fileObj)
         filedirs = MapFiles(in_path=fileObj, file_ext=file_ext, expression=expression)
     # User provided a processed file directory
     elif type(fileObj) is dict:
@@ -2305,3 +2306,4 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
             
     SignalDF.to_csv(out_path + 'Features.csv', index=False)
     return SignalDF
+
