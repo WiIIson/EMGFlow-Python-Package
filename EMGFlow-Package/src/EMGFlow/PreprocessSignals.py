@@ -165,8 +165,8 @@ def MapFiles(in_path, file_ext='csv', expression=None):
     
     filedirs = {}
     for file in os.listdir(in_path):
-        if os.path.exists(in_path + file + '\\'):
-            subDir = MapFiles(in_path + file + '\\')
+        if os.path.exists(in_path + file + '/'):
+            subDir = MapFiles(in_path + file + '/')
             filedirs.update(subDir)
         elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             filedirs[file] = in_path + file
