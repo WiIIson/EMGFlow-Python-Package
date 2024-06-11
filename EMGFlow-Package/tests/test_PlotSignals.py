@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import shiny
 import sys
+import os
 
 sys.path.append('..')
 
@@ -48,5 +49,3 @@ class TestSimple(unittest.TestCase):
             os.rmdir('./Testing_out')
         if os.path.exists('./Testing_plots') == True:
             os.rmdir('./Testing_plots')
-
-TestSimple.setUp()

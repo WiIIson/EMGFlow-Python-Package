@@ -317,5 +317,3 @@ class TestSimple(unittest.TestCase):
             os.rmdir('./Testing_out')
         if os.path.exists('./Testing_plots') == True:
             os.rmdir('./Testing_plots')
-
-TestSimple.setUp()
