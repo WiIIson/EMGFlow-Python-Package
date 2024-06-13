@@ -14,19 +14,28 @@ test_df = pd.DataFrame({'r1':[1,2,4,2,5,3,1,5,7,3,7,8,4,2,5,3,5,3,2,1,6,3,6,1,2]
 test_df_2 = pd.DataFrame({'r1':[1,-2,3,-4,5,6,-7]})
 test_sr = 1000
 
+def setUp():
+    if os.path.exists('./Testing') == False:
+        os.mkdir('./Testing')
+        time_col = np.array(range(500)) / 100
+        emg_col = np.sin(time_col) + (np.random.rand(500)/10)
+        df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
+        df.to_csv('./Testing/Data.csv', index=False)
+    if os.path.exists('./Testing_out') == False:
+        os.mkdir('./Testing_out')
+    if os.path.exists('./Testing_plots') == False:
+        os.mkdir('./Testing_plots')
+
+def tearDown():
+    if os.path.exists('./Testing') == True:
+        os.remove('./Testing/Data.csv')
+        os.rmdir('./Testing')
+    if os.path.exists('./Testing_out') == True:
+        os.rmdir('./Testing_out')
+    if os.path.exists('./Testing_plots') == True:
+        os.rmdir('./Testing_plots')
+
 class TestSimple(unittest.TestCase):
-    
-    def setUp(self):
-        if os.path.exists('./Testing') == False:
-            os.mkdir('./Testing')
-            time_col = np.array(range(500)) / 100
-            emg_col = np.sin(time_col) + (np.random.rand(500)/10)
-            df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
-            df.to_csv('./Testing/Data.csv', index=False)
-        if os.path.exists('./Testing_out') == False:
-            os.mkdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == False:
-            os.mkdir('./Testing_plots')
 
 #
 # =============================================================================
@@ -37,24 +46,32 @@ class TestSimple(unittest.TestCase):
     # ============================
 
     def test_NotchFilterSignals(self):
+        setUp()
         NotchFilterSignals('./Testing/', './Testing_out/', 100, [(10,4)], cols=['EMG'])
         self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
         os.remove('./Testing_out/Data.csv')
+        tearDown()
 
     def test_BandpassFilterSignals(self):
+        setUp()
         BandpassFilterSignals('./Testing/', './Testing_out/', 100, 10, 40, cols=['EMG'])
         self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
         os.remove('./Testing_out/Data.csv')
+        tearDown()
         
     def test_SmoothFilterSignals(self):
+        setUp()
         SmoothFilterSignals('./Testing/', './Testing_out/', 5, ['EMG'])
         self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
         os.remove('./Testing_out/Data.csv')
+        tearDown()
         
     def test_ExtractFeatures(self):
+        setUp()
         ExtractFeatures('./Testing/', './Testing/', './Testing_out', 100)
         self.assertTrue(os.path.isfile('./Testing_out/Features.csv'))
         os.remove('./Testing_out/Features.csv')
+        tearDown()
 
 #
 # =============================================================================
@@ -308,12 +325,3 @@ class TestSimple(unittest.TestCase):
 #
 # =============================================================================
 #
-
-    def tearDown(self):
-        if os.path.exists('./Testing') == True:
-            os.remove('./Testing/Data.csv')
-            os.rmdir('./Testing')
-        if os.path.exists('./Testing_out') == True:
-            os.rmdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == True:
-            os.rmdir('./Testing_plots')
