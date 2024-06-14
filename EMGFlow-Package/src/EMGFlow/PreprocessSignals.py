@@ -461,7 +461,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
     if exp_copy:
@@ -633,7 +633,7 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
     if exp_copy:
@@ -1011,7 +1011,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
     if exp_copy:
@@ -2136,7 +2136,7 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     
     # Directories don't have to have the same file structure, but
