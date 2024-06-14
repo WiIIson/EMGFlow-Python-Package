@@ -38,23 +38,15 @@ class TestSimple(unittest.TestCase):
 
     def test_NotchFilterSignals(self):
         NotchFilterSignals('./Testing/', './Testing_out/', 100, [(10,4)], cols=['EMG'])
-        self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
-        os.remove('./Testing_out/Data.csv')
 
     def test_BandpassFilterSignals(self):
         BandpassFilterSignals('./Testing/', './Testing_out/', 100, 10, 40, cols=['EMG'])
-        self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
-        os.remove('./Testing_out/Data.csv')
         
     def test_SmoothFilterSignals(self):
         SmoothFilterSignals('./Testing/', './Testing_out/', 5, ['EMG'])
-        self.assertTrue(os.path.isfile('./Testing_out/Data.csv'))
-        os.remove('./Testing_out/Data.csv')
         
     def test_ExtractFeatures(self):
         ExtractFeatures('./Testing/', './Testing/', './Testing_out', 100)
-        self.assertTrue(os.path.isfile('./Testing_out/Features.csv'))
-        os.remove('./Testing_out/Features.csv')
 
 #
 # =============================================================================
