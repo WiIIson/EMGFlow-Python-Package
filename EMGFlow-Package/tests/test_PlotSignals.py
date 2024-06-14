@@ -31,11 +31,9 @@ class TestSimple(unittest.TestCase):
     
     def test_PlotSpectrum(self):
         PlotSpectrum('./Testing', './Testing_plots', 100, cols=['EMG'])
-        os.remove('./Testing_plots/Data.jpg')
     
     def test_PlotCompareSignals(self):
         PlotCompareSignals('./Testing', './Testing', './Testing_plots', 100)
-        os.remove('./Testing_plots/Data.jpg')
     
     def test_GenPlotDash(self):
         app = GenPlotDash(['./Testing'], 'EMG', 'mV', ['Test'], autorun=False)
