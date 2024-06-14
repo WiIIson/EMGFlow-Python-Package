@@ -139,7 +139,7 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     
     # Convert path to absolute
     if not os.path.isabs(in_path):
-        in_path = os.path.abspath(in_path) + '\\'
+        in_path = os.path.abspath(in_path)
     
     # Get dictionary of files
     filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)

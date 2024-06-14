@@ -83,7 +83,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     filedirs = ConvertMapFiles(in_path, file_ext=file_ext, expression=expression)
     
@@ -196,7 +196,7 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
     
     # Convert out path to absolute
     if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path) + '\\'
+        out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
     filedirs1 = ConvertMapFiles(in_path1, file_ext=file_ext, expression=expression)
