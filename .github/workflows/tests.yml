@@ -52,5 +52,5 @@ jobs:
           name: coverage-report
       - name: Get value
         run: |
-          export TOTAL=$(python -c "from bs4 import BeautifulSoup; path = 'index.html'; file = open(path, 'r'); index = file.read(); Parse = BeautifulSoup(index, 'lxml'); val = Parse.main.table.tfoot.select('td:nth-of-type(5)')[0].text; print(val)")
+          set TOTAL=$(python -c "from bs4 import BeautifulSoup; path = 'index.html'; file = open(path, 'r'); index = file.read(); Parse = BeautifulSoup(index, 'lxml'); val = Parse.main.table.tfoot.select('td:nth-of-type(5)')[0].text; print(val)")
           echo "Total=$TOTAL"
