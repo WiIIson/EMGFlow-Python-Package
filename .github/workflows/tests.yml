@@ -45,6 +45,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install beautifulsoup4
+          python -m pip install lxml
       - name: Download coverage data
         uses: actions/download-artifact@v3
         with:
