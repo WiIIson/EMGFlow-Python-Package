@@ -1,5 +1,6 @@
 # EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
 
+[![Tests](https://github.com/WiIIson/EMGFlow-Python-Package/actions/workflows/tests.yml/badge.svg)](https://github.com/WiIIson/EMGFlow-Python-Package/actions/workflows/tests.yml)
 ![pypi](https://img.shields.io/pypi/v/emgflow.svg)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
