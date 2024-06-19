@@ -1,6 +1,6 @@
 # EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
 
-https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Willson/da00e624c5ba768584057a6ea7c53860/raw/covbadge.json
+https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/WiIIson/da00e624c5ba768584057a6ea7c53860/raw/covbadge.json
 ![pypi](https://img.shields.io/pypi/v/emgflow.svg)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
