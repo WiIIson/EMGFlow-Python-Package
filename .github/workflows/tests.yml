@@ -37,6 +37,9 @@ jobs:
       run: |
         python -m tox
 
+    - name: List files
+      run: ls -R
+
     - name: Upload coverage data
       uses: actions/upload-artifact@v3
       with:
@@ -65,7 +68,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: covdata
-          
+
       - name: Combine
         run: |
           python -m tox -e coverage
