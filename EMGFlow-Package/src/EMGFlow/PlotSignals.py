@@ -375,20 +375,38 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv', au
                 for file_loc in reversed(list(df.loc[filename])[1:]):
                     sigDF = ReadFileType(file_loc, file_ext)
                     
+                    # Exception for column input
                     if col not in list(sigDF.columns.values):
                         raise Exception("Column " + col + " not in Signal " + filename)
                     
-                    ax.plot(sigDF['Time'], sigDF[col], alpha=0.5)
+                    # Set line width
+                    if len(sigDF.index) > 10000:
+                        lw = 0.5
+                    else:
+                        lw = 1
+                    
+                    ax.plot(sigDF['Time'], sigDF[col], alpha=0.5, linewidth=lw)
                 # Set legend for multiple plots
                 ax.legend(legnames)
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
                 sigDF = ReadFileType(file_location, file_ext)
+                
+                # Exception for column input
+                if col not in list(sigDF.columns.values):
+                    raise Exception("Column " + col + " not in Signal " + filename)
+                
+                # Set line width
+                if len(sigDF.index) > 10000:
+                    lw = 0.5
+                else:
+                    lw = 1
+                
                 # Get colour data
                 i = (names.index(column) + 1) % len(colours)
                 # Plot file
-                ax.plot(sigDF['Time'], sigDF[col], color=colours[len(names) - i], alpha=0.5)
+                ax.plot(sigDF['Time'], sigDF[col], color=colours[len(names) - i], alpha=0.5, linewidth=lw)
                 
             
             ax.set_ylabel('Voltage (mV)')
