@@ -4,13 +4,10 @@ import numpy as np
 import sys
 import os
 
-sys.path.append('..')
-
 #from EMGFlow.OutlierFinder import *
 #from EMGFlow.PreprocessSignals import EMG2PSD
 
 from src.EMGFlow.OutlierFinder import *
-from src.EMGFlow.PreprocessSignals import EMG2PSD
 
 class TestSimple(unittest.TestCase):
     

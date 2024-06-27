@@ -4,8 +4,6 @@ import numpy as np
 import os
 import sys
 
-sys.path.append('..')
-
 from src.EMGFlow.ExtractFeatures import *
 
 test_df = pd.DataFrame({'r1':[1,2,4,2,5,3,1,5,7,3,7,8,4,2,5,3,5,3,2,1,6,3,6,1,2]})

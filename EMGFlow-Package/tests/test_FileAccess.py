@@ -1,8 +1,8 @@
 import unittest
 import pandas as pd
 import sys
-
-sys.path.append('..')
+import numpy as np
+import os
 
 from src.EMGFlow.FileAccess import *
 
