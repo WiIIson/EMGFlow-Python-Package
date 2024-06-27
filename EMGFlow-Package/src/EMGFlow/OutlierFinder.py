@@ -7,7 +7,8 @@ import warnings
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from .PreprocessSignals import MapFiles, EMG2PSD, ReadFileType
+from .PreprocessSignals import EMG2PSD
+from .FileAccess import *
 
 #
 # =============================================================================

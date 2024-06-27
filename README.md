@@ -7,7 +7,7 @@
 
 The open workflow for EMG signal processing and feature extraction.
 
-**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract 32 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
 
 EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
@@ -31,11 +31,11 @@ As a quick example, the following will create a feature file, starting with a fo
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw/'          # Raw file contains raw data
-notch_path = '/data/notch/'
-band_path = '/data/bandpass/'    # Additional files are empty
-smooth_path = '/data/smoothed/'
-feature_path = '/data/feature/'
+raw_path = '/data/raw'          # Raw file contains raw data
+notch_path = '/data/notch'
+band_path = '/data/bandpass'    # Additional files are empty
+smooth_path = '/data/smoothed'
+feature_path = '/data/feature'
 
 # Sampling rate for all files
 sampling_rate = 2000
@@ -61,10 +61,11 @@ EMGFlow.AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
 General:
 - [EMG processing background](docs/02%20Background.md)
 - [EMGFlow processing pipeline overview](docs/03%20Processing%20Pipeline.md)
-- [PreprocessSignals module EMG processing documentation](docs/04%20PreprocessSignals%20Documentation.md)
-- [PreprocessSignals module feature extraction documentation](docs/05%20ExtractFeatures%20Feature%20Documentation.md)
-- [OutlierFinder module documentation](docs/06%20OutlierFinder%20Documentation.md)
-- [PlotSignals module documentation](docs/07%20PlotSignals%20Documentation.md)
+- [FileAccess module documentation](docs/04%20FileAccess%20Documentation.md)
+- [PreprocessSignals module documentation](docs/05%20PreprocessSignals%20Documentation.md)
+- [ExtractFeatures module documentation](docs/06%20ExtractFeatures%20Documentation.md)
+- [OutlierFinder module documentation](docs/07%20OutlierFinder%20Documentation.md)
+- [PlotSignals module documentation](docs/08%20PlotSignals%20Documentation.md)
 
 Examples:
 - [Processing pipeline examples](docs/01%20Examples.md)
@@ -105,7 +106,9 @@ This package can be cited as follows:
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.0.14},
+  version = {1.0.16},
   year = {2024}
 }
 ```
+
+If you are using a different version of EMGFlow, change the `version` tag to the version you are using.

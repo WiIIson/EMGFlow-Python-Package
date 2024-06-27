@@ -1,4 +1,4 @@
-# `SignalFilterer` Module Feature Extraction Documentation
+# `ExtractFeatures` Module Documentation
 
 ---
 
