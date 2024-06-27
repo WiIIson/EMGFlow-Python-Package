@@ -15,7 +15,23 @@ test_sr = 1000
 #
 
 class TestSimple(unittest.TestCase):
-            
+
+    def setUp(self):
+        if os.path.exists('./Testing') == False:
+            os.mkdir('./Testing')
+            time_col = np.array(range(500)) / 100
+            emg_col = np.sin(time_col) + (np.random.rand(500)/10)
+            df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
+            df.to_csv('./Testing/Data.csv', index=False)
+        if os.path.exists('./Testing_out') == False:
+            os.mkdir('./Testing_out')
+        if os.path.exists('./Testing_plots') == False:
+            os.mkdir('./Testing_plots')
+
+#
+# =============================================================================
+#
+        
     def test_ReadFileType(self):
         df = ReadFileType('./Testing/Data.csv', 'csv')
         self.assertIsInstance(df, pd.DataFrame)
@@ -37,3 +53,16 @@ class TestSimple(unittest.TestCase):
                             'raw':['data/raw/file1.csv', 'data/raw/file2.csv'],
                             'notch': ['data/notch/file1.csv', 'data/notch/file2.csv']}).set_index('ID')
         self.assertTrue(ans.equals(mf))
+
+#
+# =============================================================================
+#
+
+    def tearDown(self):
+        if os.path.exists('./Testing') == True:
+            os.remove('./Testing/Data.csv')
+            os.rmdir('./Testing')
+        if os.path.exists('./Testing_out') == True:
+            os.rmdir('./Testing_out')
+        if os.path.exists('./Testing_plots') == True:
+            os.rmdir('./Testing_plots')
