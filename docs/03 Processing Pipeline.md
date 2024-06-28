@@ -1,12 +1,32 @@
 # Processing Pipeline
 
-EMGFlow is broken into 3 parts - processing signals, detecting outliers, and creating visualizations. Descriptions of functions for each part are grouped together on the same documentation page
+EMGFlow is broken into 5 parts - accessing files, preprocessing signals, extracting features, detecting outliers, and creating visualizations. Descriptions of functions for each part are grouped together on the same documentation page
 
 ---
 
-## Signal Processing Pipeline
+## `FileAccess` Pipeline
 
-Signal processing is broken into 4 parts: notch filtering, bandpass filtering, smoothing and analysis. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
+File access functions are mostly used as internal helper functions for the package.
+
+One notable function, `MapFiles`, takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
+
+`MapFiles` forms the basis for the two modes of analysis offered by EMGFlow - automated, or manual.
+
+The "automated" mode makes the processing pipeline much simpler. In these functions, a file location is provided, default parameters are set, and a file output location is set. The functions then apply the filters to each file found in the folder, and output the filtered files to the output folder. Notable functions include:
+- `NotchFilterSignals`
+- `BandpassFilterSignals`
+- `SmoothFilterSignals`
+
+The "manual" mode allows for additional customization of processing. In these functions, a dataframe is provided, filter parameters are set, and the dataframe is returned. These functions are useful if the processing pipeline requires further additional processing before being outputted, of if the project is not large-scale enough to warrent batch processing. Notable functions include:
+- `ApplyNotchFilters`
+- `ApplyBandpassFilter`
+- `ApplyRMSSmooth`
+
+---
+
+## `PreprocessSignals` Pipeline
+
+Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
 
 ### `NotchFilterSignals()`
 
@@ -92,7 +112,13 @@ Smoothing is controlled by the function `SmoothFilterSignals()`, with the follow
 
 For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
 
-### `AnalyzeSignals()`
+---
+
+## `ExtractFeatures` Pipeline
+
+Featre extraction involves taking the processed data and extracting features from it. The main function to do this is `ExtractFeatures`. However, each individual feature is calculated by its own function, allowing them to be incorporated into your own workflow.
+
+### `ExtractFeatures()`
 
 **Description**
 
@@ -126,6 +152,8 @@ Analysis is controlled by the function `AnalyzeSignals()`, with the following ma
 
 And the following spectral features:
 - Max frequency
+- MNF
+- MDF
 - Twitch ratio
 - Twitch index
 - Twitch slope fast
@@ -144,7 +172,7 @@ For more information about further customizations and specifications that can be
 For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
 
 ---
-## Outlier Detection
+## `OutlierFinder` Pipeline
 
 EMGFlow provides functions to help detect outliers in large batches of signal data. This helps to identify which files need to be inspected for outliers.
 
@@ -165,7 +193,7 @@ For more information about further customizations and specifications that can be
 
 ---
 
-## Plotting
+## `PlotSignals` Pipeline
 
 The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
