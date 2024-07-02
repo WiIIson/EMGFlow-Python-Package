@@ -4,9 +4,9 @@ EMGFlow is broken into 5 parts - accessing files, preprocessing signals, extract
 
 ---
 
-## `FileAccess` Pipeline
+## `FileAccess` Module
 
-File access functions are mostly used as internal helper functions for the package.
+These functions provide helper methods for accessing files, and are mostly used internally by the package.
 
 One notable function, `MapFiles`, takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
 
@@ -22,11 +22,13 @@ The "manual" mode allows for additional customization of processing. In these fu
 - `ApplyBandpassFilter`
 - `ApplyRMSSmooth`
 
+For more information about file accessing functions, see [FileAccess API](./04%20FileAccess%20API.md).
+
 ---
 
-## `PreprocessSignals` Pipeline
+## `PreprocessSignals` Module
 
-Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
+This module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
 
 ### `NotchFilterSignals()`
 
@@ -54,7 +56,7 @@ Notch filtering is controlled by the function `NotchFilterSignals()`, with the f
 
 `NotchFilterSignals()` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings.  However, other regions use 50Hz frequencies.
 
-For more information about further customizations and detail about `NotchFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
+For more information about further customizations and detail about `NotchFilterSignals()`, see [PreprocessSignals API](./05%20PreprocessSignals%20API.md).
 
 ### `BandpassFilterSignals()`
 
@@ -83,7 +85,7 @@ Bandpass filtering is controlled by the function `BandpassFilterSignals()`, with
 
 `BandpassFilterSignals()` uses bandpass thresholds of 20Hz and 450Hz, as this is default for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscels, so `BandpassFilterSignals()` provides the option to change the thresholds.
 
-For more information about further customizations and detail about `BandpassFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
+For more information about further customizations and detail about `BandpassFilterSignals()`, see [PreprocessSignals API](./05%20PreprocessSignals%20API.md).
 
 ### `SmoothFilterSignals()`
 
@@ -110,13 +112,13 @@ Smoothing is controlled by the function `SmoothFilterSignals()`, with the follow
 
 `SmoothFilterSignals()` by default uses the RMS smoothing method, as it is the best choice for filtering EMG signals (RENSHAW et al., 2010). Regardless, EMGFlow provides different methods for smoothing signals which can be used instead.
 
-For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
+For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals API](./05%20PreprocessSignals%20API.md).
 
 ---
 
-## `ExtractFeatures` Pipeline
+## `ExtractFeatures` Module
 
-Featre extraction involves taking the processed data and extracting features from it. The main function to do this is `ExtractFeatures`. However, each individual feature is calculated by its own function, allowing them to be incorporated into your own workflow.
+This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
 
 ### `ExtractFeatures()`
 
@@ -167,14 +169,14 @@ And the following spectral features:
 
 This function requires a path to smoothed and unsmoothed data. This is because while time-series features are extracted from smoothed data, spectral features are not. High-frequency components of the signal can be lost in the smoothing, and we want to ensure the spectral features are as accurate as possible.
 
-For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [PreprocessSignals documentation](./04%20PreprocessSignals%20Documentation.md).
+For more information about further customizations and specifications that can be made to `AnalyzeSignals()`, see [PreprocessSignals API](./05%20PreprocessSignals%20API.md).
 
-For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
+For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures API](./06%20ExtractFeatures%20API.md).
 
 ---
-## `OutlierFinder` Pipeline
+## `OutlierFinder` Module
 
-EMGFlow provides functions to help detect outliers in large batches of signal data. This helps to identify which files need to be inspected for outliers.
+This module provides methods to help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
 
 Outlier detection is handled by the function `DetectOutliers()`. This function fits an inverse graph to the PSD representation of the signal, and identifies if there is a value significantly above a threshold.
 - `in_path` <-- File path to input folder
@@ -189,11 +191,11 @@ Outlier detection is handled by the function `DetectOutliers()`. This function f
 
 This function outputs a dictionary of file names and locations for each signal marked as an outlier.
 
-For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [OutlierFinder documentation](./06%20OutlierFinder%20Documentation.md).
+For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [OutlierFinder API](./07%20OutlierFinder%20API.md).
 
 ---
 
-## `PlotSignals` Pipeline
+## `PlotSignals` Module
 
 The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
@@ -210,7 +212,7 @@ The plotting module `PlotSignals` provides functions to help visualize individua
 
 `sampling_rate` refers to the sampling rate of the data. The function will assume that each signal, and each column, is using the same sampling rate.
 
-For more information about further customizations and specifications that can be made to `PlotSpectrum()`, see [PlotSignals documentation](./07%20PlotSignals%20Documentation.md).
+For more information about further customizations and specifications that can be made to `PlotSpectrum()`, see [PlotSignals API](./08%20PlotSignals%20API.md).
 
 ### `PlotCompareSignals()`
 
@@ -228,7 +230,7 @@ For more information about further customizations and specifications that can be
 
 `sampling_rate` refers to the sampling rate of the data. The function will assume that each signal, and each column, is using the same sampling rate.
 
-For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [[07 PlotSignals Documentation]]
+For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [PlotSignals API](./08%20PlotSignals%20API.md).
 
 ---
 

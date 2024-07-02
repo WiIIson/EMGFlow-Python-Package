@@ -1,5 +1,7 @@
 # `ExtractFeatures` Module Documentation
 
+This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
+
 ---
 
 ## Basic Time-Series Statistics
@@ -1330,9 +1332,9 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example**
 
 ```python
-bandpass_path = '/data/bandpass/'
-smooth_path = '/data/smooth/'
-feature_path = '/data/features/'
+bandpass_path = '/data/bandpass'
+smooth_path = '/data/smooth'
+feature_path = '/data/features'
 sampling_rate = 2000
 cols = ['EMG_zyg', 'EMG_cor']
 

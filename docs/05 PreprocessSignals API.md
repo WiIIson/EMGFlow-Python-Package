@@ -1,5 +1,7 @@
 # `PreprocessSignals` Module Documentation
 
+This module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
+
 ---
 
 ## `EMG2PSD`
@@ -162,13 +164,13 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Basic parameters
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
 sampling_rate = 2000
 notch_vals = [(50,5), (150,25)]
 
 # Special case parameters
-notch_spec = '/data/notch2/'
+notch_spec = '/data/notch2'
 notch_vals_spec = [(317,25)]
 reg = "^(08|11)"
 cols = ['EMG_zyg', 'EMG_cor']
@@ -316,8 +318,8 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-notch_path = '/data/notch/'
-bandpass_path = '/data/bandpass/'
+notch_path = '/data/notch'
+bandpass_path = '/data/bandpass'
 sampling_rate = 2000
 low = 20
 high = 200
@@ -684,8 +686,8 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-bandpass_path = '/data/bandpass/'
-smooth_path = '/data/smooth/'
+bandpass_path = '/data/bandpass'
+smooth_path = '/data/smooth'
 size = 20
 cols = ['EMG_zyg', 'EMG_cor']
 

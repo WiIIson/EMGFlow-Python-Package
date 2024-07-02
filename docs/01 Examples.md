@@ -10,11 +10,11 @@ A simple example outlining the four main steps of the EMG processing pipeline.
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
-band_path = '/data/bandpass/'
-smooth_path = '/data/smoothed/'
-feature_path = '/data/feature/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+band_path = '/data/bandpass'
+smooth_path = '/data/smoothed'
+feature_path = '/data/feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -43,12 +43,12 @@ A more advanced example applying conditional filters based on file names.
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
-notch_path_s = '/data/notch_s/'
-band_path = '/data/bandpass/'
-smooth_path = '/data/smoothed/'
-feature_path = '/data/feature/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+notch_path_s = '/data/notch_s'
+band_path = '/data/bandpass'
+smooth_path = '/data/smoothed'
+feature_path = '/data/feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -83,11 +83,11 @@ import EMGFlow
 import tqdm
 
 # Paths for data files
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
-band_path = '/data/bandpass/'
-smooth_path = '/data/smoothed/'
-feature_path = '/data/feature/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+band_path = '/data/bandpass'
+smooth_path = '/data/smoothed'
+feature_path = '/data/feature'
 
 # Sampling rate
 sampling_rate = 2000

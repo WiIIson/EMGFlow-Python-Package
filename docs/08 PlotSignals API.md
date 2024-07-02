@@ -1,5 +1,7 @@
 # `PlotSignals` Module Documentation
 
+The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
+
 ---
 
 ## `GenPlotDash`
@@ -59,9 +61,9 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
-band_path = '/data/bandpass/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+band_path = '/data/bandpass'
 s_paths = [raw_path, notch_path, band_path]
 
 sr = 2000
@@ -131,8 +133,8 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw/'
-plot_path = '/plots/'
+raw_path = '/data/raw'
+plot_path = '/plots'
 
 sr = 2000
 
@@ -197,9 +199,9 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw/'
-notch_path = '/data/notch/'
-plot_path = '/plots/'
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+plot_path = '/plots'
 
 sr = 2000
 

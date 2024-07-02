@@ -1,5 +1,7 @@
 # `OutlierFinder` Module Documentation
 
+This module provides methods to help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
+
 ---
 
 ## `DetectOutliers`
@@ -69,7 +71,7 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example:**
 
 ```python
-in_path = '/data/notch/'
+in_path = '/data/notch'
 sr = 2000
 threshold = 5
 

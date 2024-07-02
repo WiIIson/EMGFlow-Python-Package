@@ -61,11 +61,11 @@ EMGFlow.AnalyzeSignals(band_oath, smooth_path, feature_path, sampling_rate)
 General:
 - [EMG processing background](docs/02%20Background.md)
 - [EMGFlow processing pipeline overview](docs/03%20Processing%20Pipeline.md)
-- [FileAccess module documentation](docs/04%20FileAccess%20Documentation.md)
-- [PreprocessSignals module documentation](docs/05%20PreprocessSignals%20Documentation.md)
-- [ExtractFeatures module documentation](docs/06%20ExtractFeatures%20Documentation.md)
-- [OutlierFinder module documentation](docs/07%20OutlierFinder%20Documentation.md)
-- [PlotSignals module documentation](docs/08%20PlotSignals%20Documentation.md)
+- [FileAccess module API](docs/04%20FileAccess%20API.md)
+- [PreprocessSignals module API](docs/05%20PreprocessSignals%20API.md)
+- [ExtractFeatures module API](docs/06%20ExtractFeatures%20API.md)
+- [OutlierFinder module API](docs/07%20OutlierFinder%20API.md)
+- [PlotSignals module API](docs/08%20PlotSignals%20API.md)
 
 Examples:
 - [Processing pipeline examples](docs/01%20Examples.md)

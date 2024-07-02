@@ -1,5 +1,7 @@
 # `FileAccess` Module Documentation
 
+These functions provide helper methods for accessing files, and are mostly used internally by the package.
+
 ---
 
 ## `ReadFileType`
@@ -75,11 +77,11 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Map all csv files in 'dataFiles' folder and subfolders
-file_loc1 = EMGFlow.MapFiles('/data/')
+file_loc1 = EMGFlow.MapFiles('/data')
 
 # Map all csv files in 'dataFiles' folder and subfolders
 # that start with 'DATA_'
-file_loc2 = EMGFlow.MapFiles('/data/', expression='^DATA_')
+file_loc2 = EMGFlow.MapFiles('/data', expression='^DATA_')
 ```
 
 ---
@@ -122,7 +124,7 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Read in file locations normally
-file_loc1 = EMGFlow.ConvertMapFiles('/data/')
+file_loc1 = EMGFlow.ConvertMapFiles('/data')
 
 # Filter an existing dataframe with a regular expression
 file_loc2 = EMGFlow.ConvertMapFiles(file_loc1, expression='^01')
@@ -164,9 +166,9 @@ Raises an error if files contained in the first element of `filedirs` is not con
 
 ```python
 # Create file directory dictionaries
-dir_raw = EMGFlow.ConvertMapFiles('/data/raw/')
-notch_path = EMGFlow.ConvertMapFiles('/data/notch/')
-band_path = EMGFlow.ConvertMapFiles('/data/bandpass/')
+dir_raw = EMGFlow.ConvertMapFiles('/data/raw')
+notch_path = EMGFlow.ConvertMapFiles('/data/notch')
+band_path = EMGFlow.ConvertMapFiles('/data/bandpass')
 
 # Create dictionary list and names
 filedirs = [dir_raw, notch_path, band_path]
