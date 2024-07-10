@@ -95,5 +95,5 @@ jobs:
     - name: Generate JOSS paper
       uses: ldeluigi/markdown-docs@latest
       with:
-        src: papers/JOSS
+        src: papers/JOSS/paper.md
         dst: papers/JOSS
