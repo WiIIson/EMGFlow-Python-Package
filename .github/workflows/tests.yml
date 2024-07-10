@@ -87,3 +87,13 @@ jobs:
           minColorRange: 50
           maxColorRange: 90
           valColorRange: ${{ env.total }}
+
+  build-papers:
+    name: build-papers
+    runs-on: ubuntu-latest
+    steps:
+    - name: Generate JOSS paper
+      uses: ldeluigi/markdown-docs@latest
+      with:
+        src: papers/JOSS
+        dst: papers/JOSS
