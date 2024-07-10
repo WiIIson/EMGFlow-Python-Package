@@ -86,5 +86,4 @@ jobs:
           message: ${{ env.total }}%
           minColorRange: 50
           maxColorRange: 90
-      - name: Build draft PDF
           valColorRange: ${{ env.total }}
