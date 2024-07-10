@@ -92,8 +92,15 @@ jobs:
     name: build-papers
     runs-on: ubuntu-latest
     steps:
-    - name: Generate JOSS paper
-      uses: ldeluigi/markdown-docs@latest
+    - uses: actions/checkout@v3
+    - uses: baileyjm02/markdown-to-pdf@v1
       with:
-        src: papers/JOSS/paper.md
-        dst: papers/JOSS
+        input_dir: papers/JOSS
+        output_dir: papers/JOSS
+        images_dir: papers/JOSS
+        images_import: .
+        build_html: false
+    - uses: actions/upload-artifact@v3
+      with:
+        name: docs
+        path: papers/JOSS
