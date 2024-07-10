@@ -92,15 +92,15 @@ jobs:
     name: build-papers
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: baileyjm02/markdown-to-pdf@v1
-      with:
-        input_dir: papers/JOSS
-        output_dir: papers/JOSS
-        images_dir: papers/JOSS
-        images_import: .
-        build_html: false
-    - uses: actions/upload-artifact@v3
-      with:
-        name: docs
-        path: papers/JOSS
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: papers/JOSS/paper.md
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: paper
+          path: papers/JOSS/paper.pdf
