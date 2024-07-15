@@ -116,7 +116,7 @@ units = 'mV'
 EMGFlow.GenPlotDash(in_paths, sampling_rate, col, units, labels)
 ```
 
-![[figure1.png]]
+![Figure 1](figure1.png)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*_EMGFlow_'s interactive dashboard visualizing effects of different preprocessing stages on batch processed files.*
 
 ## The nature of electromyographic recordings
