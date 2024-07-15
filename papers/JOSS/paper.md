@@ -58,7 +58,8 @@ cols = ['EMG_zyg', 'EMG_cor']
 notch_vals = [(50,5)]
 
 # Apply notch filter to raw sEMG files
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+EMGFlow.NotchFilterSignals(
+  raw_path, notch_path,sampling_rate, notch_vals, cols)
 ```
 
 
@@ -77,7 +78,9 @@ reg = '^(08|11)'
 cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch filter to file subset
-EMGFlow.NotchFilterSignals(notch_path, notch_s_path, sampling_rate, notch_vals_s, cols, expression=reg_str, exp_copy=True)
+EMGFlow.NotchFilterSignals(
+  notch_path, notch_s_path, sampling_rate, notch_vals_s, cols,
+  expression=reg_str, exp_copy=True)
 ```
 
 ## Visualization of Preprocessing Stages
@@ -96,8 +99,10 @@ band_high = 450
 smooth_window = 50
 
 # Apply bandpass smoothing filters
-EMGFlow.BandpassFilterSignals(notch_s_path, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.BandpassFilterSignals(
+  notch_s_path, band_path, sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(
+  band_path, smooth_path, sampling_rate, smooth_window, cols)
 
 # Paths for dashboard generation 
 in_paths = [smooth_path, band_path, notch_path]
@@ -129,7 +134,8 @@ EMGFlow.GenPlotDash(in_paths, sampling_rate, col, units, labels)
 feature_path = 'Data/05_Feature'
 
 # Extracts features
-EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
+EMGFlow.AnalyzeSignals(
+  band_path, smooth_path, feature_path, sampling_rate, cols)
 
 # Load feature file
 df = read_csv('Data/05_Feature/Features.csv')
