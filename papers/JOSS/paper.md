@@ -33,7 +33,7 @@ bibliography: paper.bib
 
 # Comparison to Other Packages
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compared to other toolkits, _EMGFlow_ extracts a comprehensive set of 32 statistical features from sEMG signals [@bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. An interactive dashboard visualizes batch processed files rather an individual recordings, allowing the operator to efficiently view the effects of preprocessing stages across all files. Adjustable filter settings and smoothing functions support cleaning of data collected in North America or internationally (50 vs 60 HZ mains AC), a subtle difference overlooked in some packages.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compared to other toolkits, _EMGFlow_ extracts a comprehensive set of 32 statistical features from sEMG signals [@bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. An interactive dashboard visualizes batch processed files rather than individual recordings, allowing the operator to efficiently view the effects of preprocessing stages across all files. Adjustable filter settings and smoothing functions support cleaning of data collected in North America or internationally (50 vs 60 HZ mains AC), a subtle difference overlooked in some packages.
 
 # Features
 
