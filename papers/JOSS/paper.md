@@ -127,7 +127,7 @@ EMGFlow.GenPlotDash(in_paths, sampling_rate, show_col, units, labels)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here, we demonstrate feature extraction in *EMGFlow*. After specifying locations of preprocessed files, features are summarized into a single CSV file, containing rows for each file analyzed, as shown below.
 
 ```python
-# Data paths
+# Path where feature table will be written to disk
 feature_path = 'Data/05_Feature'
 
 # Extracts features

@@ -1274,7 +1274,7 @@ All files contained within the folder and subfolder with the proper extension ar
 For more specifics about the features extracted by this function, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
 
 ```python
-ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
+ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
 ```
 
 **Theory**
@@ -1341,11 +1341,6 @@ cols = ['EMG_zyg', 'EMG_cor']
 # Extracts all features from the files in bandpass_path and
 # smooth_path. Assumes the same files are in both paths.
 features = EMGFlow.ExtractFeatures(bandpass_path, smooth_path, feature_path, sampling_rate, cols)
-
-# Alternatively the same path can be provided twice to extract
-# the different feature types from the same files, but spectral
-# features may not be as accurate.
-features = EMGFlow.ExtractFeatures(smooth_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ---

@@ -25,13 +25,15 @@ band_low = 20
 band_high = 140
 smooth_window = 50
 
-# Column to apply to
-cols = ['col1']
+# Columns containing data for preprocessing
+cols = ['col1', 'col3']
 
-# Signal analysis
+# Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+
+# Extract features and save results in "Features.csv" in feature_path
 EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
@@ -63,14 +65,16 @@ smooth_window = 50
 notch_vals_s = [(45, 1), (60, 5)]
 reg_str = '^(08|11)'
 
-# Column to apply to
-cols = ['col1']
+# Columns containing data for preprocessing
+cols = ['col1', 'col3']
 
-# Signal analysis
+# Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.NotchFilterSignals(notch_path, notch_path_s, sampling_rate, notch_vals_s, cols, expression=reg_str, exp_copy=True)
 EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, band_high, cols)
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+
+# Extract features and save results in "Features.csv" in feature_path
 EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
@@ -98,10 +102,10 @@ band_low = 20
 band_high = 140
 smooth_window = 50
 
-# Column to apply to
-cols = ['col1']
+# Columns containing data for preprocessing
+cols = ['col1', 'col3']
 
-# Signal analysis
+# Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
@@ -125,6 +129,7 @@ measure_names = [
 SignalDF = pd.DataFrame(columns=measure_names)
 filetype = 'csv'
 
+# Extract features
 for file in tqdm.tqdm(filedirs_b):
 	if (file[-len(filetype):] == filetype):
 		data_b = pd.read_csv(filedirs_b[file])
@@ -153,6 +158,6 @@ for file in tqdm.tqdm(filedirs_b):
 		# Append to data frame
 		SignalDF.loc[len(SIgnalDF.inddex)] = df_vals
 
-# Write to output location
+# Save results in "Features.csv" file
 SignalDF.to_csv(feature_path + 'Features.csv', index=False)
 ```
