@@ -1262,7 +1262,7 @@ SBW = EMGFlow.CalcSBW(psd)
 
 **Description**
 
-Extracts usable features from two sets of `Signal` files before and after being smoothed. Writes output to a new folder directory, mirroring the file hierarchy of the two inputs. This assumes that both directories have the same internal file structure.
+Extracts usable features from two sets of `Signal` files (before and after being smoothed). Writes output to a new folder directory, mirroring the file hierarchy of the two inputs, and returns a dataframe copy of the results written. This assumes that both directories have the same internal file structure.
 
 Components of a "`Signal` file":
 - Has a column named `Time` containing time indexes
@@ -1270,9 +1270,6 @@ Components of a "`Signal` file":
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
-
-For more specifics about the features extracted by this function, see [ExtractFeatures documentation](./05%20ExtractFeatures%20Feature%20Documentation.md).
-
 ```python
 ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
 ```

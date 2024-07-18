@@ -103,12 +103,13 @@ This package can be cited as follows:
 
 ```bibtex
 @software{Conley_EMGFlow_2024,
-  author = {Conley {\tt william@cconley.ca}, William and Livingstone, Steven R},
+  author = {Conley, William and Livingstone, Steven R},
   month = {03},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
   version = {1.0.16},
-  year = {2024}
+  year = {2024},
+  note = "{\tt william@cconley.ca}"
 }
 ```
 
