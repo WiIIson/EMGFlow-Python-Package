@@ -74,6 +74,8 @@ names = ['raw', 'notch', 'bandpass']
 EMGFlow.GenPlotDash(s_paths, sr, col, units, names)
 ```
 
+![GenPlotDash example](images/GenPlotDashEx.png)
+
 ---
 
 ## `PlotSpectrum`

@@ -33,7 +33,7 @@ EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals)
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high)
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window)
 
-# Extract features and save results in "Features.csv" in feature_path
+# Extract features and save results to "Features.csv" in feature_path
 df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate)
 ```
 

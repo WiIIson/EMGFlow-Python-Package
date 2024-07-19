@@ -1262,7 +1262,7 @@ SBW = EMGFlow.CalcSBW(psd)
 
 **Description**
 
-Extracts usable features from two sets of `Signal` files (before and after being smoothed). Writes output to a new folder directory, mirroring the file hierarchy of the two inputs, and returns a dataframe copy of the results written. This assumes that both directories have the same internal file structure.
+Extracts usable features from two sets of `Signal` files (before and after being smoothed). Writes output to a new folder directory, as specified in `out_path`. Output is both saved to disk as a plaintext file, "Features.csv", and returned as a dataframe object.
 
 Components of a "`Signal` file":
 - Has a column named `Time` containing time indexes
@@ -1287,7 +1287,7 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 - String filepath to a directory containing `Signal` files. The files contained within should have a smoothing filter applied.
 
 `out_path`: str
-- String filepath to a directory for output `Signal` files.
+- String filepath to a directory for output feature file.
 
 `sampling_rate`: int/float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.

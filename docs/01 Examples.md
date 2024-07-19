@@ -34,7 +34,7 @@ EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, ba
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
-EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
+df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ## Advanced Example
@@ -75,7 +75,7 @@ EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, 
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
-EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
+df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ## Advanced Example
