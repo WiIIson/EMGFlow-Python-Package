@@ -187,7 +187,7 @@ EMGFlow.NotchFilterSignals(notch_path, notch_spec, sampling_rate, notch_vals_spe
 
 ---
 
-## `ApplyBandpassFilters`
+## `ApplyBandpassFilter`
 
 **Description**
 
@@ -213,11 +213,11 @@ ApplyBandpassFilter(Signal, col, sampling_rate, low, high)
 `sampling_rate`: int/float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`low`: int/float
-- Numerical value of the lower limit of the bandpass filter.
+`low`: int/float (20)
+- Numerical value of the lower limit of the bandpass filter. Defaults to 20Hz.
 
-`high`: int/float
-- Numerical value of the upper limit of the bandpass filter.
+`high`: int/float (450)
+- Numerical value of the upper limit of the bandpass filter. Defaults to 450Hz.
 
 **Returns**
 

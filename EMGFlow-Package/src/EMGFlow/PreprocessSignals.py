@@ -838,7 +838,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
                     data = ApplyRMSSmooth(data, col, window_size)
                 elif method == 'boxcar':
                     data = ApplyBoxcarSmooth(data, col, window_size)
-                elif method == 'guass':
+                elif method == 'gauss':
                     data = ApplyGaussianSmooth(data, col, window_size, sigma)
                 elif method == 'loess':
                     data = ApplyLoessSmooth(data, col, window_size)
