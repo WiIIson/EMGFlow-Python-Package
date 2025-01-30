@@ -8,6 +8,6 @@ authors:
 - family-names: "Livingstone"
   given-names: "Steven"
 title: "EMGFlow Package"
-version: 1.0.9
+version: 1.0.16
 date-released: 2024-03-11
 url: "https://github.com/WiIIson/EMGFlow-Python-Package"
