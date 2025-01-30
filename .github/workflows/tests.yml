@@ -68,7 +68,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: covdata
-          path: './covdata'
+          path: coverage
 
       - name: Combine
         run: |
