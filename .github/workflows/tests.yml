@@ -43,7 +43,7 @@ jobs:
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
       with:
-        name: covdata
+        name: covdata-${{ matrix.os }}-${{ matrix.python-version }}
         path: .coverage.*
         include-hidden-files: true
 
@@ -65,10 +65,29 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions
 
-      - name: Download coverage data
+      - name: Download coverage data (Windows 3.9)
         uses: actions/download-artifact@v4
         with:
-          name: covdata
+          name: covdata-windows-latest-3.9
+          path: ./.coverage.*
+      
+      - name: Download coverage data (Windows 3.10)
+        uses: actions/download-artifact@v4
+        with:
+          name: covdata-windows-latest-3.10
+          path: ./.coverage.*
+      
+      - name: Download coverage data (Ubuntu 3.9)
+        uses: actions/download-artifact@v4
+        with:
+          name: covdata-ubuntu-latest-3.9
+          path: ./.coverage.*
+      
+      - name: Download coverage data (Ubuntu 3.10)
+        uses: actions/download-artifact@v4
+        with:
+          name: covdata-ubuntu-latest-3.10
+          path: ./.coverage.*
 
       - name: Combine
         run: |
