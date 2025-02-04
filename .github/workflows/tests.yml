@@ -38,7 +38,7 @@ jobs:
         python -m tox
 
     - name: List files
-      run: ls -R
+      run: ls -al .coverage*
 
     - name: Upload coverage data
       uses: actions/upload-artifact@v4
