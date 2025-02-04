@@ -90,7 +90,7 @@ jobs:
           path: ./.coverage.ubuntu_3.10/*
 
       - name: List files
-        run: ls -al .coverage*
+        run: ls -a
 
       - name: Combine
         run: |
