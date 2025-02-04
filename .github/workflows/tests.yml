@@ -69,25 +69,25 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: covdata-windows-latest-3.9
-          path: ./.coverage_windows_3.9/*
+          path: ./.coverage.windows_3.9/*
       
       - name: Download coverage data (Windows 3.10)
         uses: actions/download-artifact@v4
         with:
           name: covdata-windows-latest-3.10
-          path: ./.coverage_windows_3.10/*
+          path: ./.coverage.windows_3.10/*
       
       - name: Download coverage data (Ubuntu 3.9)
         uses: actions/download-artifact@v4
         with:
           name: covdata-ubuntu-latest-3.9
-          path: ./.coverage_ubuntu_3.9/*
+          path: ./.coverage.ubuntu_3.9/*
       
       - name: Download coverage data (Ubuntu 3.10)
         uses: actions/download-artifact@v4
         with:
           name: covdata-ubuntu-latest-3.10
-          path: ./.coverage_ubuntu_3.10/*
+          path: ./.coverage.ubuntu_3.10/*
 
       - name: List files
         run: ls -al .coverage*
