@@ -162,4 +162,8 @@ During the preparation of this work, the authors used GPT-4o to edit a final dra
 
 We acknowledge the support of the Natural Sciences and Engineering Research Council of Canada (NSERC), (#2023-03786), and from the Faculty of Science, Ontario Tech University.
 
+# Author contributions
+
+S.R.L. conceptualised the project. W.L.C. and S.R.L. designed the toolbox functionality. W.L.C. wrote the toolbox code. W.L.C. created and maintained the Github repository. W.L.C. prepared figures for manuscript and Github repository. W.L.C. and S.R.L prepared the manuscript and approved the final version of the manuscript for submission.
+
 # References
