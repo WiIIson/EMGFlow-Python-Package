@@ -17,7 +17,7 @@ dependencies = [
 requires-python = ">=3.9"
 authors = [
     {name = "D. William Conley", email = "william@cconley.ca"},
-    {"Steven R. Livingstone"},
+    {name = "Steven R. Livingstone", email = "steven.livingstone@ontariotechu.ca"},
 ]
 maintainers = [
     {name = "D. William Conley", email = "william@cconley.ca"}
