@@ -2,7 +2,46 @@
 
 ---
 
-## Simple Example:
+## Simple Example (loading sample data):
+
+A simple example outlining the four main steps of the EMG processing pipeline.
+
+```python
+import EMGFlow
+
+# Paths for data files
+raw_path = '/data/raw'
+notch_path = '/data/notch'
+band_path = '/data/bandpass'
+smooth_path = '/data/smoothed'
+feature_path = '/data/feature'
+
+# Data
+sample_data = EMGFlow.sample_data
+
+# Sampling rate
+sampling_rate = 2000
+
+# Filter parameters
+notch_vals = [(50, 5)]
+band_low = 20
+band_high = 140
+smooth_window = 50
+
+# Columns containing data for preprocessing
+cols = ['EMG_zyg', 'EMG_cor']
+
+# Preprocess signals
+sample_data = EMGFlow.ApplyNotchFilters(sample_data, cols, sampling_rate, notch_vals)
+sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[0], sampling_rate, band_low, band_high)
+sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, band_low, band_high)
+sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[0], smooth_window)
+sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[1], smooth_window)
+```
+
+---
+
+## Simple Example (loading existing data):
 
 A simple example outlining the four main steps of the EMG processing pipeline.
 
@@ -37,7 +76,7 @@ EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window
 df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
-## Advanced Example
+## Advanced Example (loading existing data):
 
 A more advanced example applying conditional filters based on file names.
 
@@ -78,7 +117,7 @@ EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window
 df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
-## Advanced Example
+## Advanced Example (loading existing data):
 
 A more advnaced example using custom feature extraction functions.
 
