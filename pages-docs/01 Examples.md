@@ -9,13 +9,6 @@ A simple example outlining the four main steps of the EMG processing pipeline.
 ```python
 import EMGFlow
 
-# Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
-
 # Data
 sample_data = EMGFlow.sample_data
 
