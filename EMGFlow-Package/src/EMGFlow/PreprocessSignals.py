@@ -1,3 +1,4 @@
+import importlib.resources as resources
 import scipy
 import pandas as pd
 import numpy as np
@@ -861,3 +862,11 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
     return
+
+#
+# =============================================================================
+#
+
+# Create a sample_data variable with sample data for the package.
+with resources.open_text('EMGFlow', 'sample_data.csv') as file:
+    sample_data = pd.read_csv(file)

@@ -144,7 +144,7 @@ cython_debug/
 .pypirc
 
 # EMGFlow
-Data
+Data/*
 Plots
 Resources
 Other_Work
