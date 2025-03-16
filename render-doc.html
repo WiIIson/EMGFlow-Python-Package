@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMGFlow | Examples</title>
+    <!-- Include Showdown.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+    <!-- Include MathJax for LaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" type="text/css" href="./gila-screen.css" media="screen" title="Gila (screen)" />
+    <link rel="stylesheet" type="text/css" href="./gila-print.css" media="print" />
+    <style>
+      #output {
+        border: 1px solid #ccc;
+        padding: 15px;
+        background-color: #f9f9f9;
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      pre, code {
+        white-space: pre-wrap; /* Preserve formatting and allow wrapping */
+        word-break: break-word; /* Break words if they are too long */
+        overflow-wrap: break-word; /* Ensures proper breaking behavior */
+      }
+    </style>
+  </head>
+
+  <body>
+    
+    <!-- ##### Header ##### -->
+    <div id="header">
+      <h1 class="headerTitle">
+        <a href="./index.html" title="Browse to homepage">EMGFlow <span>The open workflow for EMG signal processing and feature extraction.</span></a>
+      </h1>
+
+      <div class="subHeader">
+        <span class="doNotDisplay">Navigation: </span>
+        <a href="https://github.com/WiIIson/EMGFlow-Python-Package">GitHub Page</a> |
+        <a href="https://pypi.org/project/EMGFlow/">PyPi Page</a>
+      </div>
+    </div>
+
+    <!-- Div to display the converted content -->
+    <div id="output">Loading content...</div>
+
+    <script>
+
+      // Function to get the value of a query parameter
+      function getQueryParam(param) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(param);
+      }
+
+      // Load the page based on the query parameter provided
+      document.addEventListener("DOMContentLoaded", () => {
+        const docNum = getQueryParam("doc");
+
+        if (docNum==="01") {
+          markdownFilePath = "pages-docs/01 Examples.md";
+        }
+        else if (docNum==="02") {
+          markdownFilePath = "pages-docs/02 Background.md";
+        }
+        else if (docNum==="03") {
+          markdownFilePath = "pages-docs/03 Processing Pipeline.md";
+        }
+        else if (docNum==="04") {
+          markdownFilePath = "pages-docs/04 FileAccess API.md";
+        }
+        else if (docNum==="05") {
+          markdownFilePath = "pages-docs/05 PreprocessSignals API.md";
+        }
+        else if (docNum==="06") {
+          markdownFilePath = "pages-docs/06 ExtractFeatures API.md";
+        }
+        else if (docNum==="07") {
+          markdownFilePath = "pages-docs/07 OutlierFinder API.md";
+        }
+        else if (docNum==="08") {
+          markdownFilePath = "pages-docs/08 PlotSignals API.md";
+        }
+
+        // Fetch and render the Markdown and LaTeX
+        fetch(markdownFilePath)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch the Markdown file');
+            }
+            return response.text();
+          })
+          .then(markdownText => {
+            // Convert Markdown to HTML using Showdown.js
+            const converter = new showdown.Converter();
+            const htmlContent = converter.makeHtml(markdownText);
+
+            // Inject the converted HTML into the output div
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = htmlContent;
+
+            // Trigger MathJax to render LaTeX
+            MathJax.typesetPromise([outputDiv]).catch(err => console.error(err.message));
+          })
+          .catch(error => {
+            document.getElementById('output').textContent = 'Error: ' + error.message;
+          });
+
+                // Resize images
+        document.querySelectorAll("#output img").forEach(img => {
+          img.style.width = "300px"; // Set the desired width
+          img.style.height = "auto"; // Maintain aspect ratio
+        });
+      });
+    </script>
+
+    <div id="footer">
+      <div class="doNotPrint">
+
+        <!--Thanks to where I got the template from (even though the website doesn't exist any more)-->
+        <span class="nocopyright">Website template from Open Web Design</span>
+
+      </div>
+
+      <div>
+        D. William Conley |
+        Modified on 2025-03-13
+      </div>
+
+    </div>
+  </body>
+</html>
