@@ -4,9 +4,6 @@ import numpy as np
 import sys
 import os
 
-#from EMGFlow.OutlierFinder import *
-#from EMGFlow.PreprocessSignals import EMG2PSD
-
 from src.EMGFlow.OutlierFinder import *
 
 class TestSimple(unittest.TestCase):

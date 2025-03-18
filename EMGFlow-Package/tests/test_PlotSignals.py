@@ -5,8 +5,6 @@ import shiny
 import sys
 import os
 
-#from EMGFlow.PlotSignals import *
-
 from src.EMGFlow.PlotSignals import *
 
 in_path = ''

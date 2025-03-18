@@ -60,16 +60,16 @@ df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate
 ## Documentation
 
 General:
-- [EMG processing background](docs/02%20Background.md)
-- [EMGFlow processing pipeline overview](docs/03%20Processing%20Pipeline.md)
-- [FileAccess module API](docs/04%20FileAccess%20API.md)
-- [PreprocessSignals module API](docs/05%20PreprocessSignals%20API.md)
-- [ExtractFeatures module API](docs/06%20ExtractFeatures%20API.md)
-- [OutlierFinder module API](docs/07%20OutlierFinder%20API.md)
-- [PlotSignals module API](docs/08%20PlotSignals%20API.md)
+- [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=02)
+- [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=03)
+- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=04)
+- [PreprocessSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=05)
+- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=06)
+- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=07)
+- [PlotSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=08)
 
 Examples:
-- [Processing pipeline examples](docs/01%20Examples.md)
+- [Processing pipeline examples](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=01)
 
 ---
 
