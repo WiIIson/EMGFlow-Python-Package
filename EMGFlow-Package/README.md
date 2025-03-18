@@ -41,7 +41,7 @@ df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate
 
 ## Documentation
 
-To see full documentation, see the [GitHub page](https://github.com/WiIIson/EMGFlow-Python-Package/tree/main).
+To see full documentation, see the [GitHub.io Pages](https://wiiison.github.io/EMGFlow-Python-Package/index.html).
 
 ---
 
