@@ -59,6 +59,9 @@ df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate
 
 ## Documentation
 
+[![pypi](https://img.shields.io/badge/documentation-online-brightgreen.svg)](https://wiiison.github.io/EMGFlow-Python-Package/docs-landing-page.html)
+[![pypi](https://img.shields.io/badge/tutorials-examples-orange.svg?colorB=E91E63)](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=01)
+
 General:
 - [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=02)
 - [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=03)
