@@ -24,11 +24,14 @@ smooth_window = 50
 # Columns containing data for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Preprocess signals
-sample_data = EMGFlow.ApplyNotchFilters(sample_data, cols, sampling_rate, notch_vals)
+# Preprocess first column of signals ('EMG_zyg')
+sample_data = EMGFlow.ApplyNotchFilters(sample_data, cols[0], sampling_rate, notch_vals)
 sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[0], sampling_rate, band_low, band_high)
-sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, band_low, band_high)
 sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[0], smooth_window)
+
+# Preprocess second column of signals ('EMG_cor')
+sample_data = EMGFlow.ApplyNotchFilters(sample_data, cols[1], sampling_rate, notch_vals)
+sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, band_low, band_high)
 sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[1], smooth_window)
 ```
 
