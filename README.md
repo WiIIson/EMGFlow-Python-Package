@@ -1,7 +1,8 @@
 # EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
 
-![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/WiIIson/da00e624c5ba768584057a6ea7c53860/raw/covbadge.json)
-![pypi](https://img.shields.io/pypi/v/emgflow.svg)
+[![Versions](https://img.shields.io/pypi/pyversions/EMGFlow.svg?logo=python&logoColor=FFE873)](https://pypi.python.org/pypi/emgflow)
+[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/WiIIson/da00e624c5ba768584057a6ea7c53860/raw/covbadge.json)](https://github.com/WiIIson/EMGFlow-Python-Package/actions)
+[![pypi](https://img.shields.io/pypi/v/emgflow.svg)](https://pypi.python.org/pypi/emgflow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
 
