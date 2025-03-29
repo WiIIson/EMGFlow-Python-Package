@@ -66,7 +66,7 @@ cols = ['col1', 'col3']
 # Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
 df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
@@ -107,7 +107,7 @@ cols = ['col1', 'col3']
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.NotchFilterSignals(notch_path, notch_path_s, sampling_rate, notch_vals_s, cols, expression=reg_str, exp_copy=True)
 EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
 df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
@@ -143,7 +143,7 @@ cols = ['col1', 'col3']
 # Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window, cols)
+EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # ---
 
