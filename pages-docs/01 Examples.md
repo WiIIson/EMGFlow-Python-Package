@@ -1,5 +1,9 @@
 # Examples
 
+These examples can be ran by copying and pasting them into a python environment and running them. The only dependency will be that EMGFlow is installed.
+
+The first example loads the example dataset included in the package. Additional examples are included, but use imaginary data stored in declared file paths. To follow along with these examples, you need to crate these folders relative to where your test file is running, and put test data in the `data/raw` folder. The test functions will generate the data in the rest of the folders as the file runs. Additionally, the data is expected to have a `col1` and `col3` column of data.
+
 ---
 
 ## Simple Example (loading sample data):
@@ -45,11 +49,11 @@ A simple example outlining the four main steps of the EMG processing pipeline.
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+band_path = 'data/bandpass'
+smooth_path = 'data/smoothed'
+feature_path = 'data/feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -80,12 +84,12 @@ A more advanced example applying conditional filters based on file names.
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-notch_path_s = '/data/notch_s'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+notch_path_s = 'data/notch_s'
+band_path = 'data/bandpass'
+smooth_path = 'data/smoothed'
+feature_path = 'data/feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -122,11 +126,11 @@ import EMGFlow
 import tqdm
 
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+band_path = 'data/bandpass'
+smooth_path = 'data/smoothed'
+feature_path = 'data/feature'
 
 # Sampling rate
 sampling_rate = 2000
