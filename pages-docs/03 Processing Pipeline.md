@@ -4,6 +4,10 @@ EMGFlow is broken into 5 parts - accessing files, preprocessing signals, extract
 
 ---
 
+## File Format
+
+The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with ideally a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time from 0 the signal has been recorded for, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
+
 ## `FileAccess` Module
 
 These functions provide helper methods for accessing files, and are mostly used internally by the package.
