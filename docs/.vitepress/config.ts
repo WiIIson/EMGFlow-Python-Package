@@ -32,7 +32,7 @@ export default defineConfig({
           { text: 'Processing Pipeline', link: '/03 Processing Pipeline' },
           { text: 'FileAccess API', link: '/04 FileAccess API' },
           { text: 'PreprocessSignals API', link: '/05 PreprocessSignals API' },
-          { text: 'ExtractFeatures API', link: '/06 ExtractFeatures' },
+          { text: 'ExtractFeatures API', link: '/06 ExtractFeatures API' },
           { text: 'OutlierFinder API', link: '/07 OutlierFinder API' },
           { text: 'PlotSignals API', link: '/08 PlotSignals API' },
           // ...
