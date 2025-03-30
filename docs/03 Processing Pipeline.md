@@ -65,8 +65,6 @@ For more information about further customizations and detail about `SmoothFilter
 
 This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
 
-### `ExtractFeatures()`
-
 Analysis involves extracting the features from each signal into a feature file. This is the end of the pipeline, producing the final result.
 
 For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures API](./06%20ExtractFeatures%20API.md).
@@ -86,13 +84,11 @@ For more information about further customizations and specifications that can be
 
 The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
-For more information about further customizations and specifications that can be made to `PlotSpectrum()`, see [PlotSignals API](./08%20PlotSignals%20API.md).
+`PlotSpectrum` can generate a signal plot for every signal file in the folder it is provided.
 
-### `PlotCompareSignals()`
+`PlotCompareSignals()` does the same, generating plots comparing every signal at two different stages of their processing.
 
-`PlotCompareSignals()` compares plots of signals for two different stages of processing.
-
-For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [PlotSignals API](./08%20PlotSignals%20API.md).
+For more information about further customizations and specifications that can be made to `PlotSpectrum()` or `PlotCompareSignals()`, see [PlotSignals API](./08%20PlotSignals%20API.md).
 
 ---
 
