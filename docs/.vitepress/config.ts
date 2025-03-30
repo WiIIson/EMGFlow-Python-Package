@@ -5,6 +5,7 @@ export default defineConfig({
   lang: 'en-US',
   title: 'EMGFlow',
   description: 'EMG Workflow package.',
+  base: '/EMGFlow-Python-Package/',
 
   themeConfig: {
     //nav: [
