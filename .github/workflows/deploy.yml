@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-  # Allow manual triggering of the workflow
+  # Allow manual triggering from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -14,11 +14,11 @@ permissions:
   id-token: write
 
 jobs:
-  # Job to build the VitePress site
+  # Build job: Generates the VitePress site
   build:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Step 4: Build the VitePress site
+      # Step 4: Build site
       - name: Build site
         run: npm run docs:build
 
@@ -43,7 +43,7 @@ jobs:
         with:
           path: docs/.vitepress/dist
 
-  # Job to deploy the site to GitHub Pages
+  # Deploy job: Deploys the built site to GitHub Pages
   deploy:
     environment:
       name: github-pages
@@ -51,7 +51,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Deploy the site to GitHub Pages
+      # Step 1: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
