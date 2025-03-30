@@ -4,7 +4,7 @@ on:
   # Trigger the workflow on push to the 'main' branch
   push:
     branches:
-      - main
+      - gh-pages
   # Allow manual triggering from the Actions tab
   workflow_dispatch:
 
