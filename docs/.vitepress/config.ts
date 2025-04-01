@@ -5,6 +5,7 @@ export default defineConfig({
   title: "EMGFlow",
   titleTemplate: 'EMG Workflow',
   description: "The open workflow for EMG signal processing and feature extraction",
+  base: '/EMGFlow-Python-Package/',
 
   // Update time of last content
   // https://vitepress.dev/reference/default-theme-last-updated
