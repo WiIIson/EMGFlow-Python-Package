@@ -1,14 +1,40 @@
-# EMGFlow
-
 ---
+# https://vitepress.dev/reference/default-theme-home-page
+layout: home
 
-This is the main page of the EMGFlow package for Python. The source code for this project is also hosted on GitHub where documentation is provided. See the menu bar for quick links to where the package can be downloaded, and the documentation pane on the side for guides on how to use functions as well as examples.
+hero:
+  name: "EMGFlow"
+  text: 
+  tagline: The open workflow for EMG signal processing and feature extraction
+  image:
+    src: /EMGFlow.png
+    alt: EMGFlow_sticker
+  actions:
+    - theme: brand
+      text: What is EMGFlow?
+      link: /guide/what-is-emgflow
+    - theme: alt
+      text: Getting started
+      link: /guide/getting-started
+    - theme: alt
+      text: GitHub
+      link: https://github.com/WiIIson/EMGFlow-Python-Package
 
-EMGFlow is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow.
-
-EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract over 30 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
-
-While several packages exist for processing physiological and neurological signals, support for surface electromyography (sEMG) has remained limited. Many packages lack a comprehensive set of features that can be extracted from sEMG data, leaving researchers to use a patchwork of tools.
-
-Other packages are orientated around event detection in individual recordings and use GUI-based workflow that requires greater manual intervention. While this design works well for single person recordings, it complicates the extraction of features from large datasets, such as those common to machine learning.
+features:
+  - icon: 
+      light: 'icons/filter2.svg'
+      dark: 'icons/filter-dark2.svg'
+    title: Signal Preprocessing
+    details: Advanced cleaning routines produces optimal sEMG signal quality
+  - icon: 
+      light: 'icons/automation.svg'
+      dark: 'icons/automation-dark.svg'
+    title: Automated pipeline
+    details: Batch processing enables hands-off treatment of large datasets
+  - icon: 
+      light: 'icons/features.svg'
+      dark: 'icons/features-dark.svg'
+    title: Feature extraction
+    details: Extraction of 32 features across temporal and spectral domains
+---
 

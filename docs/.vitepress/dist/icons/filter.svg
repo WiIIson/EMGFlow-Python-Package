@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 5.8208335 5.8208335" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" id="svg8" version="1.1">
+
+<metadata id="metadata5">
+
+<rdf:RDF>
+
+<cc:Work>
+
+<dc:format>image/svg+xml</dc:format>
+
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+
+<dc:title/>
+
+<dc:date>2021</dc:date>
+
+<dc:creator>
+
+<cc:Agent>
+
+<dc:title>Timothée Giet</dc:title>
+
+</cc:Agent>
+
+</dc:creator>
+
+<cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/"/>
+
+</cc:Work>
+
+<cc:License rdf:about="http://creativecommons.org/licenses/by-sa/4.0/">
+
+<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+
+<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+
+<cc:requires rdf:resource="http://creativecommons.org/ns#Notice"/>
+
+<cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"/>
+
+<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+
+<cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"/>
+
+</cc:License>
+
+</rdf:RDF>
+
+</metadata>
+
+<g transform="translate(0 -291.18)" id="layer1">
+
+<path id="path836" transform="matrix(.26458 0 0 .26458 0 291.18)" d="M5.342 13C2.9 17.239 1 21 1 21h20s-.396-3.76-1.143-8z" style="fill:#373737;fill-opacity:1;stroke:none;stroke-width:.99999994px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"/>
+
+<rect y="294.08957" x="-9.8607613e-32" height="0.26458332" width="5.8208332" id="rect838" style="opacity:1;vector-effect:none;fill:#373737;fill-opacity:1;stroke:none;stroke-width:.5416193;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:3.20000005;stroke-opacity:1"/>
+
+<path id="path836-7" d="M3.969 291.444c-.494 0-1.332 1.152-2.087 2.381h3.221c-.263-1.229-.64-2.381-1.134-2.381z" style="fill:#373737;fill-opacity:.3764706;stroke:none;stroke-width:.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"/>
+
+</g>
+
+</svg>
