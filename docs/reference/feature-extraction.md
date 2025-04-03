@@ -30,9 +30,7 @@ Skew and kurtosis are lesser known statistical measurements.
 Skewness describes the symmetry of a dataset, considered more skewed the less symmetrical the left and right distributions of the median are.
 
 Skew is calculated as follows:
-```math
-s=\frac{\frac{\mu-M\\_o}{\sigma}}{\frac{3(\mu-M\\_d)}{\sigma}}
-```
+$$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
 - $M_o$ <-- Mode
@@ -45,9 +43,9 @@ s=\frac{\frac{\mu-M\\_o}{\sigma}}{\frac{3(\mu-M\\_d)}{\sigma}}
 Kurtosis describes the amount of data in the tails of a bell curve of a distribution.
 
 Kurtosis is calculated as follows:
-```math
-k=\frac{1}{N}\sum\\_{i=1}^N\left(\frac{x\\_i-\mu}{\sigma}\right)^4
-```
+$$
+k=\frac{1}{N}\sum_{i=1}^N\left(\frac{x_i-\mu}{\sigma}\right)^4
+$$
 - $\mu$ <-- Mean
 - $\sigma$ <-- Standard deviation
 - $N$ <-- Number of data points
@@ -62,18 +60,18 @@ k=\frac{1}{N}\sum\\_{i=1}^N\left(\frac{x\\_i-\mu}{\sigma}\right)^4
 
 Calculates the Integrated EMG (IEMG) of the signal. The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity. In an EMG signal, the IEMG describes when the muscle begins contracting, and is related to the signal sequence firing point (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcIEMG(Signal, col, sr)
-```
+$$
 
 **Theory**
 
 In the reference, the IEMG does not account for the sampling rate. Two signal recordings with the same shape but different sampling rate would have different results since we are integrating with respect to time. As such, the calculation made here will include multiplying by sampling rate.
 
 The IEMG is calculated as follows:
-```math
-\text{IEMG}=s\\_r\sum\\_{i=1}^N|x\\_i|
-```
+$$
+\text{IEMG}=s_r\sum_{i=1}^N|x_i|
+$$
 - $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
@@ -103,7 +101,7 @@ Raises an error if `sr` is less or equal to 0.
 
 **Example**
 
-```python
+python
 # Calculate the IEMG of SignalDF, for column 'column1'
 IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 ```
@@ -116,16 +114,16 @@ IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 
 Calculates the Mean Absolute Value (MAV) of the signal. In an EMG signal, the MAV describes the muscle contraction level (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcMAV(Signal, col)
-```
+$$
 
 **Theory**
 
 The MAV is calculated as follows:
-```math
-\text{MAV}=\frac{1}{N}\sum\\_{i=1}^N|x\\_i|
-```
+$$
+\text{MAV}=\frac{1}{N}\sum_{i=1}^N|x_i|
+$$
 - $N$ <-- Number of data points
 
 (Tkach et al., 2010)
@@ -162,21 +160,21 @@ MAV = EMGFlow.CalcMAV(SignalDF, 'column1', 2000)
 **Description**
 
 Calculates the Modified Mean Absolute Value (MMAV) of the signal. The MMAV is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
-```python
+$$python
 CalcMMAV(Signal, col)
-```
+$$
 
 **Theory**
 
 The MMAV is identical to MAV, except it introduces a weight to the calculation. Values are given a weight of 1 when they are between the 25th and 74th percentile, and 0.5 outside. The article describing the MMAV also listed another modification, MMAV2, but the description appeared to be flawed, and as such the measure was not included.
 
 The MMAV is calculated as follows:
-```math
-\text{MMAV}=\frac{1}{N}\sum\\_{i=1}^N|x\\_iw\\_i|
-```
-```math
-w\\_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\\ 0.5 & \text{otherwise} \end{matrix} \right.
-```
+$$
+\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
+$$
+$$
+w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right.
+$$
 - $N$ <-- Number of data points
 
 (Chowdhury et al., 2013)
@@ -213,18 +211,18 @@ MMAV = EMGFlow.CalcMMAV(SignalDF, 'column1', 2000)
 
 Calculates the Simple Square Integral (SSI) of the signal. In an EMG signal, the SSI describes the energy of the signal (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcSSI(Signal, col, sr)
-```
+$$
 
 **Theory**
 
 In the reference, the SSI does not account for the sampling rate. Two signal recordings with the same shape but different sampling rate would have different results since we are integrating with respect to time. As such, the calculation made here will include multiplying by sampling rate.
 
 The SSI is calculated as follows:
-```math
-\text{SSI}=s\\_r^2\sum\\_{i=1}^N|x\\_i|^2
-```
+$$
+\text{SSI}=s_r^2\sum_{i=1}^N|x_i|^2
+$$
 - $s_r$ <-- Sampling rate
 - $N$ <-- Number of data points
 
@@ -267,16 +265,16 @@ SSI = EMGFlow.CalcSSI(SignalDF, 'column1', 2000)
 
 Calculates the Variance (VAR) of the signal. In an EMG signal, the VAR describes the power of the signal (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcVAR(Signal, col)
-```
+$$
 
 **Theory**
 
 The VAR is calculated as follows:
-```math
-\text{VAR}=\frac{1}{N-1}\sum\\_{i=1}^Nx\\_i^2
-```
+$$
+\text{VAR}=\frac{1}{N-1}\sum_{i=1}^Nx_i^2
+$$
 
 (Spiewak et al., 2018)
 
@@ -312,18 +310,18 @@ VAR = EMGFlow.CalcVAR(SignalDF, 'column1')
 
 Calculates the V-Order of a signal. The V-Order is an alteration of VAR that takes the square root of the result.
 
-```python
+$$python
 CalcVOrder(Signal, col)
-```
+$$
 
 **Theory**
 
 The V-Order is calculated using the $v$-operator, essentially working like a Euclidean distance to the $v$th order. One study indicates that the best value for $v$ is 2, meaning the V-Order is just the square root of the VAR feature.
 
 The V-Order is calculated as follows:
-```math
+$$
 \text{vORDER}=\sqrt{\text{VAR}}
-```
+$$
 
 (Tkach et al., 2010)
 
@@ -359,16 +357,16 @@ VOrder = EMGFlow.CalcVOrder(SignalDF, 'column1')
 
 Calculates the Root Mean Square (RMS) of a signal. In an EMG signal, the RMS provides information about the constant force, and non-fatiguing contractions of the muscles (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcRMS(Signal, col)
-```
+$$
 
 **Theory**
 
 The RMS is calculated as follows:
-```math
-\text{RMS}=\sqrt{\frac{1}{N}\sum\\_{i=1}^N|x\\_i|^2}
-```
+$$
+\text{RMS}=\sqrt{\frac{1}{N}\sum_{i=1}^N|x_i|^2}
+$$
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -405,16 +403,16 @@ RMS = EMGFlow.CalcRMS(SignalDF, 'column1')
 
 Calculates the Waveform Length (WL) of a signal. The WL provides information about the amplitude, frequency, and duration of the signal.
 
-```python
+$$python
 CalcWL(Signal, col)
-```
+$$
 
 **Theory**
 
 The WL is calculated as follows:
-```math
-\text{WL}=\sum\\_{i=1}^{N-1}|x\\_{i+1}-x\\_i|
-```
+$$
+\text{WL}=\sum_{i=1}^{N-1}|x_{i+1}-x_i|
+$$
 - $N$ <-- Number of data points
 
 (Spiewak et al., 2018)
@@ -451,9 +449,9 @@ WL = EMGFlow.CalcWL(SignalDF, 'column1')
 
 Calculate the Willison Amplitude (WAMP) of a signal. The WAMP measures the number of times an EMG amplitude exceeds a given threshold. In an EMG signal, the WAMP describes the firing of Motor Unit Action Potentials (MUAP), and muscle contraction level (Phinyomark et al., 2009).
 
-```python
+$$python
 CalcWAMP(Signal, col, threshold)
-```
+$$
 
 **Theory**
 
@@ -462,12 +460,12 @@ Thresholds for the WAMP are commonly chosen within the 50-100 mV range. The WAMP
 When choosing a value, pass it in terms of the same units being used in the data.
 
 The WAMP is calculated as follows:
-```math
-\text{WAMP}=\sum\\_{i=1}^{N-1}f(|x\\_{i+1}-x\\_i|)
-```
-```math
-f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\\ 0 & \text{otherwise} \end{matrix}\right.
-```
+$$
+\text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)
+$$
+$$
+f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right.
+$$
 - $N$ <-- Number of data points
 - $\epsilon$ <-- Voltage change threshold
 
@@ -508,16 +506,16 @@ WAMP = EMGFlow.CalcWAMP(SignalDF, 'column1', 55)
 
 Calculates the Log-Detector (LOG) of a signal. The LOG provides an estimate of the force exerted by the muscle.
 
-```python
+$$python
 CalcLOG(Signal, col)
-```
+$$
 
 **Theory**
 
 The LOG is calculated as follows:
-```math
-\text{LOG}=e^{\frac{1}{N}\sum\\_{i=1}^N\log(|x\\_k|)}
-```
+$$
+\text{LOG}=e^{\frac{1}{N}\sum_{i=1}^N\log(|x_k|)}
+$$
 - $N$ <-- Number of data points
 
 (Tkach et al., 2010)
@@ -554,16 +552,16 @@ LOG = EMGFlow.CalcLOG(SignalDF, 'column1')
 
 Calculates the Maximum Fractal Length (MFL) of a signal. The MFL measures the activation of low-level muscle contractions.
 
-```python
+$$python
 CalcMFL(Signal, col)
-```
+$$
 
 **Theory**
 
 The MFL is calculated as follows:
-```math
-\text{MFL}=\log\left(\sqrt{\sum\\_{i=1}^{N-1}(x\\_{i+1}-x\\_i)^2}\right)
-```
+$$
+\text{MFL}=\log\left(\sqrt{\sum_{i=1}^{N-1}(x_{i+1}-x_i)^2}\right)
+$$
 - $N$ <-- Number of data points
 
 (Too et al., 2019)
@@ -600,16 +598,16 @@ MFL = EMGFlow.CalcMFL(SignalDF, 'column1')
 
 Calculates the Average Power (AP) of a signal. The AP measures the energy distribution of the signal.
 
-```python
+$$python
 CalcAP(Signal, col)
-```
+$$
 
 **Theory**
 
 The AP is calculated as follows:
-```math
-\text{AP}=\frac{1}{N}\sum\\_{i=1}^Nx\\_i^2
-```
+$$
+\text{AP}=\frac{1}{N}\sum_{i=1}^Nx_i^2
+$$
 - $N$ <-- Number of data points
 
 (Too et al., 2019)
@@ -650,18 +648,18 @@ Calculates the Spectral Flux of a signal. Spectral Flux measures the change in s
 
 The call to `CalcSpecFlux` within `AnalyzeSignals` uses a default value of `diff=0.5`.
 
-```python
+$$python
 CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None)
-```
+$$
 
 **Theory**
 
 Spectral Flux is used to compare two different signals together. The applications of this are more difficult to implement, so there is no one function to handle this.
 
 Spectral Flux is calculated as follows:
-```math
-\text{FL}\\_{i,i-1}=\sum\\_{k=1}^{Wf\\_L}(\text{EN}\\_i(k)-\text{EN}\\_{i-1}(k))^2
-```
+$$
+\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2
+$$
 
 (Giannakopoulos & Pikrakis, 2014)
 
@@ -756,9 +754,9 @@ MNF is the mean frequency on the power spectrum, weighted by the power of each f
 
 MNF is calculated as follows:
 
-```math
-\text{MNF}=\frac{\sum\\_i^N f\\_ip\\_i}{\sum\\_i^N p\\_i}$$
-```
+$$
+\text{MNF}=\frac{\sum_i^N f_ip_i}{\sum_i^N p_i}
+$$
 
 (Phinyomark et al., 2009)
 
@@ -803,9 +801,9 @@ This metric uses a proposed muscle separation theory put forward by this project
 Twitch Ratio is an adaptation of Alpha Ratio (Eyben et al., 2016).
 
 Twitch Ratio is calculated as follows:
-```math
-\text{TR}=\frac{\sum\\_{i=f\\_0}^{f\\_t} p\\_i}{\sum\\_{i=f\\_t}^{f\\_N}p\\_i}
-```
+$$
+\text{TR}=\frac{\sum_{i=f_0}^{f_t} p_i}{\sum_{i=f_t}^{f_N}p_i}
+$$
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_t$ <-- Threshold frequency of the PSD
@@ -857,9 +855,9 @@ This metric uses a proposed muscle separation theory put forward by this project
 Twitch Index is an adaptation of the Hammarberg index (Eyben et al., 2016).
 
 Twitch Index is calculated as follows:
-```math
-\text{TR}=\frac{\max\left(\sum\\_{i=f\\_0}^{f\\_t} p\\_i\right)}{\max\left(\sum\\_{i=f\\_t}^{f\\_N}p\\_i\right)}
-```
+$$
+\text{TR}=\frac{\max\left(\sum_{i=f_0}^{f_t} p_i\right)}{\max\left(\sum_{i=f_t}^{f_N}p_i\right)}
+$$
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_t$ <-- Threshold frequency of the PSD
@@ -954,9 +952,9 @@ CalcSC(psd)
 **Theory**
 
 SC is calculated as follows:
-```math
-\text{SC}=\frac{\sum\\_{i=f\\_0}^{f\\_N}i\cdot p\\_i}{\sum\\_{i=f\\_0}^{f\\_N} p\\_i}
-```
+$$
+\text{SC}=\frac{\sum_{i=f_0}^{f_N}i\cdot p_i}{\sum_{i=f_0}^{f_N} p_i}
+$$
 - $p_i$ <-- Power of normalized PSD at frequency $i$
 - $f_0$ <-- Minimum frequency of the PSD
 - $f_N$ <-- Maximum frequency of the PSD
@@ -1000,9 +998,9 @@ CalcSF(psd)
 **Theory**
 
 SF is calculated as follows:
-```math
-\text{SF}=\frac{\prod\\_{i=0}^{N-1}|p\\_i|^{\frac{1}{N}}}{\frac{1}{N}\sum\\_{i=0}^{N-1}|p\\_i|}
-```
+$$
+\text{SF}=\frac{\prod_{i=0}^{N-1}|p_i|^{\frac{1}{N}}}{\frac{1}{N}\sum_{i=0}^{N-1}|p_i|}
+$$
 - $p_i$ <-- $i$th element of PSD strength
 - $N$ <-- Number of elements in PSD
 
@@ -1045,10 +1043,10 @@ CalcSS(psd)
 **Theory**
 
 SS is calculated as follows:
-```math
-\text{SS}=\frac{\sum\\_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum\\_{m=0}^{N-1}
+$$
+\text{SS}=\frac{\sum_{m=0}^{N-1}(m-\text{SC})^2 \cdot |X(m)|}{\sum_{m=0}^{N-1}
 |X(m)|}
-```
+$$
 
 (Nagineni et al., 2018)
 
@@ -1089,9 +1087,9 @@ CalcSDec(psd)
 **Theory**
 
 SDec is calculated as follows:
-```math
-\text{SDec}=\frac{\sum\\_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum\\_{m=1}^{N-1}|X(m)|}
-```
+$$
+\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}
+$$
 
 (Nagineni et al., 2018)
 
@@ -1132,9 +1130,9 @@ CalcSEntropy(psd)
 **Theory**
 
 Spectral Entropy is calculated as follows:
-```math
-\text{Spectral Entropy}=-\sum\\_{i=1}^mp(dB\\_i)\log\\_2(p(dB\\_i))
-```
+$$
+\text{Spectral Entropy}=-\sum_{i=1}^mp(dB_i)\log_2(p(dB_i))
+$$
 
 (Llanos et al., 2017)
 
@@ -1223,9 +1221,9 @@ CalcSBW(psd, p=2)
 SBW has a parameter $p$ that can be adjusted to different values. Using a value of 2 will result in the standard deviation around the centroid.
 
 SBW is calculated as follows:
-```math
+$$
 \text{SBW}=\left( \sum X(m)\cdot (m-\text{SC})^p \right)^{\frac{1}{p}}
-```
+$$
 
 (Tjoa, 2022)
 
