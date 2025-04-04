@@ -60,9 +60,9 @@ $$
 
 Calculates the Integrated EMG (IEMG) of the signal. The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity. In an EMG signal, the IEMG describes when the muscle begins contracting, and is related to the signal sequence firing point (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcIEMG(Signal, col, sr)
-$$
+```
 
 **Theory**
 
@@ -114,9 +114,9 @@ IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 
 Calculates the Mean Absolute Value (MAV) of the signal. In an EMG signal, the MAV describes the muscle contraction level (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcMAV(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -160,9 +160,9 @@ MAV = EMGFlow.CalcMAV(SignalDF, 'column1', 2000)
 **Description**
 
 Calculates the Modified Mean Absolute Value (MMAV) of the signal. The MMAV is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
-$$python
+```python
 CalcMMAV(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -173,7 +173,7 @@ $$
 \text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
 $$
 $$
-w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right.
+w_i=\left{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right}.
 $$
 - $N$ <-- Number of data points
 
@@ -211,9 +211,9 @@ MMAV = EMGFlow.CalcMMAV(SignalDF, 'column1', 2000)
 
 Calculates the Simple Square Integral (SSI) of the signal. In an EMG signal, the SSI describes the energy of the signal (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcSSI(Signal, col, sr)
-$$
+```
 
 **Theory**
 
@@ -265,9 +265,9 @@ SSI = EMGFlow.CalcSSI(SignalDF, 'column1', 2000)
 
 Calculates the Variance (VAR) of the signal. In an EMG signal, the VAR describes the power of the signal (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcVAR(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -310,9 +310,9 @@ VAR = EMGFlow.CalcVAR(SignalDF, 'column1')
 
 Calculates the V-Order of a signal. The V-Order is an alteration of VAR that takes the square root of the result.
 
-$$python
+```python
 CalcVOrder(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -357,9 +357,9 @@ VOrder = EMGFlow.CalcVOrder(SignalDF, 'column1')
 
 Calculates the Root Mean Square (RMS) of a signal. In an EMG signal, the RMS provides information about the constant force, and non-fatiguing contractions of the muscles (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcRMS(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -403,9 +403,9 @@ RMS = EMGFlow.CalcRMS(SignalDF, 'column1')
 
 Calculates the Waveform Length (WL) of a signal. The WL provides information about the amplitude, frequency, and duration of the signal.
 
-$$python
+```python
 CalcWL(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -449,9 +449,9 @@ WL = EMGFlow.CalcWL(SignalDF, 'column1')
 
 Calculate the Willison Amplitude (WAMP) of a signal. The WAMP measures the number of times an EMG amplitude exceeds a given threshold. In an EMG signal, the WAMP describes the firing of Motor Unit Action Potentials (MUAP), and muscle contraction level (Phinyomark et al., 2009).
 
-$$python
+```python
 CalcWAMP(Signal, col, threshold)
-$$
+```
 
 **Theory**
 
@@ -464,7 +464,7 @@ $$
 \text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)
 $$
 $$
-f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right.
+f(x)=\left{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right}.
 $$
 - $N$ <-- Number of data points
 - $\epsilon$ <-- Voltage change threshold
@@ -506,9 +506,9 @@ WAMP = EMGFlow.CalcWAMP(SignalDF, 'column1', 55)
 
 Calculates the Log-Detector (LOG) of a signal. The LOG provides an estimate of the force exerted by the muscle.
 
-$$python
+```python
 CalcLOG(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -552,9 +552,9 @@ LOG = EMGFlow.CalcLOG(SignalDF, 'column1')
 
 Calculates the Maximum Fractal Length (MFL) of a signal. The MFL measures the activation of low-level muscle contractions.
 
-$$python
+```python
 CalcMFL(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -598,9 +598,9 @@ MFL = EMGFlow.CalcMFL(SignalDF, 'column1')
 
 Calculates the Average Power (AP) of a signal. The AP measures the energy distribution of the signal.
 
-$$python
+```python
 CalcAP(Signal, col)
-$$
+```
 
 **Theory**
 
@@ -648,9 +648,9 @@ Calculates the Spectral Flux of a signal. Spectral Flux measures the change in s
 
 The call to `CalcSpecFlux` within `AnalyzeSignals` uses a default value of `diff=0.5`.
 
-$$python
+```python
 CalcSpecFlux(Signal1, diff, col, sr, diff_sr=None)
-$$
+```
 
 **Theory**
 
