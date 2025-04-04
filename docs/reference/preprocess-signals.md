@@ -2,7 +2,7 @@
 
 The `PreProcessSignals` module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
 
----
+
 
 ## `EMG2PSD`
 
@@ -41,7 +41,7 @@ sr = 2000
 PSD = EMGFlow.EMG2PSD(SignalDF['col1'], sr)
 ```
 
----
+
 
 ## `ApplyNotchFilters`
 
@@ -94,7 +94,7 @@ sr = 2000
 SignalFiltered = EMGFlow.ApplyNotchFilters(SignalDF, 'column1', sr, [(150, 5), (250, 5)])
 ```
 
----
+
 
 ## `NotchFilterSignals`
 
@@ -185,7 +185,7 @@ EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols
 EMGFlow.NotchFilterSignals(notch_path, notch_spec, sampling_rate, notch_vals_spec, cols, exp_copy=True)
 ```
 
----
+
 
 ## `ApplyBandpassFilter`
 
@@ -240,7 +240,7 @@ sr = 2000
 SignalFiltered = EMGFlow.ApplyNotchFilters(SignalDF, 'column1', sr, 20, 250)
 ```
 
----
+
 
 ## `BandpassFilterSignals`
 
@@ -330,7 +330,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 EMGFlow.BandpassFilterSignals(notch_path, bandpass_path, sampling_rate, low, high, cols)
 ```
 
----
+
 
 ## `ApplyFWR`
 
@@ -370,7 +370,7 @@ Raises an error if `col` is not found in `Signal`.
 FWR_DF = EMGFlow.ApplyFWR(SignalDF, 'column1')
 ```
 
----
+
 
 ## `ApplyBoxcarSmooth`
 
@@ -427,7 +427,7 @@ width = 20
 SmoothDF = EMGFlow.ApplyBoxCarSmooth(SignalDF, 'column1', width)
 ```
 
----
+
 
 ## `ApplyRMSSmooth`
 
@@ -484,7 +484,7 @@ width = 20
 SmoothDF = EMGFlow.ApplyRMSSmooth(SignalDF, 'column1', width)
 ```
 
----
+
 
 ## `ApplyGaussianSmooth`
 
@@ -545,7 +545,7 @@ width = 20
 SmoothDF = EMGFlow.ApplyGaussianSmooth(SignalDF, 'column1', width)
 ```
 
----
+
 
 ## `ApplyLoessSmooth`
 
@@ -606,7 +606,7 @@ width = 20
 SmoothDF = EMGFlow.ApplyLoessSmooth(SignalDF, 'column1', width)
 ```
 
----
+
 
 ## `SmoothFilterSignals`
 
@@ -696,7 +696,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 EMGFlow.SmoothFilterSignals(bandpass_path, smooth_path, size, cols)
 ```
 
----
+
 
 ## Sources
 

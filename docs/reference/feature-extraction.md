@@ -2,7 +2,7 @@
 
 This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
 
----
+
 
 ## Basic Time-Series Statistics
 
@@ -52,7 +52,7 @@ $$
 
 **Kurtosis** is calculated with `scipy.stats.kurtosis`
 
----
+
 
 ## `CalcIEMG`
 
@@ -106,7 +106,7 @@ Raises an error if `sr` is less or equal to 0.
 IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 ```
 
----
+
 
 ## `CalcMAV`
 
@@ -153,7 +153,7 @@ MAV = EMGFlow.CalcMAV(SignalDF, 'column1', 2000)
 ```
 
 
----
+
 
 ## `CalcMMAV`
 
@@ -203,7 +203,7 @@ Raises an error if `col` is not found in `Signal`.
 MMAV = EMGFlow.CalcMMAV(SignalDF, 'column1', 2000)
 ```
 
----
+
 
 ## `CalcSSI`
 
@@ -257,7 +257,7 @@ Raises an error if `sr` is less or equal to 0
 SSI = EMGFlow.CalcSSI(SignalDF, 'column1', 2000)
 ```
 
----
+
 
 ## `CalcVAR`
 
@@ -302,7 +302,7 @@ Raises an error if `col` is not found in `Signal`.
 VAR = EMGFlow.CalcVAR(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcVOrder`
 
@@ -349,7 +349,7 @@ Raises an error if `col` is not found in `Signal`.
 VOrder = EMGFlow.CalcVOrder(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcRMS`
 
@@ -395,7 +395,7 @@ Raises an error if `col` is not found in `Signal`.
 RMS = EMGFlow.CalcRMS(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcWL`
 
@@ -441,7 +441,7 @@ Raises an error if `col` is not found in `Signal`.
 WL = EMGFlow.CalcWL(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcWAMP`
 
@@ -498,7 +498,7 @@ Raises an error if `col` is not found in `Signal`.
 WAMP = EMGFlow.CalcWAMP(SignalDF, 'column1', 55)
 ```
 
----
+
 
 ## `CalcLOG`
 
@@ -544,7 +544,7 @@ Raises an error if `col` is not found in `Signal`.
 LOG = EMGFlow.CalcLOG(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcMFL`
 
@@ -590,7 +590,7 @@ Raises an error if `col` is not found in `Signal`.
 MFL = EMGFlow.CalcMFL(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcAP`
 
@@ -636,7 +636,7 @@ Raises an error if `col` is not found in `Signal`.
 AP = EMGFlow.CalcMFL(SignalDF, 'column1')
 ```
 
----
+
 
 ## `CalcSpecFlux`
 
@@ -704,7 +704,7 @@ Raises an error if `diff_sr` is less or equal to 0.
 AP = EMGFlow.CalcSpecFlux(Signal1DF, Signal2DF, 'column1', 2000)
 ```
 
----
+
 
 ## CalcMDF
 
@@ -740,7 +740,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 MDF = EMGFlow.CalcMDF(psd)
 ```
 
----
+
 
 ## CalcMNF
 
@@ -782,7 +782,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 MNF = EMGFlow.CalcMNF(psd)
 ```
 
----
+
 
 ## `CalcTwitchRatio`
 
@@ -836,7 +836,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 TR = EMGFlow.CalcTwitchRatio(psd)
 ```
 
----
+
 
 ## `CalcTwitchIndex`
 
@@ -890,7 +890,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 TI = EMGFlow.CalcTwitchIndex(psd)
 ```
 
----
+
 
 ## `CalcTwitchSlope`
 
@@ -937,7 +937,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 TS_Fast, TS_Slow = EMGFlow.CalcTwitchSlope(psd)
 ```
 
----
+
 
 ## `CalcSC`
 
@@ -983,7 +983,7 @@ psd = (SignalDF['column1'], 2000)
 SC = EMGFlow.CalcSC(psd)
 ```
 
----
+
 
 ## `CalcSF`
 
@@ -1028,7 +1028,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SC = EMGFlow.CalcSF(psd)
 ```
 
----
+
 
 ## `CalcSS`
 
@@ -1072,7 +1072,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SS = EMGFlow.CalcSS(psd)
 ```
 
----
+
 
 ## `CalcSDec`
 
@@ -1115,7 +1115,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SDec = EMGFlow.CalcSDec(psd)
 ```
 
----
+
 
 ## `CalcSEntropy`
 
@@ -1159,7 +1159,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SEntropy = EMGFlow.CalcSEntropy(psd)
 ```
 
----
+
 
 ## `CalcSRoll`
 
@@ -1204,7 +1204,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SRoll = EMGFlow.CalcSRoll(psd)
 ```
 
----
+
 
 ## `CalcSBW`
 
@@ -1254,7 +1254,7 @@ psd = EMGFlow.EMG2PSD(SignalDF['column1'], 2000)
 SBW = EMGFlow.CalcSBW(psd)
 ```
 
----
+
 
 ## `ExtractFeatures`
 
@@ -1338,7 +1338,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 features = EMGFlow.ExtractFeatures(bandpass_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
----
+
 
 ## Sources
 

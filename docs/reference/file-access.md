@@ -2,7 +2,7 @@
 
 These functions provide helper methods for accessing files, and are mostly used internally by the package.
 
----
+
 
 ## `ReadFileType`
 
@@ -41,7 +41,7 @@ ext = 'csv'
 df = ReadFileType(path, ext)
 ```
 
----
+
 
 ## `MapFiles`
 
@@ -84,7 +84,7 @@ file_loc1 = EMGFlow.MapFiles('/data')
 file_loc2 = EMGFlow.MapFiles('/data', expression='^DATA_')
 ```
 
----
+
 
 ## `ConvertMapFiles`
 
@@ -130,7 +130,7 @@ file_loc1 = EMGFlow.ConvertMapFiles('/data')
 file_loc2 = EMGFlow.ConvertMapFiles(file_loc1, expression='^01')
 ```
 
----
+
 
 ## `MapFilesFuse`
 

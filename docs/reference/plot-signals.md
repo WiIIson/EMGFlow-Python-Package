@@ -2,7 +2,7 @@
 
 The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
----
+
 
 ## `GenPlotDash`
 
@@ -76,7 +76,7 @@ EMGFlow.GenPlotDash(s_paths, sr, col, units, names)
 
 <img src="./images/GenPlotDashEx.png" width="500">
 
----
+
 
 ## `PlotSpectrum`
 
@@ -143,7 +143,7 @@ sr = 2000
 EMGFlow.PlotSpectrum(raw_path, plot_path, sr)
 ```
 
----
+
 
 ## `PlotCompareSignals`
 

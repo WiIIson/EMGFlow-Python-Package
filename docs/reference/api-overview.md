@@ -116,8 +116,6 @@ Smoothing is controlled by the function `SmoothFilterSignals()`, with the follow
 
 For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals API](./preprocess-signals.md).
 
----
-
 ## `ExtractFeatures` Module
 
 This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
@@ -175,7 +173,6 @@ For more information about further customizations and specifications that can be
 
 For a more detailed explanation about the features extracted by `AnalyzeSignals()`, see [ExtractFeatures API](./feature-extraction.md).
 
----
 ## `OutlierFinder` Module
 
 This module provides methods to help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
@@ -194,8 +191,6 @@ Outlier detection is handled by the function `DetectOutliers()`. This function f
 This function outputs a dictionary of file names and locations for each signal marked as an outlier.
 
 For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [OutlierFinder API](./outlier-detection.md).
-
----
 
 ## `PlotSignals` Module
 
@@ -233,8 +228,6 @@ For more information about further customizations and specifications that can be
 `sampling_rate` refers to the sampling rate of the data. The function will assume that each signal, and each column, is using the same sampling rate.
 
 For more information about further customizations and specifications that can be made to `PlotCompareSignals()`, see [PlotSignals API](./plot-signals.md).
-
----
 
 ## Sources
 
