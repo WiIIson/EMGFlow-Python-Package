@@ -101,7 +101,7 @@ Raises an error if `sr` is less or equal to 0.
 
 **Example**
 
-python
+```python
 # Calculate the IEMG of SignalDF, for column 'column1'
 IEMG = EMGFlow.CalcIEMG(SignalDF, 'column1', 2000)
 ```
@@ -173,7 +173,7 @@ $$
 \text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
 $$
 $$
-w_i=\left{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right}.
+w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right\}.
 $$
 - $N$ <-- Number of data points
 
@@ -464,7 +464,7 @@ $$
 \text{WAMP}=\sum_{i=1}^{N-1}f(|x_{i+1}-x_i|)
 $$
 $$
-f(x)=\left{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right}.
+f(x)=\left\{\begin{matrix} 1 & \text{if }x>\epsilon \\ 0 & \text{otherwise} \end{matrix}\right\}.
 $$
 - $N$ <-- Number of data points
 - $\epsilon$ <-- Voltage change threshold
