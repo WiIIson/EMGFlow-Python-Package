@@ -58,16 +58,16 @@ df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate
 [![pypi](https://img.shields.io/badge/tutorials-examples-orange.svg?colorB=E91E63)](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=01)
 
 General:
-- [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=02)
-- [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=03)
-- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=04)
-- [PreprocessSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=05)
-- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=06)
-- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=07)
-- [PlotSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=08)
+- [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/guide/about-emg.html)
+- [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/reference/api-overview.html)
+- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/file-access.html)
+- [PreprocessSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/preprocess-signals.html)
+- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/feature-extraction.html)
+- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/outlier-detection.html)
+- [PlotSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/plot-signals.html)
 
 Examples:
-- [Processing pipeline examples](https://wiiison.github.io/EMGFlow-Python-Package/render-doc.html?doc=01)
+- [Processing pipeline examples](https://wiiison.github.io/EMGFlow-Python-Package/guide/examples.html)
 
 ## Installation
 
