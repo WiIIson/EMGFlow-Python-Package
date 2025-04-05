@@ -43,14 +43,6 @@ sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, b
 sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[1], smooth_window)
 ```
 
-## Advanced examples
-
-The advanced examples can ran by copying and pasting the code into a Python environment.
-
-In addition, they require having a local "data" folder, with "raw", "notch", "notch_s", "bandpass", "smoothed" and "feature" subfolders. The "raw" subfolder is required to have one or more emotional CSV files inside.
-
-The `cols` parameter may need to be modified to contain some of the column names of the emotional CSV in the "raw" subfolder.
-
 ### Complete pipeline with project data
 
 A simple example outlining the four main steps of the EMG processing pipeline.
@@ -58,12 +50,15 @@ A simple example outlining the four main steps of the EMG processing pipeline.
 ```python
 import EMGFlow
 
+# Load sample data
+EMGFlow.make_sample_data()
+
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'Raw'
+notch_path = 'Notch'
+band_path = 'Bandpass'
+smooth_path = 'Smooth'
+feature_path = 'Feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -75,7 +70,7 @@ band_high = 140
 smooth_window = 50
 
 # Columns containing data for preprocessing
-cols = ['col1', 'col2']
+cols = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
@@ -83,8 +78,18 @@ EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, ba
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
-df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
+df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
+
+## Advanced examples
+
+The advanced examples can ran by copying and pasting the code into a Python environment.
+
+In addition, they require having a local "data" folder, with "raw", "notch", "notch_s", "bandpass", "smoothed" and "feature" subfolders. The "raw" subfolder is required to have one or more emotional CSV files inside.
+
+The `cols` parameter may need to be modified to contain some of the column names of the emotional CSV in the "raw" subfolder.
+
+They serve more as a template of how analysis can be done, to be replicated with your own data.
 
 ### Custom filters for individiual files
 
@@ -94,12 +99,12 @@ A more advanced example applying conditional filters based on file names.
 import EMGFlow
 
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-notch_path_s = '/data/notch_s'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+notch_path_s = 'data/notch_s'
+band_path = 'data/bandpass'
+smooth_path = 'data/smoothed'
+feature_path = 'data/feature'
 
 # Sampling rate
 sampling_rate = 2000
@@ -124,7 +129,7 @@ EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, 
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
-df = EMGFlow.AnalyzeSignals(band_path, smooth_path, feature_path, sampling_rate, cols)
+df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
 ```
 
 ### Calling native feature extraction routines
@@ -138,11 +143,11 @@ import EMGFlow
 import tqdm
 
 # Paths for data files
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+band_path = 'data/bandpass'
+smooth_path = 'data/smoothed'
+feature_path = 'data/feature'
 
 # Sampling rate
 sampling_rate = 2000
