@@ -30,10 +30,11 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-[tool.hatch.build]
-include = [
-    "src/EMGFlow/data/*"
-]
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"EMGFlow" = ["data/*"]
 
 [project.urls]
 Home = "https://github.com/WiIIson/EMGFlow-Python-Package"

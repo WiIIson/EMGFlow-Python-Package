@@ -7,7 +7,7 @@ import re
 from tqdm import tqdm
 import warnings
 
-from .FileAccess import *
+#from .FileAccess import *
 
 #
 # =============================================================================
@@ -867,6 +867,30 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 # =============================================================================
 #
 
-# Create a sample_data variable with sample data for the package.
-with resources.open_text('EMGFlow', 'sample_data.csv') as file:
-    sample_data = pd.read_csv(file)
+# Load the CSV file
+sample_data = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data.csv")))
+
+
+def make_sample_data():
+    """
+    Creates a template file structure and writes the sample_data file to the
+    local directory for working with examples.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    # Create directories
+    directories = ['Raw', 'Notch', 'Bandpass', 'Smooth', 'Feature']
+    for directory in directories:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    
+    # Write data
+    data_path = os.path.join('Raw','sample_data.csv')
+    if not os.path.exists(data_path):
+        sample_data.to_csv(data_path, index=False)
+    
+    return
