@@ -867,6 +867,72 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 # =============================================================================
 #
 
+def make_path_dict(raw_path='Raw', notch_path='Notch', bandpass_path='Bandpass', smooth_path='Smooth', feature_path='Feature'):
+    """
+    Generates a dictionary of filepaths to signal data.
+
+    Parameters
+    ----------
+    raw_path : str, optional
+        Path to the raw data. The default is 'Raw'.
+    notch_path : str, optional
+        Path to the notch filtered data. The default is 'Notch'.
+    bandpass_path : str, optional
+        Path to the bandpass filtered data. The default is 'Bandpass'.
+    smooth_path : str, optional
+        Path to the smooth filtered data. The default is 'Smooth'.
+    feature_path : str, optional
+        Path to the feature data. The default is 'Feature'.
+
+    Returns
+    -------
+    path_dict : TYPE
+        DESCRIPTION.
+
+    """
+    
+    path_dict = {
+        'Raw':raw_path,
+        'Notch':notch_path,
+        'Bandpass':bandpass_path,
+        'Smooth':smooth_path,
+        'Feature':feature_path
+    }
+    return path_dict
+
+def CleanSignals(path_names, sampling_rate=2000):
+    """
+    Automates the EMG preprocessing workflow, performing notch filtering,
+    bandpass filtering and smoothing.
+
+    Parameters
+    ----------
+    path_names : dict
+        Dictionary containing path locations for writing and reading Signal
+        data between paths.
+    sampling_rate : float
+        Sampling rate of the Signal.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    # Default values for notch filtering and window size
+    notch = [(50,5)]
+    window_size = 50
+    
+    # Automatically runs through workflow
+    NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch)
+    BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
+    SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], window_size)
+    return
+
+#
+# =============================================================================
+#
+
 # Load the CSV file
 sample_data = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data.csv")))
 

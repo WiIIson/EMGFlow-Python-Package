@@ -1258,5 +1258,5 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
             # Add values to the dataframe
             SignalDF.loc[len(SignalDF.index)] = df_vals
             
-    SignalDF.to_csv(out_path + 'Features.csv', index=False)
+    SignalDF.to_csv(os.path.join(out_path, 'Features.csv'), index=False)
     return SignalDF
