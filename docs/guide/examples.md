@@ -72,22 +72,49 @@ smooth_window = 50
 # Columns containing data for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Preprocess signals
+# 1. Apply notch filters
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+
+# 2. Apply bandpass filter
 EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
+
+# 3. Apply smoothing filter
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
-# Extract features and save results in "Features.csv" in feature_path
+# 4. Extract features
 df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
+```
+
+### Complete pipeline with streamlined pipeline
+
+A simple example using the streamlined form of the complete pipeline.
+
+```python
+import EMGFlow
+
+# Load sample data
+EMGFlow.make_sample_data()
+
+# Set sampling rate
+sampling_rate = 2000
+
+# Load path dictionary
+path_names = EMGFlow.make_path_dict()
+
+# Clean data
+EMGFlow.CleanSignals(path_names)
+
+# Extract features
+df = EMGFlow.ExtractFeatures(path_names['Bandpass'], path_names['Smooth'], path_names['Feature'], sampling_rate)
 ```
 
 ## Advanced examples
 
 The advanced examples can ran by copying and pasting the code into a Python environment.
 
-In addition, they require having a local "data" folder, with "raw", "notch", "notch_s", "bandpass", "smoothed" and "feature" subfolders. The "raw" subfolder is required to have one or more emotional CSV files inside.
+In addition, they require having a local "data" folder, with "raw", "notch", "notch_s", "bandpass", "smoothed" and "feature" subfolders. The "raw" subfolder is required to have one or more signal CSV files inside.
 
-The `cols` parameter may need to be modified to contain some of the column names of the emotional CSV in the "raw" subfolder.
+The `cols` parameter may need to be modified to contain some of the column names of the signal CSV in the "raw" subfolder.
 
 They serve more as a template of how analysis can be done, to be replicated with your own data.
 
