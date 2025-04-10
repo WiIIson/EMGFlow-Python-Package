@@ -867,7 +867,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 # =============================================================================
 #
 
-def make_path_dict(raw_path='Raw', notch_path='Notch', bandpass_path='Bandpass', smooth_path='Smooth', feature_path='Feature'):
+def make_path_dict(raw_path=os.path.join('Data', 'Raw'), notch_path=os.path.join('Data', 'Notch'), bandpass_path=os.path.join('Data', 'Bandpass'), smooth_path=os.path.join('Data', 'Smooth'), feature_path=os.path.join('Data', 'Feature')):
     """
     Generates a dictionary of filepaths to signal data.
 
@@ -949,13 +949,18 @@ def make_sample_data():
     """
     
     # Create directories
-    directories = ['Raw', 'Notch', 'Bandpass', 'Smooth', 'Feature']
+    directories = ['Data',
+                   os.path.join('Data', 'Raw'),
+                   os.path.join('Data', 'Notch'),
+                   os.path.join('Data', 'Bandpass'),
+                   os.path.join('Data', 'Smooth'),
+                   os.path.join('Data', 'Feature')]
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
     
     # Write data
-    data_path = os.path.join('Raw','sample_data.csv')
+    data_path = os.path.join('Data', 'Raw','sample_data.csv')
     if not os.path.exists(data_path):
         sample_data.to_csv(data_path, index=False)
     

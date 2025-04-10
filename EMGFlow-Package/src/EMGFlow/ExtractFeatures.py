@@ -1024,22 +1024,17 @@ def CalcSBW(psd, p=2):
 # =============================================================================
 #
 
-def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
+def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
     Analyze Signals by performing a collection of analyses on them and saving a
     feature file.
 
     Parameters
     ----------
-    in_bandpass : str
-        File location for reading in bandpass files. These files are used for
-        generating spectral features, as smoothed files can impact the
-        accuracy. If no bandpass files are available, the same file location
-        can be used as for in_smooth.
-    in_smooth : str
-        File location for reading in smoothed files.
-    out_path : str
-        Output location for feature file.
+    path_names : [str] dict
+        A dictionary of path names for reading data. Required paths are: Notch,
+        Bandpass and Feature. The dictionary can be created with the
+        make_path_dict function.
     sampling_rate : float
         Sampling rate for all Signals read (all files in in_bandpass and
         in_smooth).
@@ -1081,6 +1076,10 @@ def ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, 
     None.
 
     """
+    
+    in_bandpass = path_names['Bandpass']
+    in_smooth = path_names['Smooth']
+    out_path = path_names['Feature']
     
     if expression is not None:
         try:

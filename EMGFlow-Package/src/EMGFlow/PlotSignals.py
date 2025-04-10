@@ -268,23 +268,21 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 #
 
 # Creates a shiny app object that can be ran
-def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv', autorun=True):
+def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun=True):
     """
     Generate a shiny dashboard of different processing stages for a given column.
 
     Parameters
     ----------
-    in_paths : str list
-        List of string filepaths to a directories containing Signal files.
-        Directories should contain the same file names, but don't have to keep
-        the same hierarchy.
+    path_names : [str] dict
+        A dictionary of path names for reading data. The function will generate
+        graphs for as many paths are provided in the dictionary. The dictionary
+        can be created with the make_path_dict function.
     col : str
         String column name to display the visualization.
     units : str
         Units to use for the y axis of the plot, should be same units used for
         column values.
-    names : str list
-        List of names to display as the legend for the different paths provided.
     expression : str, optional
         String regular expression. If provided, will only create visualizations
         for Signal files whose names match the regular expression, and will
@@ -319,6 +317,9 @@ def GenPlotDash(in_paths, col, units, names, expression=None, file_ext='csv', au
     If autorun is True, returns None. If False, returns a shiny.App instance.
 
     """
+    
+    in_paths = list(path_names.values())
+    names = list(path_names.keys())
     
     if expression is not None:
         try:
