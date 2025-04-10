@@ -4,7 +4,7 @@ outline: deep
 
 # API Overview
 
-EMGFlow is broken into 5 models - FileIO, preprocessing signals, feature extraction, detecting outliers, and generating visualizations.
+EMGFlow is broken into 5 modules - FileIO, preprocessing signals, feature extraction, detecting outliers, and generating visualizations.
 
 ## File Format
 
