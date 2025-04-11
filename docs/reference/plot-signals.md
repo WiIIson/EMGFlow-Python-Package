@@ -13,13 +13,13 @@ Creates a HTML dashboard from a series of signal file paths to compare filtering
 The visualization is created in the default browser, and is opened automatically.
 
 ```python
-GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ext='csv', autorun=True)
+GenPlotDash(path_names, sampling_rate, col, units, expression=None, file_ext='csv', autorun=True)
 ```
 
 **Parameters:**
 
-`in_paths`: str list
-- List of string filepaths to a directories containing Signal files. Directories should contain the same file names, but don't have to keep the same hierarchy.
+`in_paths`: str dict
+- Dictionary of string filepaths to a directories containing Signal files. Directories should contain the same file names, but don't have to keep the same hierarchy. The keys of the dictionary will be used as the legend of the graphs, and will automatically ignore the `Feature` key.
 
 `sampling_rate`: int/float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
@@ -29,9 +29,6 @@ GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ex
 
 `units`: str
 - Units to use for the y axis of the plot, same units used for the column values.
-
-`names`: str list
-- List of names to use as the legend for the different paths provided
 
 `expression`: str (None)
 - String regular expression. If provided, will only create visualizations for `Signal` files whose names match the regular expression, and will ignore everything else.
@@ -48,7 +45,7 @@ GenPlotDash(in_paths, sampling_rate, col, units, names, expression=None, file_ex
 
 **Error**
 
-Raises an error if the directories in `in_paths` don't contain the same files.
+Raises an error if the directories referenced in `path_names` don't contain the same files.
 
 Raises an error if `col` is not found in a dataframe.
 
@@ -61,9 +58,9 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-band_path = '/data/bandpass'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+band_path = 'data/bandpass'
 s_paths = [raw_path, notch_path, band_path]
 
 sr = 2000
@@ -75,8 +72,6 @@ EMGFlow.GenPlotDash(s_paths, sr, col, units, names)
 ```
 
 <img src="./images/GenPlotDashEx.png" width="500">
-
-
 
 ## `PlotSpectrum`
 
@@ -135,15 +130,13 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw'
-plot_path = '/plots'
+raw_path = 'data/raw'
+plot_path = 'plots'
 
 sr = 2000
 
 EMGFlow.PlotSpectrum(raw_path, plot_path, sr)
 ```
-
-
 
 ## `PlotCompareSignals`
 
@@ -201,9 +194,9 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = '/data/raw'
-notch_path = '/data/notch'
-plot_path = '/plots'
+raw_path = 'data/raw'
+notch_path = 'data/notch'
+plot_path = 'plots'
 
 sr = 2000
 
