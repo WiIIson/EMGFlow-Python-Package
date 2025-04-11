@@ -1260,7 +1260,7 @@ SBW = EMGFlow.CalcSBW(psd)
 
 **Description**
 
-Extracts usable features from two sets of `Signal` files (before and after being smoothed). Writes output to a new folder directory, as specified in `out_path`. Output is both saved to disk as a plaintext file, "Features.csv", and returned as a dataframe object.
+Extracts usable features from two sets of `Signal` files (before and after being smoothed). Writes output to a new folder directory, as specified by the `Feature` key value of the `path_names` dictionary. Output is both saved to the disk as a plaintext file, "Features.csv", and is also returned as a dataframe object.
 
 Components of a "`Signal` file":
 - Has a column named `Time` containing time indexes
@@ -1269,7 +1269,7 @@ Components of a "`Signal` file":
 
 All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
 ```python
-ExtractFeatures(in_bandpass, in_smooth, out_path, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
+ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
 ```
 
 **Theory**
@@ -1278,14 +1278,8 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 **Parameters**
 
-`in_bandpass`: str
-- String filepath to a directory containing `Signal` files. The files contained within should not have a smoothing filter applied.
-
-`in_smooth`: str
-- String filepath to a directory containing `Signal` files. The files contained within should have a smoothing filter applied.
-
-`out_path`: str
-- String filepath to a directory for output feature file.
+`path_names`: dictionary of strings
+- A dictionary of keys (stage of preprocessing) and values (filepath to that stage). The provided dictionary is required to have a `Bandpass`, `Smooth` and `Feature` path.
 
 `sampling_rate`: int/float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
@@ -1312,33 +1306,31 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 **Error**
 
-Raises an error if `in_bandpass` and `in_smooth` don't contain the same files.
+Raises an error if `path_names` does not contain a `Bandpass`, `Smooth` and `Feature` path.
 
-Raises an error if the files from `in_bandpass` and `in_smooth` don't contain `col`.
+Raises an error if files found in the `Bandpass` and `Smooth` filepath values don't contain the same files.
+
+Raises an error if the files found in the `Bandpass` and `Smooth` filepath values don't contain `col`.
 
 Raises an error if `sampling_rate` is less or equal to 0.
 
 Raises a warning if `expression` causes all files to be filtered out.
 
-Raises an error if a file cannot be read in `in_bandpass` or `in_smooth`.
+Raises an error if a file cannot be read in the `Bandpass` or `Smooth` filepath values.
 
 Raises an error if an unsupported file format was provided for `file_ext`.
 
 **Example**
 
 ```python
-bandpass_path = '/data/bandpass'
-smooth_path = '/data/smooth'
-feature_path = '/data/features'
+path_names = EMGFlow.make_path_dict()
 sampling_rate = 2000
 cols = ['EMG_zyg', 'EMG_cor']
 
 # Extracts all features from the files in bandpass_path and
 # smooth_path. Assumes the same files are in both paths.
-features = EMGFlow.ExtractFeatures(bandpass_path, smooth_path, feature_path, sampling_rate, cols)
+features = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 ```
-
-
 
 ## Sources
 

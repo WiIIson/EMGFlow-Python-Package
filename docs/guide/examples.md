@@ -152,6 +152,14 @@ band_path = 'data/bandpass'
 smooth_path = 'data/smoothed'
 feature_path = 'data/feature'
 
+path_names = {
+	'Raw': raw_path,
+	'Notch': notch_path_s, # Use the notch path with all filters applied
+	'Bandpass': band_path,
+	'Smooth': smooth_path,
+	'Feature': feature_path
+}
+
 # Sampling rate
 sampling_rate = 2000
 
@@ -175,7 +183,7 @@ EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, 
 EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
 
 # Extract features and save results in "Features.csv" in feature_path
-df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
+df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 ```
 
 ### Calling native feature extraction routines
