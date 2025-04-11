@@ -10,14 +10,75 @@ This page demonstrates how to use EMGFlow with simple and more advanced examples
 
 The simple examples can run by copying and pasting the code into a Python environment. The only requirement is for the EMGFlow package to be installed
 
-### Cleaning, visualization, and feature extraction
+### Automated Preprocessing and Extraction Pipeline
 
-A simple example outlining EMG preprocessing.
+A simple example outlining EMG preprocessing and feature extraction using the automated functions.
 
 ```python
 import EMGFlow
 
-# Load built-in data
+# Load sample data
+EMGFlow.make_sample_data()
+
+# Set sampling rate
+sampling_rate = 2000
+
+# Load path dictionary
+path_names = EMGFlow.make_path_dict()
+
+# Clean data
+EMGFlow.CleanSignals(path_names)
+
+# Extract features
+df = EMGFlow.ExtractFeatures(path_names, sampling_rate)
+```
+
+### Manual Preprocessing and Extraction Pipeline
+
+A simple example outlining EMG preprocessing and feature extraction using manual parameter selection.
+
+```python
+import EMGFlow
+
+# Load sample data
+EMGFlow.make_sample_data()
+
+# Paths for data files
+path_names = EMGFlow.make_path_dict()
+
+# Sampling rate
+sampling_rate = 2000
+
+# Filter parameters
+notch_vals = [(50, 5)]
+band_low = 20
+band_high = 140
+smooth_window = 50
+
+# Columns containing data for preprocessing
+cols = ['EMG_zyg', 'EMG_cor']
+
+# 1. Apply notch filters
+EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+
+# 2. Apply bandpass filter
+EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
+
+# 3. Apply smoothing filter
+EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
+
+# 4. Extract features
+df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
+```
+
+### Dataframe Preprocessing Pipeline
+
+A simple example outlining EMG preprocessing using a loaded dataframe.
+
+```python
+import EMGFlow
+
+# Load built-in dataframe
 sample_data = EMGFlow.sample_data
 
 # Sampling rate
@@ -43,51 +104,9 @@ sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, b
 sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[1], smooth_window)
 ```
 
-### Complete pipeline with project data
+### Preprocessing and Plotting Pipeline
 
-A simple example outlining the four main steps of the EMG processing pipeline.
-
-```python
-import EMGFlow
-
-# Load sample data
-EMGFlow.make_sample_data()
-
-# Paths for data files
-raw_path = 'Raw'
-notch_path = 'Notch'
-band_path = 'Bandpass'
-smooth_path = 'Smooth'
-feature_path = 'Feature'
-
-# Sampling rate
-sampling_rate = 2000
-
-# Filter parameters
-notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
-smooth_window = 50
-
-# Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
-
-# 1. Apply notch filters
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
-
-# 2. Apply bandpass filter
-EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
-
-# 3. Apply smoothing filter
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
-
-# 4. Extract features
-df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sampling_rate, cols)
-```
-
-### Complete pipeline with streamlined pipeline
-
-A simple example using the streamlined form of the complete pipeline.
+A simple example outlining EMG preprocessing and plotting.
 
 ```python
 import EMGFlow
@@ -104,8 +123,8 @@ path_names = EMGFlow.make_path_dict()
 # Clean data
 EMGFlow.CleanSignals(path_names)
 
-# Extract features
-df = EMGFlow.ExtractFeatures(path_names['Bandpass'], path_names['Smooth'], path_names['Feature'], sampling_rate)
+# Plot data
+EMGFlow.GenPlotDash(path_names, 'EMG_zyg', 'mV')
 ```
 
 ## Advanced examples
