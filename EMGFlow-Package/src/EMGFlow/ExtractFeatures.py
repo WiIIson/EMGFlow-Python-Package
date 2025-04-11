@@ -1057,13 +1057,16 @@ def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_
     Raises
     ------
     Exception
-        An exception is raised if in_bandpass and in_smooth do not contain the
+        An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not
+        keys of the path_names dictionary provided
+    Exception
+        An exception is raised if Bandpass and Smooth (keys) do not contain the
         same files
     Exception
         An exception is raised if p is not greater than 0
     Exception
-        Raises an exception if a file cannot not be read in in_bandpass or
-        in_smooth.
+        Raises an exception if a file cannot not be read in Bandpass or
+        Smooth.
     Exception
         Raises an exception if an unsupported file format was provided for
         file_ext.
@@ -1076,6 +1079,13 @@ def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_
     None.
 
     """
+    
+    if 'Bandpass' not in path_names:
+        raise Exception('Bandpass path not detected in provided dictionary (path_names)')
+    if 'Smooth' not in path_names:
+        raise Exception('Smooth path not detected in provided dictionary (path_names)')
+    if 'Feature' not in path_names:
+        raise Exception('Feature path not detected in provided dictionary (path_names)')
     
     in_bandpass = path_names['Bandpass']
     in_smooth = path_names['Smooth']
