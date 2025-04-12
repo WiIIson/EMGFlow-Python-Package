@@ -27,7 +27,6 @@ bibliography: paper.bib
 
 # Statement of Need
 
-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Although several packages exist for processing physiological and neurological signals, support for sEMG has remained limited. Many packages lack a comprehensive set of features that can be extracted from sEMG data, leaving researchers to use a patchwork of tools. Other packages are orientated around event detection in individual recordings and use a GUI-based workflow that requires more manual intervention. While this design works well for processing unedited continuous recordings of a single participant, it complicates the extraction of features from large datasets common to machine learning [@abadi_decaf_2015; @chen_emotion_2022; @koelstra_deap_2012; @schmidt_introducing_2018; @sharma_dataset_2019; @zhang_biovid_2016].
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flexible pipeline for extracting a wide range of sEMG features, with a scalable design suited for large datasets.
@@ -61,8 +60,6 @@ notch_vals = [(50,5)]
 # Apply notch filter to raw sEMG files
 EMGFlow.NotchFilterSignals(raw_path, notch_path, sr, notch_vals, cols)
 ```
-
-
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Additional arguments allow users to customize which files are selected and how they are processed. Filtering functions accept an optional regex argument, allowing users to apply filters to specific files. Most functions use common sense defaults, which can be modified task-wide or for select cases. For example, in North America, mains electricity is nominally supplied at 120 VAC 60 Hz, while other countries may supply power at 200-240 VAC 50Hz. This variation in frequency requires different notch filter settings depending on where the data were recorded. _EMGFlow_ accommodates this need by allowing the user to specify the frequency and quality factor of the applied filter. Extending our first example, we now apply an additional notch filter to a subset of files exhibiting noise at 150 Hz, the 3rd harmonic of the mains source.
 
@@ -120,34 +117,36 @@ EMGFlow.GenPlotDash(in_paths, sampling_rate, show_col, units, labels)
 
 ## Feature Extraction Routines
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Following data preprocessing, the signal files are ready for feature extraction. _EMGFlow_ extracts 32 features that capture information in both time and frequency domains. The set of 18 time-domain features capture standard statistical moments, including mean, variance, skew, and kurtosis, along with sEMG-specific measures. These include features such as Willison amplitude, an indicator of motor unit firing calculated as the number of times the sEMG amplitude exceeds a threshold, and log-detector, an estimate of the exerted muscle force [@tkach_study_2010]. 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Following data preprocessing, the signal files are ready for feature extraction. _EMGFlow_ extracts 32 features that capture information in both time and frequency domains. The set of 17 time-domain features capture standard statistical moments, including mean, variance, skew, and kurtosis, along with sEMG-specific measures. These include features such as Willison amplitude, an indicator of motor unit firing calculated as the number of times the sEMG amplitude exceeds a threshold, and log-detector, an estimate of the exerted muscle force [@tkach_study_2010]. 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A set of 12 frequency-domain features are also extracted, providing information on the shape and distribution of the signal’s power spectrum. Measures such as median frequency [@phinyomark2009novel] provide insight into changes in muscle fibre conduction velocity and are used in the assessment of muscle fatigue [@van1983changes; @lindstrom1977electromyographic; @mcmanus_analysis_2020]. Standard frequency measures include spectral centroid, flatness, entropy, and roll-off. One novel sEMG feature introduced here is Twitch Ratio, an adaptation of Alpha Ratio from speech signal analysis [@eyben_geneva_2016]. Twitch Ratio is defined as the ratio of energy contained in the upper versus lower power spectrum, with a threshold of 60 Hz to delineate slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A set of 15 frequency-domain features are also extracted, providing information on the shape and distribution of the signal’s power spectrum. Measures such as median frequency [@phinyomark2009novel] provide insight into changes in muscle fibre conduction velocity and are used in the assessment of muscle fatigue [@van1983changes; @lindstrom1977electromyographic; @mcmanus_analysis_2020]. Standard frequency measures include spectral centroid, flatness, entropy, and roll-off. One novel sEMG feature introduced here is Twitch Ratio, an adaptation of Alpha Ratio from speech signal analysis [@eyben_geneva_2016]. Twitch Ratio is defined as the ratio of energy contained in the upper versus lower power spectrum, with a threshold of 60 Hz to delineate slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Here, we demonstrate feature extraction in *EMGFlow*. After specifying locations of preprocessed files, features are summarized into a single CSV file, containing rows for each file analyzed, as shown below.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_ has been designed to allow researchers without extensive knowledge of signal processing to analyze sEMG data. Here we present a simple workflow example that produces extracted features in only two lines of code. The example datasets used below are available with the package, and can be generated with the `make_sample_data` function. This function generates sample data files, and returns a series of file paths required for subsequent preprocessing steps. The `CleanSignals` function is a high-level wrapper that sequentially calls the three preprocessing functions for applying notch, bandpass and smoothing filters.
 
 ```python
-# Path where feature table will be written to disk
-feature_path = 'Data/05_Feature'
+import EMGFlow
 
-# Extracts features
-df = EMGFlow.ExtractFeatures(band_path, smooth_path, feature_path, sr, cols)
+# Load sample data
+EMGFlow.make_sample_data()
 
-# Print first few rows of extracted features table. The “File_ID” column
-# contains the names of the files extracted, and the additional columns take
-# the format “[Column name]_[Feature name]”.
-df.head()
+# Set sampling rate
+sampling_rate = 2000
+
+# Load path dictionary
+path_names = EMGFlow.make_path_dict()
+
+# Clean data
+EMGFlow.CleanSignals(path_names)
+
+# Extract features
+df = EMGFlow.ExtractFeatures(path_names, sampling_rate)
 """
-File_ID column contains
+df dataframe contains
 
-        File_ID  EMG_zyg_Min  ...  EMG_cor_Spec_Rolloff  EMG_cor_Spec_Bandwidth
-0  01-01-01.csv     0.000826  ...              0.040222             1424.933862
-1  01-01-02.csv     0.000740  ...              0.019559             2651.987804
-2  01-01-03.csv     0.000780  ...              0.065183             2021.345274
-3  01-01-04.csv     0.000660  ...              0.087384             1755.834836
-4  01-01-05.csv     0.000697  ...              0.057368             1174.562467
+        File_ID     EMG_zyg_Min   ...     EMG_cor_Spec_Rolloff  EMG_cor_Spec_Bandwidth
+0  sample_data.csv  0.002859      ...     4                     196.068942
 
-[5 rows x 61 columns]
+[1 rows x 65 columns]
 """
 ```
 
