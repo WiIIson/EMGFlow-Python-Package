@@ -21,6 +21,9 @@ path_names = EMGFlow.make_sample_data()
 # Preprocess signals
 EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
 
+# Plot data on the "EMG_zyg" column
+EMGFlow.GenPlotDash(path_names, 'EMG_zyg', 'mV')
+
 # Extract features and save results in "Features.csv" in feature_path
 df = EMGFlow.AnalyzeSignals(path_names, sampling_rate = 2000)
 ```

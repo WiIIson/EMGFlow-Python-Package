@@ -6,34 +6,11 @@ outline: deep
 
 This page demonstrates how to use EMGFlow with simple and more advanced examples.
 
-## Simple examples
+## Simple Examples
 
 The simple examples can run by copying and pasting the code into a Python environment. The only requirement is for the EMGFlow package to be installed
 
-### Automated Preprocessing and Extraction Pipeline
-
-A simple example outlining EMG preprocessing and feature extraction using the automated functions.
-
-```python
-import EMGFlow
-
-# Load sample data
-EMGFlow.make_sample_data()
-
-# Set sampling rate
-sampling_rate = 2000
-
-# Load path dictionary
-path_names = EMGFlow.make_path_dict()
-
-# Clean data
-EMGFlow.CleanSignals(path_names)
-
-# Extract features
-df = EMGFlow.ExtractFeatures(path_names, sampling_rate)
-```
-
-### Manual Preprocessing and Extraction Pipeline
+### Using Custom Filter Parameters
 
 A simple example outlining EMG preprocessing and feature extraction using manual parameter selection.
 
@@ -71,7 +48,7 @@ EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth
 df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 ```
 
-### Dataframe Preprocessing Pipeline
+### Working with individual files
 
 A simple example outlining EMG preprocessing using a loaded dataframe.
 
@@ -123,7 +100,7 @@ path_names = EMGFlow.make_path_dict()
 # Clean data
 EMGFlow.CleanSignals(path_names)
 
-# Plot data
+# Plot data on the "EMG_zyg" column
 EMGFlow.GenPlotDash(path_names, 'EMG_zyg', 'mV')
 ```
 
