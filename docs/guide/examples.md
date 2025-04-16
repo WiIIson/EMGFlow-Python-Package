@@ -4,11 +4,9 @@ outline: deep
 
 # Examples
 
-This page demonstrates how to use EMGFlow with simple and more advanced examples.
+This page demonstrates how to use EMGFlow with simple and more advanced examples. The examples can be ran by copying and pasting the code into a Python environment, ensuring the appropriate packages have been installed.
 
 ## Simple Examples
-
-The simple examples can run by copying and pasting the code into a Python environment. The only requirement is for the EMGFlow package to be installed
 
 ### Using Custom Filter Parameters
 
@@ -17,11 +15,8 @@ A simple example outlining EMG preprocessing and feature extraction using manual
 ```python
 import EMGFlow
 
-# Load sample data
-EMGFlow.make_sample_data()
-
-# Paths for data files
-path_names = EMGFlow.make_path_dict()
+# Load sample data and get path dictionary
+path_names = EMGFlow.make_sample_data()
 
 # Sampling rate
 sampling_rate = 2000
@@ -48,15 +43,20 @@ EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth
 df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 ```
 
-### Working with individual files
+### Working With Individual Files
 
 A simple example outlining EMG preprocessing using a loaded dataframe.
 
 ```python
 import EMGFlow
+import os
+import pandas as pd
 
-# Load built-in dataframe
-sample_data = EMGFlow.sample_data
+# Load sample data and get path dictionary
+path_names = EMGFlow.make_sample_data()
+
+# Load dataframe from generated data
+sample_data = pd.read_csv(os.path.join(path_names['Raw'], 'sample_data_01.csv'))
 
 # Sampling rate
 sampling_rate = 2000
@@ -81,61 +81,17 @@ sample_data = EMGFlow.ApplyBandpassFilter(sample_data, cols[1], sampling_rate, b
 sample_data = EMGFlow.ApplyRMSSmooth(sample_data, cols[1], smooth_window)
 ```
 
-### Preprocessing and Plotting Pipeline
+## Advanced Examples
 
-A simple example outlining EMG preprocessing and plotting.
-
-```python
-import EMGFlow
-
-# Load sample data
-EMGFlow.make_sample_data()
-
-# Set sampling rate
-sampling_rate = 2000
-
-# Load path dictionary
-path_names = EMGFlow.make_path_dict()
-
-# Clean data
-EMGFlow.CleanSignals(path_names)
-
-# Plot data on the "EMG_zyg" column
-EMGFlow.GenPlotDash(path_names, 'EMG_zyg', 'mV')
-```
-
-## Advanced examples
-
-The advanced examples can ran by copying and pasting the code into a Python environment.
-
-In addition, they require having a local "data" folder, with "raw", "notch", "notch_s", "bandpass", "smoothed" and "feature" subfolders. The "raw" subfolder is required to have one or more signal CSV files inside.
-
-The `cols` parameter may need to be modified to contain some of the column names of the signal CSV in the "raw" subfolder.
-
-They serve more as a template of how analysis can be done, to be replicated with your own data.
-
-### Custom filters for individiual files
+### Custom Filters for Individiual Files
 
 A more advanced example applying conditional filters based on file names.
 
 ```python
 import EMGFlow
 
-# Paths for data files
-raw_path = 'data/raw'
-notch_path = 'data/notch'
-notch_path_s = 'data/notch_s'
-band_path = 'data/bandpass'
-smooth_path = 'data/smoothed'
-feature_path = 'data/feature'
-
-path_names = {
-	'Raw': raw_path,
-	'Notch': notch_path_s, # Use the notch path with all filters applied
-	'Bandpass': band_path,
-	'Smooth': smooth_path,
-	'Feature': feature_path
-}
+# Load sample data and get path dictionary
+path_names = EMGFlow.make_sample_data()
 
 # Sampling rate
 sampling_rate = 2000
@@ -146,20 +102,20 @@ band_low = 20
 band_high = 140
 smooth_window = 50
 
-# Filter parameters for files that start with "08" or "11"
+# Filter parameters for the "sample_data_01.csv" file
 notch_vals_s = [(45, 1), (60, 5)]
-reg_str = '^(08|11)'
+reg_str = '^sample_data_01'
 
 # Columns containing data for preprocessing
-cols = ['col1', 'col2']
+cols = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
-EMGFlow.NotchFilterSignals(notch_path, notch_path_s, sampling_rate, notch_vals_s, cols, expression=reg_str, exp_copy=True)
-EMGFlow.BandpassFilterSignals(notch_path_s, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
+EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_s, cols, expression=reg_str)
+EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
 
-# Extract features and save results in "Features.csv" in feature_path
+# Extract features
 df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 ```
 
@@ -167,42 +123,38 @@ df = EMGFlow.ExtractFeatures(path_names, sampling_rate, cols)
 
 A more advnaced example using custom feature extraction functions.
 
-This example is intended to be used as a template for extracting only specific features from emotional data. It makes use of the `tqdm` library, which helps visualize loops for lengthy processes, such as large EMG processing workflows.
-
 ```python
 import EMGFlow
+import os
+import pandas as pd
 import tqdm
 
 # Paths for data files
-raw_path = 'data/raw'
-notch_path = 'data/notch'
-band_path = 'data/bandpass'
-smooth_path = 'data/smoothed'
-feature_path = 'data/feature'
+path_names = EMGFlow.make_sample_data()
 
 # Sampling rate
 sampling_rate = 2000
 
-# Filter parameters
+# Custom filter parameters
 notch_vals = [(50, 5)]
 band_low = 20
 band_high = 140
 smooth_window = 50
 
 # Columns containing data for preprocessing
-cols = ['col1', 'col2']
+cols = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
-EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high, cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, smooth_window, cols)
+EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
+EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
 
-# Custom analysis function code below:
-filedirs_b = MapFiles(band_path)
-filedirs_s = MapFiles(smooth_path)
+# Map locations of files to process
+filedirs_b = EMGFlow.MapFiles(path_names['Bandpass'])
+filedirs_s = EMGFlow.MapFiles(path_names['Smooth'])
 
+# List of measures to extract
 measure_names = [
-  'File_ID', # File ID column is necessary
   'IEMG',
   'MAV',
   'MMAV',
@@ -210,38 +162,50 @@ measure_names = [
   # ... put column names for additional features here
 ]
 
-SignalDF = pd.DataFrame(columns=measure_names)
+# Construct columns for each combination of data file column and features
+df_names = ['File_ID']
+for col in cols:
+    for measure in measure_names:
+        df_names.append(col + '_' + measure)
+
+SignalDF = pd.DataFrame(columns=df_names)
 filetype = 'csv'
 
 # Extract features
 for file in tqdm.tqdm(filedirs_b):
-	if (file[-len(filetype):] == filetype):
-		data_b = pd.read_csv(filedirs_b[file])
-		data_s = pd.read_csv(filedirs_s[file])
+    if (file[-len(filetype):] == filetype):
+        data_b = pd.read_csv(filedirs_b[file])
+        data_s = pd.read_csv(filedirs_s[file])
 		
-		File_ID = file
-		IEMG = EMGFlow.CalcIEMG(data_s, col, sampling_rate)
-		MAV = EMGFlow.CalcMAV(data_s, col)
-		MMAV = EMGFlow.CalcMMAV(data_s, col)
-		# ... calculate additional time-series features here
-
-		psd = EMGFlow.EMG2PSD(data_b[col], sampling_rate)
-		Spec_Centroid = EMGFlow.CalcSC(psd)
-		# ... calculate additional spectral features here
-		
-		# Create list of measures (should match measure_names)
-		col_vals = [
-			File_ID,
-			IEMG,
-			MAV,
-			MMAV,
-			Spec_Centroid,
-			# ... put additional features here
-		]
-		
+        File_ID = file
+        df_vals = [File_ID]
+        
+        # Make sure to make the same calculations as in measure_names
+        for col in cols:
+            IEMG = EMGFlow.CalcIEMG(data_s, col, sampling_rate)
+            MAV = EMGFlow.CalcMAV(data_s, col)
+            MMAV = EMGFlow.CalcMMAV(data_s, col)
+    		# ... calculate additional time-series features here
+    
+            psd = EMGFlow.EMG2PSD(data_b[col], sampling_rate)
+            Spec_Centroid = EMGFlow.CalcSC(psd)
+    		# ... calculate additional spectral features here
+    		
+    		# Create list of measures (should match measure_names)
+            col_vals = [
+    			IEMG,
+    			MAV,
+    			MMAV,
+    			Spec_Centroid,
+    			# ... put additional features here
+    		]
+            
+            # Combine values into list
+            df_vals = df_vals + col_vals
+            
 		# Append to data frame
-		SignalDF.loc[len(SIgnalDF.inddex)] = df_vals
+        SignalDF.loc[len(SignalDF.index)] = df_vals
 
 # Save results in "Features.csv" file
-SignalDF.to_csv(feature_path + 'Features.csv', index=False)
+SignalDF.to_csv(os.path.join(path_names['Feature'], 'Features.csv'), index=False)
 ```
