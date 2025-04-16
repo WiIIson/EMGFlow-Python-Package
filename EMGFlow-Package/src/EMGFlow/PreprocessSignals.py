@@ -867,37 +867,40 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 # =============================================================================
 #
 
-def make_path_dict(raw_path=os.path.join('Data', 'Raw'), notch_path=os.path.join('Data', 'Notch'), bandpass_path=os.path.join('Data', 'Bandpass'), smooth_path=os.path.join('Data', 'Smooth'), feature_path=os.path.join('Data', 'Feature')):
+def make_paths(root=os.getcwd()):
     """
-    Generates a dictionary of filepaths to signal data.
+    Generates a file structure for signal files, and returns a dictionary of
+    the locations for these files.
+    
+    A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and
+    "Feature" subfolders
 
     Parameters
     ----------
-    raw_path : str, optional
-        Path to the raw data. The default is 'Raw'.
-    notch_path : str, optional
-        Path to the notch filtered data. The default is 'Notch'.
-    bandpass_path : str, optional
-        Path to the bandpass filtered data. The default is 'Bandpass'.
-    smooth_path : str, optional
-        Path to the smooth filtered data. The default is 'Smooth'.
-    feature_path : str, optional
-        Path to the feature data. The default is 'Feature'.
+    root : str, optional
+        Root of the data to be generated. The default is os.cwd().
 
     Returns
     -------
-    path_dict : TYPE
-        DESCRIPTION.
+    path_dict : [str] dict
+        A dictionary of file locations with keys for stage in the processing
+        pipeline.
 
     """
-    
+    # Create dictionary
     path_dict = {
-        'Raw':raw_path,
-        'Notch':notch_path,
-        'Bandpass':bandpass_path,
-        'Smooth':smooth_path,
-        'Feature':feature_path
+        'Raw':os.path.join(root, 'Data', 'Raw'),
+        'Notch':os.path.join(root, 'Data', 'Notch'),
+        'Bandpass':os.path.join(root, 'Data', 'Bandpass'),
+        'Smooth':os.path.join(root, 'Data', 'Smooth'),
+        'Feature':os.path.join(root, 'Data', 'Feature')
     }
+    
+    # Create folders
+    for value in path_dict.values():
+        os.makedirs(value, exist_ok=True)
+    
+    # Return dictionary
     return path_dict
 
 def CleanSignals(path_names, sampling_rate=2000):
@@ -933,14 +936,13 @@ def CleanSignals(path_names, sampling_rate=2000):
 # =============================================================================
 #
 
-# Load the CSV file
-sample_data = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data.csv")))
-
-
 def make_sample_data():
     """
-    Creates a template file structure and writes the sample_data file to the
-    local directory for working with examples.
+    Generates a file structure for signal files, writes sample data, and
+    returns a dictionary of the locations for these files.
+    
+    A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and
+    "Feature" subfolders
 
     Returns
     -------
@@ -948,20 +950,16 @@ def make_sample_data():
 
     """
     
-    # Create directories
-    directories = ['Data',
-                   os.path.join('Data', 'Raw'),
-                   os.path.join('Data', 'Notch'),
-                   os.path.join('Data', 'Bandpass'),
-                   os.path.join('Data', 'Smooth'),
-                   os.path.join('Data', 'Feature')]
-    for directory in directories:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    # Generate the paths
+    path_names = make_paths()
     
-    # Write data
-    data_path = os.path.join('Data', 'Raw','sample_data.csv')
+    # Load the sample data
+    sample_data = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data.csv")))
+    
+    # Write the sample data
+    data_path = os.path.join(path_names['Raw'], 'sample_data.csv')
     if not os.path.exists(data_path):
         sample_data.to_csv(data_path, index=False)
     
-    return
+    # Return the dictionary
+    return path_names
