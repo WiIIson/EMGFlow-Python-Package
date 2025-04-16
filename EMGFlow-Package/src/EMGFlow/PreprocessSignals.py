@@ -954,12 +954,16 @@ def make_sample_data():
     path_names = make_paths()
     
     # Load the sample data
-    sample_data = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data.csv")))
+    sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
+    sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
     
     # Write the sample data
-    data_path = os.path.join(path_names['Raw'], 'sample_data.csv')
-    if not os.path.exists(data_path):
-        sample_data.to_csv(data_path, index=False)
+    data_path_01 = os.path.join(path_names['Raw'], 'sample_data_01.csv')
+    data_path_02 = os.path.join(path_names['Raw'], 'sample_data_02.csv')
+    if not os.path.exists(data_path_01):
+        sample_data_01.to_csv(data_path_01, index=False)
+    if not os.path.exists(data_path_02):
+        sample_data_02.to_csv(data_path_02, index=False)
     
     # Return the dictionary
     return path_names
