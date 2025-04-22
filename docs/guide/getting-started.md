@@ -45,12 +45,23 @@ _EMGFlow_ accepts data in plaintext .CSV file format. Files should have the foll
 
 Note, the Time column can be omitted when the sample rate is known.
 
+## EMGFlow Pipeline Processing Steps
+
+```mermaid
+flowchart LR
+A[Raw data] --> B[Notch Filter]
+B --> C[Bandpass Filter]
+C --> D[Smooth Filter]
+D --> E[Extract Features]
+D --> F[Plot Signal]
+```
+
 ## EMGFlow Module Structure
 
 ```mermaid
 mindmap
     root((EMGFlow))
-        Extract Features
+        EF(Extract Features)
             CalcIEMG
             CalcMAV
             CalcMMAV
@@ -77,17 +88,17 @@ mindmap
             CalcSRoll
             CalcSBW
             ExtractFeatures
-        File Access
+        FA(File Access)
             ReadFileType
             MapFiles
             ConvertMapFiles
-        Detect Outliers
+        DO(Detect Outliers)
             DetectOutliers
-        Plot Signals
+        PS(Plot Signals)
             GenPlotDash
             PlotSpectrum
             PlotCompareSignals
-        Preprocess Signals
+        PrS(Preprocess Signals)
             EMG2PSD
             ApplyNotchFilters
             NotchFilterSignals
