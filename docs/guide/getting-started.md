@@ -47,7 +47,7 @@ Note, the Time column can be omitted when the sample rate is known.
 
 ## EMGFlow Module Structure
 
-::: mermaid
+```mermaid
 mindmap
     root((EMGFlow))
         Extract Features
@@ -99,4 +99,4 @@ mindmap
             ApplyGaussianSmooth
             ApplyLoessSmooth
             SmoothFilterSignals
-:::
+```

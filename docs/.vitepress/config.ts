@@ -74,4 +74,5 @@ export default withMermaid({
     // Add logo to navbar before site title (top left corner)
     logo: './EMGFlow.png',
   },
+  mermaid:{},
 })
