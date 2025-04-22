@@ -44,3 +44,59 @@ _EMGFlow_ accepts data in plaintext .CSV file format. Files should have the foll
 | 20.0     | -1.2   | ... |   1.7  |
 
 Note, the Time column can be omitted when the sample rate is known.
+
+## EMGFlow Module Structure
+
+::: mermaid
+mindmap
+    root((EMGFlow))
+        Extract Features
+            CalcIEMG
+            CalcMAV
+            CalcMMAV
+            CalcSSI
+            CalcVAR
+            CalcVOrder
+            CalcRMS
+            CalcWL
+            CalcWAMP
+            CalcLOG
+            CalcMFL
+            CalcAP
+            CalcSpecFlux
+            CalcMDF
+            CalcMNF
+            CalcTwitchRatio
+            CalcTwitchIndex
+            CalcTwitchSlope
+            CalcSC
+            CalcSF
+            CalcSS
+            CalcSDec
+            CalcSEntropy
+            CalcSRoll
+            CalcSBW
+            ExtractFeatures
+        File Access
+            ReadFileType
+            MapFiles
+            ConvertMapFiles
+        Detect Outliers
+            DetectOutliers
+        Plot Signals
+            GenPlotDash
+            PlotSpectrum
+            PlotCompareSignals
+        Preprocess Signals
+            EMG2PSD
+            ApplyNotchFilters
+            NotchFilterSignals
+            ApplyBandpassFilter
+            BandpassFilterSignals
+            ApplyFWR
+            ApplyBoxcarSmooth
+            ApplyRMSSmooth
+            ApplyGaussianSmooth
+            ApplyLoessSmooth
+            SmoothFilterSignals
+:::

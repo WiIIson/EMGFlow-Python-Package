@@ -1,7 +1,8 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid';
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid({
   title: "EMGFlow",
   titleTemplate: 'EMG Workflow',
   description: "The open workflow for EMG signal processing and feature extraction",
