@@ -99,9 +99,9 @@ def CalcMAV(Signal, col):
 # =============================================================================
 #
 
-def CalcMMAV(Signal, col):
+def CalcMMAV1(Signal, col):
     """
-    Calculate the Modified Mean Absolute Value (MMAV) of a Signal.
+    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a Signal.
 
     Parameters
     ----------
@@ -118,8 +118,8 @@ def CalcMMAV(Signal, col):
 
     Returns
     -------
-    MMAV : float
-        MMAV of the Signal.
+    MMAV1 : float
+        MMAV1 of the Signal.
 
     """
     
@@ -134,8 +134,52 @@ def CalcMMAV(Signal, col):
             total += vals[n]
         else:
             total += 0.5 * vals[n]
-    MMAV = total/N
-    return MMAV
+    MMAV1 = total/N
+    return MMAV1
+
+#
+# =============================================================================
+#
+
+def CalcMMAV2(Signal, col):
+    """
+    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a Signal.
+
+    Parameters
+    ----------
+    Signal : DataFrame
+        A Pandas DataFrame containing a 'Time' column, and additional columns
+        for signal data.
+    col : str
+        Column of the Signal to apply the summary to.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if col is not found in Signal.
+
+    Returns
+    -------
+    MMAV2 : float
+        MMAV2 of the Signal.
+
+    """
+    
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + col + " not in Signal")
+    
+    N = len(Signal[col])
+    vals = list(np.abs(Signal[col]))
+    total = 0
+    for n in range(N):
+        if (0.25*N <= n) and (n <= 0.75*N):
+            total += vals[n]
+        elif (0.25*N > n):
+            total += (4*n/N) * vals[n]
+        else:
+            total += (4*(i-N)/N) * vals[n]
+    MMAV2 = total/N
+    return MMAV2
 
 #
 # =============================================================================
@@ -1120,7 +1164,8 @@ def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_
         'Kurtosis',
         'IEMG',
         'MAV',
-        'MMAV',
+        'MMAV1',
+        'MMAV2',
         'SSI',
         'VAR',
         'VOrder',
@@ -1197,7 +1242,8 @@ def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_
                 Kurtosis = scipy.stats.kurtosis(data_s[col])
                 IEMG = CalcIEMG(data_s, col, sampling_rate)
                 MAV = CalcMAV(data_s, col)
-                MMAV = CalcMMAV(data_s, col)
+                MMAV1 = CalcMMAV1(data_s, col)
+                MMAV2 = CalcMMAV2(data_s, col)
                 SSI = CalcSSI(data_s, col, sampling_rate)
                 VAR = CalcVAR(data_s, col)
                 VOrder = CalcVOrder(data_s, col)
@@ -1235,7 +1281,8 @@ def ExtractFeatures(path_names, sampling_rate, cols=None, expression=None, file_
                     
                     IEMG,
                     MAV,
-                    MMAV,
+                    MMAV1,
+                    MMAV2,
                     SSI,
                     VAR,
                     VOrder,
