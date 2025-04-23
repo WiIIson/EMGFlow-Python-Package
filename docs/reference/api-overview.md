@@ -22,11 +22,6 @@ mindmap
         DO(Detect Outliers)
         PlS(Plot Signals)
         PrS(Preprocess Signals)
-click EF "https://wiiison.github.io/EMGFlow-Python-Package/reference/feature-extraction.html"
-click FA "https://wiiison.github.io/EMGFlow-Python-Package/reference/file-access.html"
-click DO "https://wiiison.github.io/EMGFlow-Python-Package/reference/outlier-detection.html"
-click PlS "https://wiiison.github.io/EMGFlow-Python-Package/reference/plot-signals.html"
-click PrS "https://wiiison.github.io/EMGFlow-Python-Package/reference/preprocess-signals.html"
 ```
 
 ### `FileAccess`
