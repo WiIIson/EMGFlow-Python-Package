@@ -2,7 +2,28 @@
 
 The `PreProcessSignals` module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
 
+## Module Structure
 
+```mermaid
+mindmap
+    root((EMGFlow))
+        EF(Extract Features)
+        FA(File Access)
+        DO(Detect Outliers)
+        PlS(Plot Signals)
+        PrS(Preprocess Signals)
+            EMG2PSD
+            ApplyNotchFilters
+            NotchFilterSignals
+            ApplyBandpassFilter
+            BandpassFilterSignals
+            ApplyFWR
+            ApplyBoxcarSmooth
+            ApplyRMSSmooth
+            ApplyGaussianSmooth
+            ApplyLoessSmooth
+            SmoothFilterSignals
+```
 
 ## `EMG2PSD`
 

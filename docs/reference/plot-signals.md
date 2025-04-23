@@ -2,7 +2,20 @@
 
 The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
+## Module Structure
 
+```mermaid
+mindmap
+    root((EMGFlow))
+        EF(Extract Features)
+        FA(File Access)
+        DO(Detect Outliers)
+        PlS(Plot Signals)
+            GenPlotDash
+            PlotSpectrum
+            PlotCompareSignals
+        PrS(Preprocess Signals)
+```
 
 ## `GenPlotDash`
 

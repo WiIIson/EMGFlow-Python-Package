@@ -2,7 +2,44 @@
 
 This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
 
+## Module Structure
 
+```mermaid
+mindmap
+    root((EMGFlow))
+        EF(Extract Features)
+            CalcIEMG
+            CalcMAV
+            CalcMMAV1
+            CalcMMAV2
+            CalcSSI
+            CalcVAR
+            CalcVOrder
+            CalcRMS
+            CalcWL
+            CalcWAMP
+            CalcLOG
+            CalcMFL
+            CalcAP
+            CalcSpecFlux
+            CalcMDF
+            CalcMNF
+            CalcTwitchRatio
+            CalcTwitchIndex
+            CalcTwitchSlope
+            CalcSC
+            CalcSF
+            CalcSS
+            CalcSDec
+            CalcSEntropy
+            CalcSRoll
+            CalcSBW
+            ExtractFeatures
+        FA(File Access)
+        DO(Detect Outliers)
+        PlS(Plot Signals)
+        PrS(Preprocess Signals)
+```
 
 ## Basic Time-Series Statistics
 

@@ -2,7 +2,20 @@
 
 These functions provide helper methods for accessing files, and are mostly used internally by the package.
 
+## Module Structure
 
+```mermaid
+mindmap
+    root((EMGFlow))
+        EF(Extract Features)
+        FA(File Access)
+            ReadFileType
+            MapFiles
+            ConvertMapFiles
+        DO(Detect Outliers)
+        PlS(Plot Signals)
+        PrS(Preprocess Signals)
+```
 
 ## `ReadFileType`
 

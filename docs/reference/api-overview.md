@@ -12,6 +12,18 @@ The EMGFlow Python package works with CSV files, but is planned to expand to oth
 
 ## Modules
 
+### Module Structure
+
+```mermaid
+mindmap
+    root((EMGFlow))
+        EF(Extract Features)
+        FA(File Access)
+        DO(Detect Outliers)
+        PlS(Plot Signals)
+        PrS(Preprocess Signals)
+```
+
 ### `FileAccess`
 
 These functions provide helper methods for accessing files, and are mostly used internally by the package.
