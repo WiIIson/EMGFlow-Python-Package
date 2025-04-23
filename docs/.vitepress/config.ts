@@ -75,4 +75,4 @@ export default withMermaid({
     logo: './EMGFlow.png',
   },
   mermaid:{},
-})
+});
