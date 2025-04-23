@@ -177,7 +177,7 @@ def CalcMMAV2(Signal, col):
         elif (0.25*N > n):
             total += (4*n/N) * vals[n]
         else:
-            total += (4*(i-N)/N) * vals[n]
+            total += (4*(n-N)/N) * vals[n]
     MMAV2 = total/N
     return MMAV2
 
