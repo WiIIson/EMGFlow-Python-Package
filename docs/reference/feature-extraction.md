@@ -155,25 +155,25 @@ MAV = EMGFlow.CalcMAV(SignalDF, 'column1', 2000)
 
 
 
-## `CalcMMAV`
+## `CalcMMAV1`
 
 **Description**
 
-Calculates the Modified Mean Absolute Value (MMAV) of the signal. The MMAV is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+Calculates the Modified Mean Absolute Value 1 (MMAV1) of the signal. The MMAV1 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
 ```python
-CalcMMAV(Signal, col)
+CalcMMAV1(Signal, col)
 ```
 
 **Theory**
 
-The MMAV is identical to MAV, except it introduces a weight to the calculation. Values are given a weight of 1 when they are between the 25th and 74th percentile, and 0.5 outside. The article describing the MMAV also listed another modification, MMAV2, but the description appeared to be flawed, and as such the measure was not included.
+The MMAV1 is identical to MAV, except it introduces a weight to the calculation. Values are given a weight of 1 when they are between the 25th and 75th percentile, and 0.5 outside.
 
-The MMAV is calculated as follows:
+The MMAV1 is calculated as follows:
 $$
-\text{MMAV}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
+\text{MMAV1}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
 $$
 $$
-w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le n\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right\}
+w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le i\le 0.75N \\ 0.5 & \text{otherwise} \end{matrix} \right\}
 $$
 - $N$ <-- Number of data points
 
@@ -189,8 +189,8 @@ $$
 
 **Returns**
 
-`CalcMMAV`: float
-- Returns the value of the MMAV.
+`CalcMMAV1`: float
+- Returns the value of the MMAV1.
 
 **Error**
 
@@ -199,9 +199,61 @@ Raises an error if `col` is not found in `Signal`.
 **Example**
 
 ```python
-# Calculate the MMAV of SignalDF, for column 'column1'
-MMAV = EMGFlow.CalcMMAV(SignalDF, 'column1', 2000)
+# Calculate the MMAV1 of SignalDF, for column 'column1'
+MMAV1 = EMGFlow.CalcMMAV1(SignalDF, 'column1', 2000)
 ```
+
+
+
+## `CalcMMAV2`
+
+**Description**
+
+Calculates the Modified Mean Absolute Value 2 (MMAV2) of the signal. The MMAV2 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+```python
+CalcMMAV2(Signal, col)
+```
+
+**Theory**
+
+The MMAV2 is identical to MAV, except it introduces a weight to the calculation. Values are given a weight of 1 when they are between the 25th and 75th percentile, a weight of $\frac{4i}{N}$ when below the 25th percentile, and a weight of $\frac{4(i-N)}{N}$ when above the 75th percentile. This makes the weight smoothly increase and decrease approaching the center of the signal, as opposed to MMAV1 which instantly jumps from a weight of 0.5 to 1.
+
+The MMAV2 is calculated as follows:
+$$
+\text{MMAV2}=\frac{1}{N}\sum_{i=1}^N|x_iw_i|
+$$
+$$
+w_i=\left\{ \begin{matrix} 1 & \text{if }0.25N\le i\le 0.75N \\ \frac{4i}{N} & \text{if } i<0.25N  \\ \frac{4(i-N)}{4} & \text{if } i>0.75N \end{matrix} \right\}
+$$
+- $N$ <-- Number of data points
+
+(Hamedi et al., 2014)
+
+**Parameters**
+
+`Signal`: pd.DataFrame 
+- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+
+`col`: str
+- String name of a column in `Signal` the filters are being applied to.
+
+**Returns**
+
+`CalcMMAV2`: float
+- Returns the value of the MMAV2.
+
+**Error**
+
+Raises an error if `col` is not found in `Signal`.
+
+**Example**
+
+```python
+# Calculate the MMAV2 of SignalDF, for column 'column1'
+MMAV2 = EMGFlow.CalcMMAV2(SignalDF, 'column1', 2000)
+```
+
+
 
 
 
@@ -1339,6 +1391,8 @@ Chowdhury, R. H., Reaz, M. B. I., Ali, M. A. B. M., Bakar, A. A. A., Chellappan,
 Eyben, F., Scherer, K. R., Schuller, B. W., Sundberg, J., André, E., Busso, C., Devillers, L. Y., Epps, J., Laukka, P., Narayanan, S. S., & Truong, K. P. (2016). The Geneva Minimalistic Acoustic Parameter Set (GeMAPS) for Voice Research and Affective Computing. _IEEE Transactions on Affective Computing_, _7_(2), 190–202. [https://doi.org/10.1109/TAFFC.2015.2457417](https://doi.org/10.1109/TAFFC.2015.2457417)
 
 Giannakopoulos, T., & Pikrakis, A. (2014). Introduction to Audio Analysis. In T. Giannakopoulos & A. Pikrakis (Eds.), _Introduction to Audio Analysis_ (pp. 59–103). Academic Press. [https://doi.org/10.1016/B978-0-08-099388-1.00004-2](https://doi.org/10.1016/B978-0-08-099388-1.00004-2)
+
+Hamedi, M., Salleh, S.-H., Astaraki, M., Noor, A. M., & Harris, A. R. A. (2014). Comparison of Multilayer Perceptron and Radial Basis Function Neural Networks for EMG-Based Facial Gesture Recognition. In H. A. Mat Sakim & M. T. Mustaffa (Eds.), The 8th International Conference on Robotic, Vision, Signal Processing & Power Applications (Vol. 291, pp. 285–294). Springer Singapore. https://doi.org/10.1007/978-981-4585-42-2_33
 
 Hegedus, A., Trzaskoma, L., Soldos, P., Tuza, K., Katona, P., Greger, Z., Zsarnoczky-Dulhazi, F., & Kopper, B. (2020). Adaptation of Fatigue Affected Changes in Muscle EMG Frequency Characteristics for the Determination of Training Load in Physical Therapy for Cancer Patients. _Pathology Oncology Research_, _26_(2), 1129–1135. [https://doi.org/10.1007/s12253-019-00668-3](https://doi.org/10.1007/s12253-019-00668-3)
 
