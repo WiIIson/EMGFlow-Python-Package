@@ -936,13 +936,21 @@ def CleanSignals(path_names, sampling_rate=2000):
 # =============================================================================
 #
 
-def make_sample_data():
+def make_sample_data(path_names):
     """
-    Generates a file structure for signal files, writes sample data, and
-    returns a dictionary of the locations for these files.
-    
-    A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and
-    "Feature" subfolders
+    Generates sample data in the 'Raw' folder of a provided dictionary of file
+    locations.
+
+    Parameters
+    ----------
+    path_names : [str] dict
+        Dictionary of file locations.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if the provided 'path_names' dictionary doesn't
+        contain a 'Raw' path key.
 
     Returns
     -------
@@ -950,8 +958,9 @@ def make_sample_data():
 
     """
     
-    # Generate the paths
-    path_names = make_paths()
+    # Check that a 'raw' folder exists
+    if 'Raw' not in path_names:
+        raise Exception('Raw path not detected in provided dictionary (path_names)')
     
     # Load the sample data
     sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
@@ -964,6 +973,3 @@ def make_sample_data():
         sample_data_01.to_csv(data_path_01, index=False)
     if not os.path.exists(data_path_02):
         sample_data_02.to_csv(data_path_02, index=False)
-    
-    # Return the dictionary
-    return path_names
