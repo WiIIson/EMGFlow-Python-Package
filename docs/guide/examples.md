@@ -15,8 +15,11 @@ A simple example outlining EMG preprocessing and feature extraction using manual
 ```python
 import EMGFlow
 
-# Load sample data and get path dictionary
-path_names = EMGFlow.make_sample_data()
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
+# Load sample data
+EMGFlow.make_sample_data(path_names)
 
 # Sampling rate
 sampling_rate = 2000
@@ -52,8 +55,11 @@ import EMGFlow
 import os
 import pandas as pd
 
-# Load sample data and get path dictionary
-path_names = EMGFlow.make_sample_data()
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
+# Load sample data
+EMGFlow.make_sample_data(path_names)
 
 # Load dataframe from generated data
 sample_data = pd.read_csv(os.path.join(path_names['Raw'], 'sample_data_01.csv'))
@@ -90,8 +96,11 @@ A more advanced example applying conditional filters based on file names.
 ```python
 import EMGFlow
 
-# Load sample data and get path dictionary
-path_names = EMGFlow.make_sample_data()
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
+# Load sample data
+EMGFlow.make_sample_data(path_names)
 
 # Sampling rate
 sampling_rate = 2000
@@ -129,8 +138,11 @@ import os
 import pandas as pd
 import tqdm
 
-# Paths for data files
-path_names = EMGFlow.make_sample_data()
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
+# Load sample data
+EMGFlow.make_sample_data(path_names)
 
 # Sampling rate
 sampling_rate = 2000
@@ -157,7 +169,7 @@ filedirs_s = EMGFlow.MapFiles(path_names['Smooth'])
 measure_names = [
   'IEMG',
   'MAV',
-  'MMAV',
+  'MMAV1',
   'Spec_Centroid',
   # ... put column names for additional features here
 ]
@@ -184,7 +196,7 @@ for file in tqdm.tqdm(filedirs_b):
         for col in cols:
             IEMG = EMGFlow.CalcIEMG(data_s, col, sampling_rate)
             MAV = EMGFlow.CalcMAV(data_s, col)
-            MMAV = EMGFlow.CalcMMAV(data_s, col)
+            MMAV1 = EMGFlow.CalcMMAV1(data_s, col)
     		# ... calculate additional time-series features here
     
             psd = EMGFlow.EMG2PSD(data_b[col], sampling_rate)
@@ -195,7 +207,7 @@ for file in tqdm.tqdm(filedirs_b):
             col_vals = [
     			IEMG,
     			MAV,
-    			MMAV,
+    			MMAV1,
     			Spec_Centroid,
     			# ... put additional features here
     		]
