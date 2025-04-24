@@ -39,7 +39,7 @@ bibliography: paper.bib
 
 ## Processing Pipeline
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Extracting features from large datasets is a common task in machine learning and quantitative domains. _EMGFlow_ supports this need through batch-processing, allowing users to either semi- or fully automate the treatment of sEMG recordings. To demonstrate, we use data from PeakAffectDS [@greene_peakaffectds_2022], a collection of physiological signals that includes two channels of facial sEMG, labelled Zyg and Cor, capturing Zygomaticus major and Corrugator supercilii muscle activity respectively. We begin by defining the path to the directory containing our raw, uncleaned files stored in plaintext (.csv) format. We then apply a notch filter to remove the AC mains noise introduced by the recording system’s power source, a common initial step in preprocessing raw sEMG signals.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Extracting features from large datasets is a common task in machine learning and quantitative domains. _EMGFlow_ supports this need through batch-processing, allowing users to either semi- or fully automate the treatment of sEMG recordings. To demonstrate, we will use an example dataset built into EMGFlow that can be generated with the `make_sample_data()`. This data is taken from PeakAffectDS [@greene_peakaffectds_2022], a collection of physiological signals that includes two channels of facial sEMG, labelled Zyg and Cor, capturing Zygomaticus major and Corrugator supercilii muscle activity respectively. We began by creating a basic processing file structure with `make_paths()`, and loaded the sample data into the "Raw" folder with `make_sample_data()`. We then apply a notch filter to remove the AC mains noise introduced by the recording system’s power source, a common initial step in preprocessing raw sEMG signals.
 
 ```python
 import EMGFlow
@@ -74,6 +74,8 @@ reg_pat = '^(08|11)'
 EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_extra, cols, expression=reg_pat)
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An overview of the processing pipeline is illustrated in fig. 2.
+
 ## Visualization of Preprocessing Stages
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The application of a bandpass filter is often the second stage in preprocessing sEMG signals, as it isolates the frequency spectrum of human muscle activity. Signals are commonly filtered to the 10-500 Hz range [@livingstone_deficits_2016; @mcmanus_analysis_2020; @sato_emotional_2021; @tamietto_unseen_2009], though precise filter corner frequencies vary by research domain and approach [@abadi_decaf_2015]. After filtering, data can be further smoothed to remove high-frequency noise and outliers in preparation for the extraction of temporal features. The default smoother is RMS, equal to the square root of the total power in the sEMG signal and commonly used to estimate signal amplitude [@mcmanus_analysis_2020]. Additional filter options are provided, including boxcar, Gaussian, and LOESS. 
@@ -94,7 +96,7 @@ EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth
 
 # Set units and column to plot
 col = 'EMG_zyg'
-units = 'mV
+units = 'mV'
 
 # Plot data on the "EMG_zyg" column
 EMGFlow.GenPlotDash(path_names, col, units)
@@ -103,7 +105,10 @@ EMGFlow.GenPlotDash(path_names, col, units)
 ![Figure 1](figure1.png)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Figure 1:** _EMGFlow_'s interactive dashboard visualizing effects of different preprocessing stages on batch processed files.
 
-## The nature of electromyographic recordings
+![Figure 2](figure2.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Figure 2:** An overview of the processing pipeline.
+
+## The Nature of Electromyographic Recordings
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To better understand the range of features extracted by _EMGFlow_, we begin with a review of surface electromyography as a recording instrument. Nearly all body movement occurs by muscle contraction. During contraction, nerve impulses sent from motoneurons cause muscle fibers innervated by the axon to discharge, creating a motor unit action potential [@mcmanus_analysis_2020]. The speed at which action potentials propogate down the fibre is called muscle fiber conduction velocity. Each motor unit firing results in a force twitch. The superposition of these twiches over time produces a sustained force that enables functional muscle activity, such as lifting or smiling [@de_luca_practicum_2008]. 
 
