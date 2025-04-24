@@ -44,21 +44,23 @@ bibliography: paper.bib
 ```python
 import EMGFlow
 
-# Paths for sEMG files
-raw_path = 'Data/01_Raw'
-notch_path = 'Data/02_Notch'
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
+# Load sample data
+EMGFlow.make_sample_data(path_names)
 
 # Sampling rate
-sr = 2000
+sampling_rate = 2000
 
-# Columns containing sEMG
+# Filter parameters
+notch_vals = [(50, 5)]
+
+# Columns containing data for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Notch filter parameters
-notch_vals = [(50,5)]
-
-# Apply notch filter to raw sEMG files
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sr, notch_vals, cols)
+# Apply notch filters
+EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 ```
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Additional arguments allow users to customize which files are selected and how they are processed. Filtering functions accept an optional regex argument, allowing users to apply filters to specific files. Most functions use common sense defaults, which can be modified task-wide or for select cases. For example, in North America, mains electricity is nominally supplied at 120 VAC 60 Hz, while other countries may supply power at 200-240 VAC 50Hz. This variation in frequency requires different notch filter settings depending on where the data were recorded. _EMGFlow_ accommodates this need by allowing the user to specify the frequency and quality factor of the applied filter. Extending our first example, we now apply an additional notch filter to a subset of files exhibiting noise at 150 Hz, the 3rd harmonic of the mains source.
@@ -68,9 +70,8 @@ EMGFlow.NotchFilterSignals(raw_path, notch_path, sr, notch_vals, cols)
 notch_vals_extra = [(150,25)]
 reg_pat = '^(08|11)'
 
-# Apply notch filter to file subset
-EMGFlow.NotchFilterSignals(notch_path, notch_path, sr, notch_vals_extra, cols,
-                           expression=reg_pat, exp_copy=True)
+# Apply extra notch filters
+EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_extra, cols, expression=reg_pat)
 ```
 
 ## Visualization of Preprocessing Stages
@@ -80,30 +81,23 @@ EMGFlow.NotchFilterSignals(notch_path, notch_path, sr, notch_vals_extra, cols,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_ provides an interactive Shiny dashboard to visualize the effects of preprocessing on sEMG signals. Preprocessing stages can be displayed simultaneously or shown individually with options for Notch, Bandpass, and Smoothing steps. Users can select the file for visualization using the Files dropdown box. The dashboard is generated from a list of file paths containing files at different stages of preprocessing. Here, our example shows how signals are further bandpass filtered and smoothed, with results visualized using the dashboard. 
 
 ```python
-# Paths for sEMG files
-band_path = 'Data/03_Bandpass'
-smooth_path = 'Data/04_Smoothed'
-
 # Filter and smoothing parameters
 band_low = 20
-band_high = 450
-win_length = 50
+band_high = 140
+smooth_window = 50
 
-# Apply bandpass and smoothing filters
-EMGFlow.BandpassFilterSignals(notch_path, band_path, sr, band_low, band_high,
-                              cols)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sr, win_length, cols)
+# Apply bandpass filter
+EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
 
-# Paths for dashboard generation 
-in_paths = [smooth_path, band_path, notch_path]
-labels = ['Smooth', 'Bandpass', 'Notch']
+# Apply smoothing filter
+EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
 
-# Column to visualize, and units of measurement
-show_col = 'EMG_zyg'
-units = 'mV'
+# Set units and column to plot
+col = 'EMG_zyg'
+units = 'mV
 
-# Generate dashboard
-EMGFlow.GenPlotDash(in_paths, sampling_rate, show_col, units, labels)
+# Plot data on the "EMG_zyg" column
+EMGFlow.GenPlotDash(path_names, col, units)
 ```
 
 ![Figure 1](figure1.png)
@@ -126,20 +120,18 @@ EMGFlow.GenPlotDash(in_paths, sampling_rate, show_col, units, labels)
 ```python
 import EMGFlow
 
+# Get path dictionary
+path_names = EMGFlow.make_paths()
+
 # Load sample data
-EMGFlow.make_sample_data()
+EMGFlow.make_sample_data(path_names)
 
-# Set sampling rate
-sampling_rate = 2000
+# Preprocess signals
+EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
 
-# Load path dictionary
-path_names = EMGFlow.make_path_dict()
+# Extract features and save results in "Features.csv" in feature_path
+df = EMGFlow.ExtractFeatures(path_names, sampling_rate = 2000)
 
-# Clean data
-EMGFlow.CleanSignals(path_names)
-
-# Extract features
-df = EMGFlow.ExtractFeatures(path_names, sampling_rate)
 """
 df dataframe contains
 
