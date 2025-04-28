@@ -1,3 +1,4 @@
+import importlib.resources as resources
 import pandas as pd
 import re
 import os
@@ -213,3 +214,91 @@ def MapFilesFuse(filedirs, names):
     df.set_index('ID',inplace=True)
     
     return df
+
+#
+# =============================================================================
+#
+
+def make_paths(root=None):
+    """
+    Generates a file structure for signal files, and returns a dictionary of
+    the locations for these files.
+    
+    A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and
+    "Feature" subfolders
+
+    Parameters
+    ----------
+    root : str, optional
+        Root of the data to be generated. The default is None.
+
+    Returns
+    -------
+    path_dict : [str] dict
+        A dictionary of file locations with keys for stage in the processing
+        pipeline.
+
+    """
+    
+    if root is None:
+        root = os.path.join(os.getcwd(), 'Data')
+    else:
+        root = os.path.normpath(root)
+    
+    # Create dictionary
+    path_dict = {
+        'Raw':os.path.join(root, 'Raw'),
+        'Notch':os.path.join(root, 'Notch'),
+        'Bandpass':os.path.join(root, 'Bandpass'),
+        'Smooth':os.path.join(root, 'Smooth'),
+        'Feature':os.path.join(root, 'Feature')
+    }
+    
+    # Create folders
+    for value in path_dict.values():
+        os.makedirs(value, exist_ok=True)
+    
+    # Return dictionary
+    return path_dict
+
+#
+# =============================================================================
+#
+
+def make_sample_data(path_names):
+    """
+    Generates sample data in the 'Raw' folder of a provided dictionary of file
+    locations.
+
+    Parameters
+    ----------
+    path_names : [str] dict
+        Dictionary of file locations.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if the provided 'path_names' dictionary doesn't
+        contain a 'Raw' path key.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    # Check that a 'raw' folder exists
+    if 'Raw' not in path_names:
+        raise Exception('Raw path not detected in provided dictionary (path_names)')
+    
+    # Load the sample data
+    sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
+    sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
+    
+    # Write the sample data
+    data_path_01 = os.path.join(path_names['Raw'], 'sample_data_01.csv')
+    data_path_02 = os.path.join(path_names['Raw'], 'sample_data_02.csv')
+    if not os.path.exists(data_path_01):
+        sample_data_01.to_csv(data_path_01, index=False)
+    if not os.path.exists(data_path_02):
+        sample_data_02.to_csv(data_path_02, index=False)
