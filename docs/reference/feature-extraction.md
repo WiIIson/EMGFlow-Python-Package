@@ -1395,7 +1395,7 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 **Error**
 
-Raises an error if `path_names` does not contain a `Bandpass`, `Smooth` and `Feature` path.
+Raises an error if `path_names` does not contain a `Bandpass`, `Smooth` or `Feature` path key.
 
 Raises an error if files found in the `Bandpass` and `Smooth` filepath values don't contain the same files.
 
@@ -1412,7 +1412,7 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example**
 
 ```python
-path_names = EMGFlow.make_path_dict()
+path_names = EMGFlow.make_paths()
 sampling_rate = 2000
 cols = ['EMG_zyg', 'EMG_cor']
 

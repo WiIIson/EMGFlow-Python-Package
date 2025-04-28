@@ -9,12 +9,74 @@ mindmap
     root((EMGFlow))
         EF(Extract Features)
         FA(File Access)
+            make_paths
+            make_sample_data
             ReadFileType
             MapFiles
             ConvertMapFiles
         DO(Detect Outliers)
         PlS(Plot Signals)
         PrS(Preprocess Signals)
+```
+
+## `make_paths`
+
+**Description**
+
+`make_paths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
+
+A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and "Feature" subfolders. Alternatively, a path can be provided for these subfolders to be created in instead.
+
+```python
+make_paths(root=None)
+```
+
+**Parameters**
+
+`root`: str (None)
+- Root of the data to be generated. The default is None.
+
+**Returns**
+
+`path_dict`: dict (str)
+- A dictionary of file locations with keys for the stage in the processing pipeline.
+
+**Example**
+
+```python
+# Create folders and get locations
+path_names = EMGFlow.make_paths()
+```
+
+## `make_sample_data`
+
+**Description**
+
+`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations.
+
+```python
+make_sample_data(path_names)
+```
+
+**Parameters**
+
+`path_names`: dict (str)
+- A dictionary of file locations
+
+**Returns**
+
+`None`
+
+**Error**
+
+Raises an error if `path_names` does not contain a `Raw` path key.
+
+**Example**
+
+```python
+# Create file paths, then create sample data
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
 ```
 
 ## `ReadFileType`
@@ -49,9 +111,10 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example**
 
 ```python
+# Read a csv file
 path = 'data/raw/file01.csv'
 ext = 'csv'
-df = ReadFileType(path, ext)
+df = EMGFlow.ReadFileType(path, ext)
 ```
 
 

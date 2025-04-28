@@ -38,7 +38,7 @@ export default withMermaid({
         text: 'Reference',
         items: [
           { text: 'Overview', link: '/reference/api-overview' },
-          { text: 'Pre-processing', link: '/reference/preprocess-signals' },
+          { text: 'Preprocessing', link: '/reference/preprocess-signals' },
           { text: 'Feature extraction', link: '/reference/feature-extraction' },
           { text: 'Plotting signals', link: '/reference/plot-signals' },
           { text: 'Outlier detection', link: '/reference/outlier-detection' },
