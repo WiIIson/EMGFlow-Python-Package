@@ -9,8 +9,8 @@ mindmap
     root((EMGFlow))
         EF(Extract Features)
         FA(File Access)
-            make_paths
-            make_sample_data
+            makePaths
+            makeSampleData
             ReadFileType
             MapFiles
             ConvertMapFiles
