@@ -185,25 +185,23 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Basic parameters
-raw_path = '/data/raw'
-notch_path = '/data/notch'
+path_names = EMGFlow.makePaths()
 sampling_rate = 2000
 notch_vals = [(50,5), (150,25)]
 
 # Special case parameters
-notch_spec = '/data/notch2'
 notch_vals_spec = [(317,25)]
 reg = "^(08|11)"
 cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch_vals filters to all files in raw_path,
 # and write them to notch_path
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals, cols)
+EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 
 # Apply an additional special case filter to files beginning
 # with '08' or '11', and write them to notch_spec, making
 # sure to copy the other files as well
-EMGFlow.NotchFilterSignals(notch_path, notch_spec, sampling_rate, notch_vals_spec, cols, exp_copy=True)
+EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_spec, cols, exp_copy=True)
 ```
 
 
@@ -339,8 +337,7 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-notch_path = '/data/notch'
-bandpass_path = '/data/bandpass'
+path_names = EMGFlow.makePaths()
 sampling_rate = 2000
 low = 20
 high = 200
@@ -348,7 +345,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch_vals filters to all files in notch_path,
 # and write them to bandpass_path
-EMGFlow.BandpassFilterSignals(notch_path, bandpass_path, sampling_rate, low, high, cols)
+EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, low, high, cols)
 ```
 
 
@@ -707,14 +704,13 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-bandpass_path = '/data/bandpass'
-smooth_path = '/data/smooth'
+path_names = EMGFlow.makePaths()
 size = 20
 cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply smoothing filter with window size 20 to all files in
 # bandpass_path, and write them to smooth_path
-EMGFlow.SmoothFilterSignals(bandpass_path, smooth_path, size, cols)
+EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], size, cols)
 ```
 
 

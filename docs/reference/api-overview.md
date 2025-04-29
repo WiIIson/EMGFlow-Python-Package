@@ -26,13 +26,17 @@ mindmap
 
 ### `FileAccess`
 
-These functions provide helper methods for accessing files, and are mostly used internally by the package.
+These functions provide helper methods for accessing files.
 
-One notable function, `MapFiles`, takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
+`makePaths` is the beginning of the EMG processing pipeline, it generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature". This dictionary is passed to many of the processing functions.
 
-`MapFiles` forms the basis for the two modes of analysis offered by EMGFlow - automated, or manual.
+`makeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `makePaths` dictionary
 
-The "automated" mode makes the processing pipeline much simpler. In these functions, a file location is provided, default parameters are set, and a file output location is set. The functions then apply the filters to each file found in the folder, and output the filtered files to the output folder. Notable functions include:
+`MapFiles` is widely used internally in the EMGFlow, it takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
+
+This forms the basis for the two modes of analysis offered by EMGFlow - automated, or manual.
+
+The "automated" mode makes the processing pipeline much simpler. In these functions, input/output paths from your dictionary are provided, and default parameters are set. The functions then apply the filters to each file found in the folder, and output the filtered files to the output folder. Notable functions include:
 - `NotchFilterSignals`
 - `BandpassFilterSignals`
 - `SmoothFilterSignals`
