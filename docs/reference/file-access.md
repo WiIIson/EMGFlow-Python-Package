@@ -19,16 +19,16 @@ mindmap
         PrS(Preprocess Signals)
 ```
 
-## `make_paths`
+## `makePaths`
 
 **Description**
 
-`make_paths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
+`makePaths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
 
 A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and "Feature" subfolders. Alternatively, a path can be provided for these subfolders to be created in instead.
 
 ```python
-make_paths(root=None)
+makePaths(root=None)
 ```
 
 **Parameters**
@@ -45,17 +45,17 @@ make_paths(root=None)
 
 ```python
 # Create folders and get locations
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 ```
 
-## `make_sample_data`
+## `makeSampleData`
 
 **Description**
 
-`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations.
+`makeSampleData` generates sample data in the "Raw" folder of a provided dictionary of file locations.
 
 ```python
-make_sample_data(path_names)
+makeSampleData(path_names)
 ```
 
 **Parameters**
@@ -75,8 +75,8 @@ Raises an error if `path_names` does not contain a `Raw` path key.
 
 ```python
 # Create file paths, then create sample data
-path_names = EMGFlow.make_paths()
-EMGFlow.make_sample_data(path_names)
+path_names = EMGFlow.makePaths()
+EMGFlow.makeSampleData(path_names)
 ```
 
 ## `ReadFileType`

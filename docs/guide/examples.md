@@ -16,10 +16,10 @@ A simple example outlining EMG preprocessing and feature extraction using manual
 import EMGFlow
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+EMGFlow.makeSampleData(path_names)
 
 # Sampling rate
 sampling_rate = 2000
@@ -56,10 +56,10 @@ import os
 import pandas as pd
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+EMGFlow.makeSampleData(path_names)
 
 # Load dataframe from generated data
 sample_data = pd.read_csv(os.path.join(path_names['Raw'], 'sample_data_01.csv'))
@@ -97,10 +97,10 @@ A more advanced example applying conditional filters based on file names.
 import EMGFlow
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+EMGFlow.makeSampleData(path_names)
 
 # Sampling rate
 sampling_rate = 2000
@@ -139,10 +139,10 @@ import pandas as pd
 import tqdm
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+EMGFlow.makeSampleData(path_names)
 
 # Sampling rate
 sampling_rate = 2000
