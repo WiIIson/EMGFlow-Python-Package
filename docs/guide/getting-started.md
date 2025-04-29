@@ -16,10 +16,10 @@ _EMGFlow_ extracts a comprehensive set of 32 statistical features from sEMG sign
 import EMGFlow
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = EMGFlow.makePaths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+EMGFlow.makeSampleData(path_names)
 
 # Preprocess signals
 EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
