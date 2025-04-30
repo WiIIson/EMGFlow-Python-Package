@@ -219,7 +219,7 @@ def MapFilesFuse(filedirs, names):
 # =============================================================================
 #
 
-def makePaths(root=None):
+def MakePaths(root=None):
     """
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
@@ -265,7 +265,7 @@ def makePaths(root=None):
 # =============================================================================
 #
 
-def makeSampleData(path_names):
+def MakeSampleData(path_names):
     """
     Generates sample data in the 'Raw' folder of a provided dictionary of file
     locations.
