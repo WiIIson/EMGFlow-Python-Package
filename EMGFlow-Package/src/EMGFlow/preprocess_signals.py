@@ -6,7 +6,7 @@ import re
 from tqdm import tqdm
 import warnings
 
-from .FileAccess import *
+from .access_files import *
 
 #
 # =============================================================================
@@ -20,16 +20,16 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def EMG2PSD(Sig_vals, sampling_rate=1000, normalize=True):
+def EMG2PSD(sigVals, samplingRate=1000, normalize=True):
     """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).
 
     Parameters
     ----------
-    Sig_vals : float list
+    sigVals : float list
         A list of float values. A column of a Signal.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
@@ -49,24 +49,24 @@ def EMG2PSD(Sig_vals, sampling_rate=1000, normalize=True):
     
     """
     
-    if sampling_rate <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
     
     # Initial parameters
-    Sig_vals = Sig_vals - np.mean(Sig_vals)
-    N = len(Sig_vals)
+    sigVals = sigVals - np.mean(sigVals)
+    N = len(sigVals)
     
     # Calculate minimum frequency given sampling rate
-    min_frequency = (2 * sampling_rate) / (N / 2)
+    min_frequency = (2 * samplingRate) / (N / 2)
     
     # Calculate window size givern sampling rate
-    nperseg = int((2 / min_frequency) * sampling_rate)
+    nperseg = int((2 / min_frequency) * samplingRate)
     nfft = nperseg * 2
     
     # Apply welch method with hanning window
     frequency, power = scipy.signal.welch(
-        Sig_vals,
-        fs=sampling_rate,
+        sigVals,
+        fs=samplingRate,
         scaling='density',
         detrend=False,
         nfft=nfft,
@@ -91,7 +91,7 @@ def EMG2PSD(Sig_vals, sampling_rate=1000, normalize=True):
 # =============================================================================
 #
 
-def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
+def apply_notch_filters(Signal, col, samplingRate, notchVals):
     """
     Apply a list of notch filters for given frequencies and Q-factors to a
     column of the provided data.
@@ -103,9 +103,9 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
-    notch_vals : list
+    notchVals : list
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
@@ -118,8 +118,8 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
     Exception
-        An exception is raised if a Hz value in notch_vals is greater than
-        sampling_rate/2 or less than 0
+        An exception is raised if a Hz value in notchVals is greater than
+        samplingRate/2 or less than 0
 
     Returns
     -------
@@ -131,10 +131,10 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
-    if sampling_rate <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
 
-    def ApplyNotchFilter(Signal, col, sampling_rate, notch):
+    def apply_notch_filter(Signal, col, samplingRate, notch):
         """
         Apply a notch filter to a signal
 
@@ -145,7 +145,7 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
             columns for signal data.
         col : str
             Column of the Signal to apply the filter to.
-        sampling_rate : float
+        samplingRate : float
             Sampling rate of the Signal.
         notch : (int, int) tuple
             Notch filter data. Should be a (Hz, Q) tuple where Hz is the
@@ -156,7 +156,7 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         ------
         Exception
             An exception is raised if the Hz value in notch is greater than
-            sampling_rate/2 or less than 0.
+            samplingRate/2 or less than 0.
 
         Returns
         -------
@@ -169,11 +169,11 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
         
         (Hz, Q) = notch
         
-        if Hz > sampling_rate / 2 or Hz < 0:
-            raise Exception("Notch filter frequency must be between 0 and " + str(sampling_rate / 2) + " (sampling_rate/2)")
+        if Hz > samplingRate / 2 or Hz < 0:
+            raise Exception("Notch filter frequency must be between 0 and " + str(samplingRate / 2) + " (samplingRate/2)")
         
         # Normalize filtering frequency
-        nyq_freq = sampling_rate / 2
+        nyq_freq = samplingRate / 2
         norm_Hz = Hz / nyq_freq
         
         # Use scipy notch filter using normalized frequency
@@ -184,27 +184,27 @@ def ApplyNotchFilters(Signal, col, sampling_rate, notch_vals):
     
     Signal = Signal.copy()
     
-    # Applies ApplyNotchFilter for every notch_val tuple
-    for i in range(len(notch_vals)):
-        Signal[col] = ApplyNotchFilter(Signal, col, sampling_rate, notch_vals[i])
+    # Applies apply_notch_filter for every notch_val tuple
+    for i in range(len(notchVals)):
+        Signal[col] = apply_notch_filter(Signal, col, samplingRate, notchVals[i])
     return Signal
 
 #
 # =============================================================================
 #
 
-def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def notch_filter_signals(inPath, outPath, samplingRate, notch, cols=None, expression=None, expCopy=False, fileExt='csv'):
     """
     Apply notch filters to all Signals in a folder. Writes filtered Signals to
     an output folder, and generates a file structure matching the input folder.
 
     Parameters
     ----------
-    in_path : dict
+    inPath : dict
         Filepath to a directory to read Signal files.
-    out_path : str
+    outPath : str
         Filepath to an output directory.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
     notch : list
         A list of (Hz, Q) tuples corresponding to the notch filters being
@@ -218,11 +218,11 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
-    exp_copy : TYPE, optional
+    expCopy : TYPE, optional
         If true, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
-    file_ext : TYPE, optional
+    fileExt : TYPE, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
 
@@ -234,13 +234,13 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
     Exception
         An exception is raised if the sampling rate is less or equal to 0.
     Exception
-        An exception is raised if a Hz value in notch_vals is greater than
-        sampling_rate/2 or less than 0
+        An exception is raised if a Hz value in notchVals is greater than
+        samplingRate/2 or less than 0
     Exception
-        Raises an exception if a file cannot not be read in in_path.
+        Raises an exception if a file cannot not be read in inPath.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -257,24 +257,24 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
         except:
             raise Exception("Invalid regex expression provided")
     
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
+    # Convert outPath to absolute
+    if not os.path.isabs(outPath):
+        outPath = os.path.abspath(outPath)
     
     # Get dictionary of file locations
-    if exp_copy:
-        filedirs = MapFiles(in_path, file_ext=file_ext)
+    if expCopy:
+        filedirs = map_files(inPath, fileExt=fileExt)
     else:
-        filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
             warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
         
-    
     # Apply transformations
     for file in tqdm(filedirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
+            
             # Read file
-            data = ReadFileType(filedirs[file], file_ext)
+            data = read_file_type(filedirs[file], fileExt)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -284,20 +284,20 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
             
             # Apply filter to columns
             for col in cols:
-                data = ApplyNotchFilters(data, col, sampling_rate, notch)
+                data = apply_notch_filters(data, col, samplingRate, notch)
             
             # Construct out path
-            out_file = out_path + filedirs[file][len(in_path):]
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = ReadFileType(filedirs[file], file_ext)
-            out_file = out_path + filedirs[file][len(in_path):]
+        elif (file[-len(fileExt):] == fileExt) and expCopy:
+            # Copy the file even if it doesn't match if expCopy is true
+            data = read_file_type(filedirs[file], fileExt)
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
@@ -308,7 +308,7 @@ def NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expre
 # =============================================================================
 #
 
-def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
+def apply_bandpass_filter(Signal, col, samplingRate, low, high):
     """
     Apply a bandpass filter to a Signal for a given lower and upper limit.
 
@@ -319,7 +319,7 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
     low : float
         Lower frequency limit of the bandpass filter.
@@ -345,10 +345,10 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal.")
     
-    if sampling_rate <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
     
-    if high > sampling_rate/2 or low > sampling_rate/2:
+    if high > samplingRate/2 or low > samplingRate/2:
         raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
     
     if high <= low:
@@ -358,7 +358,7 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
     Signal = Signal.copy()
     # Here, the "5" is the order of the butterworth filter
     # (how quickly the signal is cut off)
-    b, a = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band')
+    b, a = scipy.signal.butter(5, [low, high], fs=samplingRate, btype='band')
     Signal[col] = scipy.signal.lfilter(b, a, Signal[col])
     return Signal
 
@@ -366,7 +366,7 @@ def ApplyBandpassFilter(Signal, col, sampling_rate, low, high):
 # =============================================================================
 #
 
-def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, cols=None, expression=None, expCopy=False, fileExt='csv'):
     """
     Apply bandpass filters to all Signals in a folder. Writes filtered Signals
     to an output folder, and generates a file structure
@@ -374,11 +374,11 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     
     Parameters
     ----------
-    in_path : dict
+    inPath : dict
         Filepath to a directory to read Signal files.
-    out_path : str
+    outPath : str
         Filepath to an output directory.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
     low : float
         Lower frequency limit of the bandpass filter. The default is 20.
@@ -391,11 +391,11 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
-    exp_copy : bool, optional
+    expCopy : bool, optional
         If true, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
     
@@ -409,10 +409,10 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
     Exception
         An exception is raised if high is not higher than low.
     Exception
-        Raises an exception if a file cannot not be read in in_path.
+        Raises an exception if a file cannot not be read in inPath.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -429,24 +429,24 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
         except:
             raise Exception("Invalid regex expression provided")
     
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
+    # Convert outPath to absolute
+    if not os.path.isabs(outPath):
+        outPath = os.path.abspath(outPath)
     
     # Get dictionary of file locations
-    if exp_copy:
-        filedirs = MapFiles(in_path, file_ext=file_ext)
+    if expCopy:
+        filedirs = map_files(inPath, fileExt=fileExt)
     else:
-        filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
             warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = ReadFileType(filedirs[file], file_ext)
+            data = read_file_type(filedirs[file], fileExt)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -456,20 +456,20 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
               
             # Apply filter to columns
             for col in cols:
-                data = ApplyBandpassFilter(data, col, sampling_rate, low, high)
+                data = apply_bandpass_filter(data, col, samplingRate, low, high)
             
             # Construct out path
-            out_file = out_path + filedirs[file][len(in_path):]
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = ReadFileType(filedirs[file], file_ext)
-            out_file = out_path + filedirs[file][len(in_path):]
+        elif (file[-len(fileExt):] == fileExt) and expCopy:
+            # Copy the file even if it doesn't match if expCopy is true
+            data = read_file_type(filedirs[file], fileExt)
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
@@ -480,7 +480,7 @@ def BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, co
 # =============================================================================
 #
 
-def ApplyFWR(Signal, col):
+def apply_fwr(Signal, col):
     """
     Apply a Full Wave Rectifier to a Signal.
 
@@ -515,7 +515,7 @@ def ApplyFWR(Signal, col):
 # =============================================================================
 #
 
-def ApplyBoxcarSmooth(Signal, col, window_size):
+def apply_boxcar_smooth(Signal, col, windowSize):
     """
     Apply a boxcar smoothing filter to a Signal. Uses a rolling average with a
     window size.
@@ -527,7 +527,7 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    window_size : int, float
+    windowSize : int, float
         Size of the window of the filter.
     
     Raises
@@ -535,9 +535,9 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
     Exception
         An exception is raised if col is not found in Signal.
     Exception
-        An exception is raised if window_size is less or equal to 0.
+        An exception is raised if windowSize is less or equal to 0.
     Warning
-        A warning is raised if window_size is greater than Signal length.
+        A warning is raised if windowSize is greater than Signal length.
     
     Returns
     -------
@@ -546,21 +546,21 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
 
     """
     
-    if window_size > len(Signal.index):
+    if windowSize > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
-    if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+    if windowSize <= 0:
+        raise Exception("windowSize cannot be 0 or negative")
         
     
     Signal = Signal.copy()
     
-    Signal = ApplyFWR(Signal, col)
+    Signal = apply_fwr(Signal, col)
     # Construct kernel
-    window = np.ones(window_size) / float(window_size)
+    window = np.ones(windowSize) / float(windowSize)
     # Convolve
     Signal[col] = np.convolve(Signal[col], window, 'same')
     return Signal
@@ -569,7 +569,7 @@ def ApplyBoxcarSmooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def ApplyRMSSmooth(Signal, col, window_size):
+def apply_rms_smooth(Signal, col, windowSize):
     """
     Apply an RMS smoothing filter to a Signal. Uses a rolling average with a
     window size.
@@ -581,7 +581,7 @@ def ApplyRMSSmooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    window_size : int, float
+    windowSize : int, float
         Size of the window of the filter.
 
     Raises
@@ -589,9 +589,9 @@ def ApplyRMSSmooth(Signal, col, window_size):
     Exception
         An exception is raised if col is not found in Signal.
     Exception
-        An exception is raised if window_size is less or equal to 0.
+        An exception is raised if windowSize is less or equal to 0.
     Warning
-        A warning is raised if window_size is greater than Signal length.
+        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -600,14 +600,14 @@ def ApplyRMSSmooth(Signal, col, window_size):
 
     """
     
-    if window_size > len(Signal.index):
+    if windowSize > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
-    if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+    if windowSize <= 0:
+        raise Exception("windowSize cannot be 0 or negative")
     
     
     
@@ -615,7 +615,7 @@ def ApplyRMSSmooth(Signal, col, window_size):
     # Square
     Signal[col] = np.power(Signal[col], 2)
     # Construct kernel
-    window = np.ones(window_size) / float(window_size)
+    window = np.ones(windowSize) / float(windowSize)
     # Convolve and square root
     Signal[col] = np.sqrt(np.convolve(Signal[col], window, 'same'))
     return Signal
@@ -624,7 +624,7 @@ def ApplyRMSSmooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
+def apply_gaussian_smooth(Signal, col, windowSize, sigma=1):
     """
     Apply a Gaussian smoothing filter to a Signal. Uses a rolling average with
     a window size.
@@ -636,7 +636,7 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    window_size : int, float
+    windowSize : int, float
         Size of the window of the filter.
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.
@@ -646,9 +646,9 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
     Exception
         An exception is raised if col is not found in Signal.
     Exception
-        An exception is raised if window_size is less or equal to 0.
+        An exception is raised if windowSize is less or equal to 0.
     Warning
-        A warning is raised if window_size is greater than Signal length.
+        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -658,24 +658,24 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
     """
     
     # Helper function for creating a Gaussian kernel
-    def getGauss(n, sigma):
+    def get_gauss(n, sigma):
         r = range(-int(n/2), int(n/2)+1)
         return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
     
-    if window_size > len(Signal.index):
+    if windowSize > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
-    if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+    if windowSize <= 0:
+        raise Exception("windowSize cannot be 0 or negative")
     
     Signal = Signal.copy()
     
-    Signal = ApplyFWR(Signal, col)
+    Signal = apply_fwr(Signal, col)
     # Construct kernel
-    window = getGauss(window_size, sigma)
+    window = get_gauss(windowSize, sigma)
     # Convolve
     Signal[col] = np.convolve(Signal[col], window, 'same')
     return Signal
@@ -684,7 +684,7 @@ def ApplyGaussianSmooth(Signal, col, window_size, sigma=1):
 # =============================================================================
 #
 
-def ApplyLoessSmooth(Signal, col, window_size):
+def apply_loess_smooth(Signal, col, windowSize):
     """
     Apply a Loess smoothing filter to a Signal. Uses a rolling average with a
     window size and tri-cubic weight.
@@ -696,7 +696,7 @@ def ApplyLoessSmooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
-    window_size : int, float
+    windowSize : int, float
         Size of the window of the filter.
 
     Raises
@@ -704,9 +704,9 @@ def ApplyLoessSmooth(Signal, col, window_size):
     Exception
         An exception is raised if col is not found in Signal.
     Exception
-        An exception is raised if window_size is less or equal to 0.
+        An exception is raised if windowSize is less or equal to 0.
     Warning
-        A warning is raised if window_size is greater than Signal length.
+        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -715,20 +715,20 @@ def ApplyLoessSmooth(Signal, col, window_size):
 
     """
     
-    if window_size > len(Signal.index):
+    if windowSize > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
         raise Exception("Column " + col + " not in Signal")
     
-    if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+    if windowSize <= 0:
+        raise Exception("windowSize cannot be 0 or negative")
     
     Signal = Signal.copy()
     
-    Signal = ApplyFWR(Signal, col)
+    Signal = apply_fwr(Signal, col)
     # Construct kernel
-    window = np.linspace(-1,1,window_size+1,endpoint=False)[1:]
+    window = np.linspace(-1,1,windowSize+1,endpoint=False)[1:]
     window = np.array(list(map(lambda x: (1 - np.abs(x) ** 3) ** 3, window)))
     window = window / np.sum(window)
     # Convolve
@@ -739,7 +739,7 @@ def ApplyLoessSmooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1):  
+def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=None, expCopy=False, fileExt='csv', method='rms', sigma=1):  
     """
     Apply smoothing filters to all Signals in a folder. Writes filtered Signals
     to an output folder, and generates a file structure matching the input
@@ -748,11 +748,11 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 
     Parameters
     ----------
-    in_path : dict
+    inPath : dict
         Filepath to a directory to read Signal files.
-    out_path : str
+    outPath : str
         Filepath to an output directory.
-    window_size : int, float
+    windowSize : int, float
         Size of the window of the filter.
     cols : list, optional
         List of columns of the Signal to apply the filter to. The default is
@@ -761,11 +761,11 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
-    exp_copy : bool, optional
+    expCopy : bool, optional
         If true, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
     method : str, optional
@@ -783,14 +783,14 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
     Exception
         An exception is raised if col is not found in any of the Signal files.
     Exception
-        An exception is raised if window_size is less or equal to 0.
+        An exception is raised if windowSize is less or equal to 0.
     Warning
-        A warning is raised if window_size is greater than Signal length.
+        A warning is raised if windowSize is greater than Signal length.
     Exception
-        Raises an exception if a file cannot not be read in in_path.
+        Raises an exception if a file cannot not be read in inPath.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -807,24 +807,24 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
         except:
             raise Exception("Invalid regex expression provided")
     
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
+    # Convert outPath to absolute
+    if not os.path.isabs(outPath):
+        outPath = os.path.abspath(outPath)
     
     # Get dictionary of file locations
-    if exp_copy:
-        filedirs = MapFiles(in_path, file_ext=file_ext)
+    if expCopy:
+        filedirs = map_files(inPath, fileExt=fileExt)
     else:
-        filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+        filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
             warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = ReadFileType(filedirs[file], file_ext)
+            data = read_file_type(filedirs[file], fileExt)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -835,28 +835,28 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
             # Apply filter to columns
             for col in cols:
                 if method == 'rms':
-                    data = ApplyRMSSmooth(data, col, window_size)
+                    data = apply_rms_smooth(data, col, windowSize)
                 elif method == 'boxcar':
-                    data = ApplyBoxcarSmooth(data, col, window_size)
+                    data = apply_boxcar_smooth(data, col, windowSize)
                 elif method == 'gauss':
-                    data = ApplyGaussianSmooth(data, col, window_size, sigma)
+                    data = apply_gaussian_smooth(data, col, windowSize, sigma)
                 elif method == 'loess':
-                    data = ApplyLoessSmooth(data, col, window_size)
+                    data = apply_loess_smooth(data, col, windowSize)
                 else:
                     raise Exception('Invalid smoothing method used: ', method, ', use "rms", "boxcar", "gauss" or "loess"')
                 
             # Construct out path
-            out_file = out_path + filedirs[file][len(in_path):]
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
         
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = ReadFileType(filedirs[file], file_ext)
-            out_file = out_path + filedirs[file][len(in_path):]
+        elif (file[-len(fileExt):] == fileExt) and expCopy:
+            # Copy the file even if it doesn't match if expCopy is true
+            data = read_file_type(filedirs[file], fileExt)
+            out_file = outPath + filedirs[file][len(inPath):]
             out_folder = out_file[:len(out_file) - len(file)]
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
@@ -866,7 +866,7 @@ def SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=No
 # =============================================================================
 #
 
-def CleanSignals(path_names, sampling_rate=2000):
+def clean_signals(path_names, samplingRate=2000):
     """
     Automates the EMG preprocessing workflow, performing notch filtering,
     bandpass filtering and smoothing.
@@ -876,7 +876,7 @@ def CleanSignals(path_names, sampling_rate=2000):
     path_names : dict
         Dictionary containing path locations for writing and reading Signal
         data between paths.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
 
     Raises
@@ -903,10 +903,10 @@ def CleanSignals(path_names, sampling_rate=2000):
     
     # Default values for notch filtering and window size
     notch = [(50,5)]
-    window_size = 50
+    windowSize = 50
     
     # Automatically runs through workflow
-    NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch)
-    BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], window_size)
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], samplingRate, notch)
+    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], samplingRate)
+    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], windowSize)
     return

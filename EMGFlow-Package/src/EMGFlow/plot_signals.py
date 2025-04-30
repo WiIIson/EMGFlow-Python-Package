@@ -11,8 +11,8 @@ from shiny import App, render, ui
 import nest_asyncio
 nest_asyncio.apply()
 
-from .PreprocessSignals import EMG2PSD
-from .FileAccess import *
+from .preprocess_signals import EMG2PSD
+from .access_files import *
 
 #
 # =============================================================================
@@ -26,17 +26,17 @@ A collection of functions for plotting subject data
 # =============================================================================
 #
 
-def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression=None, file_ext='csv'):
+def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=None, fileExt='csv'):
     """
     Generate plots of the PSDs of each column of Signals in a directory
 
     Parameters
     ----------
-    in_path : str
+    inPath : str
         Filepath to a directory to read Signal files.
-    out_path : str
+    outPath : str
         Filepath to an output directory.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signals.
     cols : list, optional
         List of columns of the Signal to plot. The default is None, in which case every column except
@@ -47,22 +47,22 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
     expression : str, optional
         A regular expression. If provided, will only generate plots for files whose names match the regular
         expression. The default is None.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if sampling_rate is less or equal to 0.
+        An exception is raised if samplingRate is less or equal to 0.
     Exception
         An exception is raised if a column is not in a dataframe.
     Exception
         An exception is raised if p is not None and not between 0 and 1.
     Exception
-        Raises an exception if a file cannot not be read in in_path.
+        Raises an exception if a file cannot not be read in inPath.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -83,20 +83,20 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
         raise Exception("p must be between 0 or 1, or None")
     
     # Convert out path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
+    if not os.path.isabs(outPath):
+        outPath = os.path.abspath(outPath)
     
-    filedirs = ConvertMapFiles(in_path, file_ext=file_ext, expression=expression)
+    filedirs = convert_map_files(inPath, fileExt=fileExt, expression=expression)
     
     # Make plots
     for file in tqdm(filedirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Randomly create signal plots if requested
             if (p is None) or (random.random() < p):
                 
                 # Read file
-                data = ReadFileType(filedirs[file], file_ext)
+                data = read_file_type(filedirs[file], fileExt)
                 
                 # If no columns selected, apply filter to all columns except time
                 if cols is None:
@@ -114,7 +114,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                     if col not in list(data.columns.values):
                         raise Exception("Column " + col + " not in Signal " + file)
                     
-                    psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                    psd = EMG2PSD(data[col], samplingRate=samplingRate)
                     axs.plot(psd['Frequency'], psd['Power'])
                     axs.set_ylabel('Power magnitude')
                     axs.set_xlabel('Frequency')
@@ -127,7 +127,7 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                         if col not in list(data.columns.values):
                             raise Exception("Column " + col + " not in Signal " + file)
                         
-                        psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                        psd = EMG2PSD(data[col], samplingRate=samplingRate)
                         axs[i].plot(psd['Frequency'], psd['Power'])
                         axs[i].set_ylabel('Power magnitude')
                         axs[i].set_xlabel('Frequency')
@@ -135,26 +135,26 @@ def PlotSpectrum(in_path, out_path, sampling_rate, cols=None, p=None, expression
                 
                 # Set title and save figure
                 fig.suptitle(file + ' Power Spectrum Density')
-                fig.savefig(out_path + file[:-len(file_ext)] + 'jpg')
+                fig.savefig(outPath + file[:-len(fileExt)] + 'jpg')
     return
 
 #
 # =============================================================================
 #
 
-def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, expression=None, file_ext='csv'):
+def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, expression=None, fileExt='csv'):
     """
     Generate plots of the PSDs comparing different processing stages.
 
     Parameters
     ----------
-    in_path1 : str
+    inPath1 : str
         Filepath to a directory containing the first set of Signals for comparison.
-    in_path2 : TYPE
+    inPath2 : TYPE
         Filepath to a directory containing the second set of Signals for comparison.
-    out_path : str
+    outPath : str
         Filepath to an output directory.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signals.
     cols : list, optional
         List of columns of the Signal to plot. The default is None, in which case every column except
@@ -162,23 +162,23 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
     expression : str, optional
         A regular expression. If provided, will only generate plots for files whose names match the regular
         expression. The default is None.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if in_path1 and in_path2 don't contain the same files.
+        An exception is raised if inPath1 and inPath2 don't contain the same files.
     Exception
-        An exception is raised if sampling_rate is less or equal to 0.
+        An exception is raised if samplingRate is less or equal to 0.
     Exception
         An exception is raised if a column in cols is not in a dataframe.
     Exception
-        Raises an exception if a file cannot not be read in in_path1 or
-        in_path2.
+        Raises an exception if a file cannot not be read in inPath1 or
+        inPath2.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -196,23 +196,23 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
             raise Exception("Invalid regex expression provided")
     
     # Convert out path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
+    if not os.path.isabs(outPath):
+        outPath = os.path.abspath(outPath)
     
     # Get dictionary of file locations
-    filedirs1 = ConvertMapFiles(in_path1, file_ext=file_ext, expression=expression)
-    filedirs2 = ConvertMapFiles(in_path2, file_ext=file_ext, expression=expression)
+    filedirs1 = convert_map_files(inPath1, fileExt=fileExt, expression=expression)
+    filedirs2 = convert_map_files(inPath2, fileExt=fileExt, expression=expression)
     
     if set(filedirs1.keys()) != set(filedirs2.keys()):
         raise Exception("File mismatch between provided directories")
     
     # Make plots
     for file in tqdm(filedirs1):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data1 = ReadFileType(filedirs1[file], file_ext)
-            data2 = ReadFileType(filedirs2[file], file_ext)
+            data1 = read_file_type(filedirs1[file], fileExt)
+            data2 = read_file_type(filedirs2[file], fileExt)
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -229,12 +229,12 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
                 if col not in list(data1.columns.values) or col not in list(data2.columns.values):
                     raise Exception("Column " + col + " not in Signal " + file)
                 
-                psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
+                psd1 = EMG2PSD(data1[col], samplingRate=samplingRate)
                 axs[0].plot(psd1['Frequency'], psd1['Power'])
                 axs[0].set_ylabel('Power magnitude')
                 axs[0].set_title(col)
                 
-                psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
+                psd2 = EMG2PSD(data2[col], samplingRate=samplingRate)
                 axs[1].plot(psd2['Frequency'], psd2['Power'])
                 axs[1].set_ylabel('Power magnitude')
                 axs[1].set_xlabel('Frequency')
@@ -247,19 +247,19 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
                     if col not in list(data1.columns.values) or col not in list(data2.columns.values):
                         raise Exception("Column " + col + " not in Signal " + file)
                     
-                    psd1 = EMG2PSD(data1[col], sampling_rate=sampling_rate)
+                    psd1 = EMG2PSD(data1[col], samplingRate=samplingRate)
                     axs[0,i].plot(psd1['Frequency'], psd1['Power'])
                     axs[0,i].set_ylabel('Power magnitude')
                     axs[0,i].set_title(col)
                     
-                    psd2 = EMG2PSD(data2[col], sampling_rate=sampling_rate)
+                    psd2 = EMG2PSD(data2[col], samplingRate=samplingRate)
                     axs[1,i].plot(psd2['Frequency'], psd2['Power'])
                     axs[1,i].set_ylabel('Power magnitude')
                     axs[1,i].set_xlabel('Frequency')
             
             # Set title and save figure
             fig.suptitle(file + ' Power Spectrum Density')
-            fig.savefig(out_path + file[:-len(file_ext)] + 'jpg')
+            fig.savefig(outPath + file[:-len(fileExt)] + 'jpg')
     
     return
 
@@ -268,16 +268,16 @@ def PlotCompareSignals(in_path1, in_path2, out_path, sampling_rate, cols=None, e
 #
 
 # Creates a shiny app object that can be ran
-def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun=True):
+def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autorun=True):
     """
     Generate a shiny dashboard of different processing stages for a given column.
 
     Parameters
     ----------
-    path_names : [str] dict
+    pathNames : [str] dict
         A dictionary of path names for reading data. The function will generate
         graphs for as many paths are provided in the dictionary. The dictionary
-        can be created with the make_path_dict function.
+        can be created with the make_paths function.
     col : str
         String column name to display the visualization.
     units : str
@@ -287,8 +287,8 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
         String regular expression. If provided, will only create visualizations
         for Signal files whose names match the regular expression, and will
         ignore everything else. The default is None.
-    file_ext : str, optional
-        String extension of the files to read. Any file in in_path with this
+    fileExt : str, optional
+        String extension of the files to read. Any file in inPath with this
         extension will be considered to be a Signal file, and treated as such.
         The default is 'csv'.
     autorun : bool, optional
@@ -299,15 +299,15 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
     Raises
     ------
     Exception
-        An exception is raised if the directories in in_paths don't contain the
+        An exception is raised if the directories in inPaths don't contain the
         same files.
     Exception
         An exception is raised if the col is not found in a dataframe.
     Exception
-        Raises an exception if a file cannot not be read in a path in in_paths.
+        Raises an exception if a file cannot not be read in a path in inPaths.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -319,9 +319,9 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
     """
     
     # Remove feature path, and convert dictionary to lists
-    path_names.pop("Feature", None)
-    in_paths = list(path_names.values())
-    names = list(path_names.keys())
+    pathNames.pop("Feature", None)
+    inPaths = list(pathNames.values())
+    names = list(pathNames.keys())
     
     if expression is not None:
         try:
@@ -331,11 +331,11 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
     
     # Convert file paths to directories
     filedirs = []
-    for path in in_paths:
-        filedirs.append(ConvertMapFiles(path))
+    for path in inPaths:
+        filedirs.append(convert_map_files(path))
         
     # Convert file directories to data frame
-    df = MapFilesFuse(filedirs, names)
+    df = map_files_fuse(filedirs, names)
     
     # Set style
     plt.style.use('fivethirtyeight')
@@ -377,7 +377,7 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
             if column == 'All':
                 # Read/plot each file
                 for file_loc in reversed(list(df.loc[filename])[1:]):
-                    sigDF = ReadFileType(file_loc, file_ext)
+                    sigDF = read_file_type(file_loc, fileExt)
                     
                     # Exception for column input
                     if col not in list(sigDF.columns.values):
@@ -390,7 +390,7 @@ def GenPlotDash(path_names, col, units, expression=None, file_ext='csv', autorun
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
-                sigDF = ReadFileType(file_location, file_ext)
+                sigDF = read_file_type(file_location, fileExt)
                 
                 # Exception for column input
                 if col not in list(sigDF.columns.values):

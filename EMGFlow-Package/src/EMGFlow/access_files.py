@@ -15,7 +15,7 @@ A collection of functions for accessing files.
 # =============================================================================
 #
 
-def ReadFileType(path, file_ext):
+def read_file_type(path, fileExt):
     """
     Safe wrapper for reading files of a given extension.
 
@@ -23,7 +23,7 @@ def ReadFileType(path, file_ext):
     ----------
     path : str
         Path of file to read.
-    file_ext : str
+    fileExt : str
         File extension to read.
 
     Raises
@@ -32,7 +32,7 @@ def ReadFileType(path, file_ext):
         Raises an exception if the file could not be read.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
 
     Returns
     -------
@@ -41,13 +41,13 @@ def ReadFileType(path, file_ext):
 
     """
     
-    if file_ext == 'csv':
+    if fileExt == 'csv':
         try:
             file = pd.read_csv(path)
         except:
             raise Exception("CSV file could not be read: " + path)
     else:
-        raise Exception("Unsupported file format provided: " + file_ext)
+        raise Exception("Unsupported file format provided: " + fileExt)
         
     return file
 
@@ -55,16 +55,16 @@ def ReadFileType(path, file_ext):
 # =============================================================================
 #
 
-def MapFiles(in_path, file_ext='csv', expression=None):
+def map_files(inPath, fileExt='csv', expression=None):
     """
     Generate a dictionary of file names and locations from the subfiles of a
     folder.
     
     Parameters
     ----------
-    in_path : str
+    inPath : str
         The filepath to a directory to read Signal files.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. The default is 'csv'.
     expression : str, optional
         A regular expression. If provided, will only count files whose names
@@ -90,12 +90,12 @@ def MapFiles(in_path, file_ext='csv', expression=None):
             raise Exception("Invalid regex expression provided")
     
     filedirs = {}
-    for file in os.listdir(in_path):
-        new_path = os.path.join(in_path, file)
+    for file in os.listdir(inPath):
+        new_path = os.path.join(inPath, file)
         if os.path.isdir(new_path):
-            subDir = MapFiles(new_path, file_ext=file_ext, expression=expression)
+            subDir = map_files(new_path, fileExt=fileExt, expression=expression)
             filedirs.update(subDir)
-        elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        elif (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             filedirs[file] = new_path
     return filedirs
 
@@ -103,7 +103,7 @@ def MapFiles(in_path, file_ext='csv', expression=None):
 # =============================================================================
 #
 
-def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
+def convert_map_files(fileObj, fileExt='csv', expression=None):
     """
     Generate a dictionary of file names and locations from different forms of
     input.
@@ -113,7 +113,7 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
     fileObj : str
         The file location object. This can be a string to a file location, or
         an already formed dictionary of file locations.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
     expression : str, optional
@@ -146,7 +146,7 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
     if type(fileObj) is str:
         if not os.path.isabs(fileObj):
             fileObj = os.path.abspath(fileObj)
-        filedirs = MapFiles(in_path=fileObj, file_ext=file_ext, expression=expression)
+        filedirs = map_files(inPath=fileObj, fileExt=fileExt, expression=expression)
     # User provided a processed file directory
     elif type(fileObj) is dict:
         # If expression is provided, filters the dictionary
@@ -167,8 +167,7 @@ def ConvertMapFiles(fileObj, file_ext='csv', expression=None):
 # =============================================================================
 #
 
-
-def MapFilesFuse(filedirs, names):
+def map_files_fuse(filedirs, names):
     """
     Generate a dictionary of file names and locations from different forms of
     input. Each directory should contain the same file at different stages with
@@ -219,7 +218,7 @@ def MapFilesFuse(filedirs, names):
 # =============================================================================
 #
 
-def MakePaths(root=None):
+def make_paths(root=None):
     """
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
@@ -265,20 +264,20 @@ def MakePaths(root=None):
 # =============================================================================
 #
 
-def MakeSampleData(path_names):
+def make_sample_data(pathNames):
     """
     Generates sample data in the 'Raw' folder of a provided dictionary of file
     locations.
 
     Parameters
     ----------
-    path_names : [str] dict
+    pathNames : [str] dict
         Dictionary of file locations.
 
     Raises
     ------
     Exception
-        An exception is raised if the provided 'path_names' dictionary doesn't
+        An exception is raised if the provided 'pathNames' dictionary doesn't
         contain a 'Raw' path key.
 
     Returns
@@ -288,16 +287,16 @@ def MakeSampleData(path_names):
     """
     
     # Check that a 'raw' folder exists
-    if 'Raw' not in path_names:
-        raise Exception('Raw path not detected in provided dictionary (path_names)')
+    if 'Raw' not in pathNames:
+        raise Exception('Raw path not detected in provided dictionary (pathNames)')
     
     # Load the sample data
     sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
     sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
     
     # Write the sample data
-    data_path_01 = os.path.join(path_names['Raw'], 'sample_data_01.csv')
-    data_path_02 = os.path.join(path_names['Raw'], 'sample_data_02.csv')
+    data_path_01 = os.path.join(pathNames['Raw'], 'sample_data_01.csv')
+    data_path_02 = os.path.join(pathNames['Raw'], 'sample_data_02.csv')
     if not os.path.exists(data_path_01):
         sample_data_01.to_csv(data_path_01, index=False)
     if not os.path.exists(data_path_02):

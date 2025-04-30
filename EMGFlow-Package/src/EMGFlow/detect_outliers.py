@@ -7,8 +7,8 @@ import warnings
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from .PreprocessSignals import EMG2PSD
-from .FileAccess import *
+from .preprocess_signals import EMG2PSD
+from .access_files import *
 
 #
 # =============================================================================
@@ -22,16 +22,16 @@ A collection of functions for finding outliers while testing
 # =============================================================================
 #
 
-def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
+def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, windowSize=200, fileExt='csv'):
     """
     Looks at all Signals contained in a filepath, returns a dictionary of file
     names and locations that have outliers.
 
     Parameters
     ----------
-    in_path : str
+    inPath : str
         Filepath to a directory to read Signal files.
-    sampling_rate : float
+    samplingRate : float
         Sampling rate of the Signal.
     cols : TYPE
         List of columns of the Signal to search for outliers in. The default is
@@ -57,17 +57,17 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     expression : str, optional
         A regular expression. If provided, will only search for outliers in
         files whose names match the regular expression. The default is None.
-    window_size : int, optional
+    windowSize : int, optional
         The window size to use when filtering for local maxima. The default is
         200.
-    file_ext : str, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if sampling_rate is less or equal to 0.
+        An exception is raised if samplingRate is less or equal to 0.
     Exception
         An exception is raised if threshold is less or equal to 0.
     Exception
@@ -79,10 +79,10 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     Exception
         An exception is raised if a column in cols is not in the data file.
     Exception
-        Raises an exception if a file cannot not be read in in_path.
+        Raises an exception if a file cannot not be read in inPath.
     Exception
         Raises an exception if an unsupported file format was provided for
-        file_ext.
+        fileExt.
     Exception
         Raises an exception if expression is not None or a valid regular
         expression.
@@ -116,7 +116,7 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     if low is None:
         low = 0
     if high is None:
-        high = sampling_rate/2
+        high = samplingRate/2
     
     if low >= high:
         raise Exception("low (" + str(low) + ") must be greater than high (" + str(high), ")")
@@ -139,20 +139,20 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
     outliers = {}
     
     # Convert path to absolute
-    if not os.path.isabs(in_path):
-        in_path = os.path.abspath(in_path)
+    if not os.path.isabs(inPath):
+        inPath = os.path.abspath(inPath)
     
     # Get dictionary of files
-    filedirs = MapFiles(in_path, file_ext=file_ext, expression=expression)
+    filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
     
     # Iterate over detected files
     for file in tqdm(filedirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = ReadFileType(filedirs[file], file_ext)
+            data = read_file_type(filedirs[file], fileExt)
             
-            if len(data.index)/2 <= window_size:
+            if len(data.index)/2 <= windowSize:
                 warnings.warn("Warning: Window size is greater than 1/2 of data file, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
@@ -171,17 +171,17 @@ def DetectOutliers(in_path, sampling_rate, threshold, cols=None, low=None, high=
                 if col not in list(data.columns.values):
                     raise Exception("Column " + col + " not in Signal " + file)
                 
-                psd = EMG2PSD(data[col], sampling_rate=sampling_rate)
+                psd = EMG2PSD(data[col], samplingRate=samplingRate)
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima
-                psd['max'] = psd.iloc[argrelextrema(psd['Power'].values, np.greater_equal, order=window_size)[0]]['Power']
+                psd['max'] = psd.iloc[argrelextrema(psd['Power'].values, np.greater_equal, order=windowSize)[0]]['Power']
                 
                 # Filter non-maxima
                 maxima = psd[psd['max'].notnull()]
                 
                 if len(maxima.index) == 1:
-                    raise Exception("Not enough maxima to create approximation - reduce window_size or use a larger data file.")
+                    raise Exception("Not enough maxima to create approximation - reduce windowSize or use a larger data file.")
     
                 # Initialize rational function parameters
                 p_init = np.poly1d(np.ones(p_deg))

@@ -1,6 +1,6 @@
 __version__ = "1.0.17"
-from .FileAccess import *
-from .PreprocessSignals import *
-from .ExtractFeatures import *
-from .OutlierFinder import *
-from .PlotSignals import *
+from .access_files import *
+from .preprocess_signals import *
+from .extract_features import *
+from .detect_outliers import *
+from .plot_signals import *
