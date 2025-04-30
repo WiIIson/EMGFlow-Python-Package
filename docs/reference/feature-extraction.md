@@ -1412,7 +1412,7 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example**
 
 ```python
-path_names = EMGFlow.makePaths()
+path_names = EMGFlow.MakePaths()
 sampling_rate = 2000
 cols = ['EMG_zyg', 'EMG_cor']
 

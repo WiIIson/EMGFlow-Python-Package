@@ -185,7 +185,7 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Basic parameters
-path_names = EMGFlow.makePaths()
+path_names = EMGFlow.MakePaths()
 sampling_rate = 2000
 notch_vals = [(50,5), (150,25)]
 
@@ -337,7 +337,7 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-path_names = EMGFlow.makePaths()
+path_names = EMGFlow.MakePaths()
 sampling_rate = 2000
 low = 20
 high = 200
@@ -704,7 +704,7 @@ Raises an error if `expression` is not a valid regular expression.
 **Example**
 
 ```python
-path_names = EMGFlow.makePaths()
+path_names = EMGFlow.MakePaths()
 size = 20
 cols = ['EMG_zyg', 'EMG_cor']
 
@@ -714,6 +714,42 @@ EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], size, 
 ```
 
 
+
+## `CleanSignals`
+
+**Description**
+
+Automates the EMG preprocessing workflow, proforming notch filtering, bandpass filtering and smoothing.
+
+This function uses each functions' default values, with (50Hz, 5Q) notch filtering, and a bandpass window size of 50.
+
+```python
+CleanSignals(path_names, sampling_rate=2000)
+```
+
+**Parameters**
+
+`path_names`: dictionary of strings
+- A dictionary of keys (stage of preprocessing) and values (filepath to that stage). The provided dictionary is required to have a `Raw`, `Notch`, `Bandpass`, and `Smooth` path.
+
+`sampling_rate`: int/float
+- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+
+**Returns**
+
+`None`
+
+**Error**
+
+Raises an error if `path_names` does not contain a key for "Raw", "Notch", "Bandpass" or "Smooth".
+
+**Example**
+
+```python
+# Create path dictionary, then clean the signals.
+path_names = EMGFlow.MakePaths()
+EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
+```
 
 ## Sources
 

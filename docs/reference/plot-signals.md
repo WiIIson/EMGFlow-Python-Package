@@ -23,7 +23,7 @@ mindmap
 
 Creates a HTML dashboard from a series of signal file paths to compare filtering progress at different stages. Has a side bar menu to navigate the signal file and stage being displayed.
 
-The visualization is created in the default browser, and is opened automatically.
+The visualization is created in the default browser, and is opened automatically. The function will automatically create plots for any paths provided in the dictionary, using the keys as the legend.
 
 ```python
 GenPlotDash(path_names, sampling_rate, col, units, expression=None, file_ext='csv', autorun=True)
@@ -31,8 +31,8 @@ GenPlotDash(path_names, sampling_rate, col, units, expression=None, file_ext='cs
 
 **Parameters:**
 
-`in_paths`: str dict
-- Dictionary of string filepaths to a directories containing Signal files. Directories should contain the same file names, but don't have to keep the same hierarchy. The keys of the dictionary will be used as the legend of the graphs, and will automatically ignore the `Feature` key.
+`path_names`: dictionary of strings
+- A dictionary of keys (stage of preprocessing) and values (filepath to that stage).
 
 `sampling_rate`: int/float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
@@ -71,17 +71,12 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = 'data/raw'
-notch_path = 'data/notch'
-band_path = 'data/bandpass'
-s_paths = [raw_path, notch_path, band_path]
+# Create a plot of each stage
+path_names = EMGFlow.MakePaths()
+col = 'EMG_zyg'
+units = 'mV
 
-sr = 2000
-col = 'col1'
-units = 'mV'
-names = ['raw', 'notch', 'bandpass']
-
-EMGFlow.GenPlotDash(s_paths, sr, col, units, names)
+EMGFlow.GenPlotDash(path_names, col, units)
 ```
 
 <img src="./images/GenPlotDashEx.png" width="500">
@@ -143,12 +138,12 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = 'data/raw'
-plot_path = 'plots'
+path_names = EMGFlow.MakePaths()
+path_names['Plots'] = 'Data/Plots' # Add a path for plots
 
 sr = 2000
 
-EMGFlow.PlotSpectrum(raw_path, plot_path, sr)
+EMGFlow.PlotSpectrum(path_names['Raw'], path_names['Plots'], sr)
 ```
 
 ## `PlotCompareSignals`
@@ -207,11 +202,10 @@ Raises an error if `expression` is not a valid regular expression.
 **Example:**
 
 ```python
-raw_path = 'data/raw'
-notch_path = 'data/notch'
-plot_path = 'plots'
+path_names = EMGFlow.MakePaths()
+path_names['Plots'] = 'Data/Plots' # Add a path for plots
 
 sr = 2000
 
-EMGFlow.PlotSpectrum(raw_path, notch_path, plot_path, sr)
+EMGFlow.PlotSpectrum(path_names['Raw'], path_names['Notch'], path_names['Plots'], sr)
 ```

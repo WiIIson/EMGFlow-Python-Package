@@ -9,8 +9,8 @@ mindmap
     root((EMGFlow))
         EF(Extract Features)
         FA(File Access)
-            makePaths
-            makeSampleData
+            MakePaths
+            MakeSampleData
             ReadFileType
             MapFiles
             ConvertMapFiles
@@ -19,16 +19,16 @@ mindmap
         PrS(Preprocess Signals)
 ```
 
-## `makePaths`
+## `MakePaths`
 
 **Description**
 
-`makePaths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
+`MakePaths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
 
 A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and "Feature" subfolders. Alternatively, a path can be provided for these subfolders to be created in instead.
 
 ```python
-makePaths(root=None)
+MakePaths(root=None)
 ```
 
 **Parameters**
@@ -45,17 +45,17 @@ makePaths(root=None)
 
 ```python
 # Create folders and get locations
-path_names = EMGFlow.makePaths()
+path_names = EMGFlow.MakePaths()
 ```
 
-## `makeSampleData`
+## `MakeSampleData`
 
 **Description**
 
-`makeSampleData` generates sample data in the "Raw" folder of a provided dictionary of file locations.
+`MakeSampleData` generates sample data in the "Raw" folder of a provided dictionary of file locations.
 
 ```python
-makeSampleData(path_names)
+MakeSampleData(path_names)
 ```
 
 **Parameters**
@@ -75,8 +75,8 @@ Raises an error if `path_names` does not contain a `Raw` path key.
 
 ```python
 # Create file paths, then create sample data
-path_names = EMGFlow.makePaths()
-EMGFlow.makeSampleData(path_names)
+path_names = EMGFlow.MakePaths()
+EMGFlow.MakeSampleData(path_names)
 ```
 
 ## `ReadFileType`

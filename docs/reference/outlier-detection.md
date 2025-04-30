@@ -82,9 +82,9 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 **Example:**
 
 ```python
-in_path = '/data/notch'
+path_names = EMGFlow.MakePaths()
 sr = 2000
 threshold = 5
 
-EMGFlow.DetectOutliers(in_path, sr, threshold)
+outliers = EMGFlow.DetectOutliers(path_names['Notch'], sr, threshold)
 ```

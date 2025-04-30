@@ -28,9 +28,9 @@ mindmap
 
 These functions provide helper methods for accessing files.
 
-`makePaths` is the beginning of the EMG processing pipeline, it generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature". This dictionary is passed to many of the processing functions.
+`MakePaths` is the beginning of the EMG processing pipeline, it generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature". This dictionary is passed to many of the processing functions.
 
-`makeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `makePaths` dictionary
+`MakeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `makePaths` dictionary
 
 `MapFiles` is widely used internally in the EMGFlow, it takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
 
