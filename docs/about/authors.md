@@ -30,7 +30,7 @@ svg_icons["dataset"] = '<svg viewBox="0 0 91 91" enable-background="new 0 0 91 9
 const authors = [
   {
     avatar: '../avatars/Conley_WL.jpg',
-    name: 'Douglas Conley',
+    name: 'D. William Conley',
     title: 'Lead developer and maintainer',
     links: [
       { icon: {

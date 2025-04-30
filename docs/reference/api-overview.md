@@ -8,7 +8,7 @@ EMGFlow is broken into 5 modules - FileIO, preprocessing signals, feature extrac
 
 ## File Format
 
-The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with ideally a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time from 0 the signal has been recorded for, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
+The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with, ideally, a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time from 0 the signal has been recorded for, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
 
 ## Modules
 
@@ -30,7 +30,7 @@ These functions provide helper methods for accessing files.
 
 `MakePaths` is the beginning of the EMG processing pipeline, it generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature". This dictionary is passed to many of the processing functions.
 
-`MakeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `makePaths` dictionary
+`MakeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `MakePaths` dictionary
 
 `MapFiles` is widely used internally in the EMGFlow, it takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
 
@@ -46,7 +46,7 @@ The "manual" mode allows for additional customization of processing. In these fu
 - `ApplyBandpassFilter`
 - `ApplyRMSSmooth`
 
-For more information about file accessing functions, see [FileAccess API](./file-access.md).
+For more information about file accessing functions, see [File access](./file-access.md).
 
 ### `PreprocessSignals`
 
@@ -58,7 +58,7 @@ Notch filtering involves filtering specific frequencies. This is typically due t
 
 `NotchFilterSignals()` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings.  However, other regions use 50Hz frequencies.
 
-For more information about further customizations and detail about `NotchFilterSignals()`, see [PreprocessSignals API](./preprocess-signals.md).
+For more information about further customizations and detail about `NotchFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
 
 #### `BandpassFilterSignals()`
 
@@ -66,7 +66,7 @@ Bandpass filtering involves specifying a range of frequencies to keep, and remov
 
 `BandpassFilterSignals()` uses bandpass thresholds of 20Hz and 450Hz, as this is default for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscels, so `BandpassFilterSignals()` provides the option to change the thresholds.
 
-For more information about further customizations and detail about `BandpassFilterSignals()`, see [PreprocessSignals API](./preprocess-signals.md).
+For more information about further customizations and detail about `BandpassFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
 
 #### `SmoothFilterSignals()`
 
@@ -74,7 +74,7 @@ Smoothing involves limiting the impacts of noise and outliers in the signal. By 
 
 `SmoothFilterSignals()` by default uses the RMS smoothing method, as it is the best choice for filtering EMG signals (RENSHAW et al., 2010). Regardless, EMGFlow provides different methods for smoothing signals which can be used instead.
 
-For more information about further customizations and detail about `SmoothFilterSignals()`, see [PreprocessSignals API](./preprocess-signals.md).
+For more information about further customizations and detail about `SmoothFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
 
 ### `ExtractFeatures` Module
 
@@ -82,7 +82,7 @@ This module takes preprocessed data, and extracts features from the sEMG signal 
 
 Analysis involves extracting the features from each signal into a feature file. This is the end of the pipeline, producing the final result.
 
-For a more detailed explanation about the features extracted by `ExtractFeatures()`, see [ExtractFeatures API](./feature-extraction.md).
+For a more detailed explanation about the features extracted by `ExtractFeatures()`, see [Feature extraction](./feature-extraction.md).
 
 ### `OutlierFinder` Module
 
@@ -90,7 +90,7 @@ This module provides methods to help detect signal files that contain outliers. 
 
 Outlier detection is handled by the function `DetectOutliers()`. This function outputs a dictionary of file names and locations for each signal marked as an outlier.
 
-For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [OutlierFinder API](./outlier-detection.md).
+For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [Outlier detection](./outlier-detection.md).
 
 ### `PlotSignals` Module
 
@@ -100,7 +100,7 @@ The plotting module `PlotSignals` provides functions to help visualize individua
 
 `PlotCompareSignals()` does the same, generating plots comparing every signal at two different stages of their processing.
 
-For more information about further customizations and specifications that can be made to `PlotSpectrum()` or `PlotCompareSignals()`, see [PlotSignals API](./plot-signals.md).
+For more information about further customizations and specifications that can be made to `PlotSpectrum()` or `PlotCompareSignals()`, see [Plotting signals](./plot-signals.md).
 
 ## Sources
 

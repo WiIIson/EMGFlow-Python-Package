@@ -25,16 +25,16 @@ features:
       light: 'icons/filter2.svg'
       dark: 'icons/filter-dark2.svg'
     title: Signal Preprocessing
-    details: Advanced cleaning routines produces optimal sEMG signal quality
+    details: Advanced cleaning routines produce optimal sEMG signal quality
   - icon: 
       light: 'icons/automation.svg'
       dark: 'icons/automation-dark.svg'
     title: Automated pipeline
-    details: Batch processing enables hands-off treatment of large datasets
+    details: Batch processing enables a hands-off approach to large datasets
   - icon: 
       light: 'icons/features.svg'
       dark: 'icons/features-dark.svg'
     title: Feature extraction
-    details: Extraction of 32 features across temporal and spectral domains
+    details: Provides extraction of 33 features across temporal and spectral domains
 ---
 
