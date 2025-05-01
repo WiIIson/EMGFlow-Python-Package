@@ -58,7 +58,7 @@ Units for signal magnitudes should be consistent within each file to ensure accu
 
 ### Sampling Rate
 
-The sampling rate (`sampling_rate` or `sr`) defines how frequently data points were recorded per second. It is calculated as the inverse of the time interval between consecutive samples.
+The sampling rate (`samplingRate` or `sr`) defines how frequently data points were recorded per second. It is calculated as the inverse of the time interval between consecutive samples.
 
 ### Power Spectral Density (PSD)
 

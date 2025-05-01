@@ -7,9 +7,9 @@ The `PreProcessSignals` module provides preprocessing functions for cleaning sEM
 ```mermaid
 mindmap
     root((EMGFlow))
-        EF(Extract Features)
         FA(File Access)
         DO(Detect Outliers)
+        EF(Extract Features)
         PlS(Plot Signals)
         PrS(Preprocess Signals)
             EMG2PSD

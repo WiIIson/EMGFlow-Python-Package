@@ -17,9 +17,9 @@ The EMGFlow Python package works with CSV files, but is planned to expand to oth
 ```mermaid
 mindmap
     root((EMGFlow))
-        EF(Extract Features)
-        FA(File Access)
+        FA(Access Files)
         DO(Detect Outliers)
+        EF(Extract Features)
         PlS(Plot Signals)
         PrS(Preprocess Signals)
 ```

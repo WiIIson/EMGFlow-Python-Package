@@ -7,7 +7,6 @@ These functions provide helper methods for accessing files, and are mostly used 
 ```mermaid
 mindmap
     root((EMGFlow))
-        EF(Extract Features)
         FA(File Access)
             MakePaths
             MakeSampleData
@@ -15,6 +14,7 @@ mindmap
             MapFiles
             ConvertMapFiles
         DO(Detect Outliers)
+        EF(Extract Features)
         PlS(Plot Signals)
         PrS(Preprocess Signals)
 ```
