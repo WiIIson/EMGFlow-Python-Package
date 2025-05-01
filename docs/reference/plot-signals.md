@@ -7,14 +7,14 @@ The plotting module `PlotSignals` provides functions to help visualize individua
 ```mermaid
 mindmap
     root((EMGFlow))
-        AF(File Access)
-        DO(Detect Outliers)
+        PrS(Preprocess Signals)
         EF(Extract Features)
         PlS(Plot Signals)
             GenPlotDash
             PlotSpectrum
             PlotCompareSignals
-        PrS(Preprocess Signals)
+        DO(Detect Outliers)
+        AF(Access File)
 ```
 
 ## `GenPlotDash`

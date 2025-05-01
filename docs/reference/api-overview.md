@@ -17,11 +17,11 @@ The EMGFlow Python package works with CSV files, but is planned to expand to oth
 ```mermaid
 mindmap
     root((EMGFlow))
-        AF(Access Files)
-        DO(Detect Outliers)
+        PrS(Preprocess Signals)
         EF(Extract Features)
         PlS(Plot Signals)
-        PrS(Preprocess Signals)
+        DO(Detect Outliers)
+        AF(Access Files)
 ```
 
 ### `FileAccess`
