@@ -20,7 +20,7 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def EMG2PSD(sigVals, samplingRate=1000, normalize=True):
+def emg_to_psd(sigVals, samplingRate=1000, normalize=True):
     """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).

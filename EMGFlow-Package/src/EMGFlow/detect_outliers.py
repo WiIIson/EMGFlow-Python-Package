@@ -7,7 +7,7 @@ import warnings
 from scipy.signal import argrelextrema
 from tqdm import tqdm
 
-from .preprocess_signals import EMG2PSD
+from .preprocess_signals import emg_to_psd
 from .access_files import *
 
 #
@@ -171,7 +171,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 if col not in list(data.columns.values):
                     raise Exception("Column " + col + " not in Signal " + file)
                 
-                psd = EMG2PSD(data[col], samplingRate=samplingRate)
+                psd = emg_to_psd(data[col], samplingRate=samplingRate)
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima

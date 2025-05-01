@@ -11,7 +11,7 @@ from shiny import App, render, ui
 import nest_asyncio
 nest_asyncio.apply()
 
-from .preprocess_signals import EMG2PSD
+from .preprocess_signals import emg_to_psd
 from .access_files import *
 
 #
@@ -114,7 +114,7 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
                     if col not in list(data.columns.values):
                         raise Exception("Column " + col + " not in Signal " + file)
                     
-                    psd = EMG2PSD(data[col], samplingRate=samplingRate)
+                    psd = emg_to_psd(data[col], samplingRate=samplingRate)
                     axs.plot(psd['Frequency'], psd['Power'])
                     axs.set_ylabel('Power magnitude')
                     axs.set_xlabel('Frequency')
@@ -127,7 +127,7 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
                         if col not in list(data.columns.values):
                             raise Exception("Column " + col + " not in Signal " + file)
                         
-                        psd = EMG2PSD(data[col], samplingRate=samplingRate)
+                        psd = emg_to_psd(data[col], samplingRate=samplingRate)
                         axs[i].plot(psd['Frequency'], psd['Power'])
                         axs[i].set_ylabel('Power magnitude')
                         axs[i].set_xlabel('Frequency')
@@ -229,12 +229,12 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
                 if col not in list(data1.columns.values) or col not in list(data2.columns.values):
                     raise Exception("Column " + col + " not in Signal " + file)
                 
-                psd1 = EMG2PSD(data1[col], samplingRate=samplingRate)
+                psd1 = emg_to_psd(data1[col], samplingRate=samplingRate)
                 axs[0].plot(psd1['Frequency'], psd1['Power'])
                 axs[0].set_ylabel('Power magnitude')
                 axs[0].set_title(col)
                 
-                psd2 = EMG2PSD(data2[col], samplingRate=samplingRate)
+                psd2 = emg_to_psd(data2[col], samplingRate=samplingRate)
                 axs[1].plot(psd2['Frequency'], psd2['Power'])
                 axs[1].set_ylabel('Power magnitude')
                 axs[1].set_xlabel('Frequency')
@@ -247,12 +247,12 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
                     if col not in list(data1.columns.values) or col not in list(data2.columns.values):
                         raise Exception("Column " + col + " not in Signal " + file)
                     
-                    psd1 = EMG2PSD(data1[col], samplingRate=samplingRate)
+                    psd1 = emg_to_psd(data1[col], samplingRate=samplingRate)
                     axs[0,i].plot(psd1['Frequency'], psd1['Power'])
                     axs[0,i].set_ylabel('Power magnitude')
                     axs[0,i].set_title(col)
                     
-                    psd2 = EMG2PSD(data2[col], samplingRate=samplingRate)
+                    psd2 = emg_to_psd(data2[col], samplingRate=samplingRate)
                     axs[1,i].plot(psd2['Frequency'], psd2['Power'])
                     axs[1,i].set_ylabel('Power magnitude')
                     axs[1,i].set_xlabel('Frequency')

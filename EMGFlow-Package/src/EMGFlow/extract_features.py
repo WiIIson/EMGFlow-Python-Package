@@ -7,7 +7,7 @@ from tqdm import tqdm
 import warnings
 
 from .access_files import *
-from .preprocess_signals import EMG2PSD
+from .preprocess_signals import emg_to_psd
 
 #
 # =============================================================================
@@ -571,8 +571,8 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
-        psd1 = EMG2PSD(Signal1[col][:diff_ind], samplingRate=sr)
-        psd2 = EMG2PSD(Signal1[col][diff_ind:], samplingRate=sr)
+        psd1 = emg_to_psd(Signal1[col][:diff_ind], samplingRate=sr)
+        psd2 = emg_to_psd(Signal1[col][diff_ind:], samplingRate=sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
@@ -587,8 +587,8 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
         if diffSr <= 0:
             raise Exception("Sampling rate cannot be 0 or negative")
         # Take the PSD of each signal
-        psd1 = EMG2PSD(Signal1[col], samplingRate=sr)
-        psd2 = EMG2PSD(diff[col], samplingRate=diffSr)
+        psd1 = emg_to_psd(Signal1[col], samplingRate=sr)
+        psd2 = emg_to_psd(diff[col], samplingRate=diffSr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
@@ -1255,7 +1255,7 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     
                 # Calculate spectral features
                 Spectral_Flux = calc_spec_flux(data_s, 0.5, col, samplingRate)
-                psd = EMG2PSD(data_b[col], samplingRate=samplingRate)
+                psd = emg_to_psd(data_b[col], samplingRate=samplingRate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 MDF = calc_mdf(psd)
                 MNF = calc_mnf(psd)
