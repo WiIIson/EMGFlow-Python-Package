@@ -46,7 +46,7 @@ The "manual" mode allows for additional customization of processing. In these fu
 - `ApplyBandpassFilter`
 - `ApplyRMSSmooth`
 
-For more information about file accessing functions, see [File access](./file-access.md).
+For more information about file accessing functions, see [File access](./access-files.md).
 
 ### `PreprocessSignals`
 
@@ -82,7 +82,7 @@ This module takes preprocessed data, and extracts features from the sEMG signal 
 
 Analysis involves extracting the features from each signal into a feature file. This is the end of the pipeline, producing the final result.
 
-For a more detailed explanation about the features extracted by `ExtractFeatures()`, see [Feature extraction](./feature-extraction.md).
+For a more detailed explanation about the features extracted by `ExtractFeatures()`, see [Feature extraction](./extract-features.md).
 
 ### `OutlierFinder` Module
 
@@ -90,7 +90,7 @@ This module provides methods to help detect signal files that contain outliers. 
 
 Outlier detection is handled by the function `DetectOutliers()`. This function outputs a dictionary of file names and locations for each signal marked as an outlier.
 
-For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [Outlier detection](./outlier-detection.md).
+For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [Outlier detection](./detect-outliers.md).
 
 ### `PlotSignals` Module
 
