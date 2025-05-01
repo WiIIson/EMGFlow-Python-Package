@@ -7,12 +7,12 @@ This module provides methods to help detect signal files that contain outliers. 
 ```mermaid
 mindmap
     root((EMGFlow))
-        PrS(Preprocess Signals)
-        EF(Extract Features)
-        PlS(Plot Signals)
+        AF(Access Files)
         DO(Detect Outliers)
             DetectOutliers
-        AF(Access Files)
+        PrS(Preprocess Signals)
+        PlS(Plot Signals)
+        EF(Extract Features)
 ```
 
 ## `DetectOutliers`

@@ -7,7 +7,10 @@ This module takes preprocessed data, and extracts features from the sEMG signal 
 ```mermaid
 mindmap
     root((EMGFlow))
+        AF(Access Files)
+        DO(Detect Outliers)
         PrS(Preprocess Signals)
+        PlS(Plot Signals)
         EF(Extract Features)
             CalcIEMG
             CalcMAV
@@ -36,9 +39,6 @@ mindmap
             CalcSRoll
             CalcSBW
             ExtractFeatures
-        PlS(Plot Signals)
-        DO(Detect Outliers)
-        AF(Access Files)
 ```
 
 ## Basic Time-Series Statistics

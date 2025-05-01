@@ -7,6 +7,8 @@ The `PreProcessSignals` module provides preprocessing functions for cleaning sEM
 ```mermaid
 mindmap
     root((EMGFlow))
+        AF(File Access)
+        DO(Detect Outliers)
         PrS(Preprocess Signals)
             EMG2PSD
             ApplyNotchFilters
@@ -19,10 +21,8 @@ mindmap
             ApplyGaussianSmooth
             ApplyLoessSmooth
             SmoothFilterSignals
-        EF(Extract Features)
         PlS(Plot Signals)
-        DO(Detect Outliers)
-        AF(File Access)
+        EF(Extract Features)
 ```
 
 ## `EMG2PSD`

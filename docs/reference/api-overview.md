@@ -4,11 +4,11 @@ outline: deep
 
 # API Overview
 
-EMGFlow is broken into 5 modules - FileIO, preprocessing signals, feature extraction, detecting outliers, and generating visualizations.
+EMGFlow is broken into 5 modules: `access_files` for file IO, `detect_outliers` for detecting outliers, `preprocess_signals` for preprocessing signals, `plot_signals` generating visualizations, and `extract_features` feature extraction.
 
 ## File Format
 
-The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with, ideally, a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time from 0 the signal has been recorded for, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
+The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with, ideally, a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time since the beginning of the recording, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
 
 ## Modules
 
@@ -17,90 +17,90 @@ The EMGFlow Python package works with CSV files, but is planned to expand to oth
 ```mermaid
 mindmap
     root((EMGFlow))
-        PrS(Preprocess Signals)
-        EF(Extract Features)
-        PlS(Plot Signals)
-        DO(Detect Outliers)
         AF(Access Files)
+        DO(Detect Outliers)
+        PrS(Preprocess Signals)
+        PlS(Plot Signals)
+        EF(Extract Features)
 ```
 
-### `FileAccess`
+### `access_files` Module
 
-These functions provide helper methods for accessing files.
+These functions provide helper methods for accessing files, as well as functions for creating an EMG workflow filestructure.
 
-`MakePaths` is the beginning of the EMG processing pipeline, it generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature". This dictionary is passed to many of the processing functions.
+`make_paths` is the beginning of the EMG processing pipeline. It generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature" - each for a different stage of processing. This dictionary is passed to many of the processing functions. If you have your own file structure you want to use instead, you can create your own dictionary to use instead, manually setting the locations of the paths under these keys.
 
-`MakeSampleData` is a supplementary function that writes sample data for testing to the "Raw" folder of your `MakePaths` dictionary
+`make_sample_data` provides built-in data to test out a data processing pipeline. It writes EMG data files to the "Raw" directory of a provided dictionary.
 
-`MapFiles` is widely used internally in the EMGFlow, it takes a path to a folder, and generates a dictionary of paths to files contained within. This makes it easier to create a loop over subfiles, reading them in and performing analysis.
+`map_files` is widely used internally to the EMGFlow package. It takes a path to a folder, and generates a dictionary of paths to the files contained within based on their names. This makes it easier to loop over subfiles, reading and analyzing them.
 
-This forms the basis for the two modes of analysis offered by EMGFlow - automated, or manual.
+This function forms the basis for the two modes of analysis offered by EMGFlow: automated or manual.
 
-The "automated" mode makes the processing pipeline much simpler. In these functions, input/output paths from your dictionary are provided, and default parameters are set. The functions then apply the filters to each file found in the folder, and output the filtered files to the output folder. Notable functions include:
-- `NotchFilterSignals`
-- `BandpassFilterSignals`
-- `SmoothFilterSignals`
+The "automated" mode is designed for bulk processing files. In these functions, input/output is handled using your filepath dictionary. The functions loop over the files in the input folder, apply the filters, and write the filtered files to the output folder. Notable functions for this workflow includes:
+- `notch_filter_signals`
+- `bandpass_filter_signals`
+- `smooth_filter_signals`
 
-The "manual" mode allows for additional customization of processing. In these functions, a dataframe is provided, filter parameters are set, and the dataframe is returned. These functions are useful if the processing pipeline requires further additional processing before being outputted, of if the project is not large-scale enough to warrent batch processing. Notable functions include:
-- `ApplyNotchFilters`
-- `ApplyBandpassFilter`
-- `ApplyRMSSmooth`
+The "manual" mode is designed for processing individual files. In these functions, input/output is handled by passing and recieving a dataframe. Notable functions include:
+- `apply_notch_filters`
+- `apply_bandpass_filter`
+- `apply_rms_smooth`
 
-For more information about file accessing functions, see [File access](./access-files.md).
+For more information, see the documentation for the [access_files module](./access-files.md).
 
-### `PreprocessSignals`
+### `detect_outliers` Module
 
-This module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
+It can be useful to look for outliers in EMG data to identify which filters need to be applied. While filter parameters can typically be determined by looking at a signal, in a large dataset it can be tiresome to look through every file.
 
-#### `NotchFilterSignals()`
+The `detect_outliers` function helps by using a frequency-domain anomaly detection algorithm. This helps identify which files may need additional processing, as well as determine if there is a pattern to which files contain outliers.
+
+For more information, see the documentation for the [detect_outliers module](./detect-outliers.md).
+
+### `preprocess_signals` Module
+
+This module contains the functions used for preprocessing and cleaning sEMG signals before extracting features. The preprocessing stage is broken into 3 parts: notch filtering, bandpass filtering, and smoothing.
+
+#### `notch_filter_signals`
 
 Notch filtering involves filtering specific frequencies. This is typically due to some sort of interference, such as the power source of the device taking the reading.
 
-`NotchFilterSignals()` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings.  However, other regions use 50Hz frequencies.
+`notch_filter_signals` provides flexibility for use in different regions of the world. Some filtering packages only provide notch filtering for 60Hz, the frequency where power can interfere with signal readings. However, other regions use different frequencies for power, such as 50Hz. EMGFlow allows you to choose the frequency and strength of the filter in a simple wrapper.
 
-For more information about further customizations and detail about `NotchFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
+For more information, see the documentation for the [preprocess_signals module](./preprocess-signals.md).
 
-#### `BandpassFilterSignals()`
+#### `bandpass_filter_signals`
 
-Bandpass filtering involves specifying a range of frequencies to keep, and removing all other frequencies outside this range. This is useful to remove interference outside the most meaningful range of readings. 
+Bandpass filtering involves filtering frequencies outside a specific range. This is because sEMG signals only produce frequencies in a specific range, so any other recorded frequencies can be assumed to be interference.
 
-`BandpassFilterSignals()` uses bandpass thresholds of 20Hz and 450Hz, as this is default for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscels, so `BandpassFilterSignals()` provides the option to change the thresholds.
+`bandpass_filter_signals` uses bandpass thresholds of outside 20Hz and 450Hz, as this is the standard for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscles, so `bandpass_filter_signals` provides the option to change these thresholds.
 
-For more information about further customizations and detail about `BandpassFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
+For more information, see the documentation for the [preprocess_signals module](./preprocess-signals.md).
 
-#### `SmoothFilterSignals()`
+#### `smooth_filter_signals`
 
-Smoothing involves limiting the impacts of noise and outliers in the signal. By default, this function uses the RMS smoothing method, as it is the best choice for smoothing EMG signals (RENSHAW et al., 2010).
+Smoothing involves limiting the impacts of noise and outliers in the signal by applying a smoothing algorithm.
 
-`SmoothFilterSignals()` by default uses the RMS smoothing method, as it is the best choice for filtering EMG signals (RENSHAW et al., 2010). Regardless, EMGFlow provides different methods for smoothing signals which can be used instead.
+`smooth_filter_signals` uses the RMS smoothing slgorithm by default as it is the best choice for filtering EMG signals (RENSHAW et al., 2010), however, EMGFlow provides other options as well.
 
-For more information about further customizations and detail about `SmoothFilterSignals()`, see [Preprocessing](./preprocess-signals.md).
+For more information, see the documentation for the [preprocess_signals module](./preprocess-signals.md).
 
-### `ExtractFeatures` Module
+### `plot_signals` Module
 
-This module takes preprocessed data, and extracts features from the sEMG signal that capture information in both time and frequency domains. The main function to do this is `ExtractFeatures`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
+This module contains the functions used for visualizing individual, or large batches of signal data. This helps to see what is going on in the signal files whether to produce graphics, to make comparisons between files, or to look for outliers.
 
-Analysis involves extracting the features from each signal into a feature file. This is the end of the pipeline, producing the final result.
+The `plot_dashboard` function uses an R Shiny Dashboard to dynamically load signal files. This makes it easy to compare different stages of processing, and jump between files.
 
-For a more detailed explanation about the features extracted by `ExtractFeatures()`, see [Feature extraction](./extract-features.md).
+The `plot_spectrum` function generates image files of power spectral density graphs for signals.
 
-### `OutlierFinder` Module
+For more information, see the documentation for the [plot_signals module](./plot-signals.md).
 
-This module provides methods to help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
+### `extract_features` Module
 
-Outlier detection is handled by the function `DetectOutliers()`. This function outputs a dictionary of file names and locations for each signal marked as an outlier.
+This module contains the functions used for extracting features from signal data. This is primarily done with the `extract_features` function, though each individual feature is available as its own independent function for use in your own workflow.
 
-For more information about further customizations and specifications that can be made to `DetectOutliers()`, see [Outlier detection](./detect-outliers.md).
+The `extract_features` function writes the feature data to a "features.csv" file, with a column for the name of the signal file, and additional columns for each feature extracted. This is the end of the EMGFlow pipeline, producing this final file.
 
-### `PlotSignals` Module
-
-The plotting module `PlotSignals` provides functions to help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
-
-`PlotSpectrum` can generate a signal plot for every signal file in the folder it is provided.
-
-`PlotCompareSignals()` does the same, generating plots comparing every signal at two different stages of their processing.
-
-For more information about further customizations and specifications that can be made to `PlotSpectrum()` or `PlotCompareSignals()`, see [Plotting signals](./plot-signals.md).
+For more information, see the documentation for the [extract_features module](./extract-features.md).
 
 ## Sources
 
