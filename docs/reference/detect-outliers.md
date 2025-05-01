@@ -7,7 +7,7 @@ This module provides methods to help detect signal files that contain outliers. 
 ```mermaid
 mindmap
     root((EMGFlow))
-        FA(File Access)
+        AF(File Access)
         DO(Detect Outliers)
             DetectOutliers
         EF(Extract Features)

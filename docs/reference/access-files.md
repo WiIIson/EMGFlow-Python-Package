@@ -7,7 +7,7 @@ These functions provide helper methods for accessing files, and are mostly used 
 ```mermaid
 mindmap
     root((EMGFlow))
-        FA(File Access)
+        AF(File Access)
             MakePaths
             MakeSampleData
             ReadFileType

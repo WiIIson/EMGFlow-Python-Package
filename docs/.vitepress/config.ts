@@ -38,11 +38,11 @@ export default withMermaid({
         text: 'Reference',
         items: [
           { text: 'Overview', link: '/reference/api-overview' },
-          { text: 'Preprocessing', link: '/reference/preprocess-signals' },
-          { text: 'Feature extraction', link: '/reference/feature-extraction' },
-          { text: 'Plotting signals', link: '/reference/plot-signals' },
-          { text: 'Outlier detection', link: '/reference/outlier-detection' },
-          { text: 'File access', link: '/reference/file-access' },
+          { text: 'Preprocess Signals', link: '/reference/preprocess-signals' },
+          { text: 'Extract Features', link: '/reference/feature-extraction' },
+          { text: 'Plot Signals', link: '/reference/plot-signals' },
+          { text: 'Detect Outliers', link: '/reference/detect-outliers' },
+          { text: 'Access Files', link: '/reference/access-files' },
         ]
       },
 

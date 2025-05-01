@@ -7,7 +7,7 @@ This module takes preprocessed data, and extracts features from the sEMG signal 
 ```mermaid
 mindmap
     root((EMGFlow))
-        FA(File Access)
+        AF(File Access)
         DO(Detect Outliers)
         EF(Extract Features)
             CalcIEMG
