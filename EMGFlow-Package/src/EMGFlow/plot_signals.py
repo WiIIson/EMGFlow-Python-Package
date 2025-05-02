@@ -381,7 +381,7 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
                     
                     # Exception for column input
                     if col not in list(sigDF.columns.values):
-                        raise Exception("Column " + col + " not in Signal " + filename)
+                        raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                     
                     
                     ax.plot(sigDF['Time'], sigDF[col], alpha=0.5, linewidth=1)
