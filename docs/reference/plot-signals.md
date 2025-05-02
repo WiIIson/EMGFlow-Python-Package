@@ -58,6 +58,8 @@ GenPlotDash(path_names, sampling_rate, col, units, expression=None, file_ext='cs
 
 **Error**
 
+Raises an error if `col` is a list.
+
 Raises an error if the directories referenced in `path_names` don't contain the same files.
 
 Raises an error if `col` is not found in a dataframe.
