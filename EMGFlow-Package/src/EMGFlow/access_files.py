@@ -295,8 +295,10 @@ def make_sample_data(pathNames):
     sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
     
     # Write the sample data
-    data_path_01 = os.path.join(pathNames['Raw'], 'sample_data_01.csv')
-    data_path_02 = os.path.join(pathNames['Raw'], 'sample_data_02.csv')
+    os.makedirs(os.path.join(pathNames['Raw'], '01'), exist_ok=True)
+    os.makedirs(os.path.join(pathNames['Raw'], '02'), exist_ok=True)
+    data_path_01 = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+    data_path_02 = os.path.join(pathNames['Raw'], '02', 'sample_data_02.csv')
     if not os.path.exists(data_path_01):
         sample_data_01.to_csv(data_path_01, index=False)
     if not os.path.exists(data_path_02):
