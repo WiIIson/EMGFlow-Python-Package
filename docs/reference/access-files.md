@@ -1,4 +1,4 @@
-# `FileAccess` Module Documentation
+# `access_files` Module Documentation
 
 These functions provide helper methods for accessing files, and are mostly used internally by the package.
 
@@ -8,27 +8,27 @@ These functions provide helper methods for accessing files, and are mostly used 
 mindmap
     root((EMGFlow))
         AF(Access Files)
-            MakePaths
-            MakeSampleData
-            ReadFileType
-            MapFiles
-            ConvertMapFiles
+            make_paths
+            make_sample_data
+            read_file_type
+            map_files
+            convert_map_files
         DO(Detect Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
 ```
 
-## `MakePaths`
+## `make_paths`
 
 **Description**
 
-`MakePaths` generates a file structure for signal file processing, and returns a dictionary of the locations of these files.
+`make_paths` generates a file structure for signal files, and returns a dictionary of the locations of these files.
 
-A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and "Feature" subfolders. Alternatively, a path can be provided for these subfolders to be created in instead.
+"Raw", "Notch", "Bandpass", "Smooth" and "Feature" folders are created at a given location. By default, if no path is provided, these folders will be created inside a "Data" folder in the current working directory.
 
 ```python
-MakePaths(root=None)
+make_paths(root=None)
 ```
 
 **Parameters**
@@ -38,55 +38,55 @@ MakePaths(root=None)
 
 **Returns**
 
-`path_dict`: dict (str)
+`make_paths`: dict (str)
 - A dictionary of file locations with keys for the stage in the processing pipeline.
 
 **Example**
 
 ```python
 # Create folders and get locations
-path_names = EMGFlow.MakePaths()
+pathNames = EMGFlow.make_paths()
 ```
 
-## `MakeSampleData`
+## `make_sample_data`
 
 **Description**
 
-`MakeSampleData` generates sample data in the "Raw" folder of a provided dictionary of file locations.
+`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations.
 
 ```python
-MakeSampleData(path_names)
+make_sample_data(pathNames)
 ```
 
 **Parameters**
 
-`path_names`: dict (str)
+`pathNames`: dict (str)
 - A dictionary of file locations
 
 **Returns**
 
-`None`
+`make_sample_data`: None
 
 **Error**
 
-Raises an error if `path_names` does not contain a `Raw` path key.
+Raises an error if `pathNames` does not contain a `Raw` path key.
 
 **Example**
 
 ```python
 # Create file paths, then create sample data
-path_names = EMGFlow.MakePaths()
-EMGFlow.MakeSampleData(path_names)
+pathNames = EMGFlow.make_paths()
+EMGFlow.make_sample_data(pathNames)
 ```
 
-## `ReadFileType`
+## `read_file_type`
 
 **Description**
 
-`ReadFileType` is a safe wrapper for reading files of a given extension.
+`read_file_type` is a safe wrapper for reading files of a given extension.
 
 ```python
-ReadFileType(path, file_ext)
+read_file_type(path, fileExt)
 ```
 
 **Parameters**
@@ -94,19 +94,19 @@ ReadFileType(path, file_ext)
 `path`: str
 - String filepath of file to read.
 
-`file_ext`: str
+`fileExt`: str
 - String extension of the files to read.
 
 **Returns**
 
-`ReadFileType`: pd.DataFrame
+`read_file_type`: pd.DataFrame
 - Returns a Pandas dataframe of the file contents.
 
 **Error**
 
 Raises an error if the file could not be read.
 
-Raises an error if an unsupported file format was provided for `file_ext`.
+Raises an error if an unsupported file format was provided for `fileExt`.
 
 **Example**
 
@@ -114,27 +114,27 @@ Raises an error if an unsupported file format was provided for `file_ext`.
 # Read a csv file
 path = 'data/raw/file01.csv'
 ext = 'csv'
-df = EMGFlow.ReadFileType(path, ext)
+df = EMGFlow.read_file_type(path, ext)
 ```
 
 
 
-## `MapFiles`
+## `map_files`
 
 **Description**
 
-`MapFiles` generates a dictionary of file name and location keys/values from a folder and its subfolders.
+`map_files` generates a dictionary of file name and location keys/values from a folder and its subfolders.
 
 ```python
-MapFiles(in_path, file_ext='csv', expression=None)
+map_files(inPath, fileExt='csv', expression=None)
 ```
 
 **Parameters**
 
-`in_path`: str
+`inPath`: str
 - String filepath to a directory containing Signal files.
 
-`file_ext`: str ("csv")
+`fileExt`: str ("csv")
 - String extension of the files to read. The default is `'csv'`.
 
 `expression`: str (None)
@@ -142,7 +142,7 @@ MapFiles(in_path, file_ext='csv', expression=None)
 
 **Returns**
 
-`MapFiles`: dict
+`map_files`: dict
 - Returns a dictionary of file names and locations keys/values.
 
 **Error**
@@ -153,25 +153,25 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Map all csv files in 'dataFiles' folder and subfolders
-file_loc1 = EMGFlow.MapFiles('/data')
+fileLoc1 = EMGFlow.map_files('data')
 
 # Map all csv files in 'dataFiles' folder and subfolders
 # that start with 'DATA_'
-file_loc2 = EMGFlow.MapFiles('/data', expression='^DATA_')
+fileLoc2 = EMGFlow.map_files('data', expression='^DATA_')
 ```
 
 
 
-## `ConvertMapFiles`
+## `convert_map_files`
 
 **Description**
 
-A more advanced version of `MapFiles` that can coerce other data types into the `MapFiles` format.
+A more advanced version of `map_files` that can coerce other data types into the `map_files` format.
 
 If provided a dictionary (assumed to be a file location map), it will return it, filtered by `expression` if provided.
 
 ```python
-ConvertMapFiles(fileObj, file_ext='csv', experssion=None)
+convert_map_files(fileObj, fileExt='csv', experssion=None)
 ```
 
 **Parameters**
@@ -179,7 +179,7 @@ ConvertMapFiles(fileObj, file_ext='csv', experssion=None)
 `fileObj`: str, dict
 - Any filepath data type supported by the function. Supported data types are: string filepath, or filepath dictionary.
 
-`file_ext`: str ("csv")
+`fileExt`: str ("csv")
 - Extension of the files to read. The default is 'csv'.
 
 `expression`: str (None)
@@ -187,7 +187,7 @@ ConvertMapFiles(fileObj, file_ext='csv', experssion=None)
 
 **Returns**
 
-`ConvertMapFiles`: dict
+`convert_map_files`: dict
 - Returns a dictionary of file names and locations keys/values.
 
 **Error**
@@ -200,38 +200,37 @@ Raises an error if `expression` is not a valid regular expression.
 
 ```python
 # Read in file locations normally
-file_loc1 = EMGFlow.ConvertMapFiles('/data')
+fileLoc1 = EMGFlow.convert_map_files('/data')
 
 # Filter an existing dataframe with a regular expression
-file_loc2 = EMGFlow.ConvertMapFiles(file_loc1, expression='^01')
+fileLoc2 = EMGFlow.convert_map_files(fileLoc1, expression='^01')
 ```
 
 
 
-## `MapFilesFuse`
-
+## `map_files_fuse`
 
 **Description**
 
-Combines multiple dictionaries of mapped files (see `MapFiles`) into a Pandas DataFrame.
+Combines multiple dictionaries of mapped files (see `map_files`) into a Pandas DataFrame.
 
 Assumes that the files contained in the first dictionary are present in each of the following dictionaries.
 
 ```python
-MapFilesFuse(filedirs, names)
+map_files_fuse(filedirs, names)
 ```
 
 **Parameters**
 
-`filedirs`:  dict list
+`filedirs`:  list (dict)
 - List of dictionaries assumed to contain file maps.
 
-`names`: str list
+`names`: list (str)
 - List of names to use for columns, same order as filedirs
 
 **Returns**
 
-`MapFilesFuse`: pd.DataFrame
+`map_files_fuse`: pd.DataFrame
 - Returns a Pandas DataFrame containing each file, and their location for each directory.
 
 **Error**
@@ -242,14 +241,14 @@ Raises an error if files contained in the first element of `filedirs` is not con
 
 ```python
 # Create file directory dictionaries
-dir_raw = EMGFlow.ConvertMapFiles('/data/raw')
-notch_path = EMGFlow.ConvertMapFiles('/data/notch')
-band_path = EMGFlow.ConvertMapFiles('/data/bandpass')
+dirRaw = EMGFlow.map_files_fuse('/data/raw')
+notchPath = EMGFlow.map_files_fuse('/data/notch')
+bandPath = EMGFlow.map_files_fuse('/data/bandpass')
 
 # Create dictionary list and names
-filedirs = [dir_raw, notch_path, band_path]
-names = ['raw', 'notch', 'bandpass']
+filedirs = [dirRaw, notchPath, bandPath]
+names = ['Raw', 'Notch', 'Bandpass']
 
 # Create data frame
-df_dirs = EMGFlow.MapFilesFuse(filedirs, names)
+dfDirs = EMGFlow.map_files_fuse(filedirs, names)
 ```
