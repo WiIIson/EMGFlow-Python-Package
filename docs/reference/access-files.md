@@ -52,7 +52,7 @@ pathNames = EMGFlow.make_paths()
 
 **Description**
 
-`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations.
+`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations. Creates an "01" folder with "sample_data_01.csv", and an "02" folder with "sample_data_02.csv".
 
 ```python
 make_sample_data(pathNames)

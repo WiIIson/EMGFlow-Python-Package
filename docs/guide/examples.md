@@ -62,7 +62,7 @@ pathNames = EMGFlow.make_paths()
 EMGFlow.make_sample_data(pathNames)
 
 # Load dataframe from generated data
-sampleData = pd.read_csv(os.path.join(pathNames['Raw'], 'sample_data_01.csv'))
+sampleData = pd.read_csv(os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv'))
 
 # Sampling rate
 samplingRate = 2000
