@@ -55,7 +55,7 @@ def read_file_type(path, fileExt):
 # =============================================================================
 #
 
-def map_files(inPath, fileExt='csv', expression=None):
+def map_files(inPath, fileExt='csv', expression=None, base=None):
     """
     Generate a dictionary of file names and locations from the subfiles of a
     folder.
@@ -69,6 +69,9 @@ def map_files(inPath, fileExt='csv', expression=None):
     expression : str, optional
         A regular expression. If provided, will only count files whose names
         match the regular expression. The default is None.
+    base : str, optional
+        Path of the root folder the path keys should start from. The default is
+        None. 
 
     Raises
     ------
@@ -83,20 +86,31 @@ def map_files(inPath, fileExt='csv', expression=None):
 
     """
     
+    # Throw error if Regex does not compile
     if expression is not None:
         try:
             re.compile(expression)
         except:
             raise Exception("Invalid regex expression provided")
     
+    # Set base path and ensure inPath is absolute
+    if base is None:
+        if not os.path.isabs(inPath):
+            inPath = os.path.join(os.getcwd(), inPath)
+        base = inPath
+    
+    # Build file directory dictionary
     filedirs = {}
     for file in os.listdir(inPath):
         new_path = os.path.join(inPath, file)
+        # Recursively check folders
         if os.path.isdir(new_path):
-            subDir = map_files(new_path, fileExt=fileExt, expression=expression)
+            subDir = map_files(new_path, fileExt=fileExt, expression=expression, base=base)
             filedirs.update(subDir)
+        # Record the file path (from base to current folder) and absolute path
         elif (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
-            filedirs[file] = new_path
+            fileName = os.path.relpath(new_path, base)
+            filedirs[fileName] = new_path
     return filedirs
 
 #

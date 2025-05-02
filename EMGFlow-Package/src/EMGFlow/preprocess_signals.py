@@ -288,7 +288,7 @@ def notch_filter_signals(inPath, outPath, samplingRate, notch, cols=None, expres
             
             # Construct out path
             out_file = outPath + filedirs[file][len(inPath):]
-            out_folder = out_file[:len(out_file) - len(file)]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
@@ -460,7 +460,7 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
             
             # Construct out path
             out_file = outPath + filedirs[file][len(inPath):]
-            out_folder = out_file[:len(out_file) - len(file)]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
@@ -847,7 +847,7 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
                 
             # Construct out path
             out_file = outPath + filedirs[file][len(inPath):]
-            out_folder = out_file[:len(out_file) - len(file)]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
             
             # Make folders and write data
             os.makedirs(out_folder, exist_ok=True)
