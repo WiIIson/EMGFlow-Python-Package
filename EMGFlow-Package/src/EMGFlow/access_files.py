@@ -45,9 +45,9 @@ def read_file_type(path, fileExt):
         try:
             file = pd.read_csv(path)
         except:
-            raise Exception("CSV file could not be read: " + path)
+            raise Exception("CSV file could not be read: " + str(path))
     else:
-        raise Exception("Unsupported file format provided: " + fileExt)
+        raise Exception("Unsupported file format provided: " + str(fileExt))
         
     return file
 
@@ -218,7 +218,7 @@ def map_files_fuse(filedirs, names):
         for i, filedir in enumerate(filedirs):
             if file not in filedir:
                 # Raise exception if file does not exist
-                raise Exception('File ' + file + ' does not exist in file directory ' + names[i])
+                raise Exception('File ' + str(file) + ' does not exist in file directory ' + str(names[i]))
             row.append(filedir[file])
         # Add row to data frame
         data.append(row)

@@ -51,7 +51,7 @@ def calc_iemg(Signal, col, sr):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if sr <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
@@ -89,7 +89,7 @@ def calc_mav(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     MAV = np.sum(np.abs(Signal[col])) / N
@@ -124,7 +124,7 @@ def calc_mmav1(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     vals = list(np.abs(Signal[col]))
@@ -166,7 +166,7 @@ def calc_mmav2(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     vals = list(np.abs(Signal[col]))
@@ -214,7 +214,7 @@ def calc_ssi(Signal, col, sr):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if sr <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
@@ -251,7 +251,7 @@ def calc_var(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     VAR = 1/(N - 1) * np.sum(Signal[col] ** 2)
@@ -286,7 +286,7 @@ def calc_vorder(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     vOrder = np.sqrt(calc_var(Signal, col))
     return vOrder
@@ -320,7 +320,7 @@ def calc_rms(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal)
     RMS = np.sqrt((1/N) * np.sum(Signal[col] ** 2))
@@ -355,7 +355,7 @@ def calc_wl(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     vals = list(Signal[col])
@@ -394,7 +394,7 @@ def calc_wamp(Signal, col, threshold):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     vals = list(Signal[col])
@@ -431,7 +431,7 @@ def calc_log(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     N = len(Signal[col])
     ex = (1/N) * np.sum(np.log(Signal[col]))
@@ -467,7 +467,7 @@ def calc_mfl(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     vals = Signal[col]
     N = len(Signal[col])
@@ -504,7 +504,7 @@ def calc_ap(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     AP = np.sum(Signal[col] ** 2) / len(Signal[col])
     return AP
@@ -558,7 +558,7 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     """
     
     if col not in list(Signal1.columns.values):
-        raise Exception("Column " + col + " not in Signal1")
+        raise Exception("Column " + str(col) + " not in Signal1")
         
     if sr <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
@@ -579,7 +579,7 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     # Find spectral flux of Signal1 by div
     elif isinstance(diff, pd.DataFrame):
         if col not in list(diff.columns.values):
-            raise Exception("Column " + col + " not in diff")
+            raise Exception("Column " + str(col) + " not in diff")
         
         # If no second sampling rate, assume same sampling rate as first Signal
         if diffSr == None: diffSr = sr
@@ -1219,9 +1219,9 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
             data_s = read_file_type(filedirs_s[file], fileExt)
             
             if col not in list(data_b.columns.values):
-                raise Exception("Bandpass file " + file + " does not contain column " + col)
+                raise Exception("Bandpass file " + str(file) + " does not contain column " + str(col))
             if col not in list(data_s.columns.values):
-                raise Exception("Smooth file " + file + " does not contain column " + col)
+                raise Exception("Smooth file " + str(file) + " does not contain column " + str(col))
             
             # Calculate ID
             if shortName:

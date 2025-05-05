@@ -129,7 +129,7 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
     """
 
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if samplingRate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
@@ -267,7 +267,7 @@ def notch_filter_signals(inPath, outPath, samplingRate, notch, cols=None, expres
     else:
         filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
-            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
         
     # Apply transformations
     for file in tqdm(filedirs):
@@ -343,7 +343,7 @@ def apply_bandpass_filter(Signal, col, samplingRate, low, high):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal.")
+        raise Exception("Column " + str(col) + " not in Signal.")
     
     if samplingRate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
@@ -439,7 +439,7 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
     else:
         filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
-            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
@@ -505,7 +505,7 @@ def apply_fwr(Signal, col):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     Signal = Signal.copy()
     Signal[col] = np.abs(Signal[col])
@@ -550,7 +550,7 @@ def apply_boxcar_smooth(Signal, col, windowSize):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if windowSize <= 0:
         raise Exception("windowSize cannot be 0 or negative")
@@ -604,7 +604,7 @@ def apply_rms_smooth(Signal, col, windowSize):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if windowSize <= 0:
         raise Exception("windowSize cannot be 0 or negative")
@@ -666,7 +666,7 @@ def apply_gaussian_smooth(Signal, col, windowSize, sigma=1):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + (col) + " not in Signal")
     
     if windowSize <= 0:
         raise Exception("windowSize cannot be 0 or negative")
@@ -719,7 +719,7 @@ def apply_loess_smooth(Signal, col, windowSize):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + col + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if windowSize <= 0:
         raise Exception("windowSize cannot be 0 or negative")
@@ -817,7 +817,7 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
     else:
         filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
         if len(filedirs) == 0:
-            warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
     
     # Apply transformations
     for file in tqdm(filedirs):
@@ -843,7 +843,7 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
                 elif method == 'loess':
                     data = apply_loess_smooth(data, col, windowSize)
                 else:
-                    raise Exception('Invalid smoothing method used: ', method, ', use "rms", "boxcar", "gauss" or "loess"')
+                    raise Exception('Invalid smoothing method used: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
             # Construct out path
             out_file = outPath + filedirs[file][len(inPath):]

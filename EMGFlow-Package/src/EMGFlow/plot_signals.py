@@ -112,7 +112,7 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
                     col = cols[0]
                     
                     if col not in list(data.columns.values):
-                        raise Exception("Column " + col + " not in Signal " + file)
+                        raise Exception("Column " + str(col) + " not in Signal " + str(file))
                     
                     psd = emg_to_psd(data[col], samplingRate=samplingRate)
                     axs.plot(psd['Frequency'], psd['Power'])
@@ -125,7 +125,7 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
                         col = cols[i]
                         
                         if col not in list(data.columns.values):
-                            raise Exception("Column " + col + " not in Signal " + file)
+                            raise Exception("Column " + str(col) + " not in Signal " + str(file))
                         
                         psd = emg_to_psd(data[col], samplingRate=samplingRate)
                         axs[i].plot(psd['Frequency'], psd['Power'])
@@ -227,7 +227,7 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
                 col = cols[0]
                 
                 if col not in list(data1.columns.values) or col not in list(data2.columns.values):
-                    raise Exception("Column " + col + " not in Signal " + file)
+                    raise Exception("Column " + str(col) + " not in Signal " + str(file))
                 
                 psd1 = emg_to_psd(data1[col], samplingRate=samplingRate)
                 axs[0].plot(psd1['Frequency'], psd1['Power'])
@@ -245,7 +245,7 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
                     col = cols[i]
                     
                     if col not in list(data1.columns.values) or col not in list(data2.columns.values):
-                        raise Exception("Column " + col + " not in Signal " + file)
+                        raise Exception("Column " + str(col) + " not in Signal " + str(file))
                     
                     psd1 = emg_to_psd(data1[col], samplingRate=samplingRate)
                     axs[0,i].plot(psd1['Frequency'], psd1['Power'])
@@ -350,11 +350,11 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
     # =============
     app_ui = ui.page_fluid(
         ui.layout_sidebar(
-            ui.panel_sidebar(
+            ui.sidebar(
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
                 ui.input_select('file_type', 'File:', choices=df['File'])
             ),
-            ui.panel_main(
+            ui.card(
                 ui.output_plot('plt_signal'),
             ),
         ),
@@ -394,7 +394,7 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
                 
                 # Exception for column input
                 if col not in list(sigDF.columns.values):
-                    raise Exception("Column " + col + " not in Signal " + filename)
+                    raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                 
                 # Get colour data
                 i = (names.index(column) + 1) % len(colours)

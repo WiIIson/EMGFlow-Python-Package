@@ -169,7 +169,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 col = cols[i]
                 
                 if col not in list(data.columns.values):
-                    raise Exception("Column " + col + " not in Signal " + file)
+                    raise Exception("Column " + str(col) + " not in Signal " + str(file))
                 
                 psd = emg_to_psd(data[col], samplingRate=samplingRate)
                 psd = ZoomIn(psd, low, high)
