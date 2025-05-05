@@ -23,136 +23,146 @@ bibliography: paper.bib
 
 # Summary
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The use of surface electromyography (sEMG) as a measure of human physiology and behaviour has grown recently, supported by developments in deep learning and wearable computing. Here, we present _EMGFlow_, an open-source Python package for preprocessing and extracting features from sEMG signals. *EMGFlow* has been designed to facilitate the analysis of large datasets through batch processing of signal files, a common requirement in machine learning. The package extracts an extensive set of features from both time and frequency domains. Regular expression matching provides additional flexibility in mapping files for selective preprocessing and extraction. The use of Pandas DataFrame throughout allows users to mix and match elements of the processing pipeline, supporting interoperability with other packages. An interactive dashboard supports human decision processes through a visual comparison of signals at each stage of preprocessing. _EMGFlow_ is released under the GNU General Public License (v3.0) and can be installed from PyPI. Source code, documentation, and examples are accessible on GitHub ([https://github.com/WiIIson/EMGFlow-Python-Package](https://github.com/WiIIson/EMGFlow-Python-Package)).
+Surface electromyography (sEMG) is increasingly used to study human physiology and behaviour, spurred by advances in deep learning and wearable sensors. Here, we introduce _EMGFlow_, an open-source Python package designed to simplify the preprocessing and feature extraction of sEMG signals. Tailored for batch processing, EMGFlow efficiently handles large datasets typical in machine learning contexts, extracting a comprehensive set of 33 statistical features across both time and frequency domains. The package integrates regular expression matching to support flexible file selection for preprocessing and feature extraction tasks. _EMGFlow_ uses Pandas DataFrames throughout its workflow to facilitate interoperability with other data analysis tools. An interactive dashboard provides visual comparisons of signals at each preprocessing stage, enhancing user understanding and decision-making. _EMGFlow_ is distributed under the GNU General Public License v3.0 (GPL-3.0) and can be installed directly from PyPI. A dedicated documentation site—complete with detailed guides, API references, and runnable examples—is available at [https://wiiison.github.io/EMGFlow-Python-Package/](https://wiiison.github.io/EMGFlow-Python-Package/).
 
 # Statement of Need
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Although several packages exist for processing physiological and neurological signals, support for sEMG has remained limited. Many packages lack a comprehensive set of features that can be extracted from sEMG data, leaving researchers to use a patchwork of tools. Other packages are orientated around event detection in individual recordings and use a GUI-based workflow that requires more manual intervention. While this design works well for processing unedited continuous recordings of a single participant, it complicates the extraction of features from large datasets common to machine learning [@abadi_decaf_2015; @chen_emotion_2022; @koelstra_deap_2012; @schmidt_introducing_2018; @sharma_dataset_2019; @zhang_biovid_2016].
+Although several packages exist for processing physiological and neurological signals, support for sEMG has remained limited. Many packages lack a comprehensive set of features that can be extracted from sEMG data, leaving researchers to use a patchwork of tools. Other packages are orientated around event detection in individual recordings and use a GUI-based workflow that requires more manual intervention. While this design works well for processing unedited continuous recordings of a single participant, it complicates the extraction of features from large datasets common to machine learning [@abadi_decaf_2015; @chen_emotion_2022; @koelstra_deap_2012; @schmidt_introducing_2018; @sharma_dataset_2019; @zhang_biovid_2016].
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flexible pipeline for extracting a wide range of sEMG features, with a scalable design suited for large datasets.
+_EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flexible pipeline for extracting a wide range of sEMG features, with a scalable design suited for large datasets.
 
 # Comparison to Other Packages
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compared to other toolkits, _EMGFlow_ extracts a comprehensive set of 32 statistical features from sEMG signals [@bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. An interactive dashboard visualizes batch processed files rather than individual recordings, allowing the operator to efficiently view the effects of preprocessing stages across all files. Adjustable filter settings and smoothing functions support cleaning of data collected in North America or internationally (50 vs 60 HZ mains AC), a subtle difference overlooked in some packages.
+Compared to existing toolkits, _EMGFlow_ offers a more comprehensive set of 33 statistical features tailored specifically for sEMG signals [@bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. An interactive dashboard visualizes batch processed files rather than individual recordings, allowing the operator to view the effects of preprocessing across multiple datasets simultaneously [@gabrieli_pysiology_2020]. Adjustable filter settings and smoothing functions accommodate different international standards (50 vs. 60 Hz mains AC), a critical detail overlooked by some packages.
 
 # Features
 
-## Processing Pipeline
+## A Simplified Processing Pipeline
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Extracting features from large datasets is a common task in machine learning and quantitative domains. _EMGFlow_ supports this need through batch-processing, allowing users to either semi- or fully automate the treatment of sEMG recordings. To demonstrate, we will use an example dataset built into EMGFlow that can be generated with the `make_sample_data()`. This data is taken from PeakAffectDS [@greene_peakaffectds_2022], a collection of physiological signals that includes two channels of facial sEMG, labelled Zyg and Cor, capturing Zygomaticus major and Corrugator supercilii muscle activity respectively. We began by creating a basic processing file structure with `make_paths()`, and loaded the sample data into the "Raw" folder with `make_sample_data()`. We then apply a notch filter to remove the AC mains noise introduced by the recording system’s power source, a common initial step in preprocessing raw sEMG signals.
+Extracting features from large datasets is fundamental in machine learning and quantitative analyses. _EMGFlow_ supports batch-processing, enabling users to automate fully or semi-automate the treatment of sEMG recordings. Figure 1 illustrates the general pipeline. For demonstration, we use the built-in sample dataset from PeakAffectDS [@greene_peakaffectds_2022], containing data from two facial muscles: Zygomaticus major (Zyg) and Corrugator supercilii (Cor). We begin by creating file structures using `make_paths()`, then generating our sample data with `make_sample_data()`.
+
+_EMGFlow_ has been designed to allow researchers without deep signal-processing expertise to analyze sEMG data, while providing expert users flexability to control each step in the pipeline. Next, the `clean_signals()` function provides a high-level wrapper for automated preprocessing with sensible, literature-based defaults. Advanced users can customize individual processing steps as needed, as demonstrated below. Here, we apply a notch filter to remove AC mains interference, a common preliminary step in sEMG signal preprocessing.
 
 ```python
 import EMGFlow
 
-# Get path dictionary
+# Create processing file structure within '/Data'
 path_names = EMGFlow.make_paths()
 
-# Load sample data
+# Load sample data into Data/Raw
 EMGFlow.make_sample_data(path_names)
 
-# Sampling rate
+# Sampling rate (in Hz)
 sampling_rate = 2000
 
-# Filter parameters
+# Notch filter parameters (frequency, Q-factor)
 notch_vals = [(50, 5)]
 
-# Columns containing data for preprocessing
+# Data columns for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Apply notch filters
-EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+# Apply notch filter (input path: /Raw, output path: /Notch)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Additional arguments allow users to customize which files are selected and how they are processed. Filtering functions accept an optional regex argument, allowing users to apply filters to specific files. Most functions use common sense defaults, which can be modified task-wide or for select cases. For example, in North America, mains electricity is nominally supplied at 120 VAC 60 Hz, while other countries may supply power at 200-240 VAC 50Hz. This variation in frequency requires different notch filter settings depending on where the data were recorded. _EMGFlow_ accommodates this need by allowing the user to specify the frequency and quality factor of the applied filter. Extending our first example, we now apply an additional notch filter to a subset of files exhibiting noise at 150 Hz, the 3rd harmonic of the mains source.
+![Figure 1](figure1.png)
+**Figure 1:** Overview of _EMGFlow_'s processing pipeline.
+
+At each preprocessing step, _EMGFlow_ mirrors the original input file structure, mapping its layout to the concomittant output folder. This approch maintains the researcher's data hierarchy, allowing for easy inspection of results at each stage of processing.
+
+Advanced users can further customize preprocessing via regular expressions to selectively process subsets of files. Default parameters use canonical values widely recommended in the literature, and can be adjusted according to specific requirements. For example, in North America, mains electricity is nominally supplied at 120 VAC 60 Hz, while other countries may supply power at 200-240 VAC 50Hz. This variation in frequency requires different notch filter settings depending on where the data were recorded. Here we apply an additional notch filter to a subset of files belonging to participant 02, that exhibited noise at 150 Hz, the 3rd harmonic of the mains source.
 
 ```python
-# Filter parameters for files that start with "08" or "11"
-notch_vals_extra = [(150,25)]
-reg_pat = '^(08|11)'
+# Secondary notch filter
+notch_vals_subset = [(150, 25)]
 
-# Apply extra notch filters
-EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_extra, cols, expression=reg_pat)
+# Match all .csv files within participant folder '02/'
+participant_pattern = '02\/\w+.csv'
+
+# Apply custom notch filter
+EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_subset, cols, expression=participant_pattern)
 ```
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An overview of the processing pipeline is illustrated in fig. 2.
 
 ## Visualization of Preprocessing Stages
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The application of a bandpass filter is often the second stage in preprocessing sEMG signals, as it isolates the frequency spectrum of human muscle activity. Signals are commonly filtered to the 10-500 Hz range [@livingstone_deficits_2016; @mcmanus_analysis_2020; @sato_emotional_2021; @tamietto_unseen_2009], though precise filter corner frequencies vary by research domain and approach [@abadi_decaf_2015]. After filtering, data can be further smoothed to remove high-frequency noise and outliers in preparation for the extraction of temporal features. The default smoother is RMS, equal to the square root of the total power in the sEMG signal and commonly used to estimate signal amplitude [@mcmanus_analysis_2020]. Additional filter options are provided, including boxcar, Gaussian, and LOESS. 
+A bandpass filter typically follows notch filtering, as it isolates the frequency spectrum of human muscle activity. Signals are commonly filtered to the 10-500 Hz range [@livingstone_deficits_2016; @mcmanus_analysis_2020; @sato_emotional_2021; @tamietto_unseen_2009], though precise filter corner frequencies vary by research domain and approach [@abadi_decaf_2015]. Next, data are smoothed to reduce high-frequency noise and outliers, enhancing temporal feature extraction accuracy. The default smoother is RMS, equal to the square root of the total power in the sEMG signal and commonly used to estimate signal amplitude [@mcmanus_analysis_2020]. Alternative smoothing methods include boxcar, Gaussian, and LOESS.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_ provides an interactive Shiny dashboard to visualize the effects of preprocessing on sEMG signals. Preprocessing stages can be displayed simultaneously or shown individually with options for Notch, Bandpass, and Smoothing steps. Users can select the file for visualization using the Files dropdown box. The dashboard is generated from a list of file paths containing files at different stages of preprocessing. Here, our example shows how signals are further bandpass filtered and smoothed, with results visualized using the dashboard. 
+_EMGFlow_ provides an interactive Shiny dashboard that allows users to visualize and contrast the effects of preprocessing on sEMG signals, as shown in Figure 2. Preprocessing stages can be displayed simultaneously or shown individually with options for Notch, Bandpass, and Smoothing steps. Users can select the file for visualization using the Files dropdown box. The dashboard is generated by extracting paths from the pipeline's file structure. Below, our example shows how signals are further bandpass filtered and smoothed, with results visualized using the dashboard.
 
 ```python
-# Filter and smoothing parameters
+# Bandpass and smoothing filter parameters
 band_low = 20
 band_high = 140
 smooth_window = 50
 
 # Apply bandpass filter
-EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
 
 # Apply smoothing filter
-EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
+EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
 
-# Set units and column to plot
+# Data column and units for plotting
 col = 'EMG_zyg'
 units = 'mV'
 
-# Plot data on the "EMG_zyg" column
-EMGFlow.GenPlotDash(path_names, col, units)
+# Plot all "EMG_zyg" data with interactive dashboard
+EMGFlow.plot_dashboard(path_names, col, units)
 ```
-
-![Figure 1](figure1.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Figure 1:** _EMGFlow_'s interactive dashboard visualizing effects of different preprocessing stages on batch processed files.
 
 ![Figure 2](figure2.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Figure 2:** An overview of the processing pipeline.
+**Figure 2:** _EMGFlow_'s interactive dashboard shows the effects of preprocessing stages on batch processed files.
 
-## The Nature of Electromyographic Recordings
+## Feature Extraction
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To better understand the range of features extracted by _EMGFlow_, we begin with a review of surface electromyography as a recording instrument. Nearly all body movement occurs by muscle contraction. During contraction, nerve impulses sent from motoneurons cause muscle fibers innervated by the axon to discharge, creating a motor unit action potential [@mcmanus_analysis_2020]. The speed at which action potentials propogate down the fibre is called muscle fiber conduction velocity. Each motor unit firing results in a force twitch. The superposition of these twiches over time produces a sustained force that enables functional muscle activity, such as lifting or smiling [@de_luca_practicum_2008]. 
+We begin with a review of surface electromyography as a recording instrument to better understand the range of features extracted by _EMGFlow_. Nearly all body movement occurs by muscle contraction. During contraction, nerve impulses sent from motoneurons cause muscle fibers innervated by the axon to discharge, creating a motor unit action potential [@mcmanus_analysis_2020]. The speed at which action potentials propogate down the fibre is called muscle fiber conduction velocity. Each motor unit firing results in a force twitch. The superposition of these twiches over time produces a sustained force that enables functional muscle activity, such as lifting or smiling [@de_luca_practicum_2008].
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Surface electromyography measures voltage difference across muscle fibers generated by action potentials, producing a voltage timeseries that quantifies muscle activity [@fridlund_guidelines_1986]. It is from this voltage timeseries that statistical features are extracted.
+Surface electromyography measures muscle activity by detecting the voltage differences produced as action potentials propagate through contracting muscle fibres. The resulting recordings form a voltage time-series that reflects the intensity and timing of muscle activation [@fridlund_guidelines_1986]. _EMGFlow_ processes these voltage timeseries and extracts 33 features across time and frequency domains, as listed in Table 1. A key contribution of _EMGFlow_ is that all features are computed natively with SciPy primitives; no external feature‑extraction libraries are required [@virtanen_scipy_2020]. All computed features, along with their mathematical definitions, can be found in the Reference section of the Documentation website.
 
-## Feature Extraction Routines
+Eighteen time-domain features capture standanrd statistical moments, including mean, variance, skew, and kurtosis, along with sEMG-specific measures. These include features such as Willison amplitude, an indicator of motor unit firing calculated as the number of times the sEMG amplitude exceeds a threshold, and log-detector, an estimate of the exerted muscle force [@tkach_study_2010]. Fifteen frequency-domain features provide information on the shape and distribution of the signal’s power spectrum. Measures such as median frequency [@phinyomark2009novel] provide insight into changes in muscle fibre conduction velocity and are used in the assessment of muscle fatigue [@van1983changes; @lindstrom1977electromyographic; @mcmanus_analysis_2020]. Standard frequency measures include spectral centroid, flatness, entropy, and roll-off. An innovative feature is Twich Ratio, defined as the ratio of energy contained in the upper versus lower power spectrum, with a threshold of 60 Hz to delineate slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020]. Twitch ratio was adapted from Alpha Ratio in speech signal analysis [@eyben_geneva_2016].
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Following data preprocessing, the signal files are ready for feature extraction. _EMGFlow_ extracts 32 features that capture information in both time and frequency domains. The set of 17 time-domain features capture standard statistical moments, including mean, variance, skew, and kurtosis, along with sEMG-specific measures. These include features such as Willison amplitude, an indicator of motor unit firing calculated as the number of times the sEMG amplitude exceeds a threshold, and log-detector, an estimate of the exerted muscle force [@tkach_study_2010]. 
+| Domain   | Feature |
+|----------|---------|
+| Temporal | minV, maxV, meanV, stdV, skewV, kurtosisV, maxF, IEMG, MAV, MMAV1, MMAV2, SSI, VAR, VOrder, RMS, WL, WAMP, LOG |
+| Spectral | MFL, AP, SpecFlux, MDF, MNF, TwitchRatio, TwitchIndex, TwitchSlope, SC, SF, SS, SDec, SEntropy, SRoll, SBW |
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A set of 15 frequency-domain features are also extracted, providing information on the shape and distribution of the signal’s power spectrum. Measures such as median frequency [@phinyomark2009novel] provide insight into changes in muscle fibre conduction velocity and are used in the assessment of muscle fatigue [@van1983changes; @lindstrom1977electromyographic; @mcmanus_analysis_2020]. Standard frequency measures include spectral centroid, flatness, entropy, and roll-off. One novel sEMG feature introduced here is Twitch Ratio, an adaptation of Alpha Ratio from speech signal analysis [@eyben_geneva_2016]. Twitch Ratio is defined as the ratio of energy contained in the upper versus lower power spectrum, with a threshold of 60 Hz to delineate slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
+**Table 1:** Features extracted from sEMG signals.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_EMGFlow_ has been designed to allow researchers without extensive knowledge of signal processing to analyze sEMG data. Here we present a simple workflow example that produces extracted features in only two lines of code. The example datasets used below are available with the package, and can be generated with the `make_sample_data` function. This function generates sample data files, and returns a series of file paths required for subsequent preprocessing steps. The `CleanSignals` function is a high-level wrapper that sequentially calls the three preprocessing functions for applying notch, bandpass and smoothing filters.
+Our demonstration concludes with the extraction of features from our processed sEMG signal files. Features are summarized into a single CSV file, containing rows for each file analyzed, as shown below.
 
 ```python
-import EMGFlow
+# Extract features and save results in "/Feature/Features.csv"
+df = EMGFlow.extract_features(path_names, sampling_rate, cols)
 
-# Get path dictionary
-path_names = EMGFlow.make_paths()
-
-# Load sample data
-EMGFlow.make_sample_data(path_names)
-
-# Preprocess signals
-EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
-
-# Extract features and save results in "Features.csv" in feature_path
-df = EMGFlow.ExtractFeatures(path_names, sampling_rate = 2000)
-
+# Print first few rows of extracted features table. The “File_ID” column
+# contains the local path of files extracted, and the additional columns take
+# the format “[Column name]_[Feature name]”.
+df.head()
 """
-df dataframe contains
+File_ID column contains
 
-        File_ID     EMG_zyg_Min   ...     EMG_cor_Spec_Rolloff  EMG_cor_Spec_Bandwidth
-0  sample_data.csv  0.002859      ...     4                     196.068942
+      File_ID                EMG_zyg_Min  ...  EMG_cor_Spec_Rolloff  EMG_cor_Spec_Bandwidth
+0  01/sample_data_01.csv     0.000826     ...  0.040222              1424.933862
+1  01/sample_data_02.csv     0.000740     ...  0.019559              2651.987804
+2  02/sample_data_03.csv     0.000780     ...  0.065183              2021.345274
+3  03/sample_data_04.csv     0.000660     ...  0.087384              1755.834836
 
-[1 rows x 65 columns]
+[4 rows x 61 columns]
 """
 ```
+
+# Documentation, Testing, and Availability
+
+_EMGFlow_ is supported by comprehensive documentation ([https://wiiison.github.io/EMGFlow-Python-Package](https://wiiison.github.io/EMGFlow-Python-Package)), generated with VitePress to provide a modern user experience [@vitepress]. Documentation consists of (i) a Quick-Start tutorial for new users, (ii) an example gallery spanning three-line demonstrations to advanced processing pipelines, and (iii) an API reference annotated with executable code snippets, and mathematical definitions of all features. Package-level mind-maps, rendered with Mermaid.js [@mermaidjs], provide a visual overview of the module hierarchy to assist user orientation.
+
+Code reliability is maintained by an automated test suite, _unittest_, that executes on every GitHub commit via continuous-integration workflows. The complete source code is publicly available on GitHub under the GPL-3.0 licence ((https://github.com/WiIIson/EMGFlow-Python-Package](https://github.com/WiIIson/EMGFlow-Python-Package)).
 
 # Community Guidelines
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;We welcome contributions to the project. These can be initiated through the project's issue tracker or via a pull request. Suggestions for feature enhancements, tips, as well as general questions and concerns, can also be expressed through direct interaction with contributors and developers.
+Contributions are encouraged via the project's issue tracker or pull requests. Suggestions for feature enhancements, tips, as well as general questions and concerns, can also be expressed through direct interaction with contributors and developers.
 
 # Declaration of Generative AI and AI-Assisted Technologies in the Writing Process
-During the preparation of this work, the authors used GPT-4o to edit a final draft of the manuscript for flow, tone, and grammatical correctness. After using this tool, the authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
+
+GPT-4.5 was used to edit the final manuscript draft. Authors carefully reviewed and finalized the content, and take full responsibility for the content of the publication.
 
 # Acknowledgements
 
@@ -160,6 +170,6 @@ We acknowledge the support of the Natural Sciences and Engineering Research Coun
 
 # Author contributions
 
-S.R.L. conceptualised the project. W.L.C. and S.R.L. designed the toolbox functionality. W.L.C. wrote the toolbox code. W.L.C. created and maintained the Github repository. W.L.C. prepared figures for manuscript and Github repository. W.L.C. and S.R.L prepared the manuscript and approved the final version of the manuscript for submission.
+S.R.L. conceptualised the project. W.L.C. and S.R.L. designed the toolbox functionality. W.L.C. wrote the toolbox code. W.L.C. created and maintained the Github repository. S.R.L. and W.L.C. created the documentation website. W.L.C. and S.R.L. prepared figures for manuscript and Github repository. S.R.L and W.L.C. prepared the manuscript and approved the final version of the manuscript for submission.
 
 # References
