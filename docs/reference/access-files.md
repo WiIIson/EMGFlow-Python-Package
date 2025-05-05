@@ -38,7 +38,7 @@ make_paths(root=None)
 
 **Returns**
 
-`make_paths`: dict (str)
+`make_paths`: dict-str
 - A dictionary of file locations with keys for the stage in the processing pipeline.
 
 **Example**
@@ -60,8 +60,8 @@ make_sample_data(pathNames)
 
 **Parameters**
 
-`pathNames`: dict (str)
-- A dictionary of file locations
+`pathNames`: dict-str
+- A dictionary of string file locations
 
 **Returns**
 
@@ -176,7 +176,7 @@ convert_map_files(fileObj, fileExt='csv', experssion=None)
 
 **Parameters**
 
-`fileObj`: str, dict
+`fileObj`: str, dict-str
 - Any filepath data type supported by the function. Supported data types are: string filepath, or filepath dictionary.
 
 `fileExt`: str ("csv")
@@ -187,7 +187,7 @@ convert_map_files(fileObj, fileExt='csv', experssion=None)
 
 **Returns**
 
-`convert_map_files`: dict
+`convert_map_files`: dict-str
 - Returns a dictionary of file names and locations keys/values.
 
 **Error**
@@ -222,10 +222,10 @@ map_files_fuse(filedirs, names)
 
 **Parameters**
 
-`filedirs`:  list (dict)
+`filedirs`:  list-dict
 - List of dictionaries assumed to contain file maps.
 
-`names`: list (str)
+`names`: list-str
 - List of names to use for columns, same order as filedirs
 
 **Returns**
