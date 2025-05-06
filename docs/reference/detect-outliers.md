@@ -32,22 +32,22 @@ detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=None,
 `inPath`: str
 - String filepath to a directory containing Signal files.
 
-`samplingRate`: int/float
+`samplingRate`: int, float
 - Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`threshold`: int/float
+`threshold`: int, float
 - Number of times greater than the metric calculated for the file to be considered an outlier
 
-`cols`: str (None)
+`cols`: list-str (None)
 - List of string column names. If provided, will only search for outliers in the specified columns. If left `None`, will search for outliers in each column except for the `'Time'` column.
 
-`low`: int/float (None)
+`low`: int, float (None)
 - Minimum frequency range to search for outliers in. If left None, no lower limit is placed.
 
-`high`: int/float (None)
+`high`: int, float (None)
 - Maximum frequency range to search for outliers in. If left None, no upper limit is placed.
 
-`metric`: int/float (np.median)
+`metric`: int, float (np.median)
 - Aggregation metric used to calculate outliers. Can be any function that takes a list of numeric values, and returns a single value. Recommended functions are: `np.median` and `np.mean`.
 
 `expression`: str (None)
@@ -58,11 +58,6 @@ detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=None,
 
 `fileExt`: str ("csv")
 - String extension of the files to read. Any file in `inPath` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
-
-**Returns:**
-
-`detect_outliers`: dict
-- Returns a dictionary of file names and locations keys/values.
 
 **Error**
 
@@ -83,6 +78,11 @@ Raises an error if a file cannot be read in `inPath`.
 Raises an error if an unsupported file format was provided for `fileExt`.
 
 Raises an error if `expression` is not None or a valid regular expression
+
+**Returns:**
+
+`detect_outliers`: dict
+- Returns a dictionary of file names and locations keys/values.
 
 **Example:**
 
