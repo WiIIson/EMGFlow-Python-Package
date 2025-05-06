@@ -18,11 +18,16 @@ A collection of functions for accessing files.
 def read_file_type(path, fileExt):
     """
     Safe wrapper for reading files of a given extension.
+    
+    Switches between different reading methods based on the instructions
+    provided.
+    
+    Supported formats that can be read are: 'csv'.
 
     Parameters
     ----------
     path : str
-        Path of file to read.
+        Path of the file to read.
     fileExt : str
         File extension to read.
 
@@ -32,7 +37,7 @@ def read_file_type(path, fileExt):
         Raises an exception if the file could not be read.
     Exception
         Raises an exception if an unsupported file format was provided for
-        fileExt.
+        'fileExt'.
 
     Returns
     -------
@@ -140,7 +145,7 @@ def convert_map_files(fileObj, fileExt='csv', expression=None):
         An exception is raised if an unsupported file location format is
         provided.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        Raises an exception if 'expression' is not None or a valid regular
         expression.
 
     Returns
@@ -154,7 +159,7 @@ def convert_map_files(fileObj, fileExt='csv', expression=None):
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("Invalid regex expression provided.")
     
     # User provided a path to a folder
     if type(fileObj) is str:
@@ -190,9 +195,9 @@ def map_files_fuse(filedirs, names):
 
     Parameters
     ----------
-    filedirs : dict list
+    filedirs : list-dict-str
         List of file location directories
-    names : str
+    names : list-str
         List of names to use for file directory columns. Same order as file
         directories.
 
@@ -205,7 +210,7 @@ def map_files_fuse(filedirs, names):
     Returns
     -------
     filedirs : pd.DataFrame
-        A DataFrame of file names, and their locations in each file directory.
+        A dataframe of file names, and their locations in each file directory.
     
     """
     
@@ -218,7 +223,7 @@ def map_files_fuse(filedirs, names):
         for i, filedir in enumerate(filedirs):
             if file not in filedir:
                 # Raise exception if file does not exist
-                raise Exception('File ' + str(file) + ' does not exist in file directory ' + str(names[i]))
+                raise Exception('File ' + str(file) + ' does not exist in file directory ' + str(names[i]) + '.')
             row.append(filedir[file])
         # Add row to data frame
         data.append(row)
@@ -237,8 +242,8 @@ def make_paths(root=None):
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
     
-    A "Data" folder is created, with "Raw", "Notch", "Bandpass", "Smooth" and
-    "Feature" subfolders
+    A 'Data' folder is created, with 'Raw', 'Notch', 'Bandpass', 'Smooth' and
+    'Feature' subfolders.
 
     Parameters
     ----------
@@ -247,7 +252,7 @@ def make_paths(root=None):
 
     Returns
     -------
-    path_dict : [str] dict
+    pathNames : dict-str
         A dictionary of file locations with keys for stage in the processing
         pipeline.
 
@@ -259,7 +264,7 @@ def make_paths(root=None):
         root = os.path.normpath(root)
     
     # Create dictionary
-    path_dict = {
+    pathNames = {
         'Raw':os.path.join(root, 'Raw'),
         'Notch':os.path.join(root, 'Notch'),
         'Bandpass':os.path.join(root, 'Bandpass'),
@@ -268,11 +273,11 @@ def make_paths(root=None):
     }
     
     # Create folders
-    for value in path_dict.values():
+    for value in pathNames.values():
         os.makedirs(value, exist_ok=True)
     
     # Return dictionary
-    return path_dict
+    return pathNames
 
 #
 # =============================================================================
@@ -285,7 +290,7 @@ def make_sample_data(pathNames):
 
     Parameters
     ----------
-    pathNames : [str] dict
+    pathNames : dict-str
         Dictionary of file locations.
 
     Raises
@@ -293,6 +298,8 @@ def make_sample_data(pathNames):
     Exception
         An exception is raised if the provided 'pathNames' dictionary doesn't
         contain a 'Raw' path key.
+    Exception
+        An exception is raised if the sample data cannot be loaded.
 
     Returns
     -------
@@ -302,11 +309,14 @@ def make_sample_data(pathNames):
     
     # Check that a 'raw' folder exists
     if 'Raw' not in pathNames:
-        raise Exception('Raw path not detected in provided dictionary (pathNames)')
+        raise Exception('Raw path not detected in pathNames.')
     
     # Load the sample data
-    sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
-    sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
+    try:
+        sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
+        sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
+    except:
+        raise Exception('Failed to load EMGFlow sample data.')
     
     # Write the sample data
     os.makedirs(os.path.join(pathNames['Raw'], '01'), exist_ok=True)

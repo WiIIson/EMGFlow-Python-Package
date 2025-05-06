@@ -15,7 +15,7 @@ from .access_files import *
 #
 
 """
-A collection of functions for finding outliers while testing
+A collection of functions for finding outliers while testing.
 """
 
 #
@@ -26,6 +26,14 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     """
     Looks at all Signals contained in a filepath, returns a dictionary of file
     names and locations that have outliers.
+    
+    Works by interpolating an inverse function from the peaks of the signal's
+    spectrum. The function then calculates the 'metric' aggregate of the
+    differences between the predicted spectrum intensity of the inverse
+    function, and the actual spectrum intensity of the peaks. Finally, if the
+    largest difference between the predicted and actual values is greater than
+    the metric average multiplied by the threshold value, the file is flagged
+    for having an outlier and is added to the dictionary.
 
     Parameters
     ----------
@@ -33,7 +41,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
         Filepath to a directory to read Signal files.
     samplingRate : float
         Sampling rate of the Signal.
-    cols : TYPE
+    cols : list-str
         List of columns of the Signal to search for outliers in. The default is
         None, in which case outliers are searched for in every column except
         for 'time'.
@@ -52,8 +60,8 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
         in which case no upper threshold is used.
     metric : function, optional
         Some summary function that defines the metric used for finding
-        outliers. The default is np.median, but others such as np.mean can be
-        used instead.
+        outliers. The default is 'np.median', but others such as 'np.mean' can
+        be used instead.
     expression : str, optional
         A regular expression. If provided, will only search for outliers in
         files whose names match the regular expression. The default is None.
@@ -67,47 +75,55 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     Raises
     ------
     Exception
-        An exception is raised if samplingRate is less or equal to 0.
+        'windowSize' must be an integer greater than 0.
     Exception
-        An exception is raised if threshold is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if low is greater than high.
+        An exception is raised if 'threshold' is less or equal to 0.
     Exception
-        An exception is raised if low or high are negative.
+        An exception is raised if 'low' is greater than 'high'.
     Exception
-        An exception is raised if metric is not a valid summary function.
+        An exception is raised if 'low' or 'high' are negative.
     Exception
-        An exception is raised if a column in cols is not in the data file.
+        An exception is raised if 'metric' is not a valid summary function.
     Exception
-        Raises an exception if a file cannot not be read in inPath.
+        An exception is raised if a column in 'cols' is not in a data file.
+    Exception
+        Raises an exception if a file cannot not be read in 'inPath'.
     Exception
         Raises an exception if an unsupported file format was provided for
-        fileExt.
+        'fileExt'.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        Raises an exception if 'expression' is not None or a valid regular
         expression.
 
     Returns
     -------
-    dict
+    outliers : dict-str
         Dictionary of file names/locations as keys/values for each file
         detected that contains an outlier.
 
     """
     
+    if not type(windowSize) == int:
+        raise Exception("'windowSize' must be a valid integer.")
+    
+    if windowSize <= 0:
+        raise Exception("'windowSize' cannot be 0 or less.")
+    
     if expression is not None:
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("Invalid regex expression provided.")
     
     if threshold <= 0:
-        raise Exception("threshold must be greater than 0")
+        raise Exception("'threshold' must be greater than 0.")
     
     try:
         metric([1,2,3,4,5])
     except:
-        raise Exception("Invalid summary metric provided, must take a single numeric list input")
+        raise Exception("Invalid summary metric provided, 'metric' must be able to take a single numeric list as input.")
     
     p_deg = 1   # Degree of equation on the top of the fraction
     q_deg = 2   # Degree of equation on the bottom of the fraction
@@ -119,10 +135,10 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
         high = samplingRate/2
     
     if low >= high:
-        raise Exception("low (" + str(low) + ") must be greater than high (" + str(high), ")")
+        raise Exception("'low' (" + str(low) + ") must be greater than 'high' (" + str(high), ").")
     
     if low < 0 or high < 0:
-        raise Exception("low and high must be positive values")
+        raise Exception("'low' and 'high' must be positive values.")
     
     # Create rational function equation
     def Rational(x, *params):
@@ -153,7 +169,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
             data = read_file_type(filedirs[file], fileExt)
             
             if len(data.index)/2 <= windowSize:
-                warnings.warn("Warning: Window size is greater than 1/2 of data file, results may be poor.")
+                warnings.warn("Warning: windowSize is greater than 1/2 of data file, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -169,7 +185,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 col = cols[i]
                 
                 if col not in list(data.columns.values):
-                    raise Exception("Column " + str(col) + " not in Signal " + str(file))
+                    raise Exception("Column " + str(col) + " is not in 'Signal': " + str(file))
                 
                 psd = emg_to_psd(data[col], samplingRate=samplingRate)
                 psd = ZoomIn(psd, low, high)
@@ -181,7 +197,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 maxima = psd[psd['max'].notnull()]
                 
                 if len(maxima.index) == 1:
-                    raise Exception("Not enough maxima to create approximation - reduce windowSize or use a larger data file.")
+                    raise Exception("Not enough maxima to create approximation - reduce 'windowSize' or use a larger data file.")
     
                 # Initialize rational function parameters
                 p_init = np.poly1d(np.ones(p_deg))
@@ -205,12 +221,10 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 max_fit = np.max(maxima['Power'] - y_vals)
                 
                 if (max_fit > data_metric * threshold):
-                    print('\tOutlier in: ' + cols[i])
                     isOutlier = True
             
-            # If any columns has an outlier, mark as an outlier
+            # If any columns have an outlier, mark as an outlier
             if isOutlier:
-                # print('\tOutlier detected...')
                 outliers[file] = filedirs[file]
                 
     return outliers
