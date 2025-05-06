@@ -121,7 +121,7 @@ Surface electromyography measures muscle activity by detecting the voltage diffe
 Eighteen time-domain features capture standanrd statistical moments, including mean, variance, skew, and kurtosis, along with sEMG-specific measures. These include features such as Willison amplitude, an indicator of motor unit firing calculated as the number of times the sEMG amplitude exceeds a threshold, and log-detector, an estimate of the exerted muscle force [@tkach_study_2010]. Fifteen frequency-domain features provide information on the shape and distribution of the signal’s power spectrum. Measures such as median frequency [@phinyomark2009novel] provide insight into changes in muscle fibre conduction velocity and are used in the assessment of muscle fatigue [@van1983changes; @lindstrom1977electromyographic; @mcmanus_analysis_2020]. Standard frequency measures include spectral centroid, flatness, entropy, and roll-off. An innovative feature is Twich Ratio, defined as the ratio of energy contained in the upper versus lower power spectrum, with a threshold of 60 Hz to delineate slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020]. Twitch ratio was adapted from Alpha Ratio in speech signal analysis [@eyben_geneva_2016].
 
 | Domain   | Feature |
-|----------|---------|
+|:----------|:---------|
 | Temporal | minV, maxV, meanV, stdV, skewV, kurtosisV, maxF, IEMG, MAV, MMAV1, MMAV2, SSI, VAR, VOrder, RMS, WL, WAMP, LOG |
 | Spectral | MFL, AP, SpecFlux, MDF, MNF, TwitchRatio, TwitchIndex, TwitchSlope, SC, SF, SS, SDec, SEntropy, SRoll, SBW |
 
@@ -144,7 +144,7 @@ File_ID column contains
 0  01/sample_data_01.csv     0.000826     ...  0.040222              1424.933862
 1  01/sample_data_02.csv     0.000740     ...  0.019559              2651.987804
 2  02/sample_data_03.csv     0.000780     ...  0.065183              2021.345274
-3  03/sample_data_04.csv     0.000660     ...  0.087384              1755.834836
+3  02/sample_data_04.csv     0.000660     ...  0.087384              1755.834836
 
 [4 rows x 61 columns]
 """
@@ -154,7 +154,7 @@ File_ID column contains
 
 _EMGFlow_ is supported by comprehensive documentation ([https://wiiison.github.io/EMGFlow-Python-Package](https://wiiison.github.io/EMGFlow-Python-Package)), generated with VitePress to provide a modern user experience [@vitepress]. Documentation consists of (i) a Quick-Start tutorial for new users, (ii) an example gallery spanning three-line demonstrations to advanced processing pipelines, and (iii) an API reference annotated with executable code snippets, and mathematical definitions of all features. Package-level mind-maps, rendered with Mermaid.js [@mermaidjs], provide a visual overview of the module hierarchy to assist user orientation.
 
-Code reliability is maintained by an automated test suite, _unittest_, that executes on every GitHub commit via continuous-integration workflows. The complete source code is publicly available on GitHub under the GPL-3.0 licence ((https://github.com/WiIIson/EMGFlow-Python-Package](https://github.com/WiIIson/EMGFlow-Python-Package)).
+Code reliability is maintained by an automated test suite, _unittest_, that executes on every GitHub commit via continuous-integration workflows. The complete source code is publicly available on GitHub under the GPL-3.0 licence - [https://github.com/WiIIson/EMGFlow-Python-Package](https://github.com/WiIIson/EMGFlow-Python-Package).
 
 # Community Guidelines
 
