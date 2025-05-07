@@ -1,4 +1,4 @@
-import importlib.resources as resources
+import importlib_resources
 import pandas as pd
 import re
 import os
@@ -313,8 +313,9 @@ def make_sample_data(pathNames):
     
     # Load the sample data
     try:
-        sample_data_01 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
-        sample_data_02 = pd.read_csv(resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
+        print(importlib_resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
+        sample_data_01 = pd.read_csv(importlib_resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_01.csv")))
+        sample_data_02 = pd.read_csv(importlib_resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_02.csv")))
     except:
         raise Exception('Failed to load EMGFlow sample data.')
     
