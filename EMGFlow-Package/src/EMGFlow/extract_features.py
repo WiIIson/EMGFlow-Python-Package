@@ -29,7 +29,7 @@ def calc_iemg(Signal, col, sr):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -39,7 +39,7 @@ def calc_iemg(Signal, col, sr):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sr' is less or equal to 0.
 
@@ -70,7 +70,7 @@ def calc_mav(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -78,7 +78,7 @@ def calc_mav(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -105,7 +105,7 @@ def calc_mmav1(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -113,7 +113,7 @@ def calc_mmav1(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -147,7 +147,7 @@ def calc_mmav2(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -155,7 +155,7 @@ def calc_mmav2(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -191,7 +191,7 @@ def calc_ssi(Signal, col, sr):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -201,7 +201,7 @@ def calc_ssi(Signal, col, sr):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if sr is less or equal to 0.
 
@@ -232,7 +232,7 @@ def calc_var(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -240,7 +240,7 @@ def calc_var(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -267,7 +267,7 @@ def calc_vorder(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -275,7 +275,7 @@ def calc_vorder(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -301,7 +301,7 @@ def calc_rms(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -309,7 +309,7 @@ def calc_rms(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -336,7 +336,7 @@ def calc_wl(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -344,7 +344,7 @@ def calc_wl(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -373,7 +373,7 @@ def calc_wamp(Signal, col, threshold):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -383,7 +383,7 @@ def calc_wamp(Signal, col, threshold):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -412,7 +412,7 @@ def calc_log(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -420,7 +420,7 @@ def calc_log(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -448,7 +448,7 @@ def calc_mfl(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -456,7 +456,7 @@ def calc_mfl(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -485,7 +485,7 @@ def calc_ap(Signal, col):
     Parameters
     ----------
     Signal : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
@@ -493,7 +493,7 @@ def calc_ap(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
@@ -519,9 +519,9 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     Parameters
     ----------
     Signal1 : pd.DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    diff : float, DataFrame
+    diff : float, pd.DataFrame
         The divisor of the calculation. If a percentage is provided, it will
         calculate the spectral flux of the percentage of the Signal with one
         minus the percentage of the Signal.
@@ -539,11 +539,11 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal1'
+        An exception is raised if 'col' is not a column of 'Signal1'.
     Exception
         An exception is raised if 'sr' is less or equal to 0.
     Exception
-        An exception is raised if 'diff' is a float and not between 0 and 1.
+        An exception is raised if 'diff' is a float, but isn't between 0 and 1.
     Exception
         An exception is raised if 'diff' is a dataframe and does not contain
         'col'.
@@ -1113,13 +1113,13 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     Exception
         An exception is raised if p is not greater than 0.
     Exception
-        Raises an exception if a file cannot not be read in the 'Bandpass' or
-        'Smooth' filepaths.
+        An exception is raised if a file cannot not be read in the 'Bandpass'
+        or 'Smooth' filepaths.
     Exception
-        Raises an exception if an unsupported file format was provided for
+        An exception is raised if an unsupported file format was provided for
         'fileExt'.
     Exception
-        Raises an exception if 'expression' is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns

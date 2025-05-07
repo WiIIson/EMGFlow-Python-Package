@@ -75,7 +75,8 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     Raises
     ------
     Exception
-        'windowSize' must be an integer greater than 0.
+        An exception is raised if 'windowSize' is not an integer greater than
+        0.
     Exception
         An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
@@ -89,12 +90,12 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     Exception
         An exception is raised if a column in 'cols' is not in a data file.
     Exception
-        Raises an exception if a file cannot not be read in 'inPath'.
+        An exception is raised if a file cannot not be read in 'inPath'.
     Exception
-        Raises an exception if an unsupported file format was provided for
+        An exception is raised if an unsupported file format was provided for
         'fileExt'.
     Exception
-        Raises an exception if 'expression' is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns

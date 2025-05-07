@@ -19,7 +19,7 @@ from .access_files import *
 #
 
 """
-A collection of functions for plotting subject data
+A collection of functions for plotting subject data.
 """
 
 #
@@ -28,7 +28,7 @@ A collection of functions for plotting subject data
 
 def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=None, fileExt='csv'):
     """
-    Generate plots of the PSDs of each column of Signals in a directory
+    Generate plots of the PSDs of each column of Signals in a directory.
 
     Parameters
     ----------
@@ -39,32 +39,34 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
     samplingRate : float
         Sampling rate of the Signals.
     cols : list, optional
-        List of columns of the Signal to plot. The default is None, in which case every column except
-        'time' is plotted.
+        List of columns of the Signal to plot. The default is None, in which
+        case every column except 'time' is plotted.
     p : float, optional
-        Random sampling probability. If given a percentage, will have that probability to plot
-        each Signal. The default is None, in which case all Signals are plotted.
+        Random sampling probability. If given a percentage, will have that
+        probability to plot each Signal. The default is None, in which case all
+        Signals are plotted.
     expression : str, optional
-        A regular expression. If provided, will only generate plots for files whose names match the regular
-        expression. The default is None.
+        A regular expression. If provided, will only generate plots for files
+        whose names match the regular expression. The default is None.
     fileExt : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if samplingRate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if a column is not in a dataframe.
+        An exception is raised if a column in 'cols' is not in a dataframe.
     Exception
-        An exception is raised if p is not None and not between 0 and 1.
+        An exception is raised if 'p' is not None, and not between 0 and 1.
     Exception
-        Raises an exception if a file cannot not be read in inPath.
+        An exception is raised if a file cannot not be read in 'inPath'.
     Exception
-        Raises an exception if an unsupported file format was provided for
-        fileExt.
+        An exception is raised if an unsupported file format was provided for
+        'fileExt'.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
@@ -149,38 +151,42 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
     Parameters
     ----------
     inPath1 : str
-        Filepath to a directory containing the first set of Signals for comparison.
-    inPath2 : TYPE
-        Filepath to a directory containing the second set of Signals for comparison.
+        Filepath to a directory containing the first set of Signals for
+        comparison.
+    inPath2 : str
+        Filepath to a directory containing the second set of Signals for
+        comparison.
     outPath : str
         Filepath to an output directory.
     samplingRate : float
         Sampling rate of the Signals.
-    cols : list, optional
-        List of columns of the Signal to plot. The default is None, in which case every column except
-        'time' is plotted.
+    cols : list-str, optional
+        List of columns of the Signal to plot. The default is None, in which
+        case every column except 'time' is plotted.
     expression : str, optional
-        A regular expression. If provided, will only generate plots for files whose names match the regular
-        expression. The default is None.
+        A regular expression. If provided, will only generate plots for files
+        whose names match the regular expression. The default is None.
     fileExt : str, optional
-        File extension for files to read. Only reads files with this extension. The default is 'csv'.
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
 
     Raises
     ------
     Exception
-        An exception is raised if inPath1 and inPath2 don't contain the same files.
+        An exception is raised if 'inPath1' and 'inPath2' don't contain the
+        same files.
     Exception
-        An exception is raised if samplingRate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if a column in cols is not in a dataframe.
+        An exception is raised if a column in 'cols' is not in a dataframe.
     Exception
-        Raises an exception if a file cannot not be read in inPath1 or
-        inPath2.
+        An exception is raised if a file cannot not be read in 'inPath1' or
+        'inPath2'.
     Exception
-        Raises an exception if an unsupported file format was provided for
-        fileExt.
+        An exception is raised if an unsupported file format was provided for
+        'fileExt'.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
@@ -270,11 +276,12 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
 # Creates a shiny app object that can be ran
 def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autorun=True):
     """
-    Generate a shiny dashboard of different processing stages for a given column.
+    Generate a shiny dashboard of different processing stages for a given
+    column.
 
     Parameters
     ----------
-    pathNames : [str] dict
+    pathNames : dict-str
         A dictionary of path names for reading data. The function will generate
         graphs for as many paths are provided in the dictionary. The dictionary
         can be created with the make_paths function.
@@ -299,22 +306,26 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
     Raises
     ------
     Exception
-        An exception is raised if the directories in inPaths don't contain the
-        same files.
+        An exception is raised if the directories in 'inPaths' don't contain
+        the same files.
     Exception
-        An exception is raised if the col is not found in a dataframe.
+        An exception is raised if 'col' is not found as a column in a
+        dataframe.
     Exception
-        Raises an exception if a file cannot not be read in a path in inPaths.
+        An exception is raised if a file cannot not be read in a path in
+        'inPaths'.
     Exception
-        Raises an exception if an unsupported file format was provided for
-        fileExt.
+        An exception is raised if an unsupported file format was provided for
+        'fileExt'.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
     -------
-    If autorun is True, returns None. If False, returns a shiny.App instance.
+    app : None, shiny.App
+        If 'autorun' is True, returns None. If False, returns a shiny.App
+        instance.
 
     """
     

@@ -34,9 +34,9 @@ def read_file_type(path, fileExt):
     Raises
     ------
     Exception
-        Raises an exception if the file could not be read.
+        An exception is raised if the file could not be read.
     Exception
-        Raises an exception if an unsupported file format was provided for
+        An exception is raised if an unsupported file format was provided for
         'fileExt'.
 
     Returns
@@ -81,12 +81,12 @@ def map_files(inPath, fileExt='csv', expression=None, base=None):
     Raises
     ------
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if expression is not None or a valid regular
         expression.
 
     Returns
     -------
-    filedirs : dict
+    filedirs : dict-str
         A dictionary of file name keys and file path location values.
 
     """
@@ -145,12 +145,12 @@ def convert_map_files(fileObj, fileExt='csv', expression=None):
         An exception is raised if an unsupported file location format is
         provided.
     Exception
-        Raises an exception if 'expression' is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
     -------
-    filedirs : dict
+    filedirs : dict-str
         A dictionary of file name keys and file path location values.
     
     """

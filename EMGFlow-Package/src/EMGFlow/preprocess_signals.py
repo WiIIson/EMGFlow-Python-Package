@@ -27,7 +27,7 @@ def emg_to_psd(sigVals, samplingRate=1000, normalize=True):
 
     Parameters
     ----------
-    sigVals : float list
+    sigVals : list-float
         A list of float values. A column of a Signal.
     samplingRate : float
         Sampling rate of the Signal.
@@ -38,12 +38,12 @@ def emg_to_psd(sigVals, samplingRate=1000, normalize=True):
     Raises
     ------
     Exception
-        An exception is raised if the sampling rate is less or equal to 0
+        An exception is raised if 'samplingRate' is less or equal to 0
 
     Returns
     -------
-    psd : DataFrame
-        A DataFrame containing a 'Frequency' and 'Power' column. The Power
+    psd : pd.DataFrame
+        A dataframe containing a 'Frequency' and 'Power' column. The 'Power'
         column indicates the intensity of each frequency in the Signal
         provided. Results will be normalized if 'normalize' is set to True.
     
@@ -98,14 +98,14 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
     samplingRate : float
         Sampling rate of the Signal.
-    notchVals : list
+    notchVals : list-tuple
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
@@ -114,17 +114,17 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
     Raises
     ------
     Exception
-        An exception is raised if the column is not found in the Signal.
+        An exception is raised if the column 'col' is not found in the Signal.
     Exception
-        An exception is raised if the sampling rate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if a Hz value in notchVals is greater than
+        An exception is raised if a Hz value in 'notchVals' is greater than
         samplingRate/2 or less than 0
 
     Returns
     -------
-    DataFrame
-        A copy of Signal after the notch filters are applied.
+    Signal : pd.DataFrame
+        A copy of the 'Signal' dataframe with the notch filters are applied.
 
     """
 
@@ -136,18 +136,18 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
 
     def apply_notch_filter(Signal, col, samplingRate, notch):
         """
-        Apply a notch filter to a signal
+        Apply a notch filter to a signal.
 
         Parameters
         ----------
-        Signal : DataFrame
-            A Pandas DataFrame containing a 'Time' column, and additional
+        Signal : pd.DataFrame
+            A Pandas dataframe containing a 'Time' column, and additional
             columns for signal data.
         col : str
             Column of the Signal to apply the filter to.
         samplingRate : float
             Sampling rate of the Signal.
-        notch : (int, int) tuple
+        notch : tuple
             Notch filter data. Should be a (Hz, Q) tuple where Hz is the
             frequency to apply the filter to, and Q. is the Q-score (an
             intensity score where a higher number means a less extreme filter).
@@ -160,8 +160,9 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
 
         Returns
         -------
-        Signal_col : Series
-            A Pandas Series of the provided column with the notch filter applied
+        SignalCol : Series
+            A Pandas series of the provided column with the notch filter
+            applied.
 
         """
         
@@ -178,9 +179,9 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
         
         # Use scipy notch filter using normalized frequency
         b, a = scipy.signal.iirnotch(norm_Hz, Q)
-        Signal_col = scipy.signal.lfilter(b, a, Signal[col])
+        SignalCol = scipy.signal.lfilter(b, a, Signal[col])
         
-        return Signal_col
+        return SignalCol
     
     Signal = Signal.copy()
     
@@ -200,50 +201,53 @@ def notch_filter_signals(inPath, outPath, samplingRate, notch, cols=None, expres
 
     Parameters
     ----------
-    inPath : dict
+    inPath : str
         Filepath to a directory to read Signal files.
     outPath : str
         Filepath to an output directory.
     samplingRate : float
         Sampling rate of the Signal.
-    notch : list
+    notch : list-tuples
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less
         extreme filter).
-    cols : list, optional
+    cols : list-str, optional
         List of columns of the Signal to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
-    expCopy : TYPE, optional
+    expCopy : bool, optional
         If true, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
-    fileExt : TYPE, optional
+    fileExt : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
 
     Raises
     ------
+    Warning
+        Raises a warning if no files in 'inPath' match with 'expression'.
     Exception
-        An exception is raised if the column is not found in any of the Signal
-        files found.
+        An exception is raised if any column in 'cols' is not found in any of
+        the Signal files read.
     Exception
-        An exception is raised if the sampling rate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if a Hz value in notchVals is greater than
+        An exception is raised if a Hz value in 'notchVals' is greater than
         samplingRate/2 or less than 0
     Exception
-        Raises an exception if a file cannot not be read in inPath.
+        An exception is raised if a file cannot not be read in 'inPath'.
     Exception
-        Raises an exception if an unsupported file format was provided for
-        fileExt.
+        An exception is raised if an unsupported file format was provided for
+        'fileExt'.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
+    
 
     Returns
     -------
@@ -401,6 +405,8 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
     
     Raises
     ------
+    Warning
+        A warning is raised if no files in 'inPath' match with 'expression'.
     Exception
         An exception is raised if the column is not found in any of the Signal
         files found.
@@ -409,12 +415,12 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
     Exception
         An exception is raised if high is not higher than low.
     Exception
-        Raises an exception if a file cannot not be read in inPath.
+        An exception is raised if a file cannot not be read in inPath.
     Exception
-        Raises an exception if an unsupported file format was provided for
+        An exception is raised if an unsupported file format was provided for
         fileExt.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if expression is not None or a valid regular
         expression.
     
     Returns
@@ -532,12 +538,12 @@ def apply_boxcar_smooth(Signal, col, windowSize):
     
     Raises
     ------
+    Warning
+        A warning is raised if windowSize is greater than Signal length.
     Exception
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if windowSize is less or equal to 0.
-    Warning
-        A warning is raised if windowSize is greater than Signal length.
     
     Returns
     -------
@@ -586,12 +592,12 @@ def apply_rms_smooth(Signal, col, windowSize):
 
     Raises
     ------
+    Warning
+        A warning is raised if windowSize is greater than Signal length.
     Exception
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if windowSize is less or equal to 0.
-    Warning
-        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -643,12 +649,12 @@ def apply_gaussian_smooth(Signal, col, windowSize, sigma=1):
 
     Raises
     ------
+    Warning
+        A warning is raised if windowSize is greater than Signal length.
     Exception
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if windowSize is less or equal to 0.
-    Warning
-        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -701,12 +707,12 @@ def apply_loess_smooth(Signal, col, windowSize):
 
     Raises
     ------
+    Warning
+        A warning is raised if windowSize is greater than Signal length.
     Exception
         An exception is raised if col is not found in Signal.
     Exception
         An exception is raised if windowSize is less or equal to 0.
-    Warning
-        A warning is raised if windowSize is greater than Signal length.
 
     Returns
     -------
@@ -777,6 +783,8 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
 
     Raises
     ------
+    Warning
+        A warning is raised if windowSize is greater than Signal length.
     Exception
         An exception is raised if an invalid smoothing method is used. Valid
         methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
@@ -784,15 +792,13 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
         An exception is raised if col is not found in any of the Signal files.
     Exception
         An exception is raised if windowSize is less or equal to 0.
-    Warning
-        A warning is raised if windowSize is greater than Signal length.
     Exception
-        Raises an exception if a file cannot not be read in inPath.
+        An exception is raised if a file cannot not be read in inPath.
     Exception
-        Raises an exception if an unsupported file format was provided for
+        An exception is raised if an unsupported file format was provided for
         fileExt.
     Exception
-        Raises an exception if expression is not None or a valid regular
+        An exception is raised if expression is not None or a valid regular
         expression.
 
     Returns
