@@ -62,7 +62,8 @@ notch_vals = [(50, 5)]
 cols = ['EMG_zyg', 'EMG_cor']
 
 # Apply notch filter (input path: /Raw, output path: /Notch)
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], 
+    sampling_rate, notch_vals, cols)
 ```
 
 ![Figure 1](figure1.png)
@@ -81,7 +82,7 @@ participant_pattern = '02\/\w+.csv'
 
 # Apply custom notch filter
 EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], 
-sampling_rate, notch_vals_subset, cols, expression=participant_pattern)
+    sampling_rate, notch_vals_subset, cols, expression=participant_pattern)
 ```
 
 ## Visualization of Preprocessing Stages
@@ -98,11 +99,11 @@ smooth_window = 50
 
 # Apply bandpass filter
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], 
-sampling_rate, band_low, band_high, cols)
+    sampling_rate, band_low, band_high, cols)
 
 # Apply smoothing filter
 EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], 
-smooth_window, cols)
+    smooth_window, cols)
 
 # Data column and units for plotting
 col = 'EMG_zyg'
