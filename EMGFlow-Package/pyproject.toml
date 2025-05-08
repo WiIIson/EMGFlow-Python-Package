@@ -12,7 +12,8 @@ dependencies = [
     "matplotlib",
     "tqdm",
     "shiny",
-    "nest-asyncio"
+    "nest-asyncio",
+    "importlib-resources"
 ]
 requires-python = ">=3.9"
 authors = [

@@ -27,29 +27,35 @@ As a quick example, the following will create a feature file, starting with a fo
 ```python
 import EMGFlow
 
-# Paths for data files
-raw_path = '/data/raw'          # Raw file contains raw data
-notch_path = '/data/notch'
-band_path = '/data/bandpass'    # Additional files are empty
-smooth_path = '/data/smoothed'
-feature_path = '/data/feature'
+# Get path dictionary
+pathNames = EMGFlow.make_paths()
 
-# Sampling rate for all files
-sampling_rate = 2000
+# Load sample data
+EMGFlow.make_sample_data(pathNames)
+
+# Sampling rate
+samplingRate = 2000
 
 # Filter parameters
-notch_vals = [(50, 5)]  # Notch filters to apply (Q, Hz)
-band_low = 20           # Low threshold for bandpass filter
-band_high = 140         # High threshold for bandpass filter
-smooth_window = 50      # Window size for smoothing filter
+notchVals = [(50, 5)]
+bandLow = 20
+bandHigh = 140
+smoothWindow = 50
 
-# Preprocess signals
-EMGFlow.NotchFilterSignals(raw_path, notch_path, sampling_rate, notch_vals)
-EMGFlow.BandpassFilterSignals(notch_path, band_path, sampling_rate, band_low, band_high)
-EMGFlow.SmoothFilterSignals(band_path, smooth_path, sampling_rate, smooth_window)
+# Columns containing data for preprocessing
+cols = ['EMG_zyg', 'EMG_cor']
 
-# Extract features and save results to "Features.csv" in feature_path
-df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate)
+# 1. Apply notch filters
+EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], samplingRate, notchVals, cols)
+
+# 2. Apply bandpass filter
+EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], samplingRate, bandLow, bandHigh, cols)
+
+# 3. Apply smoothing filter
+EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], smoothWindow, cols)
+
+# 4. Extract features
+df = EMGFlow.extract_features(pathNames, samplingRate, cols)
 ```
 
 ## Documentation
@@ -60,10 +66,10 @@ df = EMGFlow.ExtractFeatures(band_oath, smooth_path, feature_path, sampling_rate
 General:
 - [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/guide/about-emg.html)
 - [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/reference/api-overview.html)
-- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/file-access.html)
+- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/access-files.html)
 - [PreprocessSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/preprocess-signals.html)
-- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/feature-extraction.html)
-- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/outlier-detection.html)
+- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/extract-features.html)
+- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/detect-outliers.html)
 - [PlotSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/plot-signals.html)
 
 Examples:
