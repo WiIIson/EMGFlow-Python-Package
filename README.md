@@ -60,7 +60,7 @@ df = EMGFlow.extract_features(pathNames, samplingRate, cols)
 
 ## Documentation
 
-[![pypi](https://img.shields.io/badge/documentation-online-brightgreen.svg)](https://wiiison.github.io/EMGFlow-Python-Package/)
+[![pypi](https://img.shields.io/badge/documentation-online-brightgreen.svg)](https://wiiison.github.io/EMGFlow-Python-Package/reference/api-overview.html)
 [![pypi](https://img.shields.io/badge/tutorials-examples-orange.svg?colorB=E91E63)](https://wiiison.github.io/EMGFlow-Python-Package/guide/examples.html)
 
 General:
