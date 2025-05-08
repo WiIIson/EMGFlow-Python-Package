@@ -74,6 +74,9 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
 
     Raises
     ------
+    Warning
+        A warning is raised if 'windowSize' is greater than half the size of
+        a file read by the function.
     Exception
         An exception is raised if 'windowSize' is not an integer greater than
         0.

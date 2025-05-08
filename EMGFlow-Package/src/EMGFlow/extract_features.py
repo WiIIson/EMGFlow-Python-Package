@@ -22,7 +22,7 @@ A collection of functions for extracting features.
 #
 
 
-def calc_iemg(Signal, col, sr):
+def calc_iemg(Signal, col, samplingRate):
     """
     Calculate the Integreated EMG (IEMG) of a Signal.
 
@@ -33,7 +33,7 @@ def calc_iemg(Signal, col, sr):
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
-    sr : float
+    samplingRate : float
         Sampling rate of the Signal.
 
     Raises
@@ -41,7 +41,7 @@ def calc_iemg(Signal, col, sr):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sr' is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
 
     Returns
     -------
@@ -53,10 +53,10 @@ def calc_iemg(Signal, col, sr):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    if sr <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate cannot be less or equal to 0.")
     
-    IEMG = np.sum(np.abs(Signal[col]) * sr)
+    IEMG = np.sum(np.abs(Signal[col]) * samplingRate)
     return IEMG
 
 #
@@ -184,7 +184,7 @@ def calc_mmav2(Signal, col):
 # =============================================================================
 #
 
-def calc_ssi(Signal, col, sr):
+def calc_ssi(Signal, col, samplingRate):
     """
     Calculate the Simple Square Integreal (SSI) of a Signal.
 
@@ -195,7 +195,7 @@ def calc_ssi(Signal, col, sr):
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
-    sr : float
+    samplingRate : float
         Sampling rate of the Signal.
 
     Raises
@@ -203,7 +203,7 @@ def calc_ssi(Signal, col, sr):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if sr is less or equal to 0.
+        An exception is raised if samplingRate is less or equal to 0.
 
     Returns
     -------
@@ -215,10 +215,10 @@ def calc_ssi(Signal, col, sr):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    if sr <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
     
-    SSI = np.sum((np.abs(Signal[col]) * sr) ** 2)
+    SSI = np.sum((np.abs(Signal[col]) * samplingRate) ** 2)
     return SSI
 
 #
@@ -512,7 +512,7 @@ def calc_ap(Signal, col):
 # =============================================================================
 #
 
-def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
+def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
     """
     Calculate the spectral flux of a Signal.
 
@@ -529,7 +529,7 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
         Column of the Signal to apply the summary to. If a second signal is
         provided for 'diff', a column of the same name should be available for
         use.
-    sr : float
+    samplingRate : float
         Sampling rate of the Signal.
     diffSr : float, optional
         Sampling rate for the second Signal if provided. The default is None,
@@ -541,7 +541,7 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     Exception
         An exception is raised if 'col' is not a column of 'Signal1'.
     Exception
-        An exception is raised if 'sr' is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
         An exception is raised if 'diff' is a float, but isn't between 0 and 1.
     Exception
@@ -562,7 +562,7 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
     if col not in list(Signal1.columns.values):
         raise Exception("Column " + str(col) + " not in Signal1")
         
-    if sr <= 0:
+    if samplingRate <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
     
     # Separate Signal1 by div and find spectral flux
@@ -573,8 +573,8 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col][:diff_ind], samplingRate=sr)
-        psd2 = emg_to_psd(Signal1[col][diff_ind:], samplingRate=sr)
+        psd1 = emg_to_psd(Signal1[col][:diff_ind], samplingRate=samplingRate)
+        psd2 = emg_to_psd(Signal1[col][diff_ind:], samplingRate=samplingRate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
@@ -584,12 +584,12 @@ def calc_spec_flux(Signal1, diff, col, sr, diffSr=None):
             raise Exception("Column " + str(col) + " not in diff")
         
         # If no second sampling rate, assume same sampling rate as first Signal
-        if diffSr == None: diffSr = sr
+        if diffSr == None: diffSr = samplingRate
         
         if diffSr <= 0:
             raise Exception("Sampling rate cannot be 0 or negative")
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col], samplingRate=sr)
+        psd1 = emg_to_psd(Signal1[col], samplingRate=samplingRate)
         psd2 = emg_to_psd(diff[col], samplingRate=diffSr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
@@ -620,7 +620,7 @@ def calc_mdf(psd):
 
     Returns
     -------
-    med_freq : int, float
+    medFreq : int, float
         The MDF of the PSD dataframe provided.
     
     """
@@ -633,9 +633,9 @@ def calc_mdf(psd):
     diff = np.abs(prefix_sum - suffix_sum)
 
     min_ind = np.argmin(diff)
-    med_freq = psd.loc[diff.index.values[min_ind]]['Frequency']
+    medFreq = psd.loc[diff.index.values[min_ind]]['Frequency']
     
-    return med_freq
+    return medFreq
     
 #
 # =============================================================================
@@ -658,7 +658,7 @@ def calc_mnf(psd):
 
     Returns
     -------
-    mean_freq : int, float
+    meanFreq : int, float
         The MNF of the PSD dataframe provided.
     
     """
@@ -666,8 +666,8 @@ def calc_mnf(psd):
     if set(psd.columns.values) != {'Frequency', 'Power'}:
         raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
-    mean_freq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
-    return mean_freq
+    meanFreq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
+    return meanFreq
 
 #
 # =============================================================================
@@ -695,7 +695,7 @@ def calc_twitch_ratio(psd, freq=60):
 
     Returns
     -------
-    twitch_ratio : float
+    twitchRatio : float
         Twitch Ratio of the PSD dataframe provided.
 
     """
@@ -709,9 +709,9 @@ def calc_twitch_ratio(psd, freq=60):
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
-    twitch_ratio = np.sum(fast_twitch['Power']) / np.sum(slow_twitch['Power'])
+    twitchRatio = np.sum(fast_twitch['Power']) / np.sum(slow_twitch['Power'])
     
-    return twitch_ratio
+    return twitchRatio
 
 #
 # =============================================================================
@@ -739,7 +739,7 @@ def calc_twitch_index(psd, freq=60):
 
     Returns
     -------
-    twitch_index : float
+    twitchIndex : float
         Twitch Index of the PSD dataframe provided.
 
     """
@@ -753,9 +753,9 @@ def calc_twitch_index(psd, freq=60):
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
-    twitch_index = np.max(fast_twitch['Power']) / np.max(slow_twitch['Power'])
+    twitchIndex = np.max(fast_twitch['Power']) / np.max(slow_twitch['Power'])
     
-    return twitch_index
+    return twitchIndex
 
 #
 # =============================================================================
@@ -783,9 +783,9 @@ def calc_twitch_slope(psd, freq=60):
 
     Returns
     -------
-    fast_slope : float
+    fastSlope : float
         Twitch Slope of the fast-twitching muscles.
-    slow_slope : float
+    slowSlope : float
         Twitch Slope of the slow-twitching muscles.
 
     """
@@ -810,10 +810,10 @@ def calc_twitch_slope(psd, freq=60):
     fast_alpha = np.linalg.lstsq(A_fast, y_fast, rcond=None)[0]
     slow_alpha = np.linalg.lstsq(A_slow, y_slow, rcond=None)[0]
     
-    fast_slope = fast_alpha[0]
-    slow_slope = slow_alpha[0]
+    fastSlope = fast_alpha[0]
+    slowSlope = slow_alpha[0]
     
-    return fast_slope, slow_slope
+    return fastSlope, slowSlope
 
 #
 # =============================================================================
@@ -1006,7 +1006,7 @@ def calc_sr(psd, percent=0.85):
 
     Returns
     -------
-    float
+    SRoll : float
         Spectral Rolloff of the PSD dataframe provided.
 
     """
@@ -1026,7 +1026,8 @@ def calc_sr(psd, percent=0.85):
         prob = psdCalc.loc[i, 'Power'] / total_power
         total_prob += prob
         if total_power >= percent:
-            return psdCalc.loc[i, 'Frequency']
+            SRoll = psdCalc.loc[i, 'Frequency']
+            return SRoll
 
 #
 # =============================================================================
@@ -1104,14 +1105,15 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
 
     Raises
     ------
+    Warning
+        A warning is raised if 'expression' does not match with any files in
+        the folders provided.
     Exception
         An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not
         keys of the pathNames dictionary provided.
     Exception
         An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not
         contain the same files.
-    Exception
-        An exception is raised if p is not greater than 0.
     Exception
         An exception is raised if a file cannot not be read in the 'Bandpass'
         or 'Smooth' filepaths.
@@ -1219,8 +1221,11 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
         if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data_b = read_file_type(filedirs_b[file], fileExt)
-            data_s = read_file_type(filedirs_s[file], fileExt)
+            try:
+                data_b = read_file_type(filedirs_b[file], fileExt)
+                data_s = read_file_type(filedirs_s[file], fileExt)
+            except:
+                raise Exception("Could not find file: " + str(file))
             
             if col not in list(data_b.columns.values):
                 raise Exception("Bandpass file " + str(file) + " does not contain column " + str(col))

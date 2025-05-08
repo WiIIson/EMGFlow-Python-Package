@@ -38,7 +38,7 @@ def plot_spectrum(inPath, outPath, samplingRate, cols=None, p=None, expression=N
         Filepath to an output directory.
     samplingRate : float
         Sampling rate of the Signals.
-    cols : list, optional
+    cols : list-str, optional
         List of columns of the Signal to plot. The default is None, in which
         case every column except 'time' is plotted.
     p : float, optional
@@ -217,8 +217,11 @@ def plot_compare_signals(inPath1, inPath2, outPath, samplingRate, cols=None, exp
         if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data1 = read_file_type(filedirs1[file], fileExt)
-            data2 = read_file_type(filedirs2[file], fileExt)
+            try:
+                data1 = read_file_type(filedirs1[file], fileExt)
+                data2 = read_file_type(filedirs2[file], fileExt)
+            except:
+                raise Exception("File not found: ", str(file))
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:

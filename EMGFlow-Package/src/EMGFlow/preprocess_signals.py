@@ -43,8 +43,8 @@ def emg_to_psd(sigVals, samplingRate=1000, normalize=True):
     Returns
     -------
     psd : pd.DataFrame
-        A dataframe containing a 'Frequency' and 'Power' column. The 'Power'
-        column indicates the intensity of each frequency in the Signal
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column indicates the intensity of each frequency in the Signal
         provided. Results will be normalized if 'normalize' is set to True.
     
     """
@@ -114,7 +114,7 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
     Raises
     ------
     Exception
-        An exception is raised if the column 'col' is not found in the Signal.
+        An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
@@ -160,7 +160,7 @@ def apply_notch_filters(Signal, col, samplingRate, notchVals):
 
         Returns
         -------
-        SignalCol : Series
+        SignalCol : pd.Series
             A Pandas series of the provided column with the notch filter
             applied.
 
@@ -220,7 +220,7 @@ def notch_filter_signals(inPath, outPath, samplingRate, notch, cols=None, expres
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
     expCopy : bool, optional
-        If true, copies files that don't match the regular expression to the
+        If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     fileExt : str, optional
@@ -318,8 +318,8 @@ def apply_bandpass_filter(Signal, col, samplingRate, low, high):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -333,16 +333,19 @@ def apply_bandpass_filter(Signal, col, samplingRate, low, high):
     Raises
     ------
     Exception
-        An exception is raised if the column is not found in the Signal.
+        An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if the sampling rate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if high is not higher than low.
+        An exception is raised if 'high' is not higher than 'low'.
+    Exception
+        An exception is raised if 'high' or 'low' are higher than 1/2 of
+        'samplingRate'
 
     Returns
     -------
-    Signal : DataFrame
-        A copy of Signal after the bandpass filter is applied.
+    Signal : pd.DataFrame
+        A copy of 'Signal' after the bandpass filter is applied.
 
     """
     
@@ -378,7 +381,7 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
     
     Parameters
     ----------
-    inPath : dict
+    inPath : dict-str
         Filepath to a directory to read Signal files.
     outPath : str
         Filepath to an output directory.
@@ -396,7 +399,7 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
     expCopy : bool, optional
-        If true, copies files that don't match the regular expression to the
+        If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     fileExt : str, optional
@@ -408,19 +411,22 @@ def bandpass_filter_signals(inPath, outPath, samplingRate, low=20, high=450, col
     Warning
         A warning is raised if no files in 'inPath' match with 'expression'.
     Exception
-        An exception is raised if the column is not found in any of the Signal
-        files found.
+        An exception is raised if any column in 'cols' is not found in any of
+        the Signal files read.
     Exception
-        An exception is raised if the sampling rate is less or equal to 0.
+        An exception is raised if 'samplingRate' is less or equal to 0.
     Exception
-        An exception is raised if high is not higher than low.
+        An exception is raised if 'high' is not higher than 'low'.
     Exception
-        An exception is raised if a file cannot not be read in inPath.
+        An exception is raised if 'high' or 'low' are higher than 1/2 of
+        'samplingRate'
+    Exception
+        An exception is raised if a file cannot not be read in 'inPath'.
     Exception
         An exception is raised if an unsupported file format was provided for
-        fileExt.
+        'fileExt'.
     Exception
-        An exception is raised if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
     
     Returns
@@ -492,8 +498,8 @@ def apply_fwr(Signal, col):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -501,12 +507,12 @@ def apply_fwr(Signal, col):
     Raises
     ------
     Exception
-        An exception is raised if the column is not found in the Signal.
+        An exception is raised if 'col' is not a column of 'Signal'.
 
     Returns
     -------
-    Signal : DataFrame
-        A copy of Signal after the full wave rectifier filter is applied.
+    Signal : pd.DataFrame
+        A copy of 'Signal' after the full wave rectifier filter is applied.
 
     """
     
@@ -528,8 +534,8 @@ def apply_boxcar_smooth(Signal, col, windowSize):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -539,16 +545,17 @@ def apply_boxcar_smooth(Signal, col, windowSize):
     Raises
     ------
     Warning
-        A warning is raised if windowSize is greater than Signal length.
+        A warning is raised if 'windowSize' is greater than the length of
+        'Signal'
     Exception
-        An exception is raised if col is not found in Signal.
+        An exception is raised if 'col' is not found in 'Signal'.
     Exception
-        An exception is raised if windowSize is less or equal to 0.
+        An exception is raised if 'windowSize' is less or equal to 0.
     
     Returns
     -------
-    Signal : DataFrame
-        A copy of Signal after the boxcar smoothing filter is applied.
+    Signal : pd.DataFrame
+        A copy of 'Signal' after the boxcar smoothing filter is applied.
 
     """
     
@@ -582,8 +589,8 @@ def apply_rms_smooth(Signal, col, windowSize):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -593,16 +600,17 @@ def apply_rms_smooth(Signal, col, windowSize):
     Raises
     ------
     Warning
-        A warning is raised if windowSize is greater than Signal length.
+        A warning is raised if 'windowSize' is greater than the length of
+        'Signal'
     Exception
-        An exception is raised if col is not found in Signal.
+        An exception is raised if 'col' is not found in 'Signal'.
     Exception
-        An exception is raised if windowSize is less or equal to 0.
+        An exception is raised if 'windowSize' is less or equal to 0.
 
     Returns
     -------
-    Signal : DataFrame
-        A copy of Signal after the RMS smoothing filter is applied.
+    Signal : pd.DataFrame
+        A copy of 'Signal' after the RMS smoothing filter is applied.
 
     """
     
@@ -637,8 +645,8 @@ def apply_gaussian_smooth(Signal, col, windowSize, sigma=1):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -650,16 +658,17 @@ def apply_gaussian_smooth(Signal, col, windowSize, sigma=1):
     Raises
     ------
     Warning
-        A warning is raised if windowSize is greater than Signal length.
+        A warning is raised if 'windowSize' is greater than the length of
+        'Signal'
     Exception
-        An exception is raised if col is not found in Signal.
+        An exception is raised if 'col' is not found in 'Signal'.
     Exception
-        An exception is raised if windowSize is less or equal to 0.
+        An exception is raised if 'windowSize' is less or equal to 0.
 
     Returns
     -------
-    Signal : DataFrame
-        A copy of Signal after the Gaussian smoothing filter is applied.
+    Signal : pd.DataFrame
+        A copy of 'Signal' after the Gaussian smoothing filter is applied.
 
     """
     
@@ -697,8 +706,8 @@ def apply_loess_smooth(Signal, col, windowSize):
 
     Parameters
     ----------
-    Signal : DataFrame
-        A Pandas DataFrame containing a 'Time' column, and additional columns
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
         Column of the Signal to apply the filter to.
@@ -708,16 +717,17 @@ def apply_loess_smooth(Signal, col, windowSize):
     Raises
     ------
     Warning
-        A warning is raised if windowSize is greater than Signal length.
+        A warning is raised if 'windowSize' is greater than the length of
+        'Signal'
     Exception
-        An exception is raised if col is not found in Signal.
+        An exception is raised if 'col' is not found in 'Signal'.
     Exception
-        An exception is raised if windowSize is less or equal to 0.
+        An exception is raised if 'windowSize' is less or equal to 0.
 
     Returns
     -------
     Signal : DataFrame
-        A copy of Signal after the Loess smoothing filter is applied.
+        A copy of 'Signal' after the Loess smoothing filter is applied.
 
     """
     
@@ -754,13 +764,13 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
 
     Parameters
     ----------
-    inPath : dict
+    inPath : dict-str
         Filepath to a directory to read Signal files.
     outPath : str
         Filepath to an output directory.
     windowSize : int, float
         Size of the window of the filter.
-    cols : list, optional
+    cols : list-str, optional
         List of columns of the Signal to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'time'.
@@ -768,7 +778,7 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
     expCopy : bool, optional
-        If true, copies files that don't match the regular expression to the
+        If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     fileExt : str, optional
@@ -784,21 +794,25 @@ def smooth_filter_signals(inPath, outPath, windowSize, cols=None, expression=Non
     Raises
     ------
     Warning
-        A warning is raised if windowSize is greater than Signal length.
+        A warning is raised if 'windowSize' is greater than the length of
+        'Signal'
+    Warning
+        A warning is raised if 'expression' does not match with any files.
     Exception
         An exception is raised if an invalid smoothing method is used. Valid
         methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
     Exception
-        An exception is raised if col is not found in any of the Signal files.
+        An exception is raised if any column in 'cols' is not found in any of
+        the Signal files read.
     Exception
-        An exception is raised if windowSize is less or equal to 0.
+        An exception is raised if 'windowSize' is less or equal to 0.
     Exception
-        An exception is raised if a file cannot not be read in inPath.
+        An exception is raised if a file cannot not be read in 'inPath'.
     Exception
         An exception is raised if an unsupported file format was provided for
-        fileExt.
+        'fileExt'.
     Exception
-        An exception is raised if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
@@ -879,7 +893,7 @@ def clean_signals(path_names, samplingRate=2000):
 
     Parameters
     ----------
-    path_names : dict
+    path_names : dict-str
         Dictionary containing path locations for writing and reading Signal
         data between paths.
     samplingRate : float
