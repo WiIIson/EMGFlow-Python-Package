@@ -19,6 +19,10 @@ mindmap
         EF(Extract Features)
 ```
 
+
+
+
+
 ## `make_paths`
 
 **Description**
@@ -33,7 +37,7 @@ make_paths(root=None)
 
 **Parameters**
 
-`root`: str (None)
+`root`: str, optional (None)
 - Root of the data to be generated. The default is None.
 
 **Returns**
@@ -48,74 +52,92 @@ make_paths(root=None)
 path_names = EMGFlow.make_paths()
 ```
 
+
+
+
+
 ## `make_sample_data`
 
 **Description**
 
 Generates sample data in the 'Raw' folder of a provided dictionary of file locations.
 
+Creates '01' and '02' folders, which each contain two sample data files ('01/sample_data_01.csv', '01/sample_data_02.csv', '02/sample_data_03.csv', '02/sample_data_04.csv')
+
 ```python
-make_sample_data(pathNames)
+make_sample_data(path_names)
 ```
 
 **Parameters**
 
-`pathNames`: dict-str
-- A dictionary of string file locations
+`path_names`: dict-str
+- Dictionary of file locations.
 
-**Error**
+**Raises**
 
-Raises an error if `pathNames` does not contain a `Raw` path key.
+An exception is raised if the provided `path_names` dictionary doesn't contain a 'Raw' path key.
+
+An exception is raised if the sample data cannot be loaded.
 
 **Returns**
 
-`make_sample_data`: None
+None.
 
 **Example**
 
 ```python
 # Create file paths, then create sample data
-pathNames = EMGFlow.make_paths()
-EMGFlow.make_sample_data(pathNames)
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
 ```
+
+
+
+
 
 ## `read_file_type`
 
 **Description**
 
-`read_file_type` is a safe wrapper for reading files of a given extension.
+Safe wrapper for reading files of a given extension.
+
+Switches between different reading methods based on the instructions provided.
+    
+Supported formats that can be read are: 'csv'.
 
 ```python
-read_file_type(path, fileExt)
+read_file_type(path, file_ext)
 ```
 
 **Parameters**
 
 `path`: str
-- String filepath of file to read.
+- Path of the file to read.
 
-`fileExt`: str
-- String extension of the files to read.
+`file_ext`: str
+- File extension to read.
 
-**Error**
+**Raises**
 
-Raises an error if the file could not be read.
+An exception is raised if the file could not be read.
 
-Raises an error if an unsupported file format was provided for `fileExt`.
+An exception is raised if an unsupported file format was provided for `file_ext`.
 
 **Returns**
 
-`read_file_type`: pd.DataFrame
+`file`: pd.DataFrame
 - Returns a Pandas dataframe of the file contents.
 
 **Example**
 
 ```python
 # Read a csv file
-path = 'data/raw/file01.csv'
+path = '/Data/Raw/01/sample_data_01.csv'
 ext = 'csv'
 df = EMGFlow.read_file_type(path, ext)
 ```
+
+
 
 
 
@@ -123,45 +145,47 @@ df = EMGFlow.read_file_type(path, ext)
 
 **Description**
 
-`map_files` generates a dictionary of file name and location keys/values from a folder and its subfolders.
+Generate a dictionary of file names and locations (keys/values) from the subfiles of a folder.
 
 ```python
-map_files(inPath, fileExt='csv', expression=None, base=None)
+map_files(in_path, file_ext='csv', expression=None, base=None)
 ```
 
 **Parameters**
 
-`inPath`: str
-- String filepath to a directory containing Signal files.
+`in_path`: str
+- The filepath to a directory to read Signal files.
 
-`fileExt`: str ("csv")
-- String extension of the files to read. The default is `'csv'`.
+`file_ext`: str, optional ('csv')
+- File extension for files to read. The default is 'csv'.
 
-`expression`: str (None)
-- Optional regular expression. If provided, only maps files whose names match the regular expression matches.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
 
-`base`: str (None)
+`base`: str, optional (None)
 - Path of the root folder the path keys should start from. The default is None.
 
-**Error**
+**Raises**
 
-Raises an error if `expression` is not None or a valid regular expression.
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
-`map_files`: dict
-- Returns a dictionary of file names and locations key/values.
+`file_dirs`: dict-str
+- Returns a dictionary of file name and location keys/values.
 
 **Example**
 
 ```python
 # Map all csv files in 'dataFiles' folder and subfolders
-fileLoc1 = EMGFlow.map_files('data')
+file_loc_1 = EMGFlow.map_files('data')
 
 # Map all csv files in 'dataFiles' folder and subfolders
 # that start with 'DATA_'
-fileLoc2 = EMGFlow.map_files('data', expression='^DATA_')
+file_loc_2 = EMGFlow.map_files('data', expression='^DATA_')
 ```
+
+
 
 
 
@@ -171,43 +195,45 @@ fileLoc2 = EMGFlow.map_files('data', expression='^DATA_')
 
 A more advanced version of `map_files` that can coerce other data types into the `map_files` format.
 
-If provided a dictionary (assumed to be a file location map), it will return it, filtered by `expression` if provided.
+If provided a dictionary (assumed to be a file location map), it is returned, filtered by `expression` if provided.
 
 ```python
-convert_map_files(fileObj, fileExt='csv', experssion=None)
+convert_map_files(file_obj, file_ext='csv', experssion=None)
 ```
 
 **Parameters**
 
-`fileObj`: str, dict-str
-- Any filepath data type supported by the function. Supported data types are: filepath string, or filepath dictionary.
+`file_obj`: str, dict-str
+- The file location object. This can be a string to a file location, or an already formed dictionary of file locations.
 
-`fileExt`: str ("csv")
-- Extension of the files to read. The default is 'csv'.
+`file_ext`: str, optional ('csv')
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
-`expression`: str (None)
-- Optional regular expression. If provided, only maps files whose names match the regular expression matches.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
 
-**Error**
+**Raises**
 
-Raises an error if provided an unsupported file type for `fileObj` is provided.
+An exception is raised if `file_ext` is an unsupported file format.
 
-Raises an error if `expression` is not None or a valid regular expression.
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
-`convert_map_files`: dict-str
-- Returns a dictionary of file names and locations keys/values.
+`file_dirs`: dict-str
+- Returns a dictionary of file name and location keys/values.
 
 **Example**
 
 ```python
 # Read in file locations normally
-fileLoc1 = EMGFlow.convert_map_files('/data')
+file_loc_1 = EMGFlow.convert_map_files('/data')
 
 # Filter an existing dataframe with a regular expression
-fileLoc2 = EMGFlow.convert_map_files(fileLoc1, expression='^01')
+file_loc_2 = EMGFlow.convert_map_files(file_loc_1, expression='^01')
 ```
+
+
 
 
 
@@ -215,43 +241,41 @@ fileLoc2 = EMGFlow.convert_map_files(fileLoc1, expression='^01')
 
 **Description**
 
-Combines multiple dictionaries of mapped files (see `map_files`) into a Pandas dataframe.
-
-Assumes that the files contained in the first dictionary are present in each of the following dictionaries.
+Generate a dictionary of file names and locations from different forms of input. Each directory should contain the same file at different stages with the same name, and will create a dataframe of the location of this file in each of the directories provided.
 
 ```python
-map_files_fuse(filedirs, names)
+map_files_fuse(file_dirs, names)
 ```
 
 **Parameters**
 
-`filedirs`:  list-dict-str
-- List of dictionaries assumed to contain file maps.
+`file_dirs`:  list-dict-str
+- List of file location directories.
 
 `names`: list-str
-- List of names to use for columns, same order as filedirs.
+- List of names to use for file directory columns. Same order as `file_dirs`.
 
-**Error**
+**Raises**
 
-Raises an error if files contained in the first element of `filedirs` are not contained in the other directories.
+An exception is raised if a file contained in the first file directory is not found in the other file directories.
 
 **Returns**
 
-`map_files_fuse`: pd.DataFrame
-- Returns a Pandas DataFrame containing each file, and their location for each directory.
+`path_df`: pd.DataFrame
+- A dataframe of file names, and their locations in each file directory.
 
 **Example**
 
 ```python
 # Create file directory dictionaries
-dirRaw = EMGFlow.map_files('/data/raw')
-notchPath = EMGFlow.map_files('/data/notch')
-bandPath = EMGFlow.map_files('/data/bandpass')
+raw_path = EMGFlow.map_files('/Data/Raw')
+notch_path = EMGFlow.map_files('/Data/Notch')
+band_path = EMGFlow.map_files('/Data/Bandpass')
 
 # Create dictionary list and names
-filedirs = [dirRaw, notchPath, bandPath]
+file_dirs = [raw_path, notch_path, band_path]
 names = ['Raw', 'Notch', 'Bandpass']
 
 # Create data frame
-dfDirs = EMGFlow.map_files_fuse(filedirs, names)
+dfDirs = EMGFlow.map_files_fuse(file_dirs, names)
 ```
