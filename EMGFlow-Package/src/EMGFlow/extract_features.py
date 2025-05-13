@@ -22,7 +22,7 @@ A collection of functions for extracting features.
 #
 
 
-def calc_iemg(Signal, col, samplingRate):
+def calc_iemg(Signal, col, sampling_rate):
     """
     Calculate the Integreated EMG (IEMG) of a Signal.
 
@@ -33,7 +33,7 @@ def calc_iemg(Signal, col, samplingRate):
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
-    samplingRate : float
+    sampling_rate : float
         Sampling rate of the Signal.
 
     Raises
@@ -41,7 +41,7 @@ def calc_iemg(Signal, col, samplingRate):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'samplingRate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
 
     Returns
     -------
@@ -53,10 +53,10 @@ def calc_iemg(Signal, col, samplingRate):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    if samplingRate <= 0:
+    if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be less or equal to 0.")
     
-    IEMG = np.sum(np.abs(Signal[col]) * samplingRate)
+    IEMG = np.sum(np.abs(Signal[col]) * sampling_rate)
     return IEMG
 
 #
@@ -184,7 +184,7 @@ def calc_mmav2(Signal, col):
 # =============================================================================
 #
 
-def calc_ssi(Signal, col, samplingRate):
+def calc_ssi(Signal, col, sampling_rate):
     """
     Calculate the Simple Square Integreal (SSI) of a Signal.
 
@@ -195,7 +195,7 @@ def calc_ssi(Signal, col, samplingRate):
         for signal data.
     col : str
         Column of the Signal to apply the summary to.
-    samplingRate : float
+    sampling_rate : float
         Sampling rate of the Signal.
 
     Raises
@@ -203,7 +203,7 @@ def calc_ssi(Signal, col, samplingRate):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if samplingRate is less or equal to 0.
+        An exception is raised if sampling_rate is less or equal to 0.
 
     Returns
     -------
@@ -215,10 +215,10 @@ def calc_ssi(Signal, col, samplingRate):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    if samplingRate <= 0:
+    if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
     
-    SSI = np.sum((np.abs(Signal[col]) * samplingRate) ** 2)
+    SSI = np.sum((np.abs(Signal[col]) * sampling_rate) ** 2)
     return SSI
 
 #
@@ -512,7 +512,7 @@ def calc_ap(Signal, col):
 # =============================================================================
 #
 
-def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
+def calc_spec_flux(Signal1, diff, col, sampling_rate, diff_sr=None):
     """
     Calculate the spectral flux of a Signal.
 
@@ -529,9 +529,9 @@ def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
         Column of the Signal to apply the summary to. If a second signal is
         provided for 'diff', a column of the same name should be available for
         use.
-    samplingRate : float
+    sampling_rate : float
         Sampling rate of the Signal.
-    diffSr : float, optional
+    diff_sr : float, optional
         Sampling rate for the second Signal if provided. The default is None,
         in which case if a second Signal is provided, the sampling rate is
         assumed to be the same as the first.
@@ -541,14 +541,14 @@ def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
     Exception
         An exception is raised if 'col' is not a column of 'Signal1'.
     Exception
-        An exception is raised if 'samplingRate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if 'diff' is a float, but isn't between 0 and 1.
     Exception
         An exception is raised if 'diff' is a dataframe and does not contain
         'col'.
     Exception
-        An exception is raised if 'diffSr' is less or equal to 0.
+        An exception is raised if 'diff_sr' is less or equal to 0.
     Exception
         An exception is raised if 'diff' is an invalid data type.
 
@@ -562,7 +562,7 @@ def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
     if col not in list(Signal1.columns.values):
         raise Exception("Column " + str(col) + " not in Signal1")
         
-    if samplingRate <= 0:
+    if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
     
     # Separate Signal1 by div and find spectral flux
@@ -573,8 +573,8 @@ def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col][:diff_ind], samplingRate=samplingRate)
-        psd2 = emg_to_psd(Signal1[col][diff_ind:], samplingRate=samplingRate)
+        psd1 = emg_to_psd(Signal1[col][:diff_ind], sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1[col][diff_ind:], sampling_rate=sampling_rate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
@@ -584,13 +584,13 @@ def calc_spec_flux(Signal1, diff, col, samplingRate, diffSr=None):
             raise Exception("Column " + str(col) + " not in diff")
         
         # If no second sampling rate, assume same sampling rate as first Signal
-        if diffSr == None: diffSr = samplingRate
+        if diff_sr == None: diff_sr = sampling_rate
         
-        if diffSr <= 0:
+        if diff_sr <= 0:
             raise Exception("Sampling rate cannot be 0 or negative")
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col], samplingRate=samplingRate)
-        psd2 = emg_to_psd(diff[col], samplingRate=diffSr)
+        psd1 = emg_to_psd(Signal1[col], sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(diff[col], sampling_rate=diff_sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
@@ -620,7 +620,7 @@ def calc_mdf(psd):
 
     Returns
     -------
-    medFreq : int, float
+    med_freq : int, float
         The MDF of the PSD dataframe provided.
     
     """
@@ -633,9 +633,9 @@ def calc_mdf(psd):
     diff = np.abs(prefix_sum - suffix_sum)
 
     min_ind = np.argmin(diff)
-    medFreq = psd.loc[diff.index.values[min_ind]]['Frequency']
+    med_freq = psd.loc[diff.index.values[min_ind]]['Frequency']
     
-    return medFreq
+    return med_freq
     
 #
 # =============================================================================
@@ -658,7 +658,7 @@ def calc_mnf(psd):
 
     Returns
     -------
-    meanFreq : int, float
+    mean_freq : int, float
         The MNF of the PSD dataframe provided.
     
     """
@@ -666,8 +666,8 @@ def calc_mnf(psd):
     if set(psd.columns.values) != {'Frequency', 'Power'}:
         raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
-    meanFreq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
-    return meanFreq
+    mean_freq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
+    return mean_freq
 
 #
 # =============================================================================
@@ -695,7 +695,7 @@ def calc_twitch_ratio(psd, freq=60):
 
     Returns
     -------
-    twitchRatio : float
+    twitch_ratio : float
         Twitch Ratio of the PSD dataframe provided.
 
     """
@@ -709,9 +709,9 @@ def calc_twitch_ratio(psd, freq=60):
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
-    twitchRatio = np.sum(fast_twitch['Power']) / np.sum(slow_twitch['Power'])
+    twitch_ratio = np.sum(fast_twitch['Power']) / np.sum(slow_twitch['Power'])
     
-    return twitchRatio
+    return twitch_ratio
 
 #
 # =============================================================================
@@ -739,7 +739,7 @@ def calc_twitch_index(psd, freq=60):
 
     Returns
     -------
-    twitchIndex : float
+    twitch_index : float
         Twitch Index of the PSD dataframe provided.
 
     """
@@ -753,9 +753,9 @@ def calc_twitch_index(psd, freq=60):
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
-    twitchIndex = np.max(fast_twitch['Power']) / np.max(slow_twitch['Power'])
+    twitch_index = np.max(fast_twitch['Power']) / np.max(slow_twitch['Power'])
     
-    return twitchIndex
+    return twitch_index
 
 #
 # =============================================================================
@@ -783,9 +783,9 @@ def calc_twitch_slope(psd, freq=60):
 
     Returns
     -------
-    fastSlope : float
+    fast_slope : float
         Twitch Slope of the fast-twitching muscles.
-    slowSlope : float
+    slow_slope : float
         Twitch Slope of the slow-twitching muscles.
 
     """
@@ -810,10 +810,10 @@ def calc_twitch_slope(psd, freq=60):
     fast_alpha = np.linalg.lstsq(A_fast, y_fast, rcond=None)[0]
     slow_alpha = np.linalg.lstsq(A_slow, y_slow, rcond=None)[0]
     
-    fastSlope = fast_alpha[0]
-    slowSlope = slow_alpha[0]
+    fast_slope = fast_alpha[0]
+    slow_slope = slow_alpha[0]
     
-    return fastSlope, slowSlope
+    return fast_slope, slow_slope
 
 #
 # =============================================================================
@@ -1074,18 +1074,18 @@ def calc_sbw(psd, p=2):
 # =============================================================================
 #
 
-def extract_features(pathNames, samplingRate, cols=None, expression=None, fileExt='csv', shortName=True):
+def extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
     Analyze Signals by performing a collection of analyses on them and saving a
     feature file.
 
     Parameters
     ----------
-    pathNames : dict-str
+    path_names : dict-str
         A dictionary of path names for reading data. Required paths are:
         'Notch', 'Bandpass' and 'Feature'. The dictionary can be created with
         the 'make_paths' function.
-    samplingRate : float
+    sampling_rate : float
         Sampling rate for all Signals being read.
     cols : list-str, optional
         List of columns to analyze in each Signal. The default is None, in
@@ -1096,10 +1096,10 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     expression : str, optional
         A regular expression. If provided, will only read files whose names
         match the regular expression. The default is None.
-    fileExt : str, optional
+    file_ext : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
-    shortName : bool, optional
+    short_name : bool, optional
         If true, makes the key column of the feature files the relative path of
         the file. If false, uses the full system path. The default is True.
 
@@ -1110,7 +1110,7 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
         the folders provided.
     Exception
         An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not
-        keys of the pathNames dictionary provided.
+        keys of the path_names dictionary provided.
     Exception
         An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not
         contain the same files.
@@ -1119,7 +1119,7 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
         or 'Smooth' filepaths.
     Exception
         An exception is raised if an unsupported file format was provided for
-        'fileExt'.
+        'file_ext'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
@@ -1130,16 +1130,16 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
 
     """
     
-    if 'Bandpass' not in pathNames:
-        raise Exception('Bandpass path not detected in provided dictionary (pathNames)')
-    if 'Smooth' not in pathNames:
-        raise Exception('Smooth path not detected in provided dictionary (pathNames)')
-    if 'Feature' not in pathNames:
-        raise Exception('Feature path not detected in provided dictionary (pathNames)')
+    if 'Bandpass' not in path_names:
+        raise Exception('Bandpass path not detected in provided dictionary (path_names)')
+    if 'Smooth' not in path_names:
+        raise Exception('Smooth path not detected in provided dictionary (path_names)')
+    if 'Feature' not in path_names:
+        raise Exception('Feature path not detected in provided dictionary (path_names)')
     
-    in_bandpass = pathNames['Bandpass']
-    in_smooth = pathNames['Smooth']
-    out_path = pathNames['Feature']
+    in_bandpass = path_names['Bandpass']
+    in_smooth = path_names['Smooth']
+    out_path = path_names['Feature']
     
     if expression is not None:
         try:
@@ -1154,9 +1154,9 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     
     # Directories don't have to have the same file structure, but
     # Must have files with the same name
-    filedirs_b = map_files(in_bandpass, fileExt=fileExt, expression=expression)
-    filedirs_s = map_files(in_smooth, fileExt=fileExt, expression=expression)
-    if len(filedirs_b) == 0 or len(filedirs_s) == 0:
+    file_dirs_b = map_files(in_bandpass, file_ext=file_ext, expression=expression)
+    file_dirs_s = map_files(in_smooth, file_ext=file_ext, expression=expression)
+    if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
         warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
     # List of measure names
@@ -1201,8 +1201,8 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     
     # Read the first file to get column names
     if cols == None:
-        path1 = next(iter(filedirs_s.values()))
-        data1 = read_file_type(path1, fileExt)
+        path1 = next(iter(file_dirs_s.values()))
+        data1 = read_file_type(path1, file_ext)
         cols = list(data1.columns)
         if 'Time' in cols:
             cols.remove('Time')
@@ -1217,13 +1217,13 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
     SignalDF = pd.DataFrame(columns=df_names)
     
     # Apply transformations
-    for file in tqdm(filedirs_b):
-        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
+    for file in tqdm(file_dirs_b):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
             try:
-                data_b = read_file_type(filedirs_b[file], fileExt)
-                data_s = read_file_type(filedirs_s[file], fileExt)
+                data_b = read_file_type(file_dirs_b[file], file_ext)
+                data_s = read_file_type(file_dirs_s[file], file_ext)
             except:
                 raise Exception("Could not find file: " + str(file))
             
@@ -1233,10 +1233,10 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
                 raise Exception("Smooth file " + str(file) + " does not contain column " + str(col))
             
             # Calculate ID
-            if shortName:
+            if short_name:
                 File_ID = file
             else:
-                File_ID = filedirs_s[file]
+                File_ID = file_dirs_s[file]
              
             df_vals = [File_ID]
             # Evaluate the measures of each column
@@ -1249,11 +1249,11 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
                 SD = np.std(data_s[col])
                 Skew = scipy.stats.skew(data_s[col])
                 Kurtosis = scipy.stats.kurtosis(data_s[col])
-                IEMG = calc_iemg(data_s, col, samplingRate)
+                IEMG = calc_iemg(data_s, col, sampling_rate)
                 MAV = calc_mav(data_s, col)
                 MMAV1 = calc_mmav1(data_s, col)
                 MMAV2 = calc_mmav2(data_s, col)
-                SSI = calc_ssi(data_s, col, samplingRate)
+                SSI = calc_ssi(data_s, col, sampling_rate)
                 VAR = calc_var(data_s, col)
                 VOrder = calc_vorder(data_s, col)
                 RMS = calc_rms(data_s, col)
@@ -1263,8 +1263,8 @@ def extract_features(pathNames, samplingRate, cols=None, expression=None, fileEx
                 AP = calc_ap(data_s, col)
     
                 # Calculate spectral features
-                Spectral_Flux = calc_spec_flux(data_s, 0.5, col, samplingRate)
-                psd = emg_to_psd(data_b[col], samplingRate=samplingRate)
+                Spectral_Flux = calc_spec_flux(data_s, 0.5, col, sampling_rate)
+                psd = emg_to_psd(data_b[col], sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 MDF = calc_mdf(psd)
                 MNF = calc_mnf(psd)

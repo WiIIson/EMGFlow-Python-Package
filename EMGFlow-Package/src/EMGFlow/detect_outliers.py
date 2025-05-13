@@ -22,7 +22,7 @@ A collection of functions for finding outliers while testing.
 # =============================================================================
 #
 
-def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, windowSize=200, fileExt='csv'):
+def detect_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
     """
     Looks at all Signals contained in a filepath, returns a dictionary of file
     names and locations that have outliers.
@@ -37,9 +37,9 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
 
     Parameters
     ----------
-    inPath : str
+    in_path : str
         Filepath to a directory to read Signal files.
-    samplingRate : float
+    sampling_rate : float
         Sampling rate of the Signal.
     cols : list-str
         List of columns of the Signal to search for outliers in. The default is
@@ -65,23 +65,23 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     expression : str, optional
         A regular expression. If provided, will only search for outliers in
         files whose names match the regular expression. The default is None.
-    windowSize : int, optional
+    window_size : int, optional
         The window size to use when filtering for local maxima. The default is
         200.
-    fileExt : str, optional
+    file_ext : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
 
     Raises
     ------
     Warning
-        A warning is raised if 'windowSize' is greater than half the size of
+        A warning is raised if 'window_size' is greater than half the size of
         a file read by the function.
     Exception
-        An exception is raised if 'windowSize' is not an integer greater than
+        An exception is raised if 'window_size' is not an integer greater than
         0.
     Exception
-        An exception is raised if 'samplingRate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if 'threshold' is less or equal to 0.
     Exception
@@ -93,10 +93,10 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     Exception
         An exception is raised if a column in 'cols' is not in a data file.
     Exception
-        An exception is raised if a file cannot not be read in 'inPath'.
+        An exception is raised if a file cannot not be read in 'in_path'.
     Exception
         An exception is raised if an unsupported file format was provided for
-        'fileExt'.
+        'file_ext'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
@@ -109,11 +109,11 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
 
     """
     
-    if not type(windowSize) == int:
-        raise Exception("'windowSize' must be a valid integer.")
+    if not type(window_size) == int:
+        raise Exception("'window_size' must be a valid integer.")
     
-    if windowSize <= 0:
-        raise Exception("'windowSize' cannot be 0 or less.")
+    if window_size <= 0:
+        raise Exception("'window_size' cannot be 0 or less.")
     
     if expression is not None:
         try:
@@ -136,7 +136,7 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     if low is None:
         low = 0
     if high is None:
-        high = samplingRate/2
+        high = sampling_rate/2
     
     if low >= high:
         raise Exception("'low' (" + str(low) + ") must be greater than 'high' (" + str(high), ").")
@@ -159,21 +159,21 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
     outliers = {}
     
     # Convert path to absolute
-    if not os.path.isabs(inPath):
-        inPath = os.path.abspath(inPath)
+    if not os.path.isabs(in_path):
+        in_path = os.path.abspath(in_path)
     
     # Get dictionary of files
-    filedirs = map_files(inPath, fileExt=fileExt, expression=expression)
+    file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
     
     # Iterate over detected files
-    for file in tqdm(filedirs):
-        if (file[-len(fileExt):] == fileExt) and ((expression is None) or (re.match(expression, file))):
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
             
             # Read file
-            data = read_file_type(filedirs[file], fileExt)
+            data = read_file_type(file_dirs[file], file_ext)
             
-            if len(data.index)/2 <= windowSize:
-                warnings.warn("Warning: windowSize is greater than 1/2 of data file, results may be poor.")
+            if len(data.index)/2 <= window_size:
+                warnings.warn("Warning: window_size is greater than 1/2 of data file, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -191,17 +191,17 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
                 if col not in list(data.columns.values):
                     raise Exception("Column " + str(col) + " is not in 'Signal': " + str(file))
                 
-                psd = emg_to_psd(data[col], samplingRate=samplingRate)
+                psd = emg_to_psd(data[col], sampling_rate=sampling_rate)
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima
-                psd['max'] = psd.iloc[argrelextrema(psd['Power'].values, np.greater_equal, order=windowSize)[0]]['Power']
+                psd['max'] = psd.iloc[argrelextrema(psd['Power'].values, np.greater_equal, order=window_size)[0]]['Power']
                 
                 # Filter non-maxima
                 maxima = psd[psd['max'].notnull()]
                 
                 if len(maxima.index) == 1:
-                    raise Exception("Not enough maxima to create approximation - reduce 'windowSize' or use a larger data file.")
+                    raise Exception("Not enough maxima to create approximation - reduce 'window_size' or use a larger data file.")
     
                 # Initialize rational function parameters
                 p_init = np.poly1d(np.ones(p_deg))
@@ -229,6 +229,6 @@ def detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=N
             
             # If any columns have an outlier, mark as an outlier
             if isOutlier:
-                outliers[file] = filedirs[file]
+                outliers[file] = file_dirs[file]
                 
     return outliers

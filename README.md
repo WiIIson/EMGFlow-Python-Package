@@ -28,34 +28,34 @@ As a quick example, the following will create a feature file, starting with a fo
 import EMGFlow
 
 # Get path dictionary
-pathNames = EMGFlow.make_paths()
+path_names = EMGFlow.make_paths()
 
 # Load sample data
-EMGFlow.make_sample_data(pathNames)
+EMGFlow.make_sample_data(path_names)
 
 # Sampling rate
-samplingRate = 2000
+sampling_rate = 2000
 
 # Filter parameters
-notchVals = [(50, 5)]
-bandLow = 20
-bandHigh = 140
-smoothWindow = 50
+notch_vals = [(50, 5)]
+band_low = 20
+band_high = 140
+smooth_window = 50
 
 # Columns containing data for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']
 
 # 1. Apply notch filters
-EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], samplingRate, notchVals, cols)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 
 # 2. Apply bandpass filter
-EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], samplingRate, bandLow, bandHigh, cols)
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
 
 # 3. Apply smoothing filter
-EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], smoothWindow, cols)
+EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
 
 # 4. Extract features
-df = EMGFlow.extract_features(pathNames, samplingRate, cols)
+df = EMGFlow.extract_features(path_names, sampling_rate, cols)
 ```
 
 ## Documentation

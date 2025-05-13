@@ -22,14 +22,14 @@ A collection of functions for plotting subject data.
 # =============================================================================
 #
 
-def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autorun=True):
+def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto_run=True):
     """
     Generate a shiny dashboard of different processing stages for a given
     column.
 
     Parameters
     ----------
-    pathNames : dict-str
+    path_names : dict-str
         A dictionary of path names for reading data. The function will generate
         graphs for as many paths are provided in the dictionary. The dictionary
         can be created with the make_paths function.
@@ -42,11 +42,11 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
         String regular expression. If provided, will only create visualizations
         for Signal files whose names match the regular expression, and will
         ignore everything else. The default is None.
-    fileExt : str, optional
-        String extension of the files to read. Any file in inPath with this
+    file_ext : str, optional
+        String extension of the files to read. Any file in in_path with this
         extension will be considered to be a Signal file, and treated as such.
         The default is 'csv'.
-    autorun : bool, optional
+    auto_run : bool, optional
         Boolean controlling behavior of the function. If true (default), will
         automatically run the visual and open it in the default browser. If
         false, will return the visualization object.
@@ -54,17 +54,17 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
     Raises
     ------
     Exception
-        An exception is raised if the directories in 'inPaths' don't contain
+        An exception is raised if the directories in 'path_names' don't contain
         the same files.
     Exception
         An exception is raised if 'col' is not found as a column in a
         dataframe.
     Exception
         An exception is raised if a file cannot not be read in a path in
-        'inPaths'.
+        'path_names'.
     Exception
         An exception is raised if an unsupported file format was provided for
-        'fileExt'.
+        'file_ext'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
@@ -72,15 +72,15 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
     Returns
     -------
     app : None, shiny.App
-        If 'autorun' is True, returns None. If False, returns a shiny.App
+        If 'auto_run' is True, returns None. If False, returns a shiny.App
         instance.
 
     """
     
     # Remove feature path, and convert dictionary to lists
-    pathNames.pop("Feature", None)
-    inPaths = list(pathNames.values())
-    names = list(pathNames.keys())
+    path_names.pop("Feature", None)
+    in_paths = list(path_names.values())
+    names = list(path_names.keys())
     
     if expression is not None:
         try:
@@ -89,12 +89,12 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
             raise Exception("Invalid regex expression provided")
     
     # Convert file paths to directories
-    filedirs = []
-    for path in inPaths:
-        filedirs.append(convert_map_files(path))
+    file_dirs = []
+    for path in in_paths:
+        file_dirs.append(convert_map_files(path))
         
     # Convert file directories to data frame
-    df = map_files_fuse(filedirs, names)
+    df = map_files_fuse(file_dirs, names)
     
     # Set style
     plt.style.use('fivethirtyeight')
@@ -136,7 +136,7 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
             if column == 'All':
                 # Read/plot each file
                 for file_loc in reversed(list(df.loc[filename])[1:]):
-                    sigDF = read_file_type(file_loc, fileExt)
+                    sigDF = read_file_type(file_loc, file_ext)
                     
                     # Exception for column input
                     if col not in list(sigDF.columns.values):
@@ -149,7 +149,7 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
-                sigDF = read_file_type(file_location, fileExt)
+                sigDF = read_file_type(file_location, file_ext)
                 
                 # Exception for column input
                 if col not in list(sigDF.columns.values):
@@ -169,7 +169,7 @@ def plot_dashboard(pathNames, col, units, expression=None, fileExt='csv', autoru
     
     app = App(app_ui, server)
     
-    if autorun:
+    if auto_run:
         webbrowser.open('http://127.0.0.1:8000')
         app.run()
         return

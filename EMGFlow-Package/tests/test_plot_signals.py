@@ -32,7 +32,7 @@ class TestSimple(unittest.TestCase):
     
     def test_plot_dashboard(self):
         pathNames = EMGFlow.make_paths()
-        app = EMGFlow.plot_dashboard(pathNames, 'EMG_zyg', 'mV', autorun=False)
+        app = EMGFlow.plot_dashboard(pathNames, 'EMG_zyg', 'mV', auto_run=False)
         self.assertIsInstance(app, shiny.App)
 
 #
