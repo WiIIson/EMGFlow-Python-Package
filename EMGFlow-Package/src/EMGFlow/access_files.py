@@ -20,8 +20,9 @@ def make_paths(root=None):
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
     
-    A 'Data' folder is created, with 'Raw', 'Notch', 'Bandpass', 'Smooth' and
-    'Feature' subfolders.
+    Creates 'Raw', 'Notch', 'Bandpass', 'Smooth' and 'Feature' subfolders at a
+    given location. If no path is given, will create a 'Data' folder in the
+    current working directory, with these subfolders inside.
 
     Parameters
     ----------
