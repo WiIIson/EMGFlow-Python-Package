@@ -16,19 +16,19 @@ _EMGFlow_ extracts a comprehensive set of 32 statistical features from sEMG sign
 import EMGFlow
 
 # Get path dictionary
-pathNames = EMGFlow.make_paths()
+path_names = EMGFlow.make_paths()
 
 # Load sample data
-EMGFlow.make_sample_data(pathNames)
+EMGFlow.make_sample_data(path_names)
 
 # Preprocess signals
-EMGFlow.clean_signals(pathNames, samplingRate=2000)
-
-# Extract features and save results in "Features.csv" in feature_path
-df = EMGFlow.extract_features(pathNames, samplingRate=2000)
+EMGFlow.clean_signals(path_names, sampling_rate=2000)
 
 # Plot data on the "EMG_zyg" column
-EMGFlow.plot_dashboard(pathNames, 'EMG_zyg', 'mV')
+EMGFlow.plot_dashboard(path_names, 'EMG_zyg', 'mV')
+
+# Extract features and save results in "Features.csv" in feature_path
+df = EMGFlow.extract_features(path_names, sampling_rate=2000)
 ```
 
 ## Input data format
