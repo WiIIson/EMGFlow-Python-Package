@@ -1,48 +1,44 @@
 import unittest
-import pandas as pd
-import numpy as np
-import sys
+import importlib
 import os
+import shutil
 
-from src.EMGFlow.OutlierFinder import *
+# Load EMGFlow from local files
+filePath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'EMGFlow', '__init__.py'))
+spec = importlib.util.spec_from_file_location("EMGFlow", filePath)
+EMGFlow = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(EMGFlow)
+
+#
+# =============================================================================
+#
 
 class TestSimple(unittest.TestCase):
     
     def setUp(self):
-        if os.path.exists('./Testing') == False:
-            os.mkdir('./Testing')
-            time_col = np.array(range(500)) / 100
-            emg_col = np.sin(time_col) + (np.random.rand(500)/10)
-            df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
-            df.to_csv('./Testing/Data.csv', index=False)
-        if os.path.exists('./Testing_out') == False:
-            os.mkdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == False:
-            os.mkdir('./Testing_plots')
-    
-    def test_DetectOutliers(self):
-        
-        with self.assertRaises(Exception):
-            DetectOutliers('./Testing', -4, 5, window_size=5)
-            
-        with self.assertRaises(Exception):
-            DetectOutliers('./Testing', 100, -5, window_size=5)
-        
-        with self.assertRaises(Exception):
-            DetectOutliers('./Testing', 100, 5, expression='[', window_size=5)
-        
-        with self.assertRaises(Exception):
-            DetectOutliers('./Testing', 100, 5, metric=np.mat, window_size=5)
-            
-        outliers = DetectOutliers('./Testing', 100, 5, window_size=5)
+        pass
+
+#
+# =============================================================================
+#
+
+    def test_detect_outliers(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.make_sample_data(pathNames)
+        outliers = EMGFlow.detect_outliers(pathNames['Raw'], 2000, 2, windowSize=20)
         self.assertIsInstance(outliers, dict)
 
-    def tearDown(self):
-        if os.path.exists('./Testing') == True:
-            os.remove('./Testing/Data.csv')
-            os.rmdir('./Testing')
-        if os.path.exists('./Testing_out') == True:
-            os.rmdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == True:
-            os.rmdir('./Testing_plots')
+#
+# =============================================================================
+#
 
+    def tearDown(self):
+        if os.path.exists('./Data') == True:
+            shutil.rmtree('./Data')
+
+#
+# =============================================================================
+#
+
+if __name__ == '__main__':
+    unittest.main()

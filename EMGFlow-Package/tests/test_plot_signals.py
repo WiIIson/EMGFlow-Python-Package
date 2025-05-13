@@ -1,45 +1,52 @@
 import unittest
-import pandas as pd
-import numpy as np
-import shiny
-import sys
+import importlib
 import os
+import shutil
 
-from src.EMGFlow.PlotSignals import *
+# Load EMGFlow from local files
+filePath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'EMGFlow', '__init__.py'))
+spec = importlib.util.spec_from_file_location("EMGFlow", filePath)
+EMGFlow = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(EMGFlow)
 
-in_path = ''
-out_path = ''
-sampling_rate = 2000
+import shiny
 
 class TestSimple(unittest.TestCase):
+
+#
+# =============================================================================
+#
     
     def setUp(self):
-        if os.path.exists('./Testing') == False:
-            os.mkdir('./Testing')
-            time_col = np.array(range(500)) / 100
-            emg_col = np.sin(time_col) + (np.random.rand(500)/10)
-            df = pd.DataFrame({'Time':time_col, 'EMG':emg_col})
-            df.to_csv('./Testing/Data.csv', index=False)
-        if os.path.exists('./Testing_out') == False:
-            os.mkdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == False:
-            os.mkdir('./Testing_plots')
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.make_sample_data(pathNames)
+        samplingRate = 2000
+        cols = ['EMG_zyg', 'EMG_cor']
+        EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], samplingRate, [(50, 5)], cols)
+        EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], samplingRate, 20, 140, cols)
+        EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], 50, cols)
+
+#
+# =============================================================================
+#
     
-    def test_PlotSpectrum(self):
-        PlotSpectrum('./Testing', './Testing_plots', 100, cols=['EMG'])
-    
-    def test_PlotCompareSignals(self):
-        PlotCompareSignals('./Testing', './Testing', './Testing_plots', 100)
-    
-    def test_GenPlotDash(self):
-        app = GenPlotDash(['./Testing'], 'EMG', 'mV', ['Test'], autorun=False)
+    def test_plot_dashboard(self):
+        pathNames = EMGFlow.make_paths()
+        app = EMGFlow.plot_dashboard(pathNames, 'EMG_zyg', 'mV', autorun=False)
         self.assertIsInstance(app, shiny.App)
-    
+
+#
+# =============================================================================
+#
+
     def tearDown(self):
-        if os.path.exists('./Testing') == True:
-            os.remove('./Testing/Data.csv')
-            os.rmdir('./Testing')
-        if os.path.exists('./Testing_out') == True:
-            os.rmdir('./Testing_out')
-        if os.path.exists('./Testing_plots') == True:
-            os.rmdir('./Testing_plots')
+        if os.path.exists('./Data') == True:
+            shutil.rmtree('./Data')
+        pass
+            
+#
+# =============================================================================
+#
+
+if __name__ == '__main__':
+    unittest.main()

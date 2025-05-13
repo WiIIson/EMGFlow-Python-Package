@@ -10,8 +10,6 @@ EMGFlow = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(EMGFlow)
 
 import pandas as pd
-import sys
-import numpy as np
 
 #
 # =============================================================================
@@ -35,6 +33,9 @@ class TestSimple(unittest.TestCase):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
         self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '01', 'sample_data_01.csv')))
+        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '01', 'sample_data_02.csv')))
+        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '02', 'sample_data_03.csv')))
+        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '02', 'sample_data_04.csv')))
     
     def test_read_file_type(self):
         pathNames = EMGFlow.make_paths()
