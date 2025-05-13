@@ -1078,6 +1078,10 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     """
     Analyze Signals by performing a collection of analyses on them and saving a
     feature file.
+    
+    Generates a 'Features.csv' file of the recorded features in the 'Feature'
+    path in 'path_names'. The locations of each file analyzed are used as the
+    keys.
 
     Parameters
     ----------

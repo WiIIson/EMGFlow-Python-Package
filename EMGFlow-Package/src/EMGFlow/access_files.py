@@ -66,6 +66,10 @@ def make_sample_data(path_names):
     """
     Generates sample data in the 'Raw' folder of a provided dictionary of file
     locations.
+    
+    Creates '01' and '02' folders, which each contain two sample
+    data files ('01/sample_data_01.csv', '01/sample_data_02.csv',
+    '02/sample_data_03.csv', '02/sample_data_04.csv')
 
     Parameters
     ----------
