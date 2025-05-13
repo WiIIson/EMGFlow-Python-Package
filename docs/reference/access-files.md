@@ -23,9 +23,9 @@ mindmap
 
 **Description**
 
-`make_paths` generates a file structure for signal files, and returns a dictionary of the locations of these files.
+Generates a file structure for signal files, and returns a dictionary of the locations for these files.
 
-"Raw", "Notch", "Bandpass", "Smooth" and "Feature" folders are created at a given location. By default, if no path is provided, these folders will be created inside a "Data" folder in the current working directory.
+Creates 'Raw', 'Notch', 'Bandpass', 'Smooth' and 'Feature' subfolders at a given location. If no path is given, will create a 'Data' folder in the current working directory, with these subfolders inside.
 
 ```python
 make_paths(root=None)
@@ -38,21 +38,21 @@ make_paths(root=None)
 
 **Returns**
 
-`make_paths`: dict-str
+`path_names`: dict-str
 - A dictionary of file locations with keys for the stage in the processing pipeline.
 
 **Example**
 
 ```python
 # Create folders and get locations
-pathNames = EMGFlow.make_paths()
+path_names = EMGFlow.make_paths()
 ```
 
 ## `make_sample_data`
 
 **Description**
 
-`make_sample_data` generates sample data in the "Raw" folder of a provided dictionary of file locations. Creates an "01" folder with "sample_data_01.csv", and an "02" folder with "sample_data_02.csv".
+Generates sample data in the 'Raw' folder of a provided dictionary of file locations.
 
 ```python
 make_sample_data(pathNames)
