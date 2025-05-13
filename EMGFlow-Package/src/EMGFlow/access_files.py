@@ -153,7 +153,7 @@ def read_file_type(path, file_ext):
     Returns
     -------
     file : pd.DataFrame
-        Returns a Pandas data frame of the file contents.
+        Returns a Pandas dataframe of the file contents.
 
     """
     
@@ -173,8 +173,8 @@ def read_file_type(path, file_ext):
 
 def map_files(in_path, file_ext='csv', expression=None, base=None):
     """
-    Generate a dictionary of file names and locations from the subfiles of a
-    folder.
+    Generate a dictionary of file names and locations (keys/values) from the
+    subfiles of a folder.
     
     Parameters
     ----------
@@ -192,7 +192,7 @@ def map_files(in_path, file_ext='csv', expression=None, base=None):
     Raises
     ------
     Exception
-        An exception is raised if expression is not None or a valid regular
+        An exception is raised if 'expression' is not None or a valid regular
         expression.
 
     Returns
@@ -240,7 +240,7 @@ def convert_map_files(file_obj, file_ext='csv', expression=None):
 
     Parameters
     ----------
-    file_obj : str
+    file_obj : str, dict-str
         The file location object. This can be a string to a file location, or
         an already formed dictionary of file locations.
     file_ext : str, optional
@@ -253,8 +253,7 @@ def convert_map_files(file_obj, file_ext='csv', expression=None):
     Raises
     ------
     Exception
-        An exception is raised if an unsupported file location format is
-        provided.
+        An exception is raised if 'file_ext' is an unsupported file format.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
@@ -307,10 +306,10 @@ def map_files_fuse(file_dirs, names):
     Parameters
     ----------
     file_dirs : list-dict-str
-        List of file location directories
+        List of file location directories.
     names : list-str
-        List of names to use for file directory columns. Same order as file
-        directories.
+        List of names to use for file directory columns. Same order as
+        'file_dirs'.
 
     Raises
     ------
@@ -320,7 +319,7 @@ def map_files_fuse(file_dirs, names):
 
     Returns
     -------
-    pathDF : pd.DataFrame
+    path_df : pd.DataFrame
         A dataframe of file names, and their locations in each file directory.
     
     """
@@ -339,7 +338,7 @@ def map_files_fuse(file_dirs, names):
         # Add row to data frame
         data.append(row)
     # Create data frame
-    pathDF = pd.DataFrame(data, columns=['ID', 'File'] + names)
-    pathDF.set_index('ID',inplace=True)
+    path_df = pd.DataFrame(data, columns=['ID', 'File'] + names)
+    path_df.set_index('ID',inplace=True)
     
-    return pathDF
+    return path_df
