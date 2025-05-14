@@ -154,7 +154,7 @@ map_files(in_path, file_ext='csv', expression=None, base=None)
 **Parameters**
 
 `in_path`: str
-- The filepath to a directory to read Signal files.
+- The filepath to a directory to read signal files.
 
 `file_ext`: str, optional ('csv')
 - File extension for files to read. The default is 'csv'.

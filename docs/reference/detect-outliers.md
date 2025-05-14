@@ -21,75 +21,79 @@ mindmap
 
 Analyzes signal files and returns a dictionary of file names and locations that are flagged as having outliers in their spectral composition. This can indicate the need for additional filters to be applied.
 
-The function works by interpolating an inverse function from the peaks of the signal's spectrum. The function then calculates the metric average of the differences between the predicted spectrum intensity of the inverse function, and the actual spectrum intensity of the peaks. Finally, if the largest difference between the predicted and actual values is greater than the metric average multiplied by the threshold value, the file is flagged for having an outlier and is added to the dictionary.
+Works by interpolating an inverse function from the peaks of the signal's spectrum. The function then calculates the 'metric' aggregate of the differences between the predicted spectrum intensity of the inverse function, and the actual spectrum intensity of the peaks. Finally, if the largest difference between the predicted and actual values is greater than the metric average multiplied by the threshold value, the file is flagged for having an outlier and is added to the dictionary.
 
 ```python
-detect_outliers(inPath, samplingRate, threshold, cols=None, low=None, high=None, metirc=np.median, expression=None, windowSize=200, fileExt='csv')
+detect_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metirc=np.median, expression=None, window_size=200, file_ext='csv')
 ```
 
 **Parameters:**
 
-`inPath`: str
-- String filepath to a directory containing Signal files.
+`in_path`: str
+- Filepath to a directory to read signal files.
 
-`samplingRate`: int, float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the signal. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `threshold`: int, float
-- Number of times greater than the metric calculated for the file to be considered an outlier
+- Number of times greater than the metric calculated a recorded value has to be for the file to be considered an outlier.
 
-`cols`: list-str (None)
-- List of string column names. If provided, will only search for outliers in the specified columns. If left `None`, will search for outliers in each column except for the `'Time'` column.
+`cols`: list-str, optional (None)
+- List of columns of the signal to search for outliers in. The default is None, in which case outliers are searched for in every column except for 'time'.
 
-`low`: int, float (None)
-- Minimum frequency range to search for outliers in. If left None, no lower limit is placed.
+`low`: int, float, optional (None)
+- Lower frequency limit of where to search for outliers. Should be the same as lower limit for bandpass filtering, or some value that eliminates the irrelevant lower frequency ranges. The default is None, in which case no lower threshold is used.
 
-`high`: int, float (None)
-- Maximum frequency range to search for outliers in. If left None, no upper limit is placed.
+`high`: int, float, optional (None)
+- Upper frequency limit of where to search for outliers. Should be the same as upper limit for bandpass filtering, or some value that eliminates the irrelevant upper frequency ranges. The default is None, in which case no upper threshold is used.
 
-`metric`: int, float (np.median)
-- Aggregation metric used to calculate outliers. Can be any function that takes a list of numeric values, and returns a single value. Recommended functions are: `np.median` and `np.mean`.
+`metric`: function, optional (np.median)
+- Aggregation metric used to calculate outliers. Can be any function that takes a list of numeric values, and returns a single value. Recommended functions are: `np.median` and `np.mean`. The default is `np.median`.
 
-`expression`: str (None)
-- String regular expression. If provided, will only search for outliers in `Signal` files whose names match the regular expression, and will ignore everything else.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only search for outliers in files whose names match the regular expression. The default is None.
 
-`windowSize`: int (200)
-- Window size when filtering for local maxima.
+`window_size`: int, optional (200)
+- The window size to use when filtering for local maxima. The default is 200.
 
-`fileExt`: str ("csv")
-- String extension of the files to read. Any file in `inPath` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+`file_ext`: str, optional ("csv")
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
-**Error**
+**Raises**
 
-Raises an error if `samplingRate` is less or equal to 0.
+A warning is raised if `window_size` is greater than half the size of a file read by the function.
 
-Raises an error if `threshold` is less or equal to 0.
+An exception is raised if `window_size` is not an integer greater than 0.
 
-Raises an error is `low` is greater than `high`.
+An exception is raised if `sampling_rate` is less or equal to 0.
 
-Raises an error if `low` or `high` are negative.
+An exception is raised if `threshold` is less or equal to 0.
 
-Raises an error if `metric` is not a valid summary function.
+An exception is raised if `low` is greater than `high`.
 
-Raises an error if a column in `cols` is not in a data file.
+An exception is raised if `low` or `high` are negative.
 
-Raises an error if a file cannot be read in `inPath`.
+An exception is raised if `metric` is not a valid summary function.
 
-Raises an error if an unsupported file format was provided for `fileExt`.
+An exception is raised if a column in `cols` is not in a data file.
 
-Raises an error if `expression` is not None or a valid regular expression
+An exception is raised if a file cannot not be read in `in_path`.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns:**
 
-`detect_outliers`: dict
-- Returns a dictionary of file names and locations keys/values.
+`outliers`: dict
+- Dictionary of file names/locations as keys/values for each file detected that contains an outlier.
 
 **Example:**
 
 ```python
-pathNames = EMGFlow.make_paths()
+path_names = EMGFlow.make_paths()
 sr = 2000
 threshold = 5
 
-outliers = EMGFlow.detect_outliers(pathNames['Notch'], sr, threshold)
+outliers = EMGFlow.detect_outliers(path_names['Notch'], sr, threshold)
 ```
