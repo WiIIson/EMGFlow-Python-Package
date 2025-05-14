@@ -41,13 +41,13 @@ def detect_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high
         Filepath to a directory to read Signal files.
     sampling_rate : float
         Sampling rate of the Signal.
-    cols : list-str
-        List of columns of the Signal to search for outliers in. The default is
-        None, in which case outliers are searched for in every column except
-        for 'time'.
     threshold : float
         The number of times greater than the metric a value has to be to be
         considered an outlier.
+    cols : list-str, optional
+        List of columns of the Signal to search for outliers in. The default is
+        None, in which case outliers are searched for in every column except
+        for 'time'.
     low : float, optional
         Lower frequency limit of where to search for outliers. Should be the
         same as lower limit for bandpass filtering, or some value that
