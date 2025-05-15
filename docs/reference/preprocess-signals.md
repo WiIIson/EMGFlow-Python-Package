@@ -756,7 +756,7 @@ Automates the EMG preprocessing workflow, proforming notch filtering, bandpass f
 This function is a wrapper for `notch_filter_signals`, `bandpass_filter_signals` and `smooth_filter_signals` using their default values, a (50Hz, 5Q) notch filter, and a bandpass window size of 50.
 
 ```python
-clean_signals(path_names, 2000)
+clean_signals(path_names, sampling_rate)
 ```
 
 **Parameters**
