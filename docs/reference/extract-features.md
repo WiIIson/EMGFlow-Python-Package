@@ -12,33 +12,35 @@ mindmap
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
-            CalcIEMG
-            CalcMAV
-            CalcMMAV1
-            CalcMMAV2
-            CalcSSI
-            CalcVAR
-            CalcVOrder
-            CalcRMS
-            CalcWL
-            CalcWAMP
-            CalcLOG
-            CalcMFL
-            CalcAP
-            CalcSpecFlux
-            CalcMDF
-            CalcMNF
-            CalcTwitchRatio
-            CalcTwitchIndex
-            CalcTwitchSlope
-            CalcSC
-            CalcSF
-            CalcSS
-            CalcSDec
-            CalcSEntropy
-            CalcSRoll
-            CalcSBW
-            ExtractFeatures
+            (Time-Series Features)
+                calc_iemg
+                calc_mav
+                calc_mmav1
+                calc_mmav2
+                calc_ssi
+                calc_var
+                calc_vorder
+                calc_rms
+                calc_wl
+                calc_wamp
+                calc_log
+                calc_mfl
+                calc_ap
+            (Spectral Features)
+                calc_spec_flux
+                calc_mdf
+                calc_mnf
+                calc_twitch_ratio
+                calc_twitch_index
+                calc_twitch_slope
+                calc_sc
+                calc_sf
+                calc_ss
+                calc_sdec
+                calc_sentropy
+                calc_sroll
+                calc_sbw
+            extract_features
 ```
 
 ## Basic Time-Series Statistics
