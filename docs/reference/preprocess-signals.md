@@ -21,6 +21,7 @@ mindmap
             apply_gaussian_smooth
             apply_loess_smooth
             smooth_filter_signals
+            clean_signals
         PlS(Plot Signals)
         EF(Extract Features)
 ```

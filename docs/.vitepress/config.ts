@@ -40,8 +40,8 @@ export default withMermaid({
           { text: 'Overview', link: '/reference/api-overview' },
           { text: 'Access Files', link: '/reference/access-files' },
           { text: 'Detect Outliers', link: '/reference/detect-outliers' },
-          { text: 'Plot Signals', link: '/reference/plot-signals' },
           { text: 'Preprocess Signals', link: '/reference/preprocess-signals' },
+          { text: 'Plot Signals', link: '/reference/plot-signals' },
           { text: 'Extract Features', link: '/reference/extract-features' },
         ]
       },

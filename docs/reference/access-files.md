@@ -13,6 +13,7 @@ mindmap
             read_file_type
             map_files
             convert_map_files
+            map_files_fuse
         DO(Detect Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
