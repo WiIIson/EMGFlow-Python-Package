@@ -10,182 +10,192 @@ mindmap
         AF(File Access)
         DO(Detect Outliers)
         PrS(Preprocess Signals)
-            EMG2PSD
-            ApplyNotchFilters
-            NotchFilterSignals
-            ApplyBandpassFilter
-            BandpassFilterSignals
-            ApplyFWR
-            ApplyBoxcarSmooth
-            ApplyRMSSmooth
-            ApplyGaussianSmooth
-            ApplyLoessSmooth
-            SmoothFilterSignals
+            emg_to_psd
+            apply_notch_filters
+            notch_filter_signals
+            apply_bandpass_filter
+            bandpass_filter_signals
+            apply_fwr
+            apply_boxcar_smooth
+            apply_rms_smooth
+            apply_gaussian_smooth
+            apply_loess_smooth
+            smooth_filter_signals
         PlS(Plot Signals)
         EF(Extract Features)
 ```
 
-## `EMG2PSD`
+
+
+
+
+## `emg_to_psd`
 
 ### Description
 
-Creates a PSD (power spectrum density) of a Signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
+Creates a PSD (power spectrum density) dataframe of a Signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
 
 ```python
-EMG2PSD(Sig_vals, sr=1000, normalize=True)
+emg_to_psd(sig_vals, sampling_rate=1000, normalize=True)
 ```
 
 ### Parameters
 
-`Sig_vals`: float list
-- A list of float values. A column of a Signal.
+`sig_vals`: list-float
+- A list of float values. A column of a signal dataframe.
 
-`sr`: int/float (1000)
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float, optional (1000)
+- Sampling rate of `sig_vals`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`normalize`: bool (True)
-- Normalizes the result of the PSD by its maximum strength.
+`normalize`: bool, optional (True)
+- If True, will normalize the result of the PSD by its maximum strength. If False, will not. The default is True.
+
+### Raises
+
+An exception is raised if `sig_vals` is a `pd.DataFrame`, not a column of a dataframe.
+
+An exception is raised if `sampling_rate` is less or equal to 0.
 
 ### Returns
 
-`EMG2PSD`: pd.DataFrame
-- Returns a dictionary of frequencies and related strengths with the columns "Frequency" and "Power".
-
-### Error
-
-Raises an error if the sampling rate is less or equal to 0.
+`psd`: pd.DataFrame
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column indicates the intensity of each corresponding frequency in `sig_vals`. Results will be normalized if `normalize` is set to True.
 
 ### Example
 
 ```python
-sr = 2000
-PSD = EMGFlow.EMG2PSD(SignalDF['col1'], sr)
+sampling_rate = 2000
+PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], sampling_rate)
 ```
 
 
 
-## `ApplyNotchFilters`
+
+
+## `apply_notch_filters`
 
 **Description**
 
-Applies a list of notch filters to a `Signal`, using the `scipy.signal.iirnotch` method. Returns a new DataFrame object and does not modify the `Signal` provided.
+Applies a list of notch filters to a `Signal` dataframe, using the `scipy.signal.iirnotch` method. Returns a new dataframe object and does not modify the input `Signal`.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyNotchFilters(Signal, col, sampling_rate, notch_vals)
+apply_notch_filters(Signal, col, sampling_rate, notch_vals)
 ```
 
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filters are being applied to.
+- Column of `Signal` the filter is applied to.
 
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `notch_vals`: tuple list
-- List of the notch filters to apply to `Signal`. A notch value is a `(Hz, Q)` tuple of the frequency and Q-factor (intensity) to apply.
+- A list of `(Hz, Q)` tuples corresponding to the notch filters being applied. `Hz` is the frequency to apply the filter to, and `Q` is the Q-score (an intensity score where a higher number means a less extreme filter).
+
+**Raises**
+
+An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less or equal to 0.
+
+An exception is raised if a `Hz` value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
 
 **Returns**
 
-`ApplyNotchFilters`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filters applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if the sampling rate is less or equal to 0.
-
-Raises an error if a value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
+`notch_Signal`: pd.DataFrame
+- A copy of `Signal` after the bandpass filter is applied.
 
 **Example**
 
 ```python
-# Apply a notch filter at 150Hz and Q-score of 5, and at
-# 250Hz and a Q-score of 5
-sr = 2000
-SignalFiltered = EMGFlow.ApplyNotchFilters(SignalDF, 'column1', sr, [(150, 5), (250, 5)])
+# Apply a notch filter of 150Hz at a Q-score of 5, and of 250Hz at a Q-score of
+# 5.
+sampling_rate = 2000
+notch_Signal = EMGFlow.apply_notch_filters(Signal, 'EMG_zyg', sampling_rate, [(150, 5), (250, 5)])
 ```
 
 
 
-## `NotchFilterSignals`
+
+
+## `notch_filter_signals`
 
 **Description**
 
-Applies notch filters to all `Signal` files in a folder. Writes output to a new folder directory, mirroring the file hierarchy of the input.
+Applies notch filters to all signal files detected in a folder, reading each in as a `Signal` dataframe. Writes the output to a new folder directory, mirroring the file hierarchy of the input.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
-All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
+All files contained within the folder and subfolders with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries, as the same `sampling_rate` value will be used for each.
 
 ```python
-NotchFilterSignals(in_path, out_path, sampling_rate, notch, cols=None, expresion=None, exp_copy=False, file_ext='csv')
+notch_filter_signals(in_path, out_path, sampling_rate, notch_vals, cols=None, expresion=None, exp_copy=False, file_ext='csv')
 ```
 
 **Parameters**
 
 `in_path`: str
-- String filepath to a directory containing `Signal` files.
+- Filepath to a directory to read signal files.
 
 `out_path`: str
-- String filepath to a directory for output `Signal` files.
+- Filepath to an output directory.
 
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`notch`: tuple list
-- List of the notch filters to apply to `Signal`. A notch value is a `(Hz, Q)` tuple of the frequency and Q-factor (intensity) to apply.
+`notch_vals`: list-tuple
+- A list of `(Hz, Q)` tuples corresponding to the notch filters being applied. `Hz` is the frequency to apply the filter to, and `Q` is the Q-score (an intensity score where a higher number means a less extreme filter).
 
-`cols`: str (None)
-- List of string column names. If provided, will only apply filters to specified columns. If left `None`, will apply filters to each column except for the `'Time'` column.
+`cols`: str, optional (None)
+- List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time'.
 
-`expression`: str (None)
-- String regular expression. If provided, will only apply filters to `Signal` files whose names match the regular expression, and will ignore everything else.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
 
-`exp_copy`: bool (False)
-- If `True`, will copy `Signals` that don't match `expression` without modifying them to `out_path`. If `False`, `Signal` files that don't match `expression` will not appear in `out_path`.
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
 
-`file_ext`: str ("csv")
-- String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+`file_ext`: str, optional ("csv")
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
+
+**Raises**
+
+Raises a warning if no files in `in_path` match with `expression`.
+
+An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if `sampling_rate` is less or equal to 0.
+
+An exception is raised if a Hz value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
+
+An exception is raised if a file cannot not be read in `in_path`.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
-`NotchFilterSignals`: None
-- Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
-
-**Error**
-
-Raises an error if `col` is not found in any of the Signal files found.
-
-Raises an error if the sampling rate is less or equal to 0.
-
-Raises an error if a value in `notch_vals` is greater than `sampling_rate/2` or less than 0.
-
-Raises a warning if `expression` causes all files to be filtered out.
-
-Raises an error if a file cannot be read in `in_path`.
-
-Raises an error if an unsupported file format was provided for `file_ext`.
-
-Raises an error if `expression` is not a valid regular expression.
+None.
 
 **Example**
 
 ```python
 # Basic parameters
-path_names = EMGFlow.MakePaths()
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
 sampling_rate = 2000
 notch_vals = [(50,5), (150,25)]
 
@@ -194,88 +204,93 @@ notch_vals_spec = [(317,25)]
 reg = "^(08|11)"
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Apply notch_vals filters to all files in raw_path,
-# and write them to notch_path
-EMGFlow.NotchFilterSignals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+# Apply notch_vals filters to all files in the 'Raw' path, and write them to
+# the 'Notch' path.
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 
-# Apply an additional special case filter to files beginning
-# with '08' or '11', and write them to notch_spec, making
-# sure to copy the other files as well
-EMGFlow.NotchFilterSignals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_spec, cols, exp_copy=True)
+# Apply an additional special case filter to files beginning with '08' or '11',
+# keeping them in the 'Notch' path.
+EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_spec, cols)
 ```
 
 
 
-## `ApplyBandpassFilter`
+
+
+## `apply_bandpass_filter`
 
 **Description**
 
-Applies a bandpass filter to a `Signal`, using the `scipy.signal.lfilter` method. Returns a new Pandas DataFrame object and does not modify the `Signal` provided.
+Applies a bandpass filter to a `Signal` dataframe, using the `scipy.signal.lfilter` method. Returns a new Pandas dataframe object and does not modify the input `Signal`.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyBandpassFilter(Signal, col, sampling_rate, low, high)
+apply_bandpass_filter(Signal, col, sampling_rate, low=20, high=450)
 ```
 
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
 - String name of a column in `Signal` the filters are being applied to.
 
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`low`: int/float (20)
-- Numerical value of the lower limit of the bandpass filter. Defaults to 20Hz.
+`low`: int, float, optional (20)
+- Lower frequency limit of the bandpass filter. The default is 20Hz.
 
-`high`: int/float (450)
-- Numerical value of the upper limit of the bandpass filter. Defaults to 450Hz.
+`high`: int, float, optional (450)
+- Upper frequency limit of the bandpass filter. The default is 450Hz.
+
+**Raises**
+
+An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less or equal to 0.
+
+An exception is raised if `high` is not higher than `low`.
+
+An exception is raised if `high` or `low` are higher than 1/2 of `sampling_rate`.
 
 **Returns**
 
-`ApplyBandpassFilter`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filters applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if the sampling rate is less or equal to 0.
-
-Raises an error if `high` is not higher than `low`.
+`band_Signal`: pd.DataFrame
+- A copy of `Signal` after the bandpass filter is applied.
 
 **Example**
 
 ```python
-# Apply a notch filter from 20Hz to 250Hz
-sr = 2000
-SignalFiltered = EMGFlow.ApplyNotchFilters(SignalDF, 'column1', sr, 20, 250)
+# Apply a bandpass filter below 20Hz, and above 250Hz.
+sampling_rate = 2000
+band_Signal = EMGFlow.apply_bandpass_filter(Signal, 'EMG_zyg', sampling_rate, 20, 250)
 ```
 
 
 
-## `BandpassFilterSignals`
+
+
+## `bandpass_filter_signals`
 
 **Description**
 
 Applies a bandpass filter to all `Signal` files in a folder. Writes output to a new folder directory, mirroring the file hierarchy of the input.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
-All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
+All files contained within the folder and subfolders with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries, as the same `sampling_rate` value will be used for each.
 
 ```python
-BandpassFilterSignals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv')
+bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv')
 ```
 
 **Theory**
@@ -287,124 +302,130 @@ These values can also be set manually for specific needs. There is some disagree
 **Parameters**
 
 `in_path`: str
-- String filepath to a directory containing `Signal` files.
+- Filepath to a directory to read signal files.
 
 `out_path`: str
-- String filepath to a directory for output `Signal` files.
+- Filepath to an output directory.
 
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
-`low`: int/float (20)
-- Numerical value of the lower limit of the bandpass filter.
+`low`: int, float, optional (20)
+- Lower frequency limit of the bandpass filter. The default is 20Hz.
 
-`high`: int/float (450)
-- Numerical value of the upper limit of the bandpass filter.
+`high`: int, float, optional (450)
+- Upper frequency limit of the bandpass filter. The default is 450Hz.
 
-`cols`: str (None)
-- List of string column names. If provided, will only apply filters to specified columns. If left `None`, will apply filters to each column except for the `'Time'` column.
+`cols`: str, optional (None)
+- List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time'.
 
-`expression`: str (None)
-- String regular expression. If provided, will only apply filters to `Signal` files whose names match the regular expression, and will ignore everything else.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
 
-`exp_copy`: bool (False)
-- If `True`, will copy `Signals` that don't match `expression` without modifying them to `out_path`. If `False`, `Signal` files that don't match `expression` will not appear in `out_path`.
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
 
-`file_ext`: str ("csv")
-- String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+`file_ext`: str, optional ("csv")
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
+
+**Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if `sampling_rate` is less or equal to 0.
+
+An exception is raised if `high` is not higher than `low`.
+
+An exception is raised if `high` or `low` are higher than 1/2 of `sampling_rate`.
+
+An exception is raised if a file cannot not be read in `in_path`.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
-`BandpassFilterSignals`: None
-- Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
-
-**Error**
-
-Raises an error if `col` is not found in any of the Signal files found.
-
-Raises an error if the sampling rate is less or equal to 0.
-
-Raises a warning if `expression` causes all files to be filtered out.
-
-Raises an error if `high` is not higher than `low`.
-
-Raises an error if a file cannot be read in `in_path`.
-
-Raises an error if an unsupported file format was provided for `file_ext`.
-
-Raises an error if `expression` is not a valid regular expression.
+None.
 
 **Example**
 
 ```python
-path_names = EMGFlow.MakePaths()
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
+
 sampling_rate = 2000
 low = 20
 high = 200
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Apply notch_vals filters to all files in notch_path,
-# and write them to bandpass_path
-EMGFlow.BandpassFilterSignals(path_names['Notch'], path_names['Bandpass'], sampling_rate, low, high, cols)
+# Apply bandpass filters of below 20Hz and above 200Hz to the files in the
+# 'Notch' path, and write the output to the 'Bandpass' path.
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, low, high, cols)
 ```
 
 
 
-## `ApplyFWR`
+
+
+## `apply_fwr`
 
 **Description**
 
-Applies a Full Wave Rectifier (FWR) to a `Signal`
+Applies a Full Wave Rectifier (FWR) to a `Signal` dataframe.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyFWR(Signal, col)
+apply_fwr(Signal, col)
 ```
 
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filter is being applied to.
+- Column of `Signal` the filter is applied to.
+
+**Raises**
+
+An exception is raised if 'col' is not a column of 'Signal'.
 
 **Returns**
 
-`ApplyFWR`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
+`fwr_Signal`: pd.DataFrame
+- A copy of `Signal` after the FWR filter is applied.
 
 **Example**
 
 ```python
-FWR_DF = EMGFlow.ApplyFWR(SignalDF, 'column1')
+fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 ```
 
 
 
-## `ApplyBoxcarSmooth`
+
+
+## `apply_boxcar_smooth`
 
 **Description**
 
-Applies a boxcar smoothing filter to the `Signal`. Applies a simple unweighted average.
+Applies a boxcar smoothing filter to a `Signal` dataframe. Applies a simple unweighted average.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyBoxcarSmooth(Signal, col, window_size)
+apply_boxcar_smooth(Signal, col, window_size)
 ```
-
 
 **Theory**
 
@@ -417,49 +438,51 @@ $$
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filter is being applied to.
+- Column of `Signal` the filter is applied to.
 
 `window_size`: int
-- Size of the window in the smoothing filter.
+- Size of the window of the filter.
+
+**Raises**
+
+A warning is raised if `window_size` is greater than the length of `Signal`.
+
+An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `window_size` is less or equal to 0.
 
 **Returns**
 
-`ApplyBoxcarSmooth`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if `window_size` is less or equal to 0.
-
-Raises a warning if `window_size` is greater than the length of `Signal`.
+`boxcar_Signal`: pd.DataFrame
+- A copy of `Signal` after the boxcar smoothing filter is applied.
 
 **Example**
 
 ```python
 width = 20
-SmoothDF = EMGFlow.ApplyBoxCarSmooth(SignalDF, 'column1', width)
+boxcar_Signal = EMGFlow.apply_boxcar_smooth(Signal, 'EMG_zyg', width)
 ```
 
 
 
-## `ApplyRMSSmooth`
+
+
+## `apply_rms_smooth`
 
 **Description**
 
-Applies a Root Mean Squared (RMS) smoothing filter to the `Signal`. Takes the average of a window around each point.
+Applies a Root Mean Squared (RMS) smoothing filter to the `Signal` dataframe. Takes the average of a window around each point.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyRMSSmooth(Signal, col, window_size)
+apply_rms_smooth(Signal, col, window_size)
 ```
 
 **Theory**
@@ -474,49 +497,51 @@ $$
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filter is being applied to.
+- Column of `Signal` the filter is applied to.
 
 `window_size`: int
-- Size of the window in the smoothing filter.
+- Size of the window of the filter.
+
+**Raises**
+
+A warning is raised if `window_size` is greater than the length of `Signal`.
+
+An exception is raised if `col` is not found in `Signal`.
+
+An exception is raised if `window_size` is less or equal to 0.
 
 **Returns**
 
-`ApplyRMSSmooth`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if `window_size` is less or equal to 0.
-
-Raises a warning if `window_size` is greater than the length of `Signal`.
+`rms_Signal`: pd.DataFrame
+- A copy of `Signal` after the RMS smoothing filter is applied.
 
 **Example**
 
 ```python
 width = 20
-SmoothDF = EMGFlow.ApplyRMSSmooth(SignalDF, 'column1', width)
+rms_Signal = EMGFlow.apply_rms_smooth(Signal, 'EMG_zyg', width)
 ```
 
 
 
-## `ApplyGaussianSmooth`
+
+
+## `apply_gaussian_smooth`
 
 **Description**
 
-Applies a Root Mean Squared (RMS) smoothing filter to the `Signal`. Applies a Gaussian weighted average.
+Applies a Root Mean Squared (RMS) smoothing filter to a `Signal` dataframe. Applies a Gaussian weighted average.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyGaussianSmooth(Signal, col, window_size, sigma=1)
+apply_gaussian_smooth(Signal, col, window_size, sigma=1)
 ```
 
 **Theory**
@@ -532,52 +557,54 @@ $$
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filter is being applied to.
+- Column of `Signal` the filter is applied to.
 
 `window_size`: int
-- Size of the window in the smoothing filter.
+- Size of the window of the filter.
 
-`sigma`: int/float (1)
-- Value of sigma in the Gaussian smoothing's distribution, defaults to 1.
+`sigma`: int, float, optional (1)
+- Value of sigma in the Gaussian smoothing's distribution. The default is 1.
+
+**Raises**
+
+A warning is raised if `window_size` is greater than the length of `Signal`.
+
+An exception is raised if `col` is not found in `Signal`.
+
+An exception is raised if `window_size` is less or equal to 0.
 
 **Returns**
 
-`ApplyGaussianSmooth`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if `window_size` is less or equal to 0.
-
-Raises a warning if `window_size` is greater than the length of `Signal`.
+`gauss_Signal`: pd.DataFrame
+- A copy of `Signal` after the Gaussian smoothing filter is applied.
 
 **Example**
 
 ```python
 width = 20
-SmoothDF = EMGFlow.ApplyGaussianSmooth(SignalDF, 'column1', width)
+gauss_Signal = EMGFlow.apply_gaussian_smooth(Signal, 'EMG_zyg', width)
 ```
 
 
 
-## `ApplyLoessSmooth`
+
+
+## `apply_loess_smooth`
 
 **Description**
 
-Applies a Loess smoothing filter to the `Signal`. Applies a tricubic weighted average.
+Applies a Loess smoothing filter to a `Signal` dataframe. Applies a tricubic weighted average.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
 ```python
-ApplyLoessSmooth(Signal, col, window_size)
+apply_loess_smooth(Signal, col, window_size)
 ```
 
 **Theory**
@@ -596,135 +623,139 @@ $$
 **Parameters**
 
 `Signal`: pd.DataFrame 
-- Should have one column called "`Time`" for the time indexes, and other named columns for the values at those times.
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- String name of a column in `Signal` the filter is being applied to.
+- Column of `Signal` the filter is applied to.
 
 `window_size`: int
-- Size of the window in the smoothing filter.
+- Size of the window of the filter.
+
+**Raises**
+
+A warning is raised if `window_size` is greater than the length of `Signal`.
+
+An exception is raised if `col` is not found in `Signal`.
+
+An exception is raised if `window_size` is less or equal to 0.
 
 **Returns**
 
-`ApplyLoessSmooth`: pd.DataFrame
-- Returns a `Signal` DataFrame identical to the input, but with the corresponding filter applied to the correct column.
-
-**Error**
-
-Raises an error if `col` is not found in `Signal`.
-
-Raises an error if `window_size` is less or equal to 0.
-
-Raises a warning if `window_size` is greater than the length of `Signal`.
+`loess_Signal`: pd.DataFrame
+- A copy of `Signal` after the Loess smoothing filter is applied.
 
 **Example**
 
 ```python
 width = 20
-SmoothDF = EMGFlow.ApplyLoessSmooth(SignalDF, 'column1', width)
+loess_Signal = EMGFlow.apply_loess_smooth(Signal, 'EMG_zyg', width)
 ```
 
 
 
-## `SmoothFilterSignals`
+
+
+## `smooth_filter_signals`
 
 **Description**
 
-Applies a smoothing filter to all `Signal` files in a folder. Writes output to a new folder directory, mirroring the file hierarchy of the input.
+Apply smoothing filters to all signal files in a folder. Writes filtered signals to an output folder, and generates a file structure matching the input folder. The method used to smooth the signals can be specified, but is RMS as default.
 
-Components of a "`Signal` file":
+Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
-All files contained within the folder and subfolder with the proper extension are assumed to be `Signal` files. All `Signal` files within the folder and subfolders should have the same change in time between entries.
+All files contained within the folder and subfolders with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries, as the same `sampling_rate` value will be used for each.
 
 ```python
-SmoothFilterSignals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1)
+smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1)
 ```
 
 **Theory**
 
-By default, the `SmoothFilterSignals` function uses the RMS smoothing method. This is because for EMG signals, RMS smoothing is considered to be the best method (RENSHAW et al., 2010).
+By default, the `smooth_filter_signals` function uses the RMS smoothing method. This is because for EMG signals, RMS smoothing is considered to be the best method (RENSHAW et al., 2010).
 
 Other smoothing functions are also available for use if needed.
 
 **Parameters**
 
 `in_path`: str
-- String filepath to a directory containing `Signal` files.
+- Filepath to a directory to read signal files.
 
 `out_path`: str
-- String filepath to a directory for output `Signal` files.
+- Filepath to an output directory.
 
 `window_size`: int
 - Size of the window in the smoothing filter.
 
-`cols`: str (None)
-- List of string column names. If provided, will only apply filters to specified columns. If left `None`, will apply filters to each column except for the `'Time'` column.
+`cols`: str, optional (None)
+- List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time'.
 
-`expression`: str (None)
-- String regular expression. If provided, will only apply filters to `Signal` files whose names match the regular expression, and will ignore everything else.
+`expression`: str, optional (None)
+- A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
 
-`exp_copy`: bool (False)
-- If `True`, will copy `Signals` that don't match `expression` without modifying them to `out_path`. If `False`, `Signal` files that don't match `expression` will not appear in `out_path`.
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
 
-`file_ext`: str ("csv")
-- String extension of the files to read. Any file in `in_path` with this extension will be considered to be a `Signal` file, and treated as such. The default is `'csv'`.
+`file_ext`: str, optional ('csv')
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
-`method`: str ("rms")
-- Smoothing method to be used. Defaults to "rms", but can also be set to "boxcar, "gauss" or "loess".
+`method`: str, optional ('rms')
+- Smoothing method to be used. The default is 'rms', but can also be 'boxcar', 'gauss' or 'loess'.
 
-`sigma`: float (1)
+`sigma`: int, float, optional (1)
 - Value of `sigma` used with a Gaussian filter. Only affects output when using a Gaussian filter.
+
+**Raises**
+
+A warning is raised if `window_size` is greater than the length of `Signal`.
+
+A warning is raised if `expression` does not match with any files.
+
+An exception is raised if an invalid smoothing method is used. Valid methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
+
+An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if `window_size` is less or equal to 0.
+
+An exception is raised if a file cannot not be read in `in_path`.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
-`SmoothFilterSignals`: None
-- Does not return a value. Data is written to `out_path`. Data written will be identical to input `Signal` files, but with different values for the filter applied.
-
-**Error**
-
-Raises an error if an invalid smoothing method is passed to `method`.
-
-Raises an error if any of the Signal files don't contain a column listed in `cols`.
-
-Raises an error if `window_size` is less or equal to 0.
-
-Raises a warning if `expression` causes all files to be filtered out.
-
-Raises a warning if `window_size` is greater than the length of `Signal`.
-
-Raises an error if a file cannot be read in `in_path`.
-
-Raises an error if an unsupported file format was provided for `file_ext`.
-
-Raises an error if `expression` is not a valid regular expression.
+None.
 
 **Example**
 
 ```python
-path_names = EMGFlow.MakePaths()
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
 size = 20
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Apply smoothing filter with window size 20 to all files in
-# bandpass_path, and write them to smooth_path
-EMGFlow.SmoothFilterSignals(path_names['Bandpass'], path_names['Smooth'], size, cols)
+# Apply smoothing filter with window size 20 to all files in the 'Bandpass'
+# path and write the output to the 'Smooth' path.
+EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], size, cols)
 ```
 
 
 
-## `CleanSignals`
+
+
+## `clean_signals`
 
 **Description**
 
 Automates the EMG preprocessing workflow, proforming notch filtering, bandpass filtering and smoothing.
 
-This function uses each functions' default values, with (50Hz, 5Q) notch filtering, and a bandpass window size of 50.
+This function is a wrapper for `notch_filter_signals`, `bandpass_filter_signals` and `smooth_filter_signals` using their default values, a (50Hz, 5Q) notch filter, and a bandpass window size of 50.
 
 ```python
-CleanSignals(path_names, sampling_rate=2000)
+clean_signals(path_names, 2000)
 ```
 
 **Parameters**
@@ -732,8 +763,8 @@ CleanSignals(path_names, sampling_rate=2000)
 `path_names`: dictionary of strings
 - A dictionary of keys (stage of preprocessing) and values (filepath to that stage). The provided dictionary is required to have a `Raw`, `Notch`, `Bandpass`, and `Smooth` path.
 
-`sampling_rate`: int/float
-- Numerical value of the sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+`sampling_rate`: int, float
+- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 **Returns**
 
@@ -741,14 +772,14 @@ CleanSignals(path_names, sampling_rate=2000)
 
 **Error**
 
-Raises an error if `path_names` does not contain a key for "Raw", "Notch", "Bandpass" or "Smooth".
+An exception is raised if the provided 'path_names' dictionary doesn't contain a 'Raw', 'Notch', 'Bandpass' or 'Smooth' path key.
 
 **Example**
 
 ```python
 # Create path dictionary, then clean the signals.
-path_names = EMGFlow.MakePaths()
-EMGFlow.CleanSignals(path_names, sampling_rate = 2000)
+path_names = EMGFlow.make_paths()
+EMGFlow.clean_signals(path_names, 2000)
 ```
 
 ## Sources
