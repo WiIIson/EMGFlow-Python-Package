@@ -41,7 +41,7 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
         An exception is raised if 'sig_vals' is a pd.DataFrame, not a column of
         a dataframe.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0
+        An exception is raised if 'sampling_rate' is less or equal to 0.
 
     Returns
     -------
@@ -125,11 +125,11 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
-        sampling_rate/2 or less than 0
+        sampling_rate/2 or less than 0.
 
     Returns
     -------
-    Signal : pd.DataFrame
+    notch_Signal : pd.DataFrame
         A copy of the 'Signal' dataframe with the notch filters are applied.
 
     """
@@ -189,12 +189,12 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         
         return SignalCol
     
-    Signal = Signal.copy()
+    notch_Signal = Signal.copy()
     
     # Applies apply_notch_filter for every notch_val tuple
     for i in range(len(notch_vals)):
-        Signal[col] = apply_notch_filter(Signal, col, sampling_rate, notch_vals[i])
-    return Signal
+        notch_Signal[col] = apply_notch_filter(notch_Signal, col, sampling_rate, notch_vals[i])
+    return notch_Signal
 
 #
 # =============================================================================
@@ -244,7 +244,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
-        sampling_rate/2 or less than 0
+        sampling_rate/2 or less than 0.
     Exception
         An exception is raised if a file cannot not be read in 'in_path'.
     Exception
@@ -346,11 +346,11 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
         An exception is raised if 'high' is not higher than 'low'.
     Exception
         An exception is raised if 'high' or 'low' are higher than 1/2 of
-        'sampling_rate'
+        'sampling_rate'.
 
     Returns
     -------
-    Signal : pd.DataFrame
+    band_Signal : pd.DataFrame
         A copy of 'Signal' after the bandpass filter is applied.
 
     """
@@ -368,12 +368,12 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
         raise Exception("'high' must be higher than 'low'.")
     
     
-    Signal = Signal.copy()
+    band_Signal = Signal.copy()
     # Here, the "5" is the order of the butterworth filter
     # (how quickly the signal is cut off)
     b, a = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band')
-    Signal[col] = scipy.signal.lfilter(b, a, Signal[col])
-    return Signal
+    band_Signal[col] = scipy.signal.lfilter(b, a, band_Signal[col])
+    return band_Signal
 
 #
 # =============================================================================
@@ -425,7 +425,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
         An exception is raised if 'high' is not higher than 'low'.
     Exception
         An exception is raised if 'high' or 'low' are higher than 1/2 of
-        'sampling_rate'
+        'sampling_rate'.
     Exception
         An exception is raised if a file cannot not be read in 'in_path'.
     Exception
@@ -517,7 +517,7 @@ def apply_fwr(Signal, col):
 
     Returns
     -------
-    Signal : pd.DataFrame
+    fwr_Signal : pd.DataFrame
         A copy of 'Signal' after the full wave rectifier filter is applied.
 
     """
@@ -525,9 +525,9 @@ def apply_fwr(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
-    Signal = Signal.copy()
-    Signal[col] = np.abs(Signal[col])
-    return Signal
+    fwr_Signal = Signal.copy()
+    fwr_Signal[col] = np.abs(fwr_Signal[col])
+    return fwr_Signal
 
 #
 # =============================================================================
@@ -552,7 +552,7 @@ def apply_boxcar_smooth(Signal, col, window_size):
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
-        'Signal'
+        'Signal'.
     Exception
         An exception is raised if 'col' is not found in 'Signal'.
     Exception
@@ -560,7 +560,7 @@ def apply_boxcar_smooth(Signal, col, window_size):
     
     Returns
     -------
-    Signal : pd.DataFrame
+    boxcar_Signal : pd.DataFrame
         A copy of 'Signal' after the boxcar smoothing filter is applied.
 
     """
@@ -575,14 +575,14 @@ def apply_boxcar_smooth(Signal, col, window_size):
         raise Exception("window_size cannot be 0 or negative")
         
     
-    Signal = Signal.copy()
+    boxcar_Signal = Signal.copy()
     
-    Signal = apply_fwr(Signal, col)
+    boxcar_Signal = apply_fwr(boxcar_Signal, col)
     # Construct kernel
     window = np.ones(window_size) / float(window_size)
     # Convolve
-    Signal[col] = np.convolve(Signal[col], window, 'same')
-    return Signal
+    boxcar_Signal[col] = np.convolve(boxcar_Signal[col], window, 'same')
+    return boxcar_Signal
 
 #
 # =============================================================================
@@ -607,7 +607,7 @@ def apply_rms_smooth(Signal, col, window_size):
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
-        'Signal'
+        'Signal'.
     Exception
         An exception is raised if 'col' is not found in 'Signal'.
     Exception
@@ -615,7 +615,7 @@ def apply_rms_smooth(Signal, col, window_size):
 
     Returns
     -------
-    Signal : pd.DataFrame
+    rms_Signal : pd.DataFrame
         A copy of 'Signal' after the RMS smoothing filter is applied.
 
     """
@@ -631,14 +631,14 @@ def apply_rms_smooth(Signal, col, window_size):
     
     
     
-    Signal = Signal.copy()
+    rms_Signal = Signal.copy()
     # Square
-    Signal[col] = np.power(Signal[col], 2)
+    rms_Signal[col] = np.power(rms_Signal[col], 2)
     # Construct kernel
     window = np.ones(window_size) / float(window_size)
     # Convolve and square root
-    Signal[col] = np.sqrt(np.convolve(Signal[col], window, 'same'))
-    return Signal
+    rms_Signal[col] = np.sqrt(np.convolve(rms_Signal[col], window, 'same'))
+    return rms_Signal
 
 #
 # =============================================================================
@@ -665,7 +665,7 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
-        'Signal'
+        'Signal'.
     Exception
         An exception is raised if 'col' is not found in 'Signal'.
     Exception
@@ -673,7 +673,7 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
 
     Returns
     -------
-    Signal : pd.DataFrame
+    gauss_Signal : pd.DataFrame
         A copy of 'Signal' after the Gaussian smoothing filter is applied.
 
     """
@@ -692,14 +692,14 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    Signal = Signal.copy()
+    gauss_Signal = Signal.copy()
     
-    Signal = apply_fwr(Signal, col)
+    gauss_Signal = apply_fwr(gauss_Signal, col)
     # Construct kernel
     window = get_gauss(window_size, sigma)
     # Convolve
-    Signal[col] = np.convolve(Signal[col], window, 'same')
-    return Signal
+    gauss_Signal[col] = np.convolve(gauss_Signal[col], window, 'same')
+    return gauss_Signal
 
 #
 # =============================================================================
@@ -724,7 +724,7 @@ def apply_loess_smooth(Signal, col, window_size):
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
-        'Signal'
+        'Signal'.
     Exception
         An exception is raised if 'col' is not found in 'Signal'.
     Exception
@@ -732,7 +732,7 @@ def apply_loess_smooth(Signal, col, window_size):
 
     Returns
     -------
-    Signal : DataFrame
+    loess_Signal : DataFrame
         A copy of 'Signal' after the Loess smoothing filter is applied.
 
     """
@@ -746,16 +746,16 @@ def apply_loess_smooth(Signal, col, window_size):
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    Signal = Signal.copy()
+    loess_Signal = Signal.copy()
     
-    Signal = apply_fwr(Signal, col)
+    loess_Signal = apply_fwr(loess_Signal, col)
     # Construct kernel
     window = np.linspace(-1,1,window_size+1,endpoint=False)[1:]
     window = np.array(list(map(lambda x: (1 - np.abs(x) ** 3) ** 3, window)))
     window = window / np.sum(window)
     # Convolve
-    Signal[col] = np.convolve(Signal[col], window, 'same')
-    return Signal
+    loess_Signal[col] = np.convolve(loess_Signal[col], window, 'same')
+    return loess_Signal
 
 #
 # =============================================================================
@@ -801,7 +801,7 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
-        'Signal'
+        'Signal'.
     Warning
         A warning is raised if 'expression' does not match with any files.
     Exception
