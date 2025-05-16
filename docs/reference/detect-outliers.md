@@ -1,6 +1,6 @@
 # `detect_outliers` Module Documentation
 
-This module provides methods to help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
+These functions help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
 
 ## Module Structure
 

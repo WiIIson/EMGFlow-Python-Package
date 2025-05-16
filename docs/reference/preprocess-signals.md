@@ -1,6 +1,6 @@
-# Signal Preprocessing
+# `preprocess_signals` Module Documentation
 
-The `PreProcessSignals` module provides preprocessing functions for cleaning sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
+These functions clean sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
 
 ## Module Structure
 
@@ -35,6 +35,8 @@ mindmap
 ### Description
 
 Creates a PSD (power spectrum density) dataframe of a Signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
+
+By default, PSD dataframes are normalized, as this is necessary when passing them as a parameter to spectral feature extraction functions.
 
 ```python
 emg_to_psd(sig_vals, sampling_rate=1000, normalize=True)
@@ -154,7 +156,7 @@ notch_filter_signals(in_path, out_path, sampling_rate, notch_vals, cols=None, ex
 - Filepath to an output directory.
 
 `sampling_rate`: int, float
-- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+- Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `notch_vals`: list-tuple
 - A list of `(Hz, Q)` tuples corresponding to the notch filters being applied. `Hz` is the frequency to apply the filter to, and `Q` is the Q-score (an intensity score where a higher number means a less extreme filter).
@@ -309,7 +311,7 @@ These values can also be set manually for specific needs. There is some disagree
 - Filepath to an output directory.
 
 `sampling_rate`: int, float
-- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+- Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `low`: int, float, optional (20)
 - Lower frequency limit of the bandpass filter. The default is 20Hz.
@@ -767,13 +769,13 @@ clean_signals(path_names, sampling_rate)
 `sampling_rate`: int, float
 - Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
+**Raises**
+
+An exception is raised if the provided `path_names` dictionary doesn't contain a 'Raw', 'Notch', 'Bandpass' or 'Smooth' path key.
+
 **Returns**
 
 `None`
-
-**Error**
-
-An exception is raised if the provided 'path_names' dictionary doesn't contain a 'Raw', 'Notch', 'Bandpass' or 'Smooth' path key.
 
 **Example**
 

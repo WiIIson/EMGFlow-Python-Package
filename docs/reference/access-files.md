@@ -1,6 +1,6 @@
 # `access_files` Module Documentation
 
-These functions provide helper methods for accessing files, and are mostly used internally by the package.
+These functions access files, set up file structures for working with sEMG signals, and load EMGFlow's built-in dataset. The functions are mostly used internally by the package.
 
 ## Module Structure
 
