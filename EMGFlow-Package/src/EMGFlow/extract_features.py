@@ -934,7 +934,7 @@ def calc_sd(psd):
 
     Returns
     -------
-    SDec : float
+    SD : float
         SDec of the PSD dataframe provided.
 
     """
@@ -944,8 +944,8 @@ def calc_sd(psd):
     
     N = psd.shape[0]
     vals = np.array(psd['Power'])
-    SDec = np.sum((vals[1:] - vals[0])/N) / np.sum(vals[1:])
-    return SDec
+    SD = np.sum((vals[1:] - vals[0])/N) / np.sum(vals[1:])
+    return SD
 
 #
 # =============================================================================
@@ -968,7 +968,7 @@ def calc_se(psd):
 
     Returns
     -------
-    SEntropy : float
+    SE : float
         Spectral Entropy of the PSD dataframe provided.
 
     """
@@ -977,8 +977,8 @@ def calc_se(psd):
         raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
     
     prob = psd['Power'] / np.sum(psd['Power'])
-    SEntropy = -np.sum(prob * np.log(prob))
-    return SEntropy
+    SE = -np.sum(prob * np.log(prob))
+    return SE
 
 #
 # =============================================================================
@@ -1002,7 +1002,7 @@ def calc_sr(psd, percent=0.85):
         An exception is raised if 'psd' does not only have columns 'Frequency'
         and 'Power'.
     Exception
-        An exception is raised if percent is not between 0 and 1.
+        An exception is raised if 'percent' is not between 0 and 1.
 
     Returns
     -------
@@ -1130,7 +1130,10 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
 
     Returns
     -------
-    None.
+    Features : pd.DataFrame
+        A Pandas dataframe of feature data for each file read. Each row is a
+        different file analyzed, marked by the 'File_ID' column. Additional
+        columns show the values of the features extracted by the function.
 
     """
     
@@ -1218,7 +1221,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         for measure in measure_names:
             df_names.append(col + '_' + measure)
     
-    SignalDF = pd.DataFrame(columns=df_names)
+    Features = pd.DataFrame(columns=df_names)
     
     # Apply transformations
     for file in tqdm(file_dirs_b):
@@ -1325,7 +1328,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 df_vals = df_vals + col_vals
             
             # Add values to the dataframe
-            SignalDF.loc[len(SignalDF.index)] = df_vals
+            Features.loc[len(Features.index)] = df_vals
             
-    SignalDF.to_csv(os.path.join(out_path, 'Features.csv'), index=False)
-    return SignalDF
+    Features.to_csv(os.path.join(out_path, 'Features.csv'), index=False)
+    return Features
