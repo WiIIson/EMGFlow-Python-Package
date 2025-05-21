@@ -32,7 +32,7 @@ def calc_iemg(Signal, col, sampling_rate):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
     sampling_rate : float
         Sampling rate of the Signal.
 
@@ -73,7 +73,7 @@ def calc_mav(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -108,7 +108,7 @@ def calc_mmav1(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -150,7 +150,7 @@ def calc_mmav2(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -194,7 +194,7 @@ def calc_ssi(Signal, col, sampling_rate):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
     sampling_rate : float
         Sampling rate of the Signal.
 
@@ -235,7 +235,7 @@ def calc_var(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -270,7 +270,7 @@ def calc_vorder(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -304,7 +304,7 @@ def calc_rms(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -339,7 +339,7 @@ def calc_wl(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -376,7 +376,7 @@ def calc_wamp(Signal, col, threshold):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
     threshold : float
         Threshold of the WAMP.
         
@@ -415,7 +415,7 @@ def calc_log(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -451,7 +451,7 @@ def calc_mfl(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -488,7 +488,7 @@ def calc_ap(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the summary to.
+        Column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -526,9 +526,9 @@ def calc_spec_flux(Signal1, diff, col, sampling_rate, diff_sr=None):
         calculate the spectral flux of the percentage of the Signal with one
         minus the percentage of the Signal.
     col : str
-        Column of the Signal to apply the summary to. If a second signal is
-        provided for 'diff', a column of the same name should be available for
-        use.
+        Column of 'Signal1' the feature is calculated from. If a second signal
+        is provided for 'diff', a column of the same name should be available
+        for use.
     sampling_rate : float
         Sampling rate of the Signal.
     diff_sr : float, optional

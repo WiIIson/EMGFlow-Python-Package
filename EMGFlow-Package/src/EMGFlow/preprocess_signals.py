@@ -28,9 +28,10 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
     Parameters
     ----------
     sig_vals : list-float
-        A list of float values. A column of a Signal.
+        A list of float values. A column of a signal datframe.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of 'sig_vals'. This is the number of entries recorded per
+        second, or the inverse of the difference between entries.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
@@ -108,9 +109,9 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of 'Signal'.
     notch_vals : list-tuple
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
@@ -150,9 +151,9 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
             A Pandas dataframe containing a 'Time' column, and additional
             columns for signal data.
         col : str
-            Column of the Signal to apply the filter to.
+            Column of 'Signal' the filter is applied to.
         sampling_rate : float
-            Sampling rate of the Signal.
+            Sampling rate of 'Signal'.
         notch : tuple
             Notch filter data. Should be a (Hz, Q) tuple where Hz is the
             frequency to apply the filter to, and Q. is the Q-score (an
@@ -212,7 +213,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of the signal files.
     notch : list-tuples
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
@@ -328,9 +329,9 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of 'Signal'.
     low : float
         Lower frequency limit of the bandpass filter.
     high : float
@@ -392,7 +393,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of the signal files.
     low : float
         Lower frequency limit of the bandpass filter. The default is 20.
     high : float
@@ -508,7 +509,7 @@ def apply_fwr(Signal, col):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
 
     Raises
     ------
@@ -544,7 +545,7 @@ def apply_boxcar_smooth(Signal, col, window_size):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     window_size : int, float
         Size of the window of the filter.
     
@@ -599,7 +600,7 @@ def apply_rms_smooth(Signal, col, window_size):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     window_size : int, float
         Size of the window of the filter.
 
@@ -655,7 +656,7 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     window_size : int, float
         Size of the window of the filter.
     sigma : float, optional
@@ -716,7 +717,7 @@ def apply_loess_smooth(Signal, col, window_size):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of the Signal to apply the filter to.
+        Column of 'Signal' the filter is applied to.
     window_size : int, float
         Size of the window of the filter.
 
@@ -903,7 +904,7 @@ def clean_signals(path_names, sampling_rate=2000):
         Dictionary containing path locations for writing and reading Signal
         data between paths.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of the signal files.
 
     Raises
     ------
