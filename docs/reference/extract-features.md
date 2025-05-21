@@ -36,9 +36,9 @@ mindmap
                 calc_sc
                 calc_sf
                 calc_ss
-                calc_sdec
-                calc_sentropy
-                calc_sroll
+                calc_sd
+                calc_se
+                calc_sr
                 calc_sbw
             extract_features
 ```
