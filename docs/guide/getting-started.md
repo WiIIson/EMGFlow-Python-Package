@@ -1,4 +1,4 @@
-# Getting started with EMGFlow
+# Getting Started with EMGFlow
 
 ## Download
 
@@ -51,3 +51,4 @@ Note, the Time column can be omitted when the sample rate is known.
 ## EMGFlow Pipeline Processing Steps
 
 ![Pipeline processing steps](/figures/figure1.png)
+*Figure 1. Decomposition of the EMG signal into individual frequency components.*

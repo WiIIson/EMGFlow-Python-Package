@@ -1,4 +1,4 @@
-# About electromyography
+# About Electromyography
 
 ## The nature of sEMG recordings
 
