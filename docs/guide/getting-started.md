@@ -50,11 +50,4 @@ Note, the Time column can be omitted when the sample rate is known.
 
 ## EMGFlow Pipeline Processing Steps
 
-```mermaid
-flowchart LR
-A[Raw data] --> B[Notch Filter]
-B --> C[Bandpass Filter]
-C --> D[Smooth Filter]
-D --> E[Extract Features]
-D --> F[Plot Signal]
-```
+![Pipeline processing steps](/figures/figure1.png)

@@ -1,4 +1,4 @@
-# `extract_features` Module Documentation
+# `extract_features` Module
 
 These functions extract features from the sEMG signal, capturing information in both time and frequency domains. The main function to do this is `extract_features`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
 
@@ -43,7 +43,94 @@ mindmap
             extract_features
 ```
 
-## Basic Time-Series Statistics
+
+
+## Extract Features
+
+The `extract_features` function is the main function of the `extract_features` module. It applies all the feature extraction functions available in this module to signal dataframe files, and generates a comprehensive 'Features.csv' file.
+
+Each extracted feature is available as its own function for easy use.
+
+### `extract_features`
+
+**Description**
+
+Extracts usable features from two sets of signal files (before and after being smoothed). Writes output to a new folder directory, as specified by the 'Feature' key value of the `path_names` dictionary. Output is both saved to the disk as a plaintext file, 'Features.csv', and is also returned as a dataframe object.
+
+Components of a `Signal` dataframe:
+- Has a column named `Time` containing time indexes
+- `Time` indexes are all equally spaced apart
+- Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
+
+All files contained within the folder and subfolder with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries.
+```python
+extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
+```
+
+**Theory**
+
+This function requires a path to smoothed and unsmoothed data. This is because while time-series features are extracted from smoothed data, spectral features are not. High-frequency components of the signal can be lost in the smoothing, and we want to ensure the spectral features are as accurate as possible.
+
+**Parameters**
+
+`path_names`: dict-str
+- A dictionary of file locations with keys for the stage in the processing pipeline.
+
+`sampling_rate`: int, float
+- Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+
+`cols`: str, optional (None)
+- List of columns of the signal files to extract features from. The default is None, in which case features are extracted from every column except for 'Time'.
+
+`expression`: str, optional (None)
+- A regular expression. If provided, will only extract features from files whose names match the regular expression. The default is None.
+
+`file_ext`: str, optional ('csv')
+- File extension for files to read. Only reads files with this extension. The default is 'csv'.
+
+`short_names`: bool, optional (True)
+- If true, makes the key column of the feature files the relative path of the file. If false, uses the full system path. The default is True.
+
+**Raises**
+
+A warning is raised if `expression` does not match with any files in the folders provided.
+
+An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not keys of the `path_names` dictionary provided.
+
+An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not contain the same files.
+
+An exception is raised if a file cannot not be read in the 'Bandpass' or 'Smooth' filepaths.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+**Returns**
+
+`Features`: pd.DataFrame
+- A Pandas dataframe of feature data for each file read. Each row is a different file analyzed, marked by the 'File\_ID' column. Additional columns show the values of the features extracted by the function.
+
+**Example**
+
+```python
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
+
+sampling_rate = 2000
+cols = ['EMG_zyg', 'EMG_cor']
+
+# Extracts all features from the files in the 'Bandpass' path and the 'Smooth'
+# path. Assumes the same files are in both paths.
+features = EMGFlow.extract_features(path_names, sampling_rate, cols)
+```
+
+
+
+
+
+## Time-Series Features
+
+### Basic Time-Series Statistics
 
 The `extract_features` function calculates some basic statistics that don't involve their own functions. This includes:
 - Minimum voltage (using `np.min`)
@@ -56,7 +143,7 @@ The `extract_features` function calculates some basic statistics that don't invo
 
 Skew and kurtosis are less common, and have a more detailed explanation below.
 
-### Skew
+#### Skew
 
 Skewness describes the symmetry of a dataset, considered more skewed the less symmetrical the left and right distributions of the median are.
 
@@ -69,7 +156,7 @@ $$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
 
 **Skew** is calculated with `scipy.stats.skew`
 
-### Kurtosis
+#### Kurtosis
 
 Kurtosis describes the amount of data in the tails of a bell curve of a distribution.
 
@@ -87,7 +174,7 @@ $$
 
 
 
-## `calc_iemg`
+### `calc_iemg`
 
 **Description**
 
@@ -143,7 +230,7 @@ IEMG = EMGFlow.calc_iemg(Signal, 'EMG_zyg', 2000)
 
 
 
-## `calc_mav`
+### `calc_mav`
 
 **Description**
 
@@ -192,7 +279,7 @@ MAV = EMGFlow.calc_mav(Signal, 'EMG_zyg', 2000)
 
 
 
-## `calc_mmav1`
+### `calc_mmav1`
 
 **Description**
 
@@ -244,7 +331,7 @@ MMAV1 = EMGFlow.calc_mmav1(Signal, 'EMG_zyg', 2000)
 
 
 
-## `calc_mmav2`
+### `calc_mmav2`
 
 **Description**
 
@@ -296,7 +383,7 @@ MMAV2 = EMGFlow.calc_mmav2(Signal, 'EMG_zyg', 2000)
 
 
 
-## `calc_ssi`
+### `calc_ssi`
 
 **Description**
 
@@ -352,7 +439,7 @@ SSI = EMGFlow.calc_ssi(Signal, 'EMG_zyg', 2000)
 
 
 
-## `calc_var`
+### `calc_var`
 
 **Description**
 
@@ -399,7 +486,7 @@ VAR = EMGFlow.calc_var(Signal, 'EMG_zyg')
 
 
 
-## `calc_vorder`
+### `calc_vorder`
 
 **Description**
 
@@ -448,7 +535,7 @@ VOrder = EMGFlow.calc_vorder(Signal, 'EMG_zyg')
 
 
 
-## `calc_rms`
+### `calc_rms`
 
 **Description**
 
@@ -496,7 +583,7 @@ RMS = EMGFlow.calc_rms(Signal, 'EMG_zyg')
 
 
 
-## `calc_wl`
+### `calc_wl`
 
 **Description**
 
@@ -544,7 +631,7 @@ WL = EMGFlow.calc_wl(Signal, 'EMG_zyg')
 
 
 
-## `calc_wamp`
+### `calc_wamp`
 
 **Description**
 
@@ -603,7 +690,7 @@ WAMP = EMGFlow.calc_wamp(Signal, 'EMG_zyg', 55)
 
 
 
-## `calc_log`
+### `calc_log`
 
 **Description**
 
@@ -651,7 +738,7 @@ LOG = EMGFlow.calc_log(Signal, 'EMG_zyg')
 
 
 
-## `calc_mfl`
+### `calc_mfl`
 
 **Description**
 
@@ -699,7 +786,7 @@ MFL = EMGFlow.calc_mfl(Signal, 'EMG_zyg')
 
 
 
-## `calc_ap`
+### `calc_ap`
 
 **Description**
 
@@ -747,7 +834,13 @@ AP = EMGFlow.calc_ap(Signal, 'EMG_zyg')
 
 
 
-## `calc_spec_flux`
+## Spectral Features
+
+
+
+
+
+### `calc_spec_flux`
 
 **Description**
 
@@ -822,7 +915,7 @@ flux2 = EMGFlow.calc_spec_flux(Signal1, 0.5, 'EMG_zyg', 2000)
 
 
 
-## calc_mdf
+### calc_mdf
 
 **Description**
 
@@ -860,7 +953,7 @@ MDF = EMGFlow.calc_mdf(psd)
 
 
 
-## calc_mnf
+### calc_mnf
 
 **Description**
 
@@ -904,7 +997,7 @@ MNF = EMGFlow.calc_mnf(psd)
 
 
 
-## `calc_twitch_ratio`
+### `calc_twitch_ratio`
 
 **Description**
 
@@ -960,7 +1053,7 @@ twitch_ratio = EMGFlow.calc_twitch_ratio(psd)
 
 
 
-## `calc_twitch_index`
+### `calc_twitch_index`
 
 **Description**
 
@@ -1016,7 +1109,7 @@ twitch_index = EMGFlow.calc_twitch_index(psd)
 
 
 
-## `calc_twitch_slope`
+### `calc_twitch_slope`
 
 **Description**
 
@@ -1068,7 +1161,7 @@ fast_slope, slow_slope = EMGFlow.calc_twitch_slope(psd)
 
 
 
-## `calc_sc`
+### `calc_sc`
 
 **Description**
 
@@ -1116,7 +1209,7 @@ SC = EMGFlow.calc_sc(psd)
 
 
 
-## `calc_sf`
+### `calc_sf`
 
 **Description**
 
@@ -1163,7 +1256,7 @@ SC = EMGFlow.calc_sf(psd)
 
 
 
-## `calc_ss`
+### `calc_ss`
 
 **Description**
 
@@ -1209,7 +1302,7 @@ SS = EMGFlow.calc_ss(psd)
 
 
 
-## `calc_sd`
+### `calc_sd`
 
 **Description**
 
@@ -1254,7 +1347,7 @@ SD = EMGFlow.calc_sd(psd)
 
 
 
-## `calc_se`
+### `calc_se`
 
 **Description**
 
@@ -1299,7 +1392,7 @@ SEntropy = EMGFlow.calc_se(psd)
 
 
 
-## `calc_sr`
+### `calc_sr`
 
 **Description**
 
@@ -1346,7 +1439,7 @@ SR = EMGFlow.calc_sr(psd)
 
 
 
-## `calc_sbw`
+### `calc_sbw`
 
 **Description**
 
@@ -1392,83 +1485,6 @@ An exception is raised if `p` is not greater than 0.
 # Calculate the SBW of Signal, for column 'EMG_zyg'
 psd = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
 SBW = EMGFlow.calc_sbw(psd)
-```
-
-
-
-
-
-## `extract_features`
-
-**Description**
-
-Extracts usable features from two sets of signal files (before and after being smoothed). Writes output to a new folder directory, as specified by the 'Feature' key value of the `path_names` dictionary. Output is both saved to the disk as a plaintext file, 'Features.csv', and is also returned as a dataframe object.
-
-Components of a `Signal` dataframe:
-- Has a column named `Time` containing time indexes
-- `Time` indexes are all equally spaced apart
-- Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
-
-All files contained within the folder and subfolder with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries.
-```python
-extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
-```
-
-**Theory**
-
-This function requires a path to smoothed and unsmoothed data. This is because while time-series features are extracted from smoothed data, spectral features are not. High-frequency components of the signal can be lost in the smoothing, and we want to ensure the spectral features are as accurate as possible.
-
-**Parameters**
-
-`path_names`: dict-str
-- A dictionary of file locations with keys for the stage in the processing pipeline.
-
-`sampling_rate`: int, float
-- Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
-
-`cols`: str, optional (None)
-- List of columns of the signal files to extract features from. The default is None, in which case features are extracted from every column except for 'Time'.
-
-`expression`: str, optional (None)
-- A regular expression. If provided, will only extract features from files whose names match the regular expression. The default is None.
-
-`file_ext`: str, optional ('csv')
-- File extension for files to read. Only reads files with this extension. The default is 'csv'.
-
-`short_names`: bool, optional (True)
-- If true, makes the key column of the feature files the relative path of the file. If false, uses the full system path. The default is True.
-
-**Raises**
-
-A warning is raised if `expression` does not match with any files in the folders provided.
-
-An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not keys of the `path_names` dictionary provided.
-
-An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not contain the same files.
-
-An exception is raised if a file cannot not be read in the 'Bandpass' or 'Smooth' filepaths.
-
-An exception is raised if an unsupported file format was provided for `file_ext`.
-
-An exception is raised if `expression` is not None or a valid regular expression.
-
-**Returns**
-
-`Features`: pd.DataFrame
-- A Pandas dataframe of feature data for each file read. Each row is a different file analyzed, marked by the 'File\_ID' column. Additional columns show the values of the features extracted by the function.
-
-**Example**
-
-```python
-path_names = EMGFlow.make_paths()
-EMGFlow.make_sample_data(path_names)
-
-sampling_rate = 2000
-cols = ['EMG_zyg', 'EMG_cor']
-
-# Extracts all features from the files in the 'Bandpass' path and the 'Smooth'
-# path. Assumes the same files are in both paths.
-features = EMGFlow.extract_features(path_names, sampling_rate, cols)
 ```
 
 

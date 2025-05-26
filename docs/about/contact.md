@@ -2,9 +2,9 @@
 
 ---
 
-# Contact Us :email:
+# Contact Us
 
-## Authors :scientist:
+## Authors
 
-- <span class="email">douglas<b>.conley</b>@ontariotechu.net</span>
-- <span class="email">steven<b>.livingstone</b>@ontariotechu.ca</span>
+- <span class="email">douglas.conley@ontariotechu.net</span>
+- <span class="email">steven.livingstone@ontariotechu.ca</span>

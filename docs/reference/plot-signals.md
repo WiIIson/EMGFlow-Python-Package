@@ -1,4 +1,4 @@
-# `plot_signals` Module Documentation
+# `plot_signals` Module
 
 These functions help visualize individual, or large batches of signal data. This helps visually see what is happening in a signal to identify outliers, and determine the kinds of filters that need to be applied.
 
