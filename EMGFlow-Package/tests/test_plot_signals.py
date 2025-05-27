@@ -4,10 +4,12 @@ import os
 import shutil
 
 # Load EMGFlow from local files
-filePath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'EMGFlow', '__init__.py'))
-spec = importlib.util.spec_from_file_location("EMGFlow", filePath)
-EMGFlow = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(EMGFlow)
+#filePath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'EMGFlow', '__init__.py'))
+#spec = importlib.util.spec_from_file_location("EMGFlow", filePath)
+#EMGFlow = importlib.util.module_from_spec(spec)
+#spec.loader.exec_module(EMGFlow)
+
+import src.EMGFlow as EMGFlow
 
 import shiny
 
