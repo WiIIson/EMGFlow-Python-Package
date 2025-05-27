@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 
-from src.EMGFlow.access_files import *
+from EMGFlow.access_files import *
 
 import pandas as pd
 
