@@ -87,7 +87,7 @@ Once installed, the package can be loaded as follows:
 import EMGFlow
 ```
 
-Project dependencies can be seen [here](EMGFlow-Package/pyproject.toml).
+Project dependencies can be seen [here](pyproject.toml).
 
 ## Contributions
 
