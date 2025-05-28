@@ -5,6 +5,16 @@ build-backend = "hatchling.build"
 [project]
 name = "EMGFlow"
 version = "1.0.17"
+description = "A general EMG processing and feature extraction package."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "D. William Conley", email = "william@cconley.ca"},
+    {name = "Steven R. Livingstone", email = "steven.livingstone@ontariotechu.ca"},
+]
+maintainers = [
+    {name = "D. William Conley", email = "william@cconley.ca"}
+]
 dependencies = [
     "pandas",
     "numpy",
@@ -15,16 +25,6 @@ dependencies = [
     "nest-asyncio",
     "importlib-resources"
 ]
-requires-python = ">=3.9"
-authors = [
-    {name = "D. William Conley", email = "william@cconley.ca"},
-    {name = "Steven R. Livingstone", email = "steven.livingstone@ontariotechu.ca"},
-]
-maintainers = [
-    {name = "D. William Conley", email = "william@cconley.ca"}
-]
-description = "A general EMG processing and feature extraction package."
-readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -32,10 +32,11 @@ classifiers = [
 ]
 
 [tool.setuptools]
-include-package-data = true
+packages = ["EMGFlow"]
+package-dir = { "" = "src" }
 
 [tool.setuptools.package-data]
-"EMGFlow" = ["data/*"]
+"EMGFlow" = ["data/*.csv"]
 
 [project.urls]
 Homepage = "https://github.com/WiIIson/EMGFlow-Python-Package"
