@@ -1,92 +1,151 @@
-aggregate-coverage:
-  runs-on: ubuntu-latest
-  needs: test
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  
-  
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+name: Run Unit Tests
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install coverage==7.6.1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[test] coverage==7.6.1
+      
+      - name: Run tests with coverage
+        run: |
+          coverage run -m unittest discover -s tests -v
+          if [ ! -f .coverage ]; then
+            echo "Error: No .coverage file generated"
+            exit 1
+          fi
+          mv .coverage .coverage-${{ matrix.python-version }}
+          coverage xml -o coverage-${{ matrix.python-version }}.xml
+          coverage html -d htmlcov-${{ matrix.python-version }}
+          coverage report > coverage-${{ matrix.python-version }}.txt
+      
+      - name: Debug coverage file
+        run: |
+          ls -l .coverage-${{ matrix.python-version }} || echo "Coverage file not found"
+      
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-${{ matrix.python-version }}
+          path: |
+            .coverage-${{ matrix.python-version }}
+            coverage-${{ matrix.python-version }}.xml
+            coverage-${{ matrix.python-version }}.txt
+            htmlcov-${{ matrix.python-version }}/
+          retention-days: 1
+
+  aggregate-coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
-    - name: Download coverage data
-      uses: actions/download-artifact@v4
-      with:
-        pattern: coverage-data-*
-        path: coverage-data
-        merge-multiple: true
-    
-    - name: Debug downloaded files
-      run: |
-        echo "Directory structure of coverage-data:"
-        find coverage-data -type f -ls
-        echo "Looking for .coverage-* files:"
-        find coverage-data -type f -name '.coverage-*' || echo "No .coverage-* files found"
-    
-    - name: Move coverage files to correct location
-      run: |
-        mkdir -p .cov-data
-        find coverage-data -type f -name '.coverage-*' -exec mv {} .cov-data/ \; || { echo "No .coverage files found"; exit 1; }
-        ls -l .cov-data/ || echo "No files in .cov-data"
-    
-    - name: Combine coverage data
-      run: |
-        if [ -n "$(ls -A .cov-data)" ]; then
-          coverage combine --data-file=.cov-data/.coverage .cov-data/
-          coverage xml -o coverage-combined.xml
-          coverage html -d htmlcov-combined
-          coverage report > coverage-combined.txt
-        else
-          echo "No coverage files found to combine"
-          exit 1
-        fi
-    
-    - name: Extract combined coverage percentage
-      run: |
-        COVERAGE=$(grep 'TOTAL' coverage-combined.txt | awk '{print $NF}' | sed 's/%//')
-        echo "COVERAGE_PERCENT=$COVERAGE" >> $GITHUB_ENV
-    
-    - name: Generate shields.io badge SVG
-      run: |
-        COVERAGE=${{ env.COVERAGE_PERCENT }}
-        COLOR="red"
-        if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"; fi
-        if [ "$COVERAGE" -ge 80 ] && [ "$COVERAGE" -lt 90 ]; then COLOR="green"; fi
-        if [ "$COVERAGE" -ge 70 ] && [ "$COVERAGE" -lt 80 ]; then COLOR="yellowgreen"; fi
-        if [ "$COVERAGE" -ge 60 ] && [ "$COVERAGE" -lt 70 ]; then COLOR="yellow"; fi
-        if [ "$COVERAGE" -ge 50 ] && [ "$COVERAGE" -lt 60 ]; then COLOR="orange"; fi
-        mkdir -p badges
-        curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" -o badges/coverage.svg
-    
-    - name: Commit badge SVG
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add badges/coverage.svg
-        git commit -m "Update coverage badge SVG [ci skip]" || echo "No changes to commit"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Upload combined results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-combined
-        path: |
-          coverage-combined.xml
-          coverage-combined.txt
-          htmlcov-combined/
-          badges/coverage.svg
-        retention-days: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage==7.6.1
+      
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          path: coverage-data
+          merge-multiple: true
+      
+      - name: Debug downloaded files
+        run: |
+          echo "Listing all downloaded files:"
+          find coverage-data -type f || echo "No files found in coverage-data"
+      
+      - name: Move coverage files to correct location
+        run: |
+          mkdir -p .cov-data
+          find coverage-data -type f -name '.coverage-*' -exec mv {} .cov-data/ \;
+          echo "Files in .cov-data:"
+          ls -l .cov-data/ || echo "No files in .cov-data"
+          if [ -z "$(ls -A .cov-data)" ]; then
+            echo "Error: No .coverage-* files found to combine"
+            exit 1
+          fi
+      
+      - name: Combine coverage data
+        run: |
+          cd .cov-data
+          coverage combine --debug=path
+          coverage xml -o ../coverage-combined.xml
+          coverage html -d ../htmlcov-combined
+          coverage report > ../coverage-combined.txt
+        continue-on-error: false
+      
+      - name: Extract combined coverage percentage
+        run: |
+          COVERAGE=$(grep 'TOTAL' coverage-combined.txt | awk '{print $NF}' | sed 's/%//')
+          echo "COVERAGE_PERCENT=$COVERAGE" >> $GITHUB_ENV
+      
+      - name: Generate shields.io badge SVG
+        run: |
+          COVERAGE=${{ env.COVERAGE_PERCENT }}
+          COLOR="red"
+          if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"; fi
+          if [ "$COVERAGE" -ge 80 ] && [ "$COVERAGE" -lt 90 ]; then COLOR="green"; fi
+          if [ "$COVERAGE" -ge 70 ] && [ "$COVERAGE" -lt 80 ]; then COLOR="yellowgreen"; fi
+          if [ "$COVERAGE" -ge 60 ] && [ "$COVERAGE" -lt 70 ]; then COLOR="yellow"; fi
+          if [ "$COVERAGE" -ge 50 ] && [ "$COVERAGE" -lt 60 ]; then COLOR="orange"; fi
+          mkdir -p badges
+          curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" -o badges/coverage.svg
+      
+      - name: Commit badge SVG
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add badges/coverage.svg
+          git commit -m "Update coverage badge SVG [ci skip]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload combined results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-combined
+          path: |
+            coverage-combined.xml
+            coverage-combined.txt
+            htmlcov-combined/
+            badges/coverage.svg
+          retention-days: 1
