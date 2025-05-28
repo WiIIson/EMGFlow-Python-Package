@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # Ensure write permissions
+          token: ${{ secrets.GITHUB_TOKEN }} # Ensure write permissions or use BADGE_TOKEN
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -36,20 +36,22 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run -m unittest discover -s tests -v
+          mv .coverage .coverage.${{ matrix.python-version }}
           coverage xml -o coverage-${{ matrix.python-version }}.xml
           coverage html -d htmlcov-${{ matrix.python-version }}
           coverage report > coverage-${{ matrix.python-version }}.txt
-        # Generate coverage reports with version-specific names
+        # Generate raw .coverage file, rename it, and create reports
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
           path: |
+            .coverage.${{ matrix.python-version }}
             coverage-${{ matrix.python-version }}.xml
             coverage-${{ matrix.python-version }}.txt
             htmlcov-${{ matrix.python-version }}/
-        # Upload coverage data for aggregation
+        # Upload raw .coverage file and reports
 
   aggregate-coverage:
     runs-on: ubuntu-latest
@@ -60,7 +62,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # Ensure write permissions
+          token: ${{ secrets.GITHUB_TOKEN }} # Ensure write permissions or use BADGE_TOKEN
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -81,11 +83,12 @@ jobs:
       
       - name: Combine coverage data
         run: |
-          coverage combine coverage-data/coverage-*.xml
+          mv coverage-data/.coverage.* .
+          coverage combine
           coverage xml -o coverage-combined.xml
           coverage html -d htmlcov-combined
           coverage report > coverage-combined.txt
-        # Combine coverage data and generate reports
+        # Move .coverage files to root, combine, and generate reports
       
       - name: Extract combined coverage percentage
         run: |
@@ -114,7 +117,7 @@ jobs:
           git commit -m "Update coverage badge SVG [ci skip]" || echo "No changes to commit"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Or BADGE_TOKEN
         # Commit with [ci skip] to prevent infinite loop
       
       - name: Upload combined results
