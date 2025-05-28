@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -33,13 +35,57 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run -m unittest discover -s tests -v
-          coverage xml
-          coverage html
-          coverage report > coverage.txt
+          coverage xml -o coverage-${{ matrix.python-version }}.xml
+          coverage html -d htmlcov-${{ matrix.python-version }}
+          coverage report > coverage-${{ matrix-python-version }}.txt
       
-      - name: Extract coverage percentage
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-${{ matrix.python-version }}
+          path: |
+            coverage-${{ matrix.python-version }}.xml
+            coverage-${{ matrix.python-version }}.txt
+            htmlcov-${{ matrix.python-version }}/
+          
+  aggregate-coverage:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      - name: Install dependencies
         run: |
-          COVERAGE=$(grep 'TOTAL' coverage.txt | awk '{print $NF}' | sed 's/%//')
+          python -m pip install --upgrade pip
+          pip install coverage
+      
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          path: coverage-data
+          merge-multiple: true
+
+      - name: Combine coverage data
+        run: |
+          coverage combine coverage-data/coverage-*.xml
+          coverage xml -o coverage-combined.xml
+          coverage html -d htmlcov-combined
+          coverage report > coverage-combined.txt
+
+      - name: Extract combined coverage percentage
+        run: |
+          COVERAGE=$(grep 'TOTAL' coverage-combined.txt | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE_PERCENT=$COVERAGE" >> $GITHUB_ENV
       
       - name: Generate shields.io badge SVG
@@ -65,14 +111,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Upload test results
+      - name: Upload combined results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.python-version }}
+          name: coverage-combined
           path: |
-            test-results/
-            htmlcov/
-            coverage.xml
-            coverage.txt
+            coverage-combined.xml
+            coverage-combined.txt
+            htmlcov-combined/
             badges/coverage.svg
