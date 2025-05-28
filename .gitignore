@@ -144,12 +144,5 @@ cython_debug/
 .pypirc
 
 # EMGFlow
-Data/*
-Plots
-Resources
 Other_Work
-EMGFlow Package Presentation
-coverage.json
 EMGFlow-Package/dist
-package-test.py
-node_modules

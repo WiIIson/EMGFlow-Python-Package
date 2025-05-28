@@ -38,4 +38,6 @@ include-package-data = true
 "EMGFlow" = ["data/*"]
 
 [project.urls]
-Home = "https://github.com/WiIIson/EMGFlow-Python-Package"
+Homepage = "https://github.com/WiIIson/EMGFlow-Python-Package"
+Documentation = "https://wiiison.github.io/EMGFlow-Python-Package/"
+Issues = "https://github.com/WiIIson/EMGFlow-Python-Package/issues"
