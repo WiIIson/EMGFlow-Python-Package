@@ -30,17 +30,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .[test] coverage
-          # Ensure coverage is included in dependencies
+          pip install -e .[test] coverage
+          # Install package in editable mode to ensure imports work
       
       - name: Run tests with coverage
         run: |
-          coverage run -m unittest discover -s tests -v
+          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
+          coverage run --source=emgflow -m unittest discover -s tests -v
           mv .coverage .coverage.${{ matrix.python-version }}
           coverage xml -o coverage-${{ matrix.python-version }}.xml
           coverage html -d htmlcov-${{ matrix.python-version }}
           coverage report > coverage-${{ matrix.python-version }}.txt
-        # Generate raw .coverage file, rename it, and create reports
+        # Specify source, set PYTHONPATH, and generate reports
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
