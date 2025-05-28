@@ -11,6 +11,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -34,18 +35,15 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run -m unittest discover -s tests -v
-          if [ ! -f .coverage ]; then
-            echo "Error: No .coverage file generated"
-            exit 1
-          fi
-          mv .coverage .coverage-${{ matrix.python-version }}
           coverage xml -o coverage-${{ matrix.python-version }}.xml
           coverage html -d htmlcov-${{ matrix.python-version }}
           coverage report > coverage-${{ matrix.python-version }}.txt
+          mv .coverage .coverage-${{ matrix.python-version }} || echo "No .coverage file generated"
       
       - name: Debug coverage file
         run: |
           ls -l .coverage-${{ matrix.python-version }} || echo "Coverage file not found"
+        # Confirm the .coverage file exists before upload
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
@@ -57,6 +55,7 @@ jobs:
             coverage-${{ matrix.python-version }}.txt
             htmlcov-${{ matrix.python-version }}/
           retention-days: 1
+        # Reduced retention for artifacts to save space
 
   aggregate-coverage:
     runs-on: ubuntu-latest
@@ -88,28 +87,26 @@ jobs:
       
       - name: Debug downloaded files
         run: |
-          echo "Listing all downloaded files:"
-          find coverage-data -type f || echo "No files found in coverage-data"
+          ls -R coverage-data
+          find coverage-data -type f -name '.coverage-*' || echo "No .coverage-* files found"
       
       - name: Move coverage files to correct location
         run: |
           mkdir -p .cov-data
-          find coverage-data -type f -name '.coverage-*' -exec mv {} .cov-data/ \;
-          echo "Files in .cov-data:"
+          find coverage-data -type f -name '.coverage-*' -exec mv {} .cov-data/ \; || echo "No .coverage files to move"
           ls -l .cov-data/ || echo "No files in .cov-data"
-          if [ -z "$(ls -A .cov-data)" ]; then
-            echo "Error: No .coverage-* files found to combine"
-            exit 1
-          fi
       
       - name: Combine coverage data
         run: |
-          cd .cov-data
-          coverage combine --debug=path
-          coverage xml -o ../coverage-combined.xml
-          coverage html -d ../htmlcov-combined
-          coverage report > ../coverage-combined.txt
-        continue-on-error: false
+          if [ -n "$(ls -A .cov-data)" ]; then
+            coverage combine .cov-data/
+            coverage xml -o coverage-combined.xml
+            coverage html -d htmlcov-combined
+            coverage report > coverage-combined.txt
+          else
+            echo "No coverage files found to combine"
+            exit 1
+          fi
       
       - name: Extract combined coverage percentage
         run: |
