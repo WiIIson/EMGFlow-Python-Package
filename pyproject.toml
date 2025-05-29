@@ -31,14 +31,20 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+test = [
+  "coverage==7.6.1",
+  "unittest"
+]
+
+[project.urls]
+Homepage = "https://github.com/WiIIson/EMGFlow-Python-Package"
+Documentation = "https://wiiison.github.io/EMGFlow-Python-Package/"
+Issues = "https://github.com/WiIIson/EMGFlow-Python-Package/issues"
+
 [tool.setuptools]
 packages = ["EMGFlow"]
 package-dir = { "" = "src" }
 
 [tool.setuptools.package-data]
 "EMGFlow" = ["data/*.csv"]
-
-[project.urls]
-Homepage = "https://github.com/WiIIson/EMGFlow-Python-Package"
-Documentation = "https://wiiison.github.io/EMGFlow-Python-Package/"
-Issues = "https://github.com/WiIIson/EMGFlow-Python-Package/issues"
