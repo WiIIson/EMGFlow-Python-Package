@@ -58,123 +58,96 @@ jobs:
           path: coverage-data/${{ matrix.python-version }}/
           retention-days: 1
 
-  aggregate-coverage:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+aggregate-coverage:
+  runs-on: ubuntu-latest
+  needs: test
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install coverage==7.6.1
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coverage==7.6.1
 
-      - name: Download coverage data for Python 3.9
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-data-3.9
-          path: coverage-data/3.9
+    - name: Download all coverage data
+      uses: actions/download-artifact@v4
+      with:
+        pattern: coverage-data-*
+        path: coverage-data
+        merge-multiple: true
 
-      - name: Download coverage data for Python 3.10
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-data-3.10
-          path: coverage-data/3.10
+    - name: Debug downloaded files
+      run: |
+        ls -R coverage-data || echo "No coverage data found"
+        find coverage-data -type f -name '.coverage' || echo "No .coverage files found"
 
-      - name: Download coverage data for Python 3.11
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-data-3.11
-          path: coverage-data/3.11
-
-      - name: Download coverage data for Python 3.12
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-data-3.12
-          path: coverage-data/3.12
-
-      - name: Debug downloaded files
-        run: |
-          ls -R coverage-data
-          find coverage-data -type f -name '.coverage' || echo "No .coverage files found"
-
-      - name: Move coverage files to correct location
-        run: |
-          mkdir -p .cov-data
-          find coverage-data -type f -name '.coverage' -exec mv {} .cov-data/ \; || { echo "No .coverage files to move"; exit 1; }
-          ls -l .cov-data/ || echo "No files in .cov-data"
-
-      - name: Validate coverage files
-        run: |
-          if ls .cov-data/.coverage >/dev/null 2>&1; then
-            for file in .cov-data/.coverage; do
-              if [ -s "$file" ]; then
-                echo "Valid coverage file: $file"
-              else
-                echo "Empty or invalid coverage file: $file"
-                exit 1
-              fi
-            done
-          else
-            echo "No coverage files found in .cov-data/"
-            exit 1
-          fi
-
-      - name: Combine coverage data
-        run: |
+    - name: Combine coverage data
+      run: |
+        mkdir -p .cov-data
+        find coverage-data -type f -name '.coverage' -exec cp {} .cov-data/ \;
+        if ls .cov-data/.coverage* >/dev/null 2>&1; then
           cd .cov-data
           coverage combine --debug=combine || { echo "Coverage combine failed"; exit 1; }
           coverage xml -o ../coverage-combined.xml
           coverage html -d ../htmlcov-combined
           coverage report > ../coverage-combined.txt
-        env:
-          COVERAGE_PATH: ${{ github.workspace }}
+        else
+          echo "No valid .coverage files found in .cov-data/"
+          exit 1
+        fi
+      env:
+        COVERAGE_PATH: ${{ github.workspace }}
 
-      - name: Extract combined coverage percentage
-        run: |
+    - name: Extract combined coverage percentage
+      run: |
+        if [ -f coverage-combined.txt ]; then
           COVERAGE=$(grep 'TOTAL' coverage-combined.txt | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE_PERCENT=$COVERAGE" >> $GITHUB_ENV
+        else
+          echo "No coverage report generated"
+          exit 1
+        fi
 
-      - name: Generate shields.io badge SVG
-        run: |
-          COVERAGE=${{ env.COVERAGE_PERCENT }}
-          COLOR="red"
-          if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"; fi
-          if [ "$COVERAGE" -ge 80 ] && [ "$COVERAGE" -lt 90 ]; then COLOR="green"; fi
-          if [ "$COVERAGE" -ge 70 ] && [ "$COVERAGE" -lt 80 ]; then COLOR="yellowgreen"; fi
-          if [ "$COVERAGE" -ge 60 ] && [ "$COVERAGE" -lt 70 ]; then COLOR="yellow"; fi
-          if [ "$COVERAGE" -ge 50 ] && [ "$COVERAGE" -lt 60 ]; then COLOR="orange"; fi
-          mkdir -p badges
-          curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" -o badges/coverage.svg
+    - name: Generate shields.io badge SVG
+      run: |
+        COVERAGE=${{ env.COVERAGE_PERCENT }}
+        COLOR="red"
+        if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"; fi
+        if [ "$COVERAGE" -ge 80 ] && [ "$COVERAGE" -lt 90 ]; then COLOR="green"; fi
+        if [ "$COVERAGE" -ge 70 ] && [ "$COVERAGE" -lt 80 ]; then COLOR="yellowgreen"; fi
+        if [ "$COVERAGE" -ge 60 ] && [ "$COVERAGE" -lt 70 ]; then COLOR="yellow"; fi
+        if [ "$COVERAGE" -ge 50 ] && [ "$COVERAGE" -lt 60 ]; then COLOR="orange"; fi
+        mkdir -p badges
+        curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR" -o badges/coverage.svg
 
-      - name: Commit badge SVG
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add badges/coverage.svg
-          git commit -m "Update coverage badge SVG [ci skip]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit badge SVG
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add badges/coverage.svg
+        git commit -m "Update coverage badge SVG [ci skip]" || echo "No changes to commit"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload combined results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-combined
-          path: |
-            coverage-combined.xml
-            coverage-combined.txt
-            htmlcov-combined/
-            badges/coverage.svg
-          retention-days: 1
+    - name: Upload combined results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-combined
+        path: |
+          coverage-combined.xml
+          coverage-combined.txt
+          htmlcov-combined/
+          badges/coverage.svg
+        retention-days: 1
