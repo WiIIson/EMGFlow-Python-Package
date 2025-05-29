@@ -71,6 +71,7 @@ jobs:
           for file in coverage-data/coverage-*.txt; do
             if [ -f "$file" ]; then
               COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//')
+              echo "Processing $file: $COVERAGE%"
               TOTAL=$((TOTAL + COVERAGE))
               COUNT=$((COUNT + 1))
             fi
