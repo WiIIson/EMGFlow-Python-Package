@@ -34,26 +34,27 @@ jobs:
       
       - name: Run tests with coverage
         run: |
-          coverage run -m unittest discover -s tests -v
-          coverage xml -o coverage-${{ matrix.python-version }}.xml
-          coverage html -d htmlcov-${{ matrix.python-version }}
-          coverage report > coverage-${{ matrix.python-version }}.txt
           mkdir -p coverage-data/${{ matrix.python-version }}
-          mv .coverage coverage-data/${{ matrix.python-version }}/.coverage || echo "No .coverage file generated"
+          coverage run -m unittest discover -s tests -v || { echo "Unit tests failed or no tests found"; exit 1; }
+          coverage xml -o coverage-data/${{ matrix.python-version }}/coverage.xml
+          coverage html -d coverage-data/${{ matrix.python-version }}/htmlcov
+          coverage report > coverage-data/${{ matrix.python-version }}/coverage.txt
+          mv .coverage coverage-data/${{ matrix.python-version }}/.coverage || { echo "No .coverage file generated for Python ${{ matrix.python-version }}"; exit 1; }
       
       - name: Debug coverage file
         run: |
-          ls -l coverage-data/${{ matrix.python-version }}/.coverage || echo "Coverage file not found"
+          ls -l coverage-data/${{ matrix.python-version }}/.coverage || echo "Coverage file not found for Python ${{ matrix.python-version }}"
+          if [ -s coverage-data/${{ matrix.python-version }}/.coverage ]; then
+            echo "Coverage file exists and is non-empty for Python ${{ matrix.python-version }}"
+          else
+            echo "Coverage file is missing or empty for Python ${{ matrix.python-version }}"
+          fi
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
-          path: |
-            coverage-data/${{ matrix.python-version }}/.coverage
-            coverage-${{ matrix.python-version }}.xml
-            coverage-${{ matrix.python-version }}.txt
-            htmlcov-${{ matrix.python-version }}/
+          path: coverage-data/${{ matrix.python-version }}/
           retention-days: 1
 
   aggregate-coverage:
@@ -97,23 +98,30 @@ jobs:
       
       - name: Validate coverage files
         run: |
-          for file in .cov-data/.coverage*; do
-            if [ -s "$file" ]; then
-              echo "Valid coverage file: $file"
-            else
-              echo "Empty or invalid coverage file: $file"
-            fi
-          done
+          if ls .cov-data/.coverage* >/dev/null 2>&1; then
+            for file in .cov-data/.coverage*; do
+              if [ -s "$file" ]; then
+                echo "Valid coverage file: $file"
+              else
+                echo "Empty or invalid coverage file: $file"
+              fi
+            done
+          else
+            echo "No coverage files found in .cov-data/"
+          fi
       
       - name: Combine coverage data
         run: |
           if [ -n "$(ls -A .cov-data)" ]; then
-            coverage combine .cov-data/
+            echo "Coverage files found in .cov-data:"
+            ls -l .cov-data/
+            coverage combine --debug=combine .cov-data/ || { echo "Coverage combine failed"; exit 1; }
             coverage xml -o coverage-combined.xml
             coverage html -d htmlcov-combined
             coverage report > coverage-combined.txt
           else
-            echo "No coverage files found to combine"
+            echo "No coverage files found to combine in .cov-data/"
+            ls -l .cov-data/ || echo ".cov-data/ is empty"
             exit 1
           fi
       
