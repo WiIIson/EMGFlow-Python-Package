@@ -37,14 +37,48 @@ jobs:
           coverage html
           coverage report > coverage.txt
       
-      - name: Extract coverage percentage
+      - name: Store coverage percentage
         run: |
           COVERAGE=$(grep 'TOTAL' coverage.txt | awk '{print $NF}' | sed 's/%//')
-          echo "COVERAGE_PERCENT=$COVERAGE" >> $GITHUB_ENV
+          echo "COVERAGE_${{ matrix.python-version }}=$COVERAGE" >> $GITHUB_ENV
       
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-${{ matrix.python-version }}
+          path: coverage.txt
+
+  generate-badge:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          path: coverage-data
+          merge-multiple: true
+
+      - name: Calculate average coverage
+        run: |
+          TOTAL=0
+          COUNT=0
+          for file in coverage-data/coverage.txt; do
+            COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//')
+            TOTAL=$((TOTAL + COVERAGE))
+            COUNT=$((COUNT + 1))
+          done
+          AVG=$((TOTAL / COUNT))
+          echo "AVERAGE_COVERAGE=$AVG" >> $GITHUB_ENV
+
       - name: Generate shields.io badge SVG
         run: |
-          COVERAGE=${{ env.COVERAGE_PERCENT }}
+          COVERAGE=${{ env.AVERAGE_COVERAGE }}
           COLOR="red"
           if [ "$COVERAGE" -ge 90 ]; then COLOR="brightgreen"; fi
           if [ "$COVERAGE" -ge 80 ] && [ "$COVERAGE" -lt 90 ]; then COLOR="green"; fi
@@ -55,7 +89,6 @@ jobs:
           curl "https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR.svg" -o badges/coverage.svg
       
       - name: Commit badge SVG
-        if: matrix.python-version == '3.12' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
@@ -64,15 +97,9 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Upload test results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.python-version }}
-          path: |
-            test-results/
-            htmlcov/
-            coverage.xml
-            coverage.txt
-            badges/coverage.svg
+          name: coverage-badge
+          path: badges/coverage.svg
