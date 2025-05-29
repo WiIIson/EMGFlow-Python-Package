@@ -38,24 +38,23 @@ jobs:
           coverage xml -o coverage-${{ matrix.python-version }}.xml
           coverage html -d htmlcov-${{ matrix.python-version }}
           coverage report > coverage-${{ matrix.python-version }}.txt
-          mv .coverage .coverage-${{ matrix.python-version }} || echo "No .coverage file generated"
+          mkdir -p coverage-data/${{ matrix.python-version }}
+          mv .coverage coverage-data/${{ matrix.python-version }}/.coverage || echo "No .coverage file generated"
       
       - name: Debug coverage file
         run: |
-          ls -l .coverage-${{ matrix.python-version }} || echo "Coverage file not found"
-        # Confirm the .coverage file exists before upload
+          ls -l coverage-data/${{ matrix.python-version }}/.coverage || echo "Coverage file not found"
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
           path: |
-            .coverage-${{ matrix.python-version }}
+            coverage-data/${{ matrix.python-version }}/.coverage
             coverage-${{ matrix.python-version }}.xml
             coverage-${{ matrix.python-version }}.txt
             htmlcov-${{ matrix.python-version }}/
           retention-days: 1
-        # Reduced retention for artifacts to save space
 
   aggregate-coverage:
     runs-on: ubuntu-latest
@@ -88,13 +87,23 @@ jobs:
       - name: Debug downloaded files
         run: |
           ls -R coverage-data
-          find coverage-data -type f -name '.coverage-*' || echo "No .coverage-* files found"
+          find coverage-data -type f -name '.coverage' || echo "No .coverage files found"
       
       - name: Move coverage files to correct location
         run: |
           mkdir -p .cov-data
-          find coverage-data -type f -name '.coverage-*' -exec mv {} .cov-data/ \; || echo "No .coverage files to move"
+          find coverage-data -type f -name '.coverage' -exec mv {} .cov-data/ \; || echo "No .coverage files to move"
           ls -l .cov-data/ || echo "No files in .cov-data"
+      
+      - name: Validate coverage files
+        run: |
+          for file in .cov-data/.coverage*; do
+            if [ -s "$file" ]; then
+              echo "Valid coverage file: $file"
+            else
+              echo "Empty or invalid coverage file: $file"
+            fi
+          done
       
       - name: Combine coverage data
         run: |
