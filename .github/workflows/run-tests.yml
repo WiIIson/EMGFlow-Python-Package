@@ -35,7 +35,6 @@ jobs:
       - name: Run tests with coverage
         run: |
           mkdir -p coverage-data/${{ matrix.python-version }}
-          # Use --source to ensure consistent source paths
           coverage run --source=. -m unittest discover -s tests -v || { echo "Unit tests failed or no tests found"; exit 1; }
           coverage xml -o coverage-data/${{ matrix.python-version }}/coverage.xml
           coverage html -d coverage-data/${{ matrix.python-version }}/htmlcov
@@ -80,12 +79,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install coverage==7.6.1
 
-      - name: Download coverage data
+      - name: Download coverage data for Python 3.9
         uses: actions/download-artifact@v4
         with:
-          pattern: coverage-data-*
-          path: coverage-data
-          merge-multiple: true
+          name: coverage-data-3.9
+          path: coverage-data/3.9
+
+      - name: Download coverage data for Python 3.10
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-data-3.10
+          path: coverage-data/3.10
+
+      - name: Download coverage data for Python 3.11
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-data-3.11
+          path: coverage-data/3.11
+
+      - name: Download coverage data for Python 3.12
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-data-3.12
+          path: coverage-data/3.12
 
       - name: Debug downloaded files
         run: |
