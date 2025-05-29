@@ -1,3 +1,7 @@
+---
+outline: 'deep'
+---
+
 # `extract_features` Module
 
 These functions extract features from the sEMG signal, capturing information in both time and frequency domains. The main function to do this is `extract_features`. Within this call, individual features are calculated by their own functions, allowing them to be incorporated into your own workflow.
