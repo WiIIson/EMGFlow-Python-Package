@@ -39,15 +39,15 @@ jobs:
           coverage xml -o coverage-data/${{ matrix.python-version }}/coverage.xml
           coverage html -d coverage-data/${{ matrix.python-version }}/htmlcov
           coverage report > coverage-data/${{ matrix.python-version }}/coverage.txt
-          mv .coverage coverage-data/${{ matrix.python-version }}/.coverage.${{ matrix.python-version }} || { echo "No .coverage file generated for Python ${{ matrix.python-version }}"; exit 1; }
 
       - name: Debug coverage file
         run: |
-          ls -l coverage-data/${{ matrix.python-version }}/.coverage.${{ matrix.python-version }} || echo "Coverage file not found for Python ${{ matrix.python-version }}"
-          if [ -s coverage-data/${{ matrix.python-version }}/.coverage.${{ matrix.python-version }} ]; then
+          ls -l .coverage || echo "No .coverage file generated"
+          if [ -f .coverage ] && [ -s .coverage ]; then
             echo "Coverage file exists and is non-empty for Python ${{ matrix.python-version }}"
+            mv .coverage coverage-data/${{ matrix.python-version }}/.coverage
           else
-            echo "Coverage file is missing or empty for Python ${{ matrix.python-version }}"
+            echo "Coverage file missing or empty for Python ${{ matrix.python-version }}"
             exit 1
           fi
 
@@ -106,18 +106,18 @@ jobs:
       - name: Debug downloaded files
         run: |
           ls -R coverage-data
-          find coverage-data -type f -name '.coverage.*' || echo "No .coverage files found"
+          find coverage-data -type f -name '.coverage' || echo "No .coverage files found"
 
       - name: Move coverage files to correct location
         run: |
           mkdir -p .cov-data
-          find coverage-data -type f -name '.coverage.*' -exec mv {} .cov-data/ \; || { echo "No .coverage files to move"; exit 1; }
+          find coverage-data -type f -name '.coverage' -exec mv {} .cov-data/ \; || { echo "No .coverage files to move"; exit 1; }
           ls -l .cov-data/ || echo "No files in .cov-data"
 
       - name: Validate coverage files
         run: |
-          if ls .cov-data/.coverage.* >/dev/null 2>&1; then
-            for file in .cov-data/.coverage.*; do
+          if ls .cov-data/.coverage >/dev/null 2>&1; then
+            for file in .cov-data/.coverage; do
               if [ -s "$file" ]; then
                 echo "Valid coverage file: $file"
               else
