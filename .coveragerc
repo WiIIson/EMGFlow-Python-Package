@@ -1,7 +1,0 @@
-[run]
-source = src/EMGFlow
-parallel = true
-data_file = .cov-data/.coverage
-
-[report]
-show_missing = true

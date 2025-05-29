@@ -35,7 +35,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           mkdir -p coverage-data/${{ matrix.python-version }}
-          coverage run --source=src/EMGFlow -m unittest discover -s tests -v || { echo "Unit tests failed or no tests found"; exit 1; }
+          coverage run --source=. -m unittest discover -s tests -v || { echo "Unit tests failed or no tests found"; exit 1; }
           coverage xml -o coverage-data/${{ matrix.python-version }}/coverage.xml
           coverage html -d coverage-data/${{ matrix.python-version }}/htmlcov
           coverage report > coverage-data/${{ matrix.python-version }}/coverage.txt
@@ -50,11 +50,6 @@ jobs:
             echo "Coverage file missing or empty for Python ${{ matrix.python-version }}"
             exit 1
           fi
-
-      - name: Debug artifact contents
-        run: |
-          ls -R coverage-data/${{ matrix.python-version }}
-          find coverage-data/${{ matrix.python-version }} -type f -name '.coverage' || echo "No .coverage file in artifact directory"
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
