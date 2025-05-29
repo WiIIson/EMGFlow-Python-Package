@@ -35,18 +35,18 @@ jobs:
           coverage run -m unittest discover -s tests -v
           coverage xml
           coverage html
-          coverage report > coverage.txt
+          coverage report > coverage-${{ matrix.python-version }}.txt
       
       - name: Store coverage percentage
         run: |
-          COVERAGE=$(grep 'TOTAL' coverage.txt | awk '{print $NF}' | sed 's/%//')
+          COVERAGE=$(grep 'TOTAL' coverage-${{ matrix.python-version }}.txt | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE_${{ matrix.python-version }}=$COVERAGE" >> $GITHUB_ENV
       
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
-          path: coverage.txt
+          path: coverage-${{ matrix.python-version }}.txt
 
   generate-badge:
     needs: test
@@ -68,13 +68,20 @@ jobs:
         run: |
           TOTAL=0
           COUNT=0
-          for file in coverage-data/coverage.txt; do
-            COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//')
-            TOTAL=$((TOTAL + COVERAGE))
-            COUNT=$((COUNT + 1))
+          for file in coverage-data/coverage-*.txt; do
+            if [ -f "$file" ]; then
+              COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//')
+              TOTAL=$((TOTAL + COVERAGE))
+              COUNT=$((COUNT + 1))
+            fi
           done
-          AVG=$((TOTAL / COUNT))
-          echo "AVERAGE_COVERAGE=$AVG" >> $GITHUB_ENV
+          if [ $COUNT -gt 0 ]; then
+            AVG=$(( (TOTAL + COUNT - 1) / COUNT )) # Round up to avoid truncation
+            echo "AVERAGE_COVERAGE=$AVG" >> $GITHUB_ENV
+          else
+            echo "No coverage files found"
+            exit 1
+          fi
 
       - name: Generate shields.io badge SVG
         run: |
