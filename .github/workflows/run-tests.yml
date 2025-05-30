@@ -37,7 +37,7 @@ jobs:
           coverage xml
           coverage html
           coverage report > coverage-${{ matrix.os }}-${{ matrix.python-version }}.txt
-        shell: bash # Ensure consistent shell for Windows and Ubuntu
+        shell: bash
       
       - name: Store coverage percentage
         run: |
@@ -73,17 +73,23 @@ jobs:
           COUNT=0
           for file in coverage-data/coverage-*.txt; do
             if [ -f "$file" ]; then
-              COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//')
-              echo "Processing $file: $COVERAGE%"
-              TOTAL=$((TOTAL + COVERAGE))
-              COUNT=$((COUNT + 1))
+              # Extract the coverage percentage, ensuring only the numeric part is captured
+              COVERAGE=$(grep 'TOTAL' "$file" | awk '{print $NF}' | sed 's/%//' | tr -d '\r\n' | grep -E '^[0-9]+$')
+              if [ -n "$COVERAGE" ]; then
+                echo "Processing $file: $COVERAGE%"
+                TOTAL=$((TOTAL + COVERAGE))
+                COUNT=$((COUNT + 1))
+              else
+                echo "Warning: Invalid coverage value in $file"
+              fi
             fi
           done
           if [ $COUNT -gt 0 ]; then
             AVG=$(( (TOTAL + COUNT - 1) / COUNT )) # Round up to avoid truncation
+            echo "Average coverage: $AVG%"
             echo "AVERAGE_COVERAGE=$AVG" >> $GITHUB_ENV
           else
-            echo "No coverage files found"
+            echo "Error: No valid coverage files found"
             exit 1
           fi
         shell: bash
