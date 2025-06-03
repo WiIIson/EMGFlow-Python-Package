@@ -22,7 +22,7 @@ A collection of functions for finding outliers while testing.
 # =============================================================================
 #
 
-def detect_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
+def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
     """
     Looks at all Signals contained in a filepath, returns a dictionary of file
     names and locations that have outliers.

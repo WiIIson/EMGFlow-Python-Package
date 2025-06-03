@@ -26,6 +26,9 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
     """
     Generate a shiny dashboard of different processing stages for a given
     column.
+    
+    'CTRL + C' can be entered in the terminal to end the display of the
+    dashboard and resume code execution.
 
     Parameters
     ----------
