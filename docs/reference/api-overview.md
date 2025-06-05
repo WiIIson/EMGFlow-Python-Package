@@ -48,13 +48,13 @@ The "manual" mode is designed for processing individual files. In these function
 
 For more information, see the documentation for the [access_files module](./access-files.md).
 
-### `detect_outliers` Module
+### `handle_outliers` Module
 
 It can be useful to look for outliers in EMG data to identify which filters need to be applied. While filter parameters can typically be determined by looking at a signal, in a large dataset it can be tiresome to look through every file.
 
-The `detect_outliers` function helps by using a frequency-domain anomaly detection algorithm. This helps identify which files may need additional processing, as well as determine if there is a pattern to which files contain outliers.
+The `detect_spectral_outliers` function helps by using a frequency-domain anomaly detection algorithm. This helps identify which files may need additional processing, as well as determine if there is a pattern to which files contain outliers.
 
-For more information, see the documentation for the [detect_outliers module](./detect-outliers.md).
+For more information, see the documentation for the [handle_outliers module](./handle-outliers.md).
 
 ### `preprocess_signals` Module
 
