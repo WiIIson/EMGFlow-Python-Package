@@ -12,7 +12,7 @@ These functions extract features from the sEMG signal, capturing information in 
 mindmap
     root((EMGFlow))
         AF(Access Files)
-        DO(Detect Outliers)
+        HO(Handle Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)

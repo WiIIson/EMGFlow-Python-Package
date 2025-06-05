@@ -1,4 +1,4 @@
-# `detect_outliers` Module
+# `handle_outliers` Module
 
 These functions help detect signal files that contain outliers. This helps for workflows involving batch processing of files, where it might be harder to determine if there are any patterns, or specific files that need additional filters applied.
 
@@ -8,14 +8,14 @@ These functions help detect signal files that contain outliers. This helps for w
 mindmap
     root((EMGFlow))
         AF(Access Files)
-        DO(Detect Outliers)
-            detect_outliers
+        HO(Handle Outliers)
+            detect_spectral_outliers
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
 ```
 
-## `detect_outliers`
+## `detect_spectral_outliers`
 
 **Description:**
 
@@ -24,7 +24,7 @@ Analyzes signal files and returns a dictionary of file names and locations that 
 Works by interpolating an inverse function from the peaks of the signal's spectrum. The function then calculates the 'metric' aggregate of the differences between the predicted spectrum intensity of the inverse function, and the actual spectrum intensity of the peaks. Finally, if the largest difference between the predicted and actual values is greater than the metric average multiplied by the threshold value, the file is flagged for having an outlier and is added to the dictionary.
 
 ```python
-detect_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metirc=np.median, expression=None, window_size=200, file_ext='csv')
+detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metirc=np.median, expression=None, window_size=200, file_ext='csv')
 ```
 
 **Parameters:**
@@ -95,5 +95,5 @@ path_names = EMGFlow.make_paths()
 sr = 2000
 threshold = 5
 
-outliers = EMGFlow.detect_outliers(path_names['Notch'], sr, threshold)
+outliers = EMGFlow.detect_spectral_outliers(path_names['Notch'], sr, threshold)
 ```

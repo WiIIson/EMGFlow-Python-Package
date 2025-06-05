@@ -8,7 +8,7 @@ These functions help visualize individual, or large batches of signal data. This
 mindmap
     root((EMGFlow))
         AF(Access File)
-        DO(Detect Outliers)
+        HO(Handle Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
             plot_dashboard
@@ -24,6 +24,8 @@ Creates an HTML dashboard from a `path_names` filepath dictionary (see `make_pat
 The visualization is created in the default browser, and is opened automatically. The function will automatically create plots for any paths provided in the dictionary, using the keys as the legend.
 
 Each filepath in the dictionary is expected to contain the same named files to display them at the different stages. To avoid error, the `plot_dashboard` ignores the 'Feature' filepath.
+
+When the dashboard runs, the terminal will pause to host the visualization. To resume normal execution, enter 'CTRL + C'.
 
 ```python
 plot_dashboard(path_names, col, units, expression=None, file_ext='csv', autorun=True)

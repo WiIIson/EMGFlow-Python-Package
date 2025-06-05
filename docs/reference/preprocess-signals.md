@@ -8,7 +8,7 @@ These functions clean sEMG signals prior to their use in feature extraction. Sig
 mindmap
     root((EMGFlow))
         AF(File Access)
-        DO(Detect Outliers)
+        HO(Handle Outliers)
         PrS(Preprocess Signals)
             emg_to_psd
             apply_notch_filters

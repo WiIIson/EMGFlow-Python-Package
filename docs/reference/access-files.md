@@ -14,7 +14,7 @@ mindmap
             map_files
             convert_map_files
             map_files_fuse
-        DO(Detect Outliers)
+        HO(Handle Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
