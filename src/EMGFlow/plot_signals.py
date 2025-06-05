@@ -2,7 +2,7 @@ import re
 import matplotlib.pyplot as plt
 import webbrowser
 
-from shiny import App, render, ui
+from shiny import App, render, ui, reactive
 
 import nest_asyncio
 nest_asyncio.apply()
@@ -114,7 +114,8 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
         ui.layout_sidebar(
             ui.sidebar(
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
-                ui.input_select('file_type', 'File:', choices=df['File'])
+                ui.input_select('file_type', 'File:', choices=df['File']),
+                ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1])
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
@@ -129,10 +130,31 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
     # Server definition
     # =================
     def server(input, output, session):
+        @reactive.effect
+        def update_x_slider():
+            filename = input.file_type()
+            column = input.sig_type()
+        
+            if column == 'All':
+                max_x = max(
+                    read_file_type(file_loc, file_ext)['Time'].max()
+                    for file_loc in list(df.loc[filename])[1:]
+                )
+            else:
+                file_location = df.loc[filename][column]
+                sigDF = read_file_type(file_location, file_ext)
+                max_x = sigDF['Time'].max()
+        
+            ui.update_slider("x_range", max=max_x, value=[0, max_x])
+
+
+        
         @render.plot
         def plt_signal():
             filename = input.file_type()
             column = input.sig_type()
+            x_min, x_max = input.x_range()  # Get slider values
+
             
             # Plot data
             fig, ax = plt.subplots()
@@ -163,7 +185,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
                 # Plot file
                 ax.plot(sigDF['Time'], sigDF[col], color=colours[len(names) - i], alpha=0.5, linewidth=1)
                 
-            
+            ax.set_xlim(x_min, x_max)
             ax.set_ylabel('Voltage (mV)')
             ax.set_xlabel('Time (s)')
             ax.set_title(column + ' filter: ' + filename)
