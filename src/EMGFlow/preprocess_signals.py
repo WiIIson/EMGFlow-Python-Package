@@ -123,6 +123,8 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
+        An exception is raised if 'col' contains NaN values.
+    Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
@@ -135,9 +137,15 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
 
     """
 
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
+    
+    # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
 
@@ -174,9 +182,10 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         """
         
         Signal = Signal.copy()
-        
         (Hz, Q) = notch
         
+        # An exception is raised if a Hz value in 'notch_vals' is greater than
+        # sampling_rate/2 or less than 0.
         if Hz > sampling_rate / 2 or Hz < 0:
             raise Exception("Notch filter frequency must be between 0 and " + str(sampling_rate / 2) + " (sampling_rate/2)")
         
@@ -241,6 +250,9 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     Exception
         An exception is raised if any column in 'cols' is not found in any of
         the Signal files read.
+    Exception
+        An exception is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
@@ -342,12 +354,14 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'col' contains NaN values.
     Exception
-        An exception is raised if 'high' is not higher than 'low'.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if 'high' or 'low' are higher than 1/2 of
         'sampling_rate'.
+    Exception
+        An exception is raised if 'high' is not higher than 'low'.
 
     Returns
     -------
@@ -356,15 +370,24 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
 
     """
     
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal.")
     
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
+    
+    # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
     
+    # An exception is raised if 'high' or 'low' are higher than 1/2 of
+    # 'sampling_rate'.
     if high > sampling_rate/2 or low > sampling_rate/2:
         raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
     
+    # An exception is raised if 'high' is not higher than 'low'.
     if high <= low:
         raise Exception("'high' must be higher than 'low'.")
     
@@ -420,6 +443,9 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     Exception
         An exception is raised if any column in 'cols' is not found in any of
         the Signal files read.
+    Exception
+        An exception is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
@@ -515,6 +541,8 @@ def apply_fwr(Signal, col):
     ------
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' contains NaN values.
 
     Returns
     -------
@@ -523,8 +551,13 @@ def apply_fwr(Signal, col):
 
     """
     
+    # An exception is raised if 'col' is not a column of 'Signals'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
+        
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
     
     fwr_Signal = Signal.copy()
     fwr_Signal[col] = np.abs(fwr_Signal[col])
@@ -555,7 +588,9 @@ def apply_boxcar_smooth(Signal, col, window_size):
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not found in 'Signal'.
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     
@@ -566,19 +601,27 @@ def apply_boxcar_smooth(Signal, col, window_size):
 
     """
     
+    # A warning is raised if 'window_size' is greater than the length of
+    # 'Signal'.
     if window_size > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
+    
+    # An exception is raised if 'window_size' is less or equal to 0.
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
         
     
     boxcar_Signal = Signal.copy()
-    
     boxcar_Signal = apply_fwr(boxcar_Signal, col)
+    
     # Construct kernel
     window = np.ones(window_size) / float(window_size)
     # Convolve
@@ -610,7 +653,9 @@ def apply_rms_smooth(Signal, col, window_size):
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not found in 'Signal'.
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
 
@@ -621,12 +666,20 @@ def apply_rms_smooth(Signal, col, window_size):
 
     """
     
+    # A warning is raised if 'window_size' is greater than the length of
+    # 'Signal'.
     if window_size > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
+        
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
     
+    # An exception is raised if 'window_size' is less or equal to 0.
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
@@ -668,7 +721,9 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not found in 'Signal'.
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
 
@@ -684,12 +739,20 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
         r = range(-int(n/2), int(n/2)+1)
         return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
     
+    # A warning is raised if 'window_size' is greater than the length of
+    # 'Signal'.
     if window_size > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + (col) + " not in Signal")
     
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
+    
+    # An exception is raised if 'window_size' is less or equal to 0.
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
@@ -727,7 +790,9 @@ def apply_loess_smooth(Signal, col, window_size):
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not found in 'Signal'.
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
 
@@ -738,12 +803,20 @@ def apply_loess_smooth(Signal, col, window_size):
 
     """
     
+    # A warning is raised if 'window_size' is greater than the length of
+    # 'Signal'.
     if window_size > len(Signal.index):
         warnings.warn("Warning: Selected window size is greater than Signal file.")
     
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
+    # An exception is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        raise Exception("NaN values found in column: " + str(col))
+    
+    # An exception is raised if 'window_size' is less or equal to 0.
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
@@ -811,6 +884,9 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
     Exception
         An exception is raised if any column in 'cols' is not found in any of
         the Signal files read.
+    Exception
+        An exception is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception

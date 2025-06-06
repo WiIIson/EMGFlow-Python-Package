@@ -232,3 +232,10 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
                 outliers[file] = file_dirs[file]
                 
     return outliers
+
+#
+# =============================================================================
+#
+
+def screen_artifacts(in_path, out_path, sampling_rate, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+    pass
