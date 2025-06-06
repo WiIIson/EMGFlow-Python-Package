@@ -59,7 +59,7 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
         raise Exception("sig_vals must be a column of the dataframe, not the entire dataframe.")
     
     # An exception is raised if 'sig_vals' contains NaN values.
-    if pd.NaN in sig_vals:
+    if np.nan in sig_vals:
         raise Exception("NaN values found.")
     
     if sampling_rate <= 0:
