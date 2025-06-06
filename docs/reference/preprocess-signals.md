@@ -57,6 +57,8 @@ emg_to_psd(sig_vals, sampling_rate=1000, normalize=True)
 
 An exception is raised if `sig_vals` is a `pd.DataFrame`, not a column of a dataframe.
 
+An exception is raised if `sig_vals` contains 'NaN' values.
+
 An exception is raised if `sampling_rate` is less or equal to 0.
 
 ### Returns
@@ -107,6 +109,8 @@ apply_notch_filters(Signal, col, sampling_rate, notch_vals)
 **Raises**
 
 An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `col` contains 'NaN' values.
 
 An exception is raised if `sampling_rate` is less or equal to 0.
 
@@ -178,6 +182,8 @@ notch_filter_signals(in_path, out_path, sampling_rate, notch_vals, cols=None, ex
 Raises a warning if no files in `in_path` match with `expression`.
 
 An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if any column in `cols` in any of the Signal files read contain 'NaN' values.
 
 An exception is raised if `sampling_rate` is less or equal to 0.
 
@@ -256,6 +262,8 @@ apply_bandpass_filter(Signal, col, sampling_rate, low=20, high=450)
 
 An exception is raised if `col` is not a column of `Signal`.
 
+An exception is raised if `col` contains 'NaN' values.
+
 An exception is raised if `sampling_rate` is less or equal to 0.
 
 An exception is raised if `high` is not higher than `low`.
@@ -320,7 +328,7 @@ These values can also be set manually for specific needs. There is some disagree
 - Upper frequency limit of the bandpass filter. The default is 450Hz.
 
 `cols`: str, optional (None)
-- List of columns of the Signal to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time'.
+- List of columns of the signal to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time'.
 
 `expression`: str, optional (None)
 - A regular expression. If provided, will only filter files whose names match the regular expression. The default is None.
@@ -336,6 +344,8 @@ These values can also be set manually for specific needs. There is some disagree
 A warning is raised if no files in `in_path` match with `expression`.
 
 An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if any column in `cols` in any of the signal files read contain 'NaN' values.
 
 An exception is raised if `sampling_rate` is less or equal to 0.
 
@@ -400,6 +410,8 @@ apply_fwr(Signal, col)
 
 An exception is raised if 'col' is not a column of 'Signal'.
 
+An exception is raised if 'col' contains 'NaN' values.
+
 **Returns**
 
 `fwr_Signal`: pd.DataFrame
@@ -454,6 +466,8 @@ $$
 A warning is raised if `window_size` is greater than the length of `Signal`.
 
 An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `col` contains 'NaN' values.
 
 An exception is raised if `window_size` is less or equal to 0.
 
@@ -513,6 +527,8 @@ $$
 A warning is raised if `window_size` is greater than the length of `Signal`.
 
 An exception is raised if `col` is not found in `Signal`.
+
+An exception is raised if `col` contains 'NaN' values.
 
 An exception is raised if `window_size` is less or equal to 0.
 
@@ -577,6 +593,8 @@ A warning is raised if `window_size` is greater than the length of `Signal`.
 
 An exception is raised if `col` is not found in `Signal`.
 
+An exception is raised if `col` contains 'NaN' values.
+
 An exception is raised if `window_size` is less or equal to 0.
 
 **Returns**
@@ -639,6 +657,8 @@ $$
 A warning is raised if `window_size` is greater than the length of `Signal`.
 
 An exception is raised if `col` is not found in `Signal`.
+
+An exception is raised if `col` contains 'NaN' values.
 
 An exception is raised if `window_size` is less or equal to 0.
 
@@ -719,6 +739,8 @@ A warning is raised if `expression` does not match with any files.
 An exception is raised if an invalid smoothing method is used. Valid methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
 
 An exception is raised if any column in `cols` is not found in any of the signal files read.
+
+An exception is raised if any column in `cols` in any of the signal files read contain 'NaN' values.
 
 An exception is raised if `window_size` is less or equal to 0.
 
