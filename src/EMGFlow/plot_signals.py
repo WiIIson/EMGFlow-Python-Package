@@ -140,12 +140,17 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
                     read_file_type(file_loc, file_ext)['Time'].max()
                     for file_loc in list(df.loc[filename])[1:]
                 )
+                min_x = min(
+                    read_file_type(file_loc, file_ext)['Time'].min()
+                    for file_loc in list(df.loc[filename])[1:]
+                )
             else:
                 file_location = df.loc[filename][column]
                 sigDF = read_file_type(file_location, file_ext)
                 max_x = sigDF['Time'].max()
+                min_x = sigDF['Time'].min()
         
-            ui.update_slider("x_range", max=max_x, value=[0, max_x])
+            ui.update_slider("x_range", min=min_x, max=max_x, value=[min_x, max_x])
 
 
         
