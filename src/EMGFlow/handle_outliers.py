@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
-import scipy.optimize
+import scipy
+import scipy.interpolate
+import scipy.signal
+import scipy.stats
 import os
 import re
 import warnings
-from scipy.signal import argrelextrema
 from tqdm import tqdm
 
 from .preprocess_signals import emg_to_psd
@@ -195,7 +197,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima
-                psd['max'] = psd.iloc[argrelextrema(psd['Power'].values, np.greater_equal, order=window_size)[0]]['Power']
+                psd['max'] = psd.iloc[scipy.signal.argrelextrema(psd['Power'].values, np.greater_equal, order=window_size)[0]]['Power']
                 
                 # Filter non-maxima
                 maxima = psd[psd['max'].notnull()]
@@ -237,5 +239,64 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
 # =============================================================================
 #
 
-def screen_artifacts(in_path, out_path, sampling_rate, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def apply_screen_artifacts(Signal, col, method='robust', interpolation='pchip', maxgap=100):
+    
+    # An exception is raised if 'col' is not a column of 'Signal'.
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + str(col) + " not in Signal")
+    
+    # An exception is raised if 'Signal' does not have a 'Time' column
+    if 'Time' not in list(Signal.columns.values):
+        raise Exception('Signal is missing a "Time" column.')
+    
+    Signal = Signal.copy()
+    
+    Signal = Signal.set_index('Time')
+    
+    # 1. Identify outliers
+    if method=='robust':
+        high = np.nanmedian(Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(Signal[col], nan_policy='omit'))
+        low = np.nanmedian(Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(Signal[col], nan_policy='omit'))
+    elif method=='normal':
+        high = np.nanmean(Signal[col]) + 5*np.nanstd(Signal[col])
+        low = np.nanmean(Signal[col]) - 5*np.nanstd(Signal[col])
+    else:
+        raise Exception('Invalid outlier detection method chosen: ' + str(method) + ', use "robust" or "normal"')
+    
+    # 2. Set outliers to NaN
+    Signal.loc[(Signal[col] < low) | (Signal[col] > high), col] = np.nan
+    
+    # 3. Gap fill with interpolation method
+    if interpolation=='pchip':
+        
+        valid_index = Signal[col].dropna().index.astype(float)
+        valid_values = Signal[col].dropna().values
+        
+        if len(valid_index) < 2:
+            raise Exception('Not enough valid points for PCHIP interpolation.')
+        else:
+            pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values)
+            Signal[col] = Signal[col].combine_first(pd.Series(pchip(Signal.index.astype(float)), index=Signal.index))
+        
+    elif interpolation=='spline':
+        
+        valid_index = Signal[col].dropna().index.astype(float)
+        valid_values = Signal[col].dropna().values
+        
+        if len(valid_index) < 4:
+            raise Exception('Not enough valid points for cubic spline interpolation')
+        else:
+            cs = scipy.interpolate.CubicSpline(valid_index, valid_values)
+            Signal[col] = Signal[col].combine_first(pd.Series(cs(Signal.index.astype(float)), index=Signal.index))
+        
+    else:
+        raise Exception('Invalid interpolation method chosen: ' + str(interpolation), ', use "pchip" or "spline"')
+    
+    return Signal
+
+#
+# =============================================================================
+#
+
+def screen_artifacts_signals():
     pass

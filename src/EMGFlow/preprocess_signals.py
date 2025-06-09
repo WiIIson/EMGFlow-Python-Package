@@ -952,7 +952,7 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
                 elif method == 'loess':
                     data = apply_loess_smooth(data, col, window_size)
                 else:
-                    raise Exception('Invalid smoothing method used: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
+                    raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
