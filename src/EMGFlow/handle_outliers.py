@@ -363,5 +363,57 @@ def apply_screen_artifacts(Signal, col, method='robust', interpolation='pchip', 
 # =============================================================================
 #
 
-def screen_artifacts_signals():
-    pass
+def screen_artifacts_signals(in_path, out_path, method='robust', interpolation='pchip', maxgap=100, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                if 'Time' in cols:
+                    cols.remove('Time')
+            
+            # Apply artifact screening to columns
+            for col in cols:
+                data = apply_screen_artifacts(data, col, method=method, interpolation=interpolation, maxgap=maxgap)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+    
+    return
