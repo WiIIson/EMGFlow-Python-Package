@@ -72,7 +72,7 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
     # Calculate minimum frequency given sampling rate
     min_frequency = (2 * sampling_rate) / (N / 2)
     
-    # Calculate window size givern sampling rate
+    # Calculate window size given sampling rate
     nperseg = int((2 / min_frequency) * sampling_rate)
     nfft = nperseg * 2
     
