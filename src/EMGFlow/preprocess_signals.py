@@ -147,10 +147,6 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
-    # An exception is raised if 'col' contains NaN values.
-    if Signal[col].isnull().values.any():
-        raise Exception("NaN values found in column: " + str(col))
-    
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
@@ -199,9 +195,23 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         nyq_freq = sampling_rate / 2
         norm_Hz = Hz / nyq_freq
         
+        # Check for NaN - warn and remove if found
+        if Signal[col].isnull().values.any():
+            warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        
+        # Find indices of NaN values
+        nan_ind = np.isnan(Signal[col])
+        
+        # Remove NaN values
+        filtered_signal = Signal[col][~nan_ind]
+        
         # Use scipy notch filter using normalized frequency
         b, a = scipy.signal.iirnotch(norm_Hz, Q)
-        SignalCol = scipy.signal.lfilter(b, a, Signal[col])
+        filtered_signal = scipy.signal.lfilter(b, a, filtered_signal)
+        
+        # Reinsert NaN values
+        SignalCol = np.full_like(Signal[col], np.nan)
+        SignalCol[~nan_ind] = filtered_signal
         
         return SignalCol
     
