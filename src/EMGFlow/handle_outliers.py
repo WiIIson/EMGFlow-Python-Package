@@ -239,7 +239,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
 # =============================================================================
 #
 
-def apply_screen_artifacts(Signal, col, method='robust', interpolation='pchip', maxgap=100):
+def apply_fill_missing(Signal, col, method='robust', interpolation='pchip', maxgap=100):
     """
     Removes outlier artifacts from a column of the provided data. Works in two
     stages:
@@ -363,7 +363,7 @@ def apply_screen_artifacts(Signal, col, method='robust', interpolation='pchip', 
 # =============================================================================
 #
 
-def screen_artifacts_signals(in_path, out_path, method='robust', interpolation='pchip', maxgap=100, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def fill_missing_signals(in_path, out_path, method='robust', interpolation='pchip', maxgap=100, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     
     if expression is not None:
         try:
@@ -398,7 +398,7 @@ def screen_artifacts_signals(in_path, out_path, method='robust', interpolation='
             
             # Apply artifact screening to columns
             for col in cols:
-                data = apply_screen_artifacts(data, col, method=method, interpolation=interpolation, maxgap=maxgap)
+                data = apply_fill_missing(data, col, method=method, interpolation=interpolation, maxgap=maxgap)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
