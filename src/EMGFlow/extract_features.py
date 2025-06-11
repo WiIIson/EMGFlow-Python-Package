@@ -512,97 +512,6 @@ def calc_ap(Signal, col):
 # =============================================================================
 #
 
-def calc_spec_flux(Signal1, diff, col, sampling_rate, diff_sr=None):
-    """
-    Calculate the spectral flux of a Signal.
-
-    Parameters
-    ----------
-    Signal1 : pd.DataFrame
-        A Pandas dataframe containing a 'Time' column, and additional columns
-        for signal data.
-    diff : float, pd.DataFrame
-        The divisor of the calculation. If a percentage is provided, it will
-        calculate the spectral flux of the percentage of the Signal with one
-        minus the percentage of the Signal.
-    col : str
-        Column of 'Signal1' the feature is calculated from. If a second signal
-        is provided for 'diff', a column of the same name should be available
-        for use.
-    sampling_rate : float
-        Sampling rate of the Signal.
-    diff_sr : float, optional
-        Sampling rate for the second Signal if provided. The default is None,
-        in which case if a second Signal is provided, the sampling rate is
-        assumed to be the same as the first.
-
-    Raises
-    ------
-    Exception
-        An exception is raised if 'col' is not a column of 'Signal1'.
-    Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
-    Exception
-        An exception is raised if 'diff' is a float, but isn't between 0 and 1.
-    Exception
-        An exception is raised if 'diff' is a dataframe and does not contain
-        'col'.
-    Exception
-        An exception is raised if 'diff_sr' is less or equal to 0.
-    Exception
-        An exception is raised if 'diff' is an invalid data type.
-
-    Returns
-    -------
-    flux : float
-        Spectral flux of the Signal.
-
-    """
-    
-    if col not in list(Signal1.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal1")
-        
-    if sampling_rate <= 0:
-        raise Exception("Sampling rate cannot be 0 or negative")
-    
-    # Separate Signal1 by div and find spectral flux
-    if isinstance(diff, float):
-        if diff >= 1 or diff <= 0:
-            raise Exception("diff must be a float between 0 and 1")
-        
-        # Find column divider index
-        diff_ind = int(len(Signal1[col]) * diff)
-        # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col][:diff_ind], sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(Signal1[col][diff_ind:], sampling_rate=sampling_rate)
-        # Calculate the spectral flux
-        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
-        
-    # Find spectral flux of Signal1 by div
-    elif isinstance(diff, pd.DataFrame):
-        if col not in list(diff.columns.values):
-            raise Exception("Column " + str(col) + " not in diff")
-        
-        # If no second sampling rate, assume same sampling rate as first Signal
-        if diff_sr == None: diff_sr = sampling_rate
-        
-        if diff_sr <= 0:
-            raise Exception("Sampling rate cannot be 0 or negative")
-        # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col], sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(diff[col], sampling_rate=diff_sr)
-        # Calculate the spectral flux
-        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
-    
-    else:
-        raise Exception("Invalid data type given for diff: " + str(type(diff)))
-    
-    return flux
-
-#
-# =============================================================================
-#
-
 def calc_mdf(psd):
     """
     Calculate the Median Frequency (MDF) of a PSD.
@@ -851,9 +760,9 @@ def calc_sc(psd):
 # =============================================================================
 #
 
-def calc_sf(psd):
+def calc_sflt(psd):
     """
-    Calculate the Spectral Flatness (SF) of a PSD.
+    Calculate the Spectral Flatness (SFlt) of a PSD.
 
     Parameters
     ----------
@@ -879,6 +788,97 @@ def calc_sf(psd):
     N = psd.shape[0]
     SF = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
     return SF
+
+#
+# =============================================================================
+#
+
+def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
+    """
+    Calculate the Spectral Flux (SFlx) of a PSD.
+
+    Parameters
+    ----------
+    Signal1 : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
+        for signal data.
+    diff : float, pd.DataFrame
+        The divisor of the calculation. If a percentage is provided, it will
+        calculate the spectral flux of the percentage of the Signal with one
+        minus the percentage of the Signal.
+    col : str
+        Column of 'Signal1' the feature is calculated from. If a second signal
+        is provided for 'diff', a column of the same name should be available
+        for use.
+    sampling_rate : float
+        Sampling rate of the Signal.
+    diff_sr : float, optional
+        Sampling rate for the second Signal if provided. The default is None,
+        in which case if a second Signal is provided, the sampling rate is
+        assumed to be the same as the first.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if 'col' is not a column of 'Signal1'.
+    Exception
+        An exception is raised if 'sampling_rate' is less or equal to 0.
+    Exception
+        An exception is raised if 'diff' is a float, but isn't between 0 and 1.
+    Exception
+        An exception is raised if 'diff' is a dataframe and does not contain
+        'col'.
+    Exception
+        An exception is raised if 'diff_sr' is less or equal to 0.
+    Exception
+        An exception is raised if 'diff' is an invalid data type.
+
+    Returns
+    -------
+    flux : float
+        Spectral flux of the Signal.
+
+    """
+    
+    if col not in list(Signal1.columns.values):
+        raise Exception("Column " + str(col) + " not in Signal1")
+        
+    if sampling_rate <= 0:
+        raise Exception("Sampling rate cannot be 0 or negative")
+    
+    # Separate Signal1 by div and find spectral flux
+    if isinstance(diff, float):
+        if diff >= 1 or diff <= 0:
+            raise Exception("diff must be a float between 0 and 1")
+        
+        # Find column divider index
+        diff_ind = int(len(Signal1[col]) * diff)
+        # Take the PSD of each signal
+        psd1 = emg_to_psd(Signal1[col][:diff_ind], sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1[col][diff_ind:], sampling_rate=sampling_rate)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
+        
+    # Find spectral flux of Signal1 by div
+    elif isinstance(diff, pd.DataFrame):
+        if col not in list(diff.columns.values):
+            raise Exception("Column " + str(col) + " not in diff")
+        
+        # If no second sampling rate, assume same sampling rate as first Signal
+        if diff_sr == None: diff_sr = sampling_rate
+        
+        if diff_sr <= 0:
+            raise Exception("Sampling rate cannot be 0 or negative")
+        # Take the PSD of each signal
+        psd1 = emg_to_psd(Signal1[col], sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(diff[col], sampling_rate=diff_sr)
+        # Calculate the spectral flux
+        flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
+    
+    else:
+        raise Exception("Invalid data type given for diff: " + str(type(diff)))
+    
+    return flux
 
 #
 # =============================================================================
@@ -1187,7 +1187,6 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         'LOG',
         'MFL',
         'AP',
-        'Spectral_Flux',
         
         # Spectral features
         'Max_Freq',
@@ -1199,6 +1198,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         'Twitch_Slope_Slow',
         'Spec_Centroid',
         'Spec_Flatness',
+        'Spec_Flux',
         'Spec_Spread',
         'Spec_Decrease',
         'Spec_Entropy',
@@ -1270,7 +1270,6 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 AP = calc_ap(data_s, col)
     
                 # Calculate spectral features
-                Spectral_Flux = calc_spec_flux(data_s, 0.5, col, sampling_rate)
                 psd = emg_to_psd(data_b[col], sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 MDF = calc_mdf(psd)
@@ -1279,7 +1278,8 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 Twitch_Index = calc_twitch_index(psd)
                 Fast_Twitch_Slope, Slow_Twitch_Slope = calc_twitch_slope(psd)
                 Spectral_Centroid = calc_sc(psd)
-                Spectral_Flatness = calc_sf(psd)
+                Spectral_Flatness = calc_sflt(psd)
+                Spectral_Flux = calc_sflx(data_b, 0.5, col, sampling_rate)
                 Spectral_Spread = calc_ss(psd)
                 Spectral_Decrease = calc_sd(psd)
                 Spectral_Entropy = calc_se(psd)
@@ -1307,7 +1307,6 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                     LOG,
                     MFL,
                     AP,
-                    Spectral_Flux,
                     
                     Max_Freq,
                     MDF,
@@ -1318,6 +1317,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                     Slow_Twitch_Slope,
                     Spectral_Centroid,
                     Spectral_Flatness,
+                    Spectral_Flux,
                     Spectral_Spread,
                     Spectral_Decrease,
                     Spectral_Entropy,
