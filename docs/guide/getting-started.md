@@ -48,6 +48,7 @@ As an example, here is the first few rows of some sample data included in the pa
 | 50.0015 | -0.118713 | -0.101929 |
 | 50.0020 | -0.118103 | -0.104675 |
 | 50.0025 | -0.104370 | -0.097656 |
+| ...     | ...       | ...       |
 
 The "Time" column can generally be omitted when the sampling rate is known, though some functions require a "Time" column.
 
