@@ -182,24 +182,15 @@ class TestSimple(unittest.TestCase):
         SC = EMGFlow.calc_sc(PSD)
         self.assertIsInstance(SC, float)
     
-    def test_calc_sf(self):
-        pathNames = EMGFlow.make_paths()
-        EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
-        Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
-        SF = EMGFlow.calc_sf(PSD)
-        self.assertIsInstance(SF, float)
-    
     def test_calc_sflt(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
-        SS = EMGFlow.calc_sflt(PSD)
-        self.assertIsInstance(SS, float)
-
+        SF = EMGFlow.calc_sflt(PSD)
+        self.assertIsInstance(SF, float)
+    
     def test_calc_sflx(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
@@ -207,6 +198,15 @@ class TestSimple(unittest.TestCase):
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         specFlux = EMGFlow.calc_sflx(Signal, 0.5, 'EMG_zyg', 2000)
         self.assertIsInstance(specFlux, float)
+    
+    def test_calc_ss(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.make_sample_data(pathNames)
+        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        Signal = EMGFlow.read_file_type(filePath, 'csv')
+        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        SS = EMGFlow.calc_ss(PSD)
+        self.assertIsInstance(SS, float)
     
     def test_calc_sd(self):
         pathNames = EMGFlow.make_paths()
