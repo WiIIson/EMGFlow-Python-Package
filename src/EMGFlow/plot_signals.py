@@ -81,6 +81,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
     """
     
     # Remove feature path, and convert dictionary to lists
+    path_names = path_names.copy()
     path_names.pop("Feature", None)
     in_paths = list(path_names.values())
     names = list(path_names.keys())
