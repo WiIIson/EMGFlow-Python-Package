@@ -18,7 +18,7 @@ class TestSimple(unittest.TestCase):
         cols = ['EMG_zyg', 'EMG_cor']
         EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], samplingRate, [(50, 5)], cols)
         EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], samplingRate, 20, 140, cols)
-        EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], 50, cols)
+        EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], 2000, 50, cols)
 
 #
 # =============================================================================
