@@ -1,4 +1,5 @@
 import scipy
+import itertools
 import pandas as pd
 import numpy as np
 import os
@@ -104,7 +105,7 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
 # =============================================================================
 #
 
-def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
+def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0):
     """
     Apply a list of notch filters for given frequencies and Q-factors to a
     column of the provided data.
@@ -123,6 +124,11 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter).
+    min_gap_ms : float
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part.
 
     Raises
     ------
@@ -146,6 +152,10 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
+        
+    # A warning is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -179,7 +189,7 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
 
         Returns
         -------
-        SignalCol : pd.Series
+        notch_signal_col : pd.Series
             A Pandas series of the provided column with the notch filter
             applied.
 
@@ -187,6 +197,13 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         
         Signal = Signal.copy()
         (Hz, Q) = notch
+        
+        if Signal[col].isnull().values.any():
+            raise Exception("NaN values were detected in the dataframe.")
+        
+        # An exception is raised if 'col' is not a column of 'Signal'.
+        if col not in list(Signal.columns.values):
+            raise Exception("Column " + str(col) + " not in Signal")
         
         # An exception is raised if a Hz value in 'notch_vals' is greater than
         # sampling_rate/2 or less than 0.
@@ -197,31 +214,58 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals):
         nyq_freq = sampling_rate / 2
         norm_Hz = Hz / nyq_freq
         
-        # Check for NaN - warn and remove if found
-        if Signal[col].isnull().values.any():
-            warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
-        
-        # Find indices of NaN values
-        nan_ind = np.isnan(Signal[col])
-        
         # Remove NaN values
-        filtered_signal = Signal[col][~nan_ind]
+        notch_signal_col = Signal[col]
         
         # Use scipy notch filter using normalized frequency
         b, a = scipy.signal.iirnotch(norm_Hz, Q)
-        filtered_signal = scipy.signal.lfilter(b, a, filtered_signal)
+        notch_signal_col = scipy.signal.lfilter(b, a, notch_signal_col)
         
-        # Reinsert filtered values
-        SignalCol = np.full_like(Signal[col], np.nan)
-        SignalCol[~nan_ind] = filtered_signal
-        
-        return SignalCol
+        return notch_signal_col
     
     notch_Signal = Signal.copy()
     
-    # Applies apply_notch_filter for every notch_val tuple
-    for i in range(len(notch_vals)):
-        notch_Signal[col] = apply_notch_filter(notch_Signal, col, sampling_rate, notch_vals[i])
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    
+    # Construct list of NaN locations
+    data = notch_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = notch_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply notch filters to each value sequence set sequences that are too
+    # small to NaN
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            for notch_val in notch_vals:
+                filtered_section = apply_notch_filter(masked_data.loc[val_ind:val_ind+val_len].copy(), col, sampling_rate, notch_val)
+                masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+    
+    # Put masked_data back in notch_Signal
+    notch_Signal.loc[min_nan_mask, col] = masked_data[col]
         
     return notch_Signal
 
@@ -267,8 +311,8 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     Warning
         Raises a warning if no files in 'in_path' match with 'expression'.
     Warning
-        A warning is raised if any column in 'cols' in any of the signal files
-        read contain NaN values.
+        A warning is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
     Exception
         An exception is raised if any column in 'cols' is not found in any of
         the signal files read.
@@ -349,7 +393,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
 # =============================================================================
 #
 
-def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
+def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0):
     """
     Apply a bandpass filter to a Signal for a given lower and upper limit.
 
@@ -366,6 +410,11 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
         Lower frequency limit of the bandpass filter.
     high : float
         Upper frequency limit of the bandpass filter.
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
 
     Raises
     ------
@@ -392,6 +441,10 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal.")
     
+    # A warning is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+    
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
@@ -407,23 +460,47 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high):
     
     band_Signal = Signal.copy()
     
-    # Check for NaN - warn and remove if found
-    if band_Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
-        
-    # Find indices of NaN values
-    nan_ind = np.isnan(band_Signal[col])
-        
-    # Remove NaN values
-    filtered_signal = band_Signal[col][~nan_ind]
-        
-    # Here, the "5" is the order of the butterworth filter
-    # (how quickly the signal is cut off)
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    
+    # Construct list of NaN locations
+    data = band_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = band_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply notch filters to each value sequence set sequences that are too
+    # small to NaN
     b, a = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band')
-    filtered_signal = scipy.signal.lfilter(b, a, filtered_signal)
-        
-    # Reinsert filtered values
-    band_Signal[col][~nan_ind] = filtered_signal
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len, col].copy())
+            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+    
+    # Put masked_data back in band_Signal
+    band_Signal.loc[min_nan_mask, col] = masked_data[col]
     
     return band_Signal
 
@@ -468,6 +545,9 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     ------
     Warning
         A warning is raised if no files in 'in_path' match with 'expression'.
+    Warning
+        A warning is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
     Exception
         An exception is raised if any column in 'cols' is not found in any of
         the Signal files read.
@@ -595,7 +675,7 @@ def apply_fwr(Signal, col):
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal, col, window_size):
+def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
     """
     Apply a boxcar smoothing filter to a Signal. Uses a rolling average with a
     window size.
@@ -607,8 +687,15 @@ def apply_boxcar_smooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of 'Signal' the filter is applied to.
+    sampling_rate : float
+        Sampling rate of 'Signal'.
     window_size : int, float
         Size of the window of the filter.
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
     
     Raises
     ------
@@ -647,18 +734,47 @@ def apply_boxcar_smooth(Signal, col, window_size):
     
     boxcar_Signal = apply_fwr(Signal, col)
     
-    # Find indices of NaN values
-    nan_ind = np.isnan(boxcar_Signal[col])
-    # Remove NaN values
-    filtered_signal = boxcar_Signal[col][~nan_ind]
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Construct kernel
+    # Construct list of NaN locations
+    data = boxcar_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = boxcar_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply notch filters to each value sequence set sequences that are too
+    # small to NaN
     window = np.ones(window_size) / float(window_size)
-    # Convolve
-    filtered_signal = np.convolve(filtered_signal, window, 'same')
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
     
-    # Reinsert filtered values
-    boxcar_Signal[col][~nan_ind] = filtered_signal
+    # Put masked_data back in boxcar_Signal
+    boxcar_Signal.loc[min_nan_mask, col] = masked_data[col]
     
     return boxcar_Signal
 
@@ -666,7 +782,7 @@ def apply_boxcar_smooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal, col, window_size):
+def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
     """
     Apply an RMS smoothing filter to a Signal. Uses a rolling average with a
     window size.
@@ -678,16 +794,23 @@ def apply_rms_smooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of 'Signal' the filter is applied to.
+    sampling_rate : float
+        Sampling rate of 'Signal'.
     window_size : int, float
         Size of the window of the filter.
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
 
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
+    Warning
+        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -719,21 +842,47 @@ def apply_rms_smooth(Signal, col, window_size):
     
     rms_Signal = Signal.copy()
     
-    # Find indices of NaN values
-    nan_ind = np.isnan(rms_Signal[col])
-    # Remove NaN values
-    filtered_signal = rms_Signal[col][~nan_ind]
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Square
-    filtered_signal = np.power(filtered_signal, 2)
-    # Construct kernel
+    # Construct list of NaN locations
+    data = rms_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = rms_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply notch filters to each value sequence set sequences that are too
+    # small to NaN
     window = np.ones(window_size) / float(window_size)
-    # Convolve and square root
-    filtered_signal = np.sqrt(np.convolve(filtered_signal, window, 'same'))
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section = np.sqrt(np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy() ** 2, window, 'same'))
+            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
     
-    # Reinsert filtered values
-    rms_Signal[col][~nan_ind] = filtered_signal
-    
+    # Put masked_data back in rms_Signal
+    rms_Signal.loc[min_nan_mask, col] = masked_data[col]
     
     return rms_Signal
 
@@ -741,7 +890,7 @@ def apply_rms_smooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
+def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_gap_ms=30.0):
     """
     Apply a Gaussian smoothing filter to a Signal. Uses a rolling average with
     a window size.
@@ -753,11 +902,18 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
         for signal data.
     col : str
         Column of 'Signal' the filter is applied to.
+    sampling_rate : float
+        Sampling rate of 'Signal'.
     window_size : int, float
         Size of the window of the filter.
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.
-
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
+        
     Raises
     ------
     Warning
@@ -800,18 +956,47 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
     
     gauss_Signal = apply_fwr(Signal, col)
     
-    # Find indices of NaN values
-    nan_ind = np.isnan(gauss_Signal[col])
-    # Remove NaN values
-    filtered_signal = gauss_Signal[col][~nan_ind]
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Construct kernel
+    # Construct list of NaN locations
+    data = gauss_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = gauss_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply gaussian filters to each value sequence set sequences that are too
+    # small to NaN
     window = get_gauss(window_size, sigma)
-    # Convolve
-    filtered_signal = np.convolve(filtered_signal, window, 'same')
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
     
-    # Reinsert filtered values
-    gauss_Signal[col][~nan_ind] = filtered_signal
+    # Put masked_data back in gauss_Signal
+    gauss_Signal.loc[min_nan_mask, col] = masked_data[col]
     
     return gauss_Signal
 
@@ -819,7 +1004,7 @@ def apply_gaussian_smooth(Signal, col, window_size, sigma=1):
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal, col, window_size):
+def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
     """
     Apply a Loess smoothing filter to a Signal. Uses a rolling average with a
     window size and tri-cubic weight.
@@ -831,14 +1016,23 @@ def apply_loess_smooth(Signal, col, window_size):
         for signal data.
     col : str
         Column of 'Signal' the filter is applied to.
+    sampling_rate : float
+        Sampling rate of 'Signal'.
     window_size : int, float
         Size of the window of the filter.
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
 
     Raises
     ------
     Warning
         A warning is raised if 'window_size' is greater than the length of
         'Signal'.
+    Warning
+        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -862,6 +1056,7 @@ def apply_loess_smooth(Signal, col, window_size):
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
+    # A warning is raised if 'col' contains NaN values.
     if Signal[col].isnull().values.any():
         warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
     
@@ -871,20 +1066,49 @@ def apply_loess_smooth(Signal, col, window_size):
     
     loess_Signal = apply_fwr(Signal, col)
     
-    # Find indices of NaN values
-    nan_ind = np.isnan(loess_Signal[col])
-    # Remove NaN values
-    filtered_signal = loess_Signal[col][~nan_ind]
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Construct kernel
+    # Construct list of NaN locations
+    data = loess_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = loess_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Apply loess filters to each value sequence set sequences that are too
+    # small to NaN
     window = np.linspace(-1,1,window_size+1,endpoint=False)[1:]
     window = np.array(list(map(lambda x: (1 - np.abs(x) ** 3) ** 3, window)))
     window = window / np.sum(window)
-    # Convolve
-    filtered_signal = np.convolve(filtered_signal, window, 'same')
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
     
-    # Reinsert filtered values
-    loess_Signal[col][~nan_ind] = filtered_signal
+    # Put masked_data back in loess_Signal
+    loess_Signal.loc[min_nan_mask, col] = masked_data[col]
     
     return loess_Signal
 
@@ -892,7 +1116,7 @@ def apply_loess_smooth(Signal, col, window_size):
 # =============================================================================
 #
 
-def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', sigma=1):  
+def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', min_gap_ms=30.0, sigma=1):  
     """
     Apply smoothing filters to all Signals in a folder. Writes filtered Signals
     to an output folder, and generates a file structure matching the input
@@ -905,6 +1129,8 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
         Filepath to a directory to read Signal files.
     out_path : str
         Filepath to an output directory.
+    sampling_rate : float
+        Sampling rate of the signal files.
     window_size : int, float
         Size of the window of the filter.
     cols : list-str, optional
@@ -924,6 +1150,11 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
     method : str, optional
         The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or
         'loess'. The default is 'rms'.
+    min_gap_ms : float, optional
+        Minimum length of time (in ms) for missing data. Segments of missing
+        data less than this threshold are ignored in the filter calculation,
+        and segments greater than this are used to divide the data, with the
+        filter applied to each part. The default is 30.
     sigma: float, optional
         The value of sigma used for a Gaussian filter. Only affects output when
         using Gaussian filtering.
@@ -994,13 +1225,13 @@ def smooth_filter_signals(in_path, out_path, window_size, cols=None, expression=
             # Apply filter to columns
             for col in cols:
                 if method == 'rms':
-                    data = apply_rms_smooth(data, col, window_size)
+                    data = apply_rms_smooth(data, col, sampling_rate, window_size)
                 elif method == 'boxcar':
-                    data = apply_boxcar_smooth(data, col, window_size)
+                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size)
                 elif method == 'gauss':
-                    data = apply_gaussian_smooth(data, col, window_size, sigma)
+                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma)
                 elif method == 'loess':
-                    data = apply_loess_smooth(data, col, window_size)
+                    data = apply_loess_smooth(data, col, sampling_rate, window_size)
                 else:
                     raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
@@ -1070,5 +1301,5 @@ def clean_signals(path_names, sampling_rate=2000):
     # Automatically runs through workflow
     notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch)
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], window_size)
+    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate, window_size)
     return
