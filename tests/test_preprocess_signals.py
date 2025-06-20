@@ -62,33 +62,33 @@ class TestSimple(unittest.TestCase):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        SSignal = EMGFlow.apply_boxcar_smooth(Signal, 'EMG_zyg', 50)
+        SSignal = EMGFlow.apply_boxcar_smooth(Signal, 'EMG_zyg', 2000, 50)
         self.assertIsInstance(SSignal, pd.DataFrame)
     
     def test_apply_rms_smooth(self):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        SSignal = EMGFlow.apply_rms_smooth(Signal, 'EMG_zyg', 50)
+        SSignal = EMGFlow.apply_rms_smooth(Signal, 'EMG_zyg', 2000, 50)
         self.assertIsInstance(SSignal, pd.DataFrame)
     
     def test_apply_gaussian_smooth(self):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        SSignal = EMGFlow.apply_gaussian_smooth(Signal, 'EMG_zyg', 50)
+        SSignal = EMGFlow.apply_gaussian_smooth(Signal, 'EMG_zyg', 2000, 50)
         self.assertIsInstance(SSignal, pd.DataFrame)
     
     def test_apply_loess_smooth(self):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        SSignal = EMGFlow.apply_loess_smooth(Signal, 'EMG_zyg', 50)
+        SSignal = EMGFlow.apply_loess_smooth(Signal, 'EMG_zyg', 2000, 50)
         self.assertIsInstance(SSignal, pd.DataFrame)
     
     def test_smooth_filter_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.smooth_filter_signals(pathNames['Raw'], pathNames['Smooth'], 50)
+        EMGFlow.smooth_filter_signals(pathNames['Raw'], pathNames['Smooth'], 2000, 50)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
     
     def test_clean_signals(self):
