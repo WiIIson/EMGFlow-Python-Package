@@ -24,7 +24,7 @@ class TestSimple(unittest.TestCase):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         self.assertIsInstance(PSD, pd.DataFrame)
     
     def test_apply_notch_filters(self):

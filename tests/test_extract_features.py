@@ -131,7 +131,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         MDF = EMGFlow.calc_mdf(PSD)
         self.assertIsInstance(MDF, float)
     
@@ -140,7 +140,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         MNF = EMGFlow.calc_mnf(PSD)
         self.assertIsInstance(MNF, float)
     
@@ -149,7 +149,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchRatio = EMGFlow.calc_twitch_ratio(PSD)
         self.assertIsInstance(twitchRatio, float)
     
@@ -158,7 +158,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchIndex = EMGFlow.calc_twitch_index(PSD)
         self.assertIsInstance(twitchIndex, float)
     
@@ -167,7 +167,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchSlope = EMGFlow.calc_twitch_slope(PSD)
         self.assertIsInstance(twitchSlope, tuple)
         self.assertIsInstance(twitchSlope[0], float)
@@ -178,7 +178,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SC = EMGFlow.calc_sc(PSD)
         self.assertIsInstance(SC, float)
     
@@ -187,7 +187,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SF = EMGFlow.calc_sflt(PSD)
         self.assertIsInstance(SF, float)
     
@@ -204,7 +204,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SS = EMGFlow.calc_ss(PSD)
         self.assertIsInstance(SS, float)
     
@@ -213,7 +213,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SD = EMGFlow.calc_sd(PSD)
         self.assertIsInstance(SD, float)
     
@@ -222,7 +222,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SE = EMGFlow.calc_se(PSD)
         self.assertIsInstance(SE, float)
     
@@ -231,7 +231,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SR = EMGFlow.calc_sr(PSD)
         self.assertIsInstance(SR, float)
     
@@ -240,7 +240,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        PSD = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
+        PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SBW = EMGFlow.calc_sbw(PSD)
         self.assertIsInstance(SBW, float)
     

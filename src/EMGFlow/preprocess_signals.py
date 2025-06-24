@@ -21,15 +21,18 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
+def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0):
     """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).
 
     Parameters
     ----------
-    sig_vals : list-float
-        A list of float values. A column of a signal datframe.
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
+        for signal data.
+    col : str
+        Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'sig_vals'. This is the number of entries recorded per
         second, or the inverse of the difference between entries.
@@ -56,48 +59,84 @@ def emg_to_psd(sig_vals, sampling_rate=1000, normalize=True):
     
     """
     
-    if isinstance(sig_vals, pd.DataFrame):
-        raise Exception("sig_vals must be a column of the dataframe, not the entire dataframe.")
-    
-    # An exception is raised if 'sig_vals' contains NaN values.
-    if np.nan in sig_vals:
-        raise Exception("NaN values found.")
+    # An exception is raised if 'col' is not a column of 'Signal'.
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + str(col) + " not in Signal")
     
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0")
     
-    # Initial parameters
-    sig_vals = sig_vals - np.mean(sig_vals)
-    N = len(sig_vals)
+    PSD_Signal = Signal.copy()
     
-    # Calculate minimum frequency given sampling rate
-    min_frequency = (2 * sampling_rate) / (N / 2)
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Calculate window size given sampling rate
-    nperseg = int((2 / min_frequency) * sampling_rate)
-    nfft = nperseg * 2
+    # Construct list of NaN locations
+    data = PSD_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
-    # Apply welch method with hanning window
-    frequency, power = scipy.signal.welch(
-        sig_vals,
-        fs=sampling_rate,
-        scaling='density',
-        detrend=False,
-        nfft=nfft,
-        average='mean',
-        nperseg=nperseg,
-        window='hann'
-    )
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data))
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len] = False
     
-    # Normalize if set to true
-    if normalize is True:
-        power /= np.max(power)
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = PSD_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Make a PSD from every segment
+    PSDs = []
+    for i in range(len(val_sequences)):
+        (val_ind, val_len) = val_sequences[i]
+        temp_dat = masked_data.loc[val_ind:val_ind+val_len].copy()
         
-    # Create dataframe of results
-    psd = pd.DataFrame({'Frequency': frequency, 'Power': power})
-    # Filter given 
-    psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency,
-                                   psd['Frequency'] <= np.inf)]
+        N = len(temp_dat)
+        min_frequency = (2 * sampling_rate) / (N / 2)
+        nperseg = int((2 / min_frequency) * sampling_rate)
+        nfft = nperseg * 2
+        
+        if val_len >= min_gap:
+            # Apply welch method with hanning window
+            frequency, power = scipy.signal.welch(
+                temp_dat[col],
+                fs=sampling_rate,
+                scaling='density',
+                detrend=False,
+                nfft=nfft,
+                average='mean',
+                nperseg=nperseg,
+                window='hann'
+            )
+            
+            # Normalize if set to true
+            if normalize is True:
+                power /= np.max(power)
+    
+            # Create dataframe of results
+            psd = pd.DataFrame({'Frequency': frequency, 'Power' + str(i): power})
+            
+            PSDs.append(psd)
+            
+    psd = PSDs[0]
+    for i in range(1, len(PSDs)):
+        psd = pd.merge(psd, PSDs[i], on='Frequency', how='outer')
+        
+    # Final cleaning for psd
+    psd = psd.fillna(0)
+    psd['Power'] = psd.drop(columns='Frequency').mean(axis=1)
+    psd = psd[['Frequency', 'Power']]
+    psd = psd.sort_values(by='Frequency')
     
     return psd
 

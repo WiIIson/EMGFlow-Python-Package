@@ -56,7 +56,7 @@ def calc_iemg(Signal, col, sampling_rate):
     if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be less or equal to 0.")
     
-    IEMG = np.sum(np.abs(Signal[col]) * sampling_rate)
+    IEMG = np.nansum(np.abs(Signal[col]) * sampling_rate)
     return IEMG
 
 #
@@ -854,8 +854,8 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col][:diff_ind], sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(Signal1[col][diff_ind:], sampling_rate=sampling_rate)
+        psd1 = emg_to_psd(Signal1[:diff_ind], col, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1[diff_ind:], col, sampling_rate=sampling_rate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
@@ -870,8 +870,8 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
         if diff_sr <= 0:
             raise Exception("Sampling rate cannot be 0 or negative")
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1[col], sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(diff[col], sampling_rate=diff_sr)
+        psd1 = emg_to_psd(Signal1, col, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(diff, col, sampling_rate=diff_sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
@@ -1270,7 +1270,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 AP = calc_ap(data_s, col)
     
                 # Calculate spectral features
-                psd = emg_to_psd(data_b[col], sampling_rate=sampling_rate)
+                psd = emg_to_psd(data_b, col, sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 MDF = calc_mdf(psd)
                 MNF = calc_mnf(psd)
