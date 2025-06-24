@@ -193,7 +193,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
                 if col not in list(data.columns.values):
                     raise Exception("Column " + str(col) + " is not in 'Signal': " + str(file))
                 
-                psd = emg_to_psd(data[col], sampling_rate=sampling_rate)
+                psd = emg_to_psd(data, col, sampling_rate=sampling_rate)
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima
