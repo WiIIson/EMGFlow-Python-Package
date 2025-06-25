@@ -99,7 +99,7 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0)
     PSDs = []
     for i in range(len(val_sequences)):
         (val_ind, val_len) = val_sequences[i]
-        temp_dat = masked_data.loc[val_ind:val_ind+val_len].copy()
+        temp_dat = masked_data.iloc[val_ind:val_ind+val_len].copy()
         
         N = len(temp_dat)
         min_frequency = (2 * sampling_rate) / (N / 2)
