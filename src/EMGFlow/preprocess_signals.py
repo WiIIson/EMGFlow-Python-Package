@@ -110,7 +110,7 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0)
         if val_len >= min_gap:
             # Apply welch method with hanning window
             frequency, power = scipy.signal.welch(
-                temp_dat[col],
+                temp_dat[col].to_numpy(),
                 fs=sampling_rate,
                 scaling='density',
                 detrend=False,
