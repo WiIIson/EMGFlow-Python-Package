@@ -24,7 +24,7 @@ A collection of functions for extracting features.
 
 def calc_iemg(Signal, col, sampling_rate):
     """
-    Calculate the Integreated EMG (IEMG) of a Signal.
+    Calculate the Integreated EMG (IEMG) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -56,7 +56,10 @@ def calc_iemg(Signal, col, sampling_rate):
     if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be less or equal to 0.")
     
-    IEMG = np.nansum(np.abs(Signal[col]) * sampling_rate)
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    IEMG = np.nansum(np.abs(col_vals) * sampling_rate)
     return IEMG
 
 #
@@ -65,7 +68,7 @@ def calc_iemg(Signal, col, sampling_rate):
 
 def calc_mav(Signal, col):
     """
-    Calculate the Mean Absolute Value (MAV) of a Signal.
+    Calculate the Mean Absolute Value (MAV) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -90,8 +93,11 @@ def calc_mav(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal")
     
-    N = len(Signal[col])
-    MAV = np.sum(np.abs(Signal[col])) / N
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    MAV = np.sum(np.abs(col_vals)) / N
     return MAV
 
 #
@@ -100,7 +106,8 @@ def calc_mav(Signal, col):
 
 def calc_mmav1(Signal, col):
     """
-    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a Signal.
+    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a Signal. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -125,8 +132,11 @@ def calc_mmav1(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    vals = list(np.abs(Signal[col]))
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    vals = list(np.abs(col_vals))
     total = 0
     for n in range(N):
         if (0.25*N <= n) and (n <= 0.75*N):
@@ -142,7 +152,8 @@ def calc_mmav1(Signal, col):
 
 def calc_mmav2(Signal, col):
     """
-    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a Signal.
+    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a Signal. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -167,8 +178,11 @@ def calc_mmav2(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    vals = list(np.abs(Signal[col]))
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    vals = list(np.abs(col_vals))
     total = 0
     for n in range(N):
         if (0.25*N <= n) and (n <= 0.75*N):
@@ -186,7 +200,7 @@ def calc_mmav2(Signal, col):
 
 def calc_ssi(Signal, col, sampling_rate):
     """
-    Calculate the Simple Square Integreal (SSI) of a Signal.
+    Calculate the Simple Square Integreal (SSI) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -218,7 +232,10 @@ def calc_ssi(Signal, col, sampling_rate):
     if sampling_rate <= 0:
         raise Exception("Sampling rate cannot be 0 or negative")
     
-    SSI = np.sum((np.abs(Signal[col]) * sampling_rate) ** 2)
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    SSI = np.sum((np.abs(col_vals) * sampling_rate) ** 2)
     return SSI
 
 #
@@ -227,7 +244,7 @@ def calc_ssi(Signal, col, sampling_rate):
 
 def calc_var(Signal, col):
     """
-    Calculate the Variance (VAR) of a Signal.
+    Calculate the Variance (VAR) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -252,8 +269,11 @@ def calc_var(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    VAR = 1/(N - 1) * np.sum(Signal[col] ** 2)
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    VAR = 1/(N - 1) * np.sum(col_vals ** 2)
     return VAR
 
 #
@@ -262,7 +282,7 @@ def calc_var(Signal, col):
 
 def calc_vorder(Signal, col):
     """
-    Calculate the V-Order of a Signal.
+    Calculate the V-Order of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -296,7 +316,7 @@ def calc_vorder(Signal, col):
 
 def calc_rms(Signal, col):
     """
-    Calculate the Root Mean Square (RMS) of a Signal.
+    Calculate the Root Mean Square (RMS) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -321,8 +341,11 @@ def calc_rms(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal)
-    RMS = np.sqrt((1/N) * np.sum(Signal[col] ** 2))
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    RMS = np.sqrt((1/N) * np.sum(col_vals ** 2))
     return RMS
 
 #
@@ -331,7 +354,7 @@ def calc_rms(Signal, col):
 
 def calc_wl(Signal, col):
     """
-    Calculate the Waveform Length (WL) of a Signal.
+    Calculate the Waveform Length (WL) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -356,9 +379,11 @@ def calc_wl(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    vals = list(Signal[col])
-    diff = np.array([np.abs(vals[i + 1] - vals[i]) for i in range(N - 1)])
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
     WL = np.sum(diff)
     return WL
 
@@ -368,7 +393,7 @@ def calc_wl(Signal, col):
 
 def calc_wamp(Signal, col, threshold):
     """
-    Calculate the Willison Amplitude (WAMP) of a Signal.
+    Calculate the Willison Amplitude (WAMP) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -395,9 +420,11 @@ def calc_wamp(Signal, col, threshold):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    vals = list(Signal[col])
-    diff = np.array([np.abs(vals[i + 1] - vals[i]) for i in range(N - 1)])
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
     WAMP = np.sum(diff > threshold)
     return WAMP
 
@@ -407,7 +434,7 @@ def calc_wamp(Signal, col, threshold):
 
 def calc_log(Signal, col):
     """
-    Calculate the Log Detector (LOG) of a Signal.
+    Calculate the Log Detector (LOG) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -432,8 +459,11 @@ def calc_log(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    N = len(Signal[col])
-    ex = (1/N) * np.sum(np.log(Signal[col]))
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    ex = (1/N) * np.sum(np.log(col_vals))
     LOG = np.e ** ex
     return LOG
 
@@ -443,7 +473,7 @@ def calc_log(Signal, col):
 
 def calc_mfl(Signal, col):
     """
-    Calculate the Maximum Fractal Length (MFL) of a Signal.
+    Calculate the Maximum Fractal Length (MFL) of a Signal. Ignores NaNs.
 
     Parameters
     ----------
@@ -468,9 +498,11 @@ def calc_mfl(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    vals = Signal[col]
-    N = len(Signal[col])
-    diff = np.array([np.abs(vals[i + 1] - vals[i]) for i in range(N - 1)])
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    N = len(col_vals)
+    diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
     MFL = np.log(np.sqrt(np.sum(diff ** 2)))
     return MFL
 
@@ -480,7 +512,7 @@ def calc_mfl(Signal, col):
 
 def calc_ap(Signal, col):
     """
-    Calculate the Average Power (AP) of a Signal.
+    Calculate the Average Power (AP) of a Signal. Ignores NaNs
 
     Parameters
     ----------
@@ -505,7 +537,10 @@ def calc_ap(Signal, col):
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
-    AP = np.sum(Signal[col] ** 2) / len(Signal[col])
+    # Get valid values
+    col_vals = Signal.dropna()[col].values
+    
+    AP = np.sum(col_vals ** 2) / len(col_vals)
     return AP
 
 #
@@ -514,7 +549,7 @@ def calc_ap(Signal, col):
 
 def calc_mdf(psd):
     """
-    Calculate the Median Frequency (MDF) of a PSD.
+    Calculate the Median Frequency (MDF) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -552,7 +587,7 @@ def calc_mdf(psd):
 
 def calc_mnf(psd):
     """
-    Calculate the Mean Frequency (MNF) of a PSD.
+    Calculate the Mean Frequency (MNF) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -584,7 +619,7 @@ def calc_mnf(psd):
 
 def calc_twitch_ratio(psd, freq=60):
     """
-    Calculate the Twitch Ratio of a PSD.
+    Calculate the Twitch Ratio of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -628,7 +663,7 @@ def calc_twitch_ratio(psd, freq=60):
 
 def calc_twitch_index(psd, freq=60):
     """
-    Calculate the Twitch Index of a PSD.
+    Calculate the Twitch Index of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -672,7 +707,7 @@ def calc_twitch_index(psd, freq=60):
 
 def calc_twitch_slope(psd, freq=60):
     """
-    Calculate the Twitch Slope of a PSD.
+    Calculate the Twitch Slope of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -730,7 +765,7 @@ def calc_twitch_slope(psd, freq=60):
 
 def calc_sc(psd):
     """
-    Calculate the Spectral Centroid (SC) of a PSD.
+    Calculate the Spectral Centroid (SC) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -762,7 +797,7 @@ def calc_sc(psd):
 
 def calc_sflt(psd):
     """
-    Calculate the Spectral Flatness (SFlt) of a PSD.
+    Calculate the Spectral Flatness (SFlt) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -795,7 +830,7 @@ def calc_sflt(psd):
 
 def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
     """
-    Calculate the Spectral Flux (SFlx) of a PSD.
+    Calculate the Spectral Flux (SFlx) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -865,10 +900,11 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
             raise Exception("Column " + str(col) + " not in diff")
         
         # If no second sampling rate, assume same sampling rate as first Signal
-        if diff_sr == None: diff_sr = sampling_rate
-        
-        if diff_sr <= 0:
+        if diff_sr == None:
+            diff_sr = sampling_rate
+        elif diff_sr <= 0:
             raise Exception("Sampling rate cannot be 0 or negative")
+        
         # Take the PSD of each signal
         psd1 = emg_to_psd(Signal1, col, sampling_rate=sampling_rate)
         psd2 = emg_to_psd(diff, col, sampling_rate=diff_sr)
@@ -886,7 +922,7 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
 
 def calc_ss(psd):
     """
-    Calculate the Spectral Spread (SS) of a PSD.
+    Calculate the Spectral Spread (SS) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -919,7 +955,7 @@ def calc_ss(psd):
 
 def calc_sd(psd):
     """
-    Calculate the Spectral Decrease (SDec) of a PSD.
+    Calculate the Spectral Decrease (SDec) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -953,7 +989,7 @@ def calc_sd(psd):
 
 def calc_se(psd):
     """
-    Calculate the Spectral Entropy of a PSD.
+    Calculate the Spectral Entropy of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -986,7 +1022,7 @@ def calc_se(psd):
 
 def calc_sr(psd, percent=0.85):
     """
-    Calculate the Spectral Rolloff of a PSD.
+    Calculate the Spectral Rolloff of a PSD. Ignores NaNs.
 
     Parameters
     ----------
@@ -1035,7 +1071,7 @@ def calc_sr(psd, percent=0.85):
 
 def calc_sbw(psd, p=2):
     """
-    Calculate the Spectral Bandwidth (SBW) of a PSD.
+    Calculate the Spectral Bandwidth (SBW) of a PSD. Ignores NaNs.
 
     Parameters
     ----------
