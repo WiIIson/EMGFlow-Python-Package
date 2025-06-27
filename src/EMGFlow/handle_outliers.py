@@ -239,14 +239,9 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
 # =============================================================================
 #
 
-def apply_fill_missing(Signal, col, method='robust', interpolation='pchip', maxgap=100):
+def screen_artefacts(Signal, col, method='robust'):
     """
-    Removes outlier artifacts from a column of the provided data. Works in two
-    stages:
-        1. Identifies outliers using 'method', sets them to NaN.
-        2. Fills in NaN values using 'interpolation'.
-    
-    Either stage can be skipped by setting the parameter to None.
+    Creates a NaN mask for a column of a signal dataframe.
 
     Parameters
     ----------
@@ -254,42 +249,20 @@ def apply_fill_missing(Signal, col, method='robust', interpolation='pchip', maxg
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        Column of 'Signal' the NaN mask is created from.
     method : str, optional
         The outlier detection method being used. Valid options are 'robust',
         'normal', or None. The default is 'robust'.
-    interpolation : str, optional
-        The interpolation method being used to fill outliers. Valid options are
-        'pchip', 'spline' or None. The default is 'pchip'.
-    maxgap : int, optional
-        The maximum number of NaN values that can be present for the
-        interpolation method to trigger. If more than this number of NaN values
-        are present (including those flagged as outliers), a warning will raise
-        and the interpolation step will be skipped. The default is 100.
 
     Raises
     ------
-    Warning
-        A warning is raised if more than 'maxgap' NaN values are detected in
-        Signal at the interpolation stage.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
-    Exception
-        An exception is raised if 'Time' is not a column of 'Signal'.
-    Exception
-        An exception is raised if 'method' is not a valid outlier detection
-        method.
-    Exception
-        An exception is raised if 'interpolation' is not a valid interpolation
-        method.
-    Exception
-        An exception is raised if not enough valid values are present to
-        perform interpolation.
 
     Returns
     -------
-    Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with the artifact screening applied.
+    masked_Signal : pd.DataFrame
+        A copy of the 'Signal' dataframe with an added column for the NaN mask.
 
     """
     
@@ -297,123 +270,88 @@ def apply_fill_missing(Signal, col, method='robust', interpolation='pchip', maxg
     if col not in list(Signal.columns.values):
         raise Exception("Column " + str(col) + " not in Signal")
     
-    # An exception is raised if 'Signal' does not have a 'Time' column
-    if 'Time' not in list(Signal.columns.values):
-        raise Exception('Signal is missing a "Time" column.')
+    masked_Signal = Signal.copy()
     
-    Signal = Signal.copy()
-    Signal = Signal.set_index('Time')
-    
-    # 1. Identify outlier parameters
+    # Identify outlier parameters
     if method=='robust':
         # Set high and low with robust method
-        high = np.nanmedian(Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(Signal[col], nan_policy='omit'))
-        low = np.nanmedian(Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(Signal[col], nan_policy='omit'))
+        high = np.nanmedian(masked_Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
+        low = np.nanmedian(masked_Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
     elif method=='normal':
         # Set high and low with normal method
-        high = np.nanmean(Signal[col]) + 5*np.nanstd(Signal[col])
-        low = np.nanmean(Signal[col]) - 5*np.nanstd(Signal[col])
+        high = np.nanmean(masked_Signal[col]) + 5*np.nanstd(masked_Signal[col])
+        low = np.nanmean(masked_Signal[col]) - 5*np.nanstd(masked_Signal[col])
     elif method is None:
         pass
     else:
         raise Exception('Invalid outlier detection method chosen: ' + str(method) + ', use "robust", "normal" or None.')
     
-    # 2. Set outliers to NaN
-    Signal.loc[(Signal[col] < low) | (Signal[col] > high), col] = np.nan
+    # Create NaN mask and add to masked_Signal
+    mask = (masked_Signal[col] > low) & (masked_Signal[col] < high) & (~masked_Signal[col].isna())
+    masked_Signal['mask_' + str(col)] = mask
     
-    # 3. Gap fill with interpolation method
-    total_gap = Signal[col].isna.sum()
-    if total_gap > maxgap:
-        warnings.warn("Warning: " + str(total_gap) + " NaN values detected, aborting interpolation.")
+    return masked_Signal
+
+#
+# =============================================================================
+#
+
+def fill_missing_data(Signal, col, method='pchip', use_nan_mask=True):
+    
+    # An exception is raised if 'col' is not a column of 'Signal'.
+    if col not in list(Signal.columns.values):
+        raise Exception('Column "' + str(col) + '" not in Signal')
+    
+    if col == 'Time':
+        raise Exception('Column cannot be "Time".')
+    
+    # An exception is raised if 'Signal' does not have a 'Time' column
+    if 'Time' not in list(Signal.columns.values):
+        raise Exception('Signal is missing a "Time" column.')
+    
+    filled_Signal = Signal.copy()
+    filled_Signal.set_index('Time')
+    
+    # Get valid values
+    if use_nan_mask:
+        # Get valid values from mask filter
+        mask_col = 'mask_' + str(col)
         
-    elif interpolation=='pchip':
+        # Raise an exception if the mask column does not exist
+        if mask_col not in list(filled_Signal.columns.values):
+            raise Exception('Mask column not detected.')
         
-        # Remove NA entries
-        valid_index = Signal[col].dropna().index.astype(float)
-        valid_values = Signal[col].dropna().values
+        mask = filled_Signal[mask_col]
+        valid_values = filled_Signal[mask][col].dropna().values
+        valid_index = filled_Signal[mask][col].dropna().index.astype(float)
+    else:
+        # Get valid values by dropping NaNs
+        valid_values = filled_Signal[col].dropna().values
+        valid_index = filled_Signal[col].dropna().index.astype(float)
+    
+    # Perform interpolation
         
-        if len(valid_index) < 2:
+    if method=='pchip':
+        
+        if len(valid_values) < 2:
             raise Exception('Not enough valid points for PCHIP interpolation.')
         else:
             # Perform interpolation
             pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values)
-            Signal[col] = Signal[col].combine_first(pd.Series(pchip(Signal.index.astype(float)), index=Signal.index))
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal.index.astype(float)), index=filled_Signal.index))
         
-    elif interpolation=='spline':
-        
-        # Remove NA entries
-        valid_index = Signal[col].dropna().index.astype(float)
-        valid_values = Signal[col].dropna().values
+    elif method=='spline':
         
         if len(valid_index) < 4:
             raise Exception('Not enough valid points for cubic spline interpolation')
         else:
             # Perform interpolation
             cs = scipy.interpolate.CubicSpline(valid_index, valid_values)
-            Signal[col] = Signal[col].combine_first(pd.Series(cs(Signal.index.astype(float)), index=Signal.index))
-    
-    elif interpolation is None:
-        pass
-    else:
-        raise Exception('Invalid interpolation method chosen: ' + str(interpolation), ', use "pchip", "spline" or None.')
-    
-    return Signal
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal.index.astype(float)), index=filled_Signal.index))
 
-#
-# =============================================================================
-#
-
-def fill_missing_signals(in_path, out_path, method='robust', interpolation='pchip', maxgap=100, cols=None, expression=None, exp_copy=False, file_ext='csv'):
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
-    
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
-    
-    # Get dictionary of file locations
-    if exp_copy:
-        file_dirs = map_files(in_path, file_ext=file_ext)
     else:
-        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
-        if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
-        
-    # Apply transformations
-    for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
-            
-            # Read file
-            data = read_file_type(file_dirs[file], file_ext)
-            
-            # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
-            
-            # Apply artifact screening to columns
-            for col in cols:
-                data = apply_fill_missing(data, col, method=method, interpolation=interpolation, maxgap=maxgap)
-            
-            # Construct out path
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
-            
-            # Make folders and write data
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
-            
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = read_file_type(file_dirs[file], file_ext)
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(file)]
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
+        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip", "spline" or None.')
     
-    return
+    filled_Signal.reset_index(inplace=True)
+    
+    return filled_Signal
