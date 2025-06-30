@@ -1205,7 +1205,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
-        warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
+        warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
     
     # List of measure names
     measure_names = [
