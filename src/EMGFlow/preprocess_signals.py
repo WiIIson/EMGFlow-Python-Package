@@ -21,7 +21,7 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0):
+def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0, nan_mask=None):
     """
     Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
     used as a Long Term Average Spectrum (LTAS).
@@ -39,6 +39,9 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0)
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
+    min_gap_ms : float, optional
+        
+    mask : pd.Series, optional
 
     Raises
     ------
@@ -71,22 +74,34 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0)
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     
-    # Construct list of NaN locations
-    data = PSD_Signal[col]
-    mask = data.isna()
-    group = (mask != mask.shift()).cumsum()
-    group_sequences = data[mask].groupby(group[mask])
-    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
-    
-    # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
-    for (nan_ind, nan_len) in nan_sequences:
-        if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
-    
-    # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = PSD_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    if nan_mask is None:
+        
+        # Construct list of NaN locations
+        data = PSD_Signal[col]
+        mask = data.isna()
+        group = (mask != mask.shift()).cumsum()
+        group_sequences = data[mask].groupby(group[mask])
+        nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+        
+        # Create NaN mask
+        min_nan_mask = pd.Series([True] * len(data))
+        for (nan_ind, nan_len) in nan_sequences:
+            if nan_len < min_gap:
+                min_nan_mask[nan_ind:nan_ind+nan_len] = False
+        
+        # Use mask to remove small NaN groups, construct list of value locations
+        masked_data = PSD_Signal[min_nan_mask]
+        masked_data = masked_data.copy()
+    else:
+        # Construct masked data from provided nan mask        
+        if not isinstance(nan_mask, pd.Series):
+            raise Exception('NaN mask must be a Pandas series.')
+        
+        if len(nan_mask) != len(PSD_Signal):
+            raise Exception('NaN mask must be the same length as the Signal dataframe.')
+        
+        masked_data = PSD_Signal[nan_mask]
+        masked_data = masked_data.copy()
     
     # Construct list of value locations
     data = masked_data[col]

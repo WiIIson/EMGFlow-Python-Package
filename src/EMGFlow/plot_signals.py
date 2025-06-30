@@ -83,22 +83,40 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
     # Remove feature path, and convert dictionary to lists
     path_names = path_names.copy()
     path_names.pop("Feature", None)
-    in_paths = list(path_names.values())
-    names = list(path_names.keys())
+    
+    # Try to load from "Filled"
+    try:
+        in_paths = list(path_names.values())
+        names = list(path_names.keys())
+        
+        # Convert file paths to directories
+        file_dirs = []
+        for path in in_paths:
+            file_dirs.append(convert_map_files(path))
+        
+        # Convert file directories to data frame
+        df = map_files_fuse(file_dirs, names)
+    
+    # Load without "Filled"
+    except:
+        path_names.pop("Filled", None)
+        
+        in_paths = list(path_names.values())
+        names = list(path_names.keys())
+        
+        # Convert file paths to directories
+        file_dirs = []
+        for path in in_paths:
+            file_dirs.append(convert_map_files(path))
+        
+        # Convert file directories to data frame
+        df = map_files_fuse(file_dirs, names)
     
     if expression is not None:
         try:
             re.compile(expression)
         except:
             raise Exception("Invalid regex expression provided")
-    
-    # Convert file paths to directories
-    file_dirs = []
-    for path in in_paths:
-        file_dirs.append(convert_map_files(path))
-        
-    # Convert file directories to data frame
-    df = map_files_fuse(file_dirs, names)
     
     # Set style
     plt.style.use('fivethirtyeight')
