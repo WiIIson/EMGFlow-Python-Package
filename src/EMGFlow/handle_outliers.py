@@ -239,7 +239,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
 # =============================================================================
 #
 
-def screen_artefacts(Signal, col, method='robust'):
+def apply_screen_artefacts(Signal, col, method='robust'):
     """
     Creates a NaN mask for a column of a signal dataframe.
 
@@ -258,6 +258,8 @@ def screen_artefacts(Signal, col, method='robust'):
     ------
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
 
     Returns
     -------
@@ -296,7 +298,123 @@ def screen_artefacts(Signal, col, method='robust'):
 # =============================================================================
 #
 
-def fill_missing_data(Signal, col, method='pchip', use_nan_mask=True):
+def screen_artefacts_signals(in_path, out_path, sampling_rate, method='robust', cols=None, expression=None, exp_copy=False, file_ext='csv'):
+    """
+    
+
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read signal files.
+    out_path : str
+        Filepath to an output directory.
+    sampling_rate : float
+        Sampling rate of the signal files.
+    method : str, optional
+        The outlier detection method being used. Valid options are 'robust',
+        'normal', or None. The default is 'robust'.
+    cols : list-str, optional
+        List of columns of the signal to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time'.
+    expression : str, optional
+        A regular expression. If provided, will only filter files whose names
+        match the regular expression. The default is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
+
+    Raises
+    ------
+    Warning
+        Raises a warning if no files in 'in_path' match with 'expression'.
+    Warning
+        A warning is raised if any column in 'cols' in any of the Signal
+        files read contain NaN values.
+    Exception
+        An exception is raised if any column in 'cols' is not found in any of
+        the signal files read.
+    Exception
+        An exception is raised if 'sampling_rate' is less or equal to 0.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
+    Exception
+        An exception is raised if a file cannot not be read in 'in_path'.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+    Exception
+        An exception is raised if 'expression' is not None or a valid regular
+        expression.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                if 'Time' in cols:
+                    cols.remove('Time')
+            
+            # Apply filter to columns
+            for col in cols:
+                data = apply_screen_artefacts(data, col, method=method)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+    
+    return
+
+#
+# =============================================================================
+#
+
+def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
     
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
@@ -355,3 +473,62 @@ def fill_missing_data(Signal, col, method='pchip', use_nan_mask=True):
     filled_Signal.reset_index(inplace=True)
     
     return filled_Signal
+
+#
+# =============================================================================
+#
+
+def fill_missing_signals(in_path, out_path, sampling_rate, method='robust', use_nan_mask=True, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                if 'Time' in cols:
+                    cols.remove('Time')
+            
+            # Apply filter to columns
+            for col in cols:
+                data = apply_fill_missing(data, col, method=method, use_nan_mask=use_nan_mask)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(file)]
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+    
+    return

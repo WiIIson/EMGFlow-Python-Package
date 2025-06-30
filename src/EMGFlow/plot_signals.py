@@ -1,5 +1,6 @@
 import re
 import matplotlib.pyplot as plt
+import numpy as np
 import webbrowser
 
 from shiny import App, render, ui, reactive
@@ -191,6 +192,9 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
                     if col not in list(sigDF.columns.values):
                         raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                     
+                    mask_col = 'mask_' + str(col)
+                    if mask_col in list(sigDF.columns.values):
+                        sigDF.loc[~sigDF[mask_col], col] = np.nan
                     
                     ax.plot(sigDF['Time'], sigDF[col], alpha=0.5, linewidth=1)
                 # Set legend for multiple plots
@@ -203,6 +207,10 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', auto
                 # Exception for column input
                 if col not in list(sigDF.columns.values):
                     raise Exception("Column " + str(col) + " not in Signal " + str(filename))
+                
+                mask_col = 'mask_' + str(col)
+                if mask_col in list(sigDF.columns.values):
+                    sigDF.loc[~sigDF[mask_col], col] = np.nan
                 
                 # Get colour data
                 i = (names.index(column) + 1) % len(colours)

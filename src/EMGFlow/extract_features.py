@@ -1180,8 +1180,6 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     if 'Feature' not in path_names:
         raise Exception('Feature path not detected in provided dictionary (path_names)')
     
-    in_bandpass = path_names['Bandpass']
-    in_smooth = path_names['Smooth']
     out_path = path_names['Feature']
     
     if expression is not None:
@@ -1197,8 +1195,15 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     
     # Directories don't have to have the same file structure, but
     # Must have files with the same name
-    file_dirs_b = map_files(in_bandpass, file_ext=file_ext, expression=expression)
-    file_dirs_s = map_files(in_smooth, file_ext=file_ext, expression=expression)
+    file_dirs_b = map_files(path_names['Bandpass'], file_ext=file_ext, expression=expression)
+    
+    if 'Filled' in path_names:
+        try:
+            file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+        except:
+            file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
+            
+    
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
         warnings.warn("Warning: The regular expression " + expression + " did not match with any files.")
     
@@ -1223,6 +1228,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         'LOG',
         'MFL',
         'AP',
+        'Timeseries_Pmissing',
         
         # Spectral features
         'Max_Freq',
@@ -1239,7 +1245,8 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         'Spec_Decrease',
         'Spec_Entropy',
         'Spec_Rolloff',
-        'Spec_Bandwidth'
+        'Spec_Bandwidth',
+        'Spec_Pmissing'
     ]
     
     # Read the first file to get column names
@@ -1282,8 +1289,15 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 File_ID = file_dirs_s[file]
              
             df_vals = [File_ID]
+           
             # Evaluate the measures of each column
             for col in cols:
+                
+                # Use mask if  (smooth mask for both dataframes)
+                mask_col = 'mask_' + str(col)
+                if mask_col in data_s.columns.values:
+                    data_s.loc[~data_s[mask_col], col] = np.nan
+                    data_b.loc[~data_s[mask_col], col] = np.nan
                 
                 # Calculate time-series measures
                 Min = np.min(data_s[col])
@@ -1304,6 +1318,9 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 LOG = calc_log(data_s, col)
                 MFL = calc_mfl(data_s, col)
                 AP = calc_ap(data_s, col)
+                
+                # Calculate time-series percent missing
+                Timeseries_Pmissing = data_s[col].isna().mean()
     
                 # Calculate spectral features
                 psd = emg_to_psd(data_b, col, sampling_rate=sampling_rate)
@@ -1321,6 +1338,9 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 Spectral_Entropy = calc_se(psd)
                 Spectral_Rolloff = calc_sr(psd)
                 Spectral_Bandwidth = calc_sbw(psd, 2)
+                
+                # Calculate spectral percent missing
+                Spectral_Pmissing = data_b[col].isna().mean()
                 
                 # Append to list of values
                 col_vals = [
@@ -1343,6 +1363,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                     LOG,
                     MFL,
                     AP,
+                    Timeseries_Pmissing,
                     
                     Max_Freq,
                     MDF,
@@ -1358,7 +1379,8 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                     Spectral_Decrease,
                     Spectral_Entropy,
                     Spectral_Rolloff,
-                    Spectral_Bandwidth
+                    Spectral_Bandwidth,
+                    Spectral_Pmissing
                 ]
                 
                 df_vals = df_vals + col_vals
