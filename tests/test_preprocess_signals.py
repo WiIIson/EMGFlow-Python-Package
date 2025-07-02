@@ -101,6 +101,18 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000, 2, window_size=15)
         self.assertIsInstance(outliers, dict)
+    
+    def test_apply_screen_artefacts(self):
+        pathNames = EMGFlow.make_paths()
+        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        Signal = EMGFlow.read_file_type(filePath, 'csv')
+        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg')
+        self.assertIsInstance(ASignal, pd.DataFrame)
+    
+    def test_screen_artefact_signals(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'], 2000)
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
 
 #
 # =============================================================================
@@ -109,7 +121,6 @@ class TestSimple(unittest.TestCase):
     def tearDown(self):
         if os.path.exists('./Data') == True:
             shutil.rmtree('./Data')
-        pass
             
 #
 # =============================================================================

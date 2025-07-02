@@ -47,9 +47,7 @@ def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
         
         # Raise an exception if the mask column does not exist
         if mask_col not in list(filled_Signal.columns.values):
-            print(filled_Signal.columns.values)
-            print(mask_col)
-            raise Exception('Mask column not detected.')
+            raise Exception('Mask column not detected for: ' + str(col))
         
         mask = filled_Signal[mask_col]
         valid_values = filled_Signal[mask][col].dropna().values
@@ -120,8 +118,7 @@ def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_n
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
             
             # Apply filter to columns
             for col in cols:
