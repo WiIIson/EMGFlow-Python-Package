@@ -44,12 +44,12 @@ def make_paths(root=None):
     
     # Create dictionary
     path_names = {
-        'Raw':os.path.join(root, 'Raw'),
-        'Notch':os.path.join(root, 'Notch'),
-        'Bandpass':os.path.join(root, 'Bandpass'),
-        'Smooth':os.path.join(root, 'Smooth'),
-        'Feature':os.path.join(root, 'Feature'),
-        'Filled':os.path.join(root, 'Filled')
+        'Raw':os.path.join(root, '1_raw'),
+        'Notch':os.path.join(root, '2_notch'),
+        'Bandpass':os.path.join(root, '3_bandpass'),
+        'Smooth':os.path.join(root, '4_smooth'),
+        'Filled':os.path.join(root, '5_filled'),
+        'Feature':os.path.join(root, '6_feature')
     }
     
     # Create folders
