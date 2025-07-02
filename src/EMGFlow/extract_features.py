@@ -1200,6 +1200,8 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     if 'Filled' in path_names:
         try:
             file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+            if (len(file_dirs_s)) != (len(file_dirs_b)):
+                raise Exception('Filled files not detected...')
         except:
             file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
             
