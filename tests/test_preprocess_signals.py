@@ -96,6 +96,12 @@ class TestSimple(unittest.TestCase):
         EMGFlow.clean_signals(pathNames)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
 
+    def test_detect_outliers(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.make_sample_data(pathNames)
+        outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000, 2, window_size=15)
+        self.assertIsInstance(outliers, dict)
+
 #
 # =============================================================================
 #
