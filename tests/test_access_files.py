@@ -26,10 +26,10 @@ class TestSimple(unittest.TestCase):
     def test_make_sample_data(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '01', 'sample_data_01.csv')))
-        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '01', 'sample_data_02.csv')))
-        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '02', 'sample_data_03.csv')))
-        self.assertTrue(os.path.exists(os.path.join('Data', 'Raw', '02', 'sample_data_04.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Raw'], '01', 'sample_data_02.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Raw'], '02', 'sample_data_03.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Raw'], '02', 'sample_data_04.csv')))
     
     def test_read_file_type(self):
         pathNames = EMGFlow.make_paths()

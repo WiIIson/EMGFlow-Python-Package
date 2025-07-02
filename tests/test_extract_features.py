@@ -253,7 +253,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], samplingRate, 20, 140, cols)
         EMGFlow.smooth_filter_signals(pathNames['Bandpass'], pathNames['Smooth'], 2000, 50, cols)
         EMGFlow.extract_features(pathNames, samplingRate, cols)
-        self.assertTrue(os.path.exists(os.path.join('Data', 'Feature', 'Features.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Feature'], 'Features.csv')))
 
 #
 # =============================================================================
