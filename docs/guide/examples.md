@@ -40,10 +40,41 @@ EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_ra
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
 
 # 3. Apply smoothing filter
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
+EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate, smooth_window, cols)
+
+# 4. Apply artefact screening
+EMGFlow.screen_artefact_signals(path_names['Smooth'], path_names['Filled'], sampling_rate, cols=cols)
+
+# 5. Fill missing data
+EMGFlow.fill_missing_signals(path_names['Filled'], path_names['Filled'], sampling_rate, cols=cols)
 
 # 4. Extract features
 df = EMGFlow.extract_features(path_names, sampling_rate, cols)
+```
+
+### Using Your Own Data Paths
+
+A simple example constructing a custom `path_names` dictionary for predefined data paths.
+
+```python
+import EMGFlow as ef
+
+# PeakAffectDS data
+path_names = {
+    'Raw': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\01_Raw',
+    'Notch': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\02_Notch',
+    'Bandpass': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\03_Bandpass',
+    'Smooth': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\04_Smooth'
+}
+
+# Preprocess signals
+ef.clean_signals(path_names, sampling_rate=2000)
+
+# Plot data on the "EMG_zyg" column
+ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
+
+# Extract features and save results in "Features.csv" in feature_path
+df = ef.extract_features(path_names, sampling_rate=2000)
 ```
 
 ### Working With Individual Files
