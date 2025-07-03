@@ -93,7 +93,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         # Convert file paths to directories
         file_dirs = []
         for path in in_paths:
-            file_dirs.append(convert_map_files(path))
+            file_dirs.append(map_files(path))
         
         # Convert file directories to data frame
         df = map_files_fuse(file_dirs, names)
@@ -108,7 +108,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         # Convert file paths to directories
         file_dirs = []
         for path in in_paths:
-            file_dirs.append(convert_map_files(path))
+            file_dirs.append(map_files(path))
         
         # Convert file directories to data frame
         df = map_files_fuse(file_dirs, names)

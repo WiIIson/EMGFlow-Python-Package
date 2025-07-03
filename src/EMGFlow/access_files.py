@@ -20,9 +20,9 @@ def make_paths(root=None):
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
     
-    Creates 'Raw', 'Notch', 'Bandpass', 'Smooth' and 'Feature' subfolders at a
-    given location. If no path is given, will create a 'Data' folder in the
-    current working directory, with these subfolders inside.
+    Creates 'Raw', 'Notch', 'Bandpass', 'Smooth', 'Filled', and 'Feature'
+    subfolders at a given location. If no path is given, will create a 'Data'
+    folder in the current working directory, with these subfolders inside.
 
     Parameters
     ----------
@@ -71,6 +71,8 @@ def make_sample_data(path_names):
     Creates '01' and '02' folders, which each contain two sample
     data files ('01/sample_data_01.csv', '01/sample_data_02.csv',
     '02/sample_data_03.csv', '02/sample_data_04.csv')
+    
+    The sample data will not be written if it already exists in the folder.
 
     Parameters
     ----------
@@ -91,7 +93,8 @@ def make_sample_data(path_names):
 
     """
     
-    # Check that a 'raw' folder exists
+    # An exception is raised if the provided 'path_names' dictionary doesn't
+    # contain a 'Raw' path key.
     if 'Raw' not in path_names:
         raise Exception('Raw path not detected in path_names.')
     
@@ -102,6 +105,7 @@ def make_sample_data(path_names):
         sample_data_03 = pd.read_csv(importlib_resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_03.csv")))
         sample_data_04 = pd.read_csv(importlib_resources.files("EMGFlow").joinpath(os.path.join("data", "sample_data_04.csv")))
     except:
+        # An exception is raised if the sample data cannot be loaded.
         raise Exception('Failed to load EMGFlow sample data.')
     
     # Write the sample data
@@ -180,15 +184,15 @@ def map_files(in_path, file_ext='csv', expression=None, base=None):
     Parameters
     ----------
     in_path : str
-        The filepath to a directory to read Signal files.
+        The filepath to a directory to read files.
     file_ext : str, optional
         File extension for files to read. The default is 'csv'.
     expression : str, optional
         A regular expression. If provided, will only count files whose names
         match the regular expression. The default is None.
     base : str, optional
-        Path of the root folder the path keys should start from. The default is
-        None. 
+        Path of the root folder the path keys should start from. Used to track
+        the relative path during recursion. The default is None. 
 
     Raises
     ------
@@ -234,75 +238,11 @@ def map_files(in_path, file_ext='csv', expression=None, base=None):
 # =============================================================================
 #
 
-def convert_map_files(file_obj, file_ext='csv', expression=None):
-    """
-    Generate a dictionary of file names and locations from different forms of
-    input.
-
-    Parameters
-    ----------
-    file_obj : str, dict-str
-        The file location object. This can be a string to a file location, or
-        an already formed dictionary of file locations.
-    file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
-    expression : str, optional
-        A regular expression. If provided, will only count files whose names
-        match the regular expression. The default is None.
-
-    Raises
-    ------
-    Exception
-        An exception is raised if 'file_ext' is an unsupported file format.
-    Exception
-        An exception is raised if 'expression' is not None or a valid regular
-        expression.
-
-    Returns
-    -------
-    file_dirs : dict-str
-        A dictionary of file name keys and file path location values.
-    
-    """
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided.")
-    
-    # User provided a path to a folder
-    if type(file_obj) is str:
-        if not os.path.isabs(file_obj):
-            file_obj = os.path.abspath(file_obj)
-        file_dirs = map_files(in_path=file_obj, file_ext=file_ext, expression=expression)
-    # User provided a processed file directory
-    elif type(file_obj) is dict:
-        # If expression is provided, filters the dictionary
-        # for all entries matching it
-        fd = file_obj.copy()
-        if expression != None:
-            for file in fd:
-                if not (re.match(expression, fd[file])):
-                    del fd[file]
-        file_dirs = fd
-    # Provided file location format is unsupported
-    else:
-        raise Exception("Unsupported file location format:", type(file_obj))
-    
-    return file_dirs
-
-#
-# =============================================================================
-#
-
 def map_files_fuse(file_dirs, names):
     """
-    Generate a dictionary of file names and locations from different forms of
-    input. Each directory should contain the same file at different stages with
-    the same name, and will create a dataframe of the location of this file in
-    each of the directories provided.
+    Merge mapped file dictionaries into a single dataframe. Uses 'names' as the
+    column names, and stores the file path to a file in different stages of the
+    processing pipeline.
 
     Parameters
     ----------

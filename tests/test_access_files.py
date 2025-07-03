@@ -43,13 +43,6 @@ class TestSimple(unittest.TestCase):
         filedirs = EMGFlow.map_files(pathNames['Raw'])
         self.assertIsInstance(filedirs, dict)
     
-    def test_convert_map_files(self):
-        pathNames = EMGFlow.make_paths()
-        EMGFlow.make_sample_data(pathNames)
-        filedirs = EMGFlow.convert_map_files(pathNames['Raw'])
-        filedirs = EMGFlow.convert_map_files(filedirs)
-        self.assertIsInstance(filedirs, dict)
-    
     def test_map_files_fuse(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
