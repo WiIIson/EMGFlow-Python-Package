@@ -202,80 +202,18 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
         A copy of the 'Signal' dataframe with the notch filters are applied.
 
     """
-
+    
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
-        
+        raise Exception("Column " + str(col) + " not in Signal.")
+    
     # A warning is raised if 'col' contains NaN values.
     if Signal[col].isnull().values.any():
         warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater or equal to 0")
-
-    def apply_notch_filter(Signal, col, sampling_rate, notch):
-        """
-        Apply a notch filter to a signal.
-
-        Parameters
-        ----------
-        Signal : pd.DataFrame
-            A Pandas dataframe containing a 'Time' column, and additional
-            columns for signal data.
-        col : str
-            Column of 'Signal' the filter is applied to.
-        sampling_rate : float
-            Sampling rate of 'Signal'.
-        notch : tuple
-            Notch filter data. Should be a (Hz, Q) tuple where Hz is the
-            frequency to apply the filter to, and Q. is the Q-score (an
-            intensity score where a higher number means a less extreme filter).
-
-        Raises
-        ------
-        Warning
-            A warning is raised if 'col' contains NaN values.
-        Exception
-            An exception is raised if the Hz value in notch is greater than
-            sampling_rate/2 or less than 0.
-
-        Returns
-        -------
-        notch_signal_col : pd.Series
-            A Pandas series of the provided column with the notch filter
-            applied.
-
-        """
-        
-        Signal = Signal.copy()
-        (Hz, Q) = notch
-        
-        if Signal[col].isnull().values.any():
-            raise Exception("NaN values were detected in the dataframe.")
-        
-        # An exception is raised if 'col' is not a column of 'Signal'.
-        if col not in list(Signal.columns.values):
-            raise Exception("Column " + str(col) + " not in Signal")
-        
-        # An exception is raised if a Hz value in 'notch_vals' is greater than
-        # sampling_rate/2 or less than 0.
-        if Hz > sampling_rate / 2 or Hz < 0:
-            raise Exception("Notch filter frequency must be between 0 and " + str(sampling_rate / 2) + " (sampling_rate/2)")
-        
-        # Normalize filtering frequency
-        nyq_freq = sampling_rate / 2
-        norm_Hz = Hz / nyq_freq
-        
-        # Remove NaN values
-        notch_signal_col = Signal[col]
-        
-        # Use scipy notch filter using normalized frequency
-        b, a = scipy.signal.iirnotch(norm_Hz, Q)
-        notch_signal_col = scipy.signal.lfilter(b, a, notch_signal_col)
-        
-        return notch_signal_col
+        raise Exception("Sampling rate must be greater or equal to 0.")
     
     notch_Signal = Signal.copy()
     
@@ -308,19 +246,24 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
     
     # Apply notch filters to each value sequence set sequences that are too
     # small to NaN
+    nyq_freq = sampling_rate / 2
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
             masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
         else:
-            # Apply filter
-            for notch_val in notch_vals:
-                filtered_section = apply_notch_filter(masked_data.loc[val_ind:val_ind+val_len].copy(), col, sampling_rate, notch_val)
-                masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            # Apply filters
+            for (Hz, Q) in notch_vals:
+                 norm_Hz = Hz / nyq_freq
+                
+                 # Use scipy notch filter using normalized frequency
+                 b, a = scipy.signal.iirnotch(norm_Hz, Q)
+                 filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len, col].copy())
+                 masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
     
-    # Put masked_data back in notch_Signal
+    # Put masked_data back in band_Signal
     notch_Signal.loc[min_nan_mask, col] = masked_data[col]
-        
+    
     return notch_Signal
 
 #
