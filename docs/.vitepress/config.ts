@@ -28,7 +28,7 @@ export default withMermaid({
         text: 'Introduction',
         items: [
           { text: 'What is EMGFlow?', link: '/guide/what-is-emgflow' },
-          { text: 'Getting started', link: '/guide/getting-started' },
+          { text: 'Preprocessing Steps', link: '/guide/preprocessing-steps' },
           { text: 'Examples', link: '/guide/examples' },
           { text: 'About electromyography', link: '/guide/about-emg' },
         ]

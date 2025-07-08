@@ -14,7 +14,7 @@ hero:
       text: What is EMGFlow?
       link: /guide/what-is-emgflow
     - theme: alt
-      text: Processing Steps
+      text: Getting Started
       link: /guide/processing-steps
     - theme: alt
       text: GitHub
