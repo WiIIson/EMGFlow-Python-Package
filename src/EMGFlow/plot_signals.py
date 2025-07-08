@@ -23,7 +23,7 @@ A collection of functions for plotting subject data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=True, auto_run=True):
+def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True):
     """
     Generate a shiny dashboard of different processing stages for a given
     column.
@@ -53,7 +53,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     auto_run : bool, optional
         Boolean controlling behavior of the function. If true (default), will
         automatically run the visual and open it in the default browser. If
-        false, will return the visualization object.
+        false, will return the visualization object. The default is False.
 
     Raises
     ------

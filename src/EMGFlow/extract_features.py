@@ -24,7 +24,7 @@ A collection of functions for extracting features.
 
 def calc_iemg(Signal, col, sampling_rate):
     """
-    Calculate the Integreated EMG (IEMG) of a Signal. Ignores NaNs.
+    Calculate the Integreated EMG (IEMG) of a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def calc_iemg(Signal, col, sampling_rate):
     Returns
     -------
     IEMG : float
-        IEMG of the Signal.
+        The calculated IEMG.
 
     """
     
@@ -68,7 +68,8 @@ def calc_iemg(Signal, col, sampling_rate):
 
 def calc_mav(Signal, col):
     """
-    Calculate the Mean Absolute Value (MAV) of a Signal. Ignores NaNs.
+    Calculate the Mean Absolute Value (MAV) of a column of 'Signal'. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -86,7 +87,7 @@ def calc_mav(Signal, col):
     Returns
     -------
     MAV : float
-        MAV of the Signal.
+        The calculated MAV.
 
     """
     
@@ -106,8 +107,8 @@ def calc_mav(Signal, col):
 
 def calc_mmav1(Signal, col):
     """
-    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a Signal. Ignores
-    NaNs.
+    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a column of
+    'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -125,7 +126,7 @@ def calc_mmav1(Signal, col):
     Returns
     -------
     MMAV1 : float
-        MMAV1 of the Signal.
+        The calculated MMAV1.
 
     """
     
@@ -152,8 +153,8 @@ def calc_mmav1(Signal, col):
 
 def calc_mmav2(Signal, col):
     """
-    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a Signal. Ignores
-    NaNs.
+    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a column of
+    'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -171,7 +172,7 @@ def calc_mmav2(Signal, col):
     Returns
     -------
     MMAV2 : float
-        MMAV2 of the Signal.
+        The calculated MMAV2'.
 
     """
     
@@ -200,7 +201,8 @@ def calc_mmav2(Signal, col):
 
 def calc_ssi(Signal, col, sampling_rate):
     """
-    Calculate the Simple Square Integreal (SSI) of a Signal. Ignores NaNs.
+    Calculate the Simple Square Integral (SSI) of a column of 'Signal'.
+    Ignores NaNs.
 
     Parameters
     ----------
@@ -222,7 +224,7 @@ def calc_ssi(Signal, col, sampling_rate):
     Returns
     -------
     SSI : float
-        SSI of the Signal.
+        The calculated SSI.
 
     """
     
@@ -244,7 +246,7 @@ def calc_ssi(Signal, col, sampling_rate):
 
 def calc_var(Signal, col):
     """
-    Calculate the Variance (VAR) of a Signal. Ignores NaNs.
+    Calculate the Variance (VAR) of a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -262,7 +264,7 @@ def calc_var(Signal, col):
     Returns
     -------
     VAR : float
-        VAR of the Signal.
+        The calculated VAR.
 
     """
     
@@ -282,7 +284,7 @@ def calc_var(Signal, col):
 
 def calc_vorder(Signal, col):
     """
-    Calculate the V-Order of a Signal. Ignores NaNs.
+    Calculate the V-Order of a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -300,7 +302,7 @@ def calc_vorder(Signal, col):
     Returns
     -------
     vOrder : float
-        V-Order of the Signal.
+        The calculated V-Order.
 
     """
     
@@ -316,7 +318,7 @@ def calc_vorder(Signal, col):
 
 def calc_rms(Signal, col):
     """
-    Calculate the Root Mean Square (RMS) of a Signal. Ignores NaNs.
+    Calculate the Root Mean Square (RMS) of a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -334,7 +336,7 @@ def calc_rms(Signal, col):
     Returns
     -------
     RMS : float
-        RMS of the Signal.
+        The calculated RMS.
 
     """
     
@@ -354,7 +356,7 @@ def calc_rms(Signal, col):
 
 def calc_wl(Signal, col):
     """
-    Calculate the Waveform Length (WL) of a Signal. Ignores NaNs.
+    Calculate the Waveform Length (WL) of a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -372,7 +374,7 @@ def calc_wl(Signal, col):
     Returns
     -------
     WL : float
-        WL of the Signal.
+        The calculated WL.
 
     """
     
@@ -393,7 +395,8 @@ def calc_wl(Signal, col):
 
 def calc_wamp(Signal, col, threshold):
     """
-    Calculate the Willison Amplitude (WAMP) of a Signal. Ignores NaNs.
+    Calculate the Willison Amplitude (WAMP) of a column of 'Signal'. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -413,7 +416,7 @@ def calc_wamp(Signal, col, threshold):
     Returns
     -------
     WAMP : int
-        WAMP of the Signal.
+        The calculated WAMP.
 
     """
     
@@ -434,8 +437,8 @@ def calc_wamp(Signal, col, threshold):
 
 def calc_log(Signal, col):
     """
-    Calculate the Log Detector (LOG) of a Signal. Ignores NaNs.
-
+    Calculate the Log Detector (LOG) of a column of 'Signal'. Ignores NaNs.
+    
     Parameters
     ----------
     Signal : pd.DataFrame
@@ -452,7 +455,7 @@ def calc_log(Signal, col):
     Returns
     -------
     LOG : float
-        LOG of the Signal.
+        The calculated LOG.
     
     """
     
@@ -473,7 +476,8 @@ def calc_log(Signal, col):
 
 def calc_mfl(Signal, col):
     """
-    Calculate the Maximum Fractal Length (MFL) of a Signal. Ignores NaNs.
+    Calculate the Maximum Fractal Length (MFL) of a column of 'Signal'. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -491,7 +495,7 @@ def calc_mfl(Signal, col):
     Returns
     -------
     MFL : float
-        MFL of the Signal.
+        The calculated MFL.
 
     """
     
@@ -512,7 +516,7 @@ def calc_mfl(Signal, col):
 
 def calc_ap(Signal, col):
     """
-    Calculate the Average Power (AP) of a Signal. Ignores NaNs
+    Calculate the Average Power (AP) of a column of 'Signal'. Ignores NaNs
 
     Parameters
     ----------
@@ -530,7 +534,7 @@ def calc_ap(Signal, col):
     Returns
     -------
     AP : float
-        AP of the Signal.
+        The calculated AP.
 
     """
     
@@ -549,7 +553,7 @@ def calc_ap(Signal, col):
 
 def calc_mdf(psd):
     """
-    Calculate the Median Frequency (MDF) of a PSD. Ignores NaNs.
+    Calculate the Median Frequency (MDF) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -565,7 +569,7 @@ def calc_mdf(psd):
     Returns
     -------
     med_freq : int, float
-        The MDF of the PSD dataframe provided.
+        The MDF of 'psd'.
     
     """
     
@@ -587,7 +591,7 @@ def calc_mdf(psd):
 
 def calc_mnf(psd):
     """
-    Calculate the Mean Frequency (MNF) of a PSD. Ignores NaNs.
+    Calculate the Mean Frequency (MNF) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -603,7 +607,7 @@ def calc_mnf(psd):
     Returns
     -------
     mean_freq : int, float
-        The MNF of the PSD dataframe provided.
+        The MNF of 'psd'.
     
     """
     
@@ -619,7 +623,7 @@ def calc_mnf(psd):
 
 def calc_twitch_ratio(psd, freq=60):
     """
-    Calculate the Twitch Ratio of a PSD. Ignores NaNs.
+    Calculate the Twitch Ratio of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -640,7 +644,7 @@ def calc_twitch_ratio(psd, freq=60):
     Returns
     -------
     twitch_ratio : float
-        Twitch Ratio of the PSD dataframe provided.
+        Twitch Ratio of 'psd'.
 
     """
     
@@ -663,7 +667,7 @@ def calc_twitch_ratio(psd, freq=60):
 
 def calc_twitch_index(psd, freq=60):
     """
-    Calculate the Twitch Index of a PSD. Ignores NaNs.
+    Calculate the Twitch Index of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -684,7 +688,7 @@ def calc_twitch_index(psd, freq=60):
     Returns
     -------
     twitch_index : float
-        Twitch Index of the PSD dataframe provided.
+        Twitch Index of 'psd'.
 
     """
     
@@ -707,7 +711,7 @@ def calc_twitch_index(psd, freq=60):
 
 def calc_twitch_slope(psd, freq=60):
     """
-    Calculate the Twitch Slope of a PSD. Ignores NaNs.
+    Calculate the Twitch Slope of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -728,9 +732,9 @@ def calc_twitch_slope(psd, freq=60):
     Returns
     -------
     fast_slope : float
-        Twitch Slope of the fast-twitching muscles.
+        Twitch Slope of the fast-twitching muscles of 'psd'.
     slow_slope : float
-        Twitch Slope of the slow-twitching muscles.
+        Twitch Slope of the slow-twitching muscles of 'psd'.
 
     """
     
@@ -765,7 +769,7 @@ def calc_twitch_slope(psd, freq=60):
 
 def calc_sc(psd):
     """
-    Calculate the Spectral Centroid (SC) of a PSD. Ignores NaNs.
+    Calculate the Spectral Centroid (SC) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -781,7 +785,7 @@ def calc_sc(psd):
     Returns
     -------
     SC : float
-        SC of the PSD dataframe provided.
+        SC of 'psd'.
 
     """
     
@@ -797,7 +801,7 @@ def calc_sc(psd):
 
 def calc_sflt(psd):
     """
-    Calculate the Spectral Flatness (SFlt) of a PSD. Ignores NaNs.
+    Calculate the Spectral Flatness (SFlt) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -813,7 +817,7 @@ def calc_sflt(psd):
     Returns
     -------
     SF : float
-        SF of the PSD dataframe provided.
+        SF of 'psd'.
 
     """
     
@@ -830,7 +834,7 @@ def calc_sflt(psd):
 
 def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
     """
-    Calculate the Spectral Flux (SFlx) of a PSD. Ignores NaNs.
+    Calculate the Spectral Flux (SFlx) of 'Signal1'. Ignores NaNs.
 
     Parameters
     ----------
@@ -839,18 +843,19 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
         for signal data.
     diff : float, pd.DataFrame
         The divisor of the calculation. If a percentage is provided, it will
-        calculate the spectral flux of the percentage of the Signal with one
-        minus the percentage of the Signal.
+        calculate the spectral flux of 'Signal1', divided into two different
+        parts (diff and 1-diff). If 'diff' is instead a Pandas dataframe, it
+        will claculate the spectral flux of 'Signal1' and 'diff'.
     col : str
         Column of 'Signal1' the feature is calculated from. If a second signal
         is provided for 'diff', a column of the same name should be available
         for use.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of 'Signal1'.
     diff_sr : float, optional
-        Sampling rate for the second Signal if provided. The default is None,
-        in which case if a second Signal is provided, the sampling rate is
-        assumed to be the same as the first.
+        Sampling rate for 'diff' if it is a dataframe. The default is None,
+        in which case if 'diff' is a dataframe, it is assumed to have the same
+        sampling rate as 'Signal1'.
 
     Raises
     ------
@@ -871,7 +876,7 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
     Returns
     -------
     flux : float
-        Spectral flux of the Signal.
+        Spectral flux of 'Signal1' and 'diff'.
 
     """
     
@@ -922,7 +927,7 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
 
 def calc_ss(psd):
     """
-    Calculate the Spectral Spread (SS) of a PSD. Ignores NaNs.
+    Calculate the Spectral Spread (SS) of a 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -938,7 +943,7 @@ def calc_ss(psd):
     Returns
     -------
     SS : float
-        SS of the PSD dataframe provided.
+        The SS of 'psd'.
 
     """
     
@@ -955,7 +960,7 @@ def calc_ss(psd):
 
 def calc_sd(psd):
     """
-    Calculate the Spectral Decrease (SDec) of a PSD. Ignores NaNs.
+    Calculate the Spectral Decrease (SDec) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -971,7 +976,7 @@ def calc_sd(psd):
     Returns
     -------
     SD : float
-        SDec of the PSD dataframe provided.
+        The SDec of 'psd'.
 
     """
     
@@ -989,7 +994,7 @@ def calc_sd(psd):
 
 def calc_se(psd):
     """
-    Calculate the Spectral Entropy of a PSD. Ignores NaNs.
+    Calculate the Spectral Entropy (SE) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1005,7 +1010,7 @@ def calc_se(psd):
     Returns
     -------
     SE : float
-        Spectral Entropy of the PSD dataframe provided.
+        The SE of 'psd'.
 
     """
     
@@ -1022,7 +1027,7 @@ def calc_se(psd):
 
 def calc_sr(psd, percent=0.85):
     """
-    Calculate the Spectral Rolloff of a PSD. Ignores NaNs.
+    Calculate the Spectral Rolloff (SR) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1043,7 +1048,7 @@ def calc_sr(psd, percent=0.85):
     Returns
     -------
     SRoll : float
-        Spectral Rolloff of the PSD dataframe provided.
+        The SRoll of 'psd'.
 
     """
     
@@ -1071,7 +1076,7 @@ def calc_sr(psd, percent=0.85):
 
 def calc_sbw(psd, p=2):
     """
-    Calculate the Spectral Bandwidth (SBW) of a PSD. Ignores NaNs.
+    Calculate the Spectral Bandwidth (SBW) of 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1092,7 +1097,7 @@ def calc_sbw(psd, p=2):
     Returns
     -------
     SBW : float
-        The SBW of the PSD.
+        The SBW of 'psd'.
 
     """
     
@@ -1112,18 +1117,24 @@ def calc_sbw(psd, p=2):
 
 def extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
-    Analyze Signals by performing a collection of analyses on them and saving a
-    feature file.
+    Extract features from signals by running a series of feature extraction
+    functions and saving the output to a feature file.
     
-    Generates a 'Features.csv' file of the recorded features in the 'Feature'
-    path in 'path_names'. The locations of each file analyzed are used as the
-    keys.
+    Generates a 'Features.csv' file of the recorded data in the 'Feature' path
+    in 'path_names'. The locations of each file analyzed are used as the keys.
+
+    Time-series features are calculated from data in the 'Filled' directory,
+    while Spectral features are calculated from the 'Bandpass' directory.
+
+    For analysis, the 'Filled' directory of 'path_names' is optional for
+    filling missing data and flagging NaN values. If this folder is left empty,
+    data will be read from the 'Smooth' folder instead.
 
     Parameters
     ----------
     path_names : dict-str
         A dictionary of path names for reading data. Required paths are:
-        'Notch', 'Bandpass' and 'Feature'. The dictionary can be created with
+        'Bandpass', 'Smooth' and 'Feature'. The dictionary can be created with
         the 'make_paths' function.
     sampling_rate : float
         Sampling rate for all Signals being read.
@@ -1156,7 +1167,10 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         contain the same files.
     Exception
         An exception is raised if a file cannot not be read in the 'Bandpass'
-        or 'Smooth' filepaths.
+        or 'Smooth'/'Filled' filepaths.
+    Exception
+        An exception is raised if a file does not contain one of the columns
+        from 'cols'.
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
@@ -1204,6 +1218,8 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 raise Exception('Filled files not detected...')
         except:
             file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
+    else:
+        file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:

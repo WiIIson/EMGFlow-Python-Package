@@ -140,6 +140,9 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
             # Create dataframe of results
             psd = pd.DataFrame({'Frequency': frequency, 'Power' + str(i): power})
             
+            # Filter given valid range
+            psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency, psd['Frequency'] <= np.inf)]
+            
             PSDs.append(psd)
             
     psd = PSDs[0]
@@ -151,6 +154,86 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     psd['Power'] = psd.drop(columns='Frequency').mean(axis=1)
     psd = psd[['Frequency', 'Power']]
     psd = psd.sort_values(by='Frequency')
+    
+    return psd
+
+def emg_to_psd_old(sig_vals, sampling_rate=1000, normalize=True):
+    """
+    Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
+    used as a Long Term Average Spectrum (LTAS).
+
+    Parameters
+    ----------
+    sig_vals : list-float
+        A list of float values. A column of a signal datframe.
+    sampling_rate : float
+        Sampling rate of 'sig_vals'. This is the number of entries recorded per
+        second, or the inverse of the difference between entries.
+    normalize : bool, optional
+        If True, will normalize the result. If False, will not. The default is
+        True.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if 'sig_vals' is a pd.DataFrame, not a column of
+        a dataframe.
+    Exception
+        An exception is raised if 'sig_vals' contains NaN values.
+    Exception
+        An exception is raised if 'sampling_rate' is less or equal to 0.
+
+    Returns
+    -------
+    psd : pd.DataFrame
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column indicates the intensity of each frequency in the Signal
+        provided. Results will be normalized if 'normalize' is set to True.
+    
+    """
+    
+    if isinstance(sig_vals, pd.DataFrame):
+        raise Exception("sig_vals must be a column of the dataframe, not the entire dataframe.")
+    
+    # An exception is raised if 'sig_vals' contains NaN values.
+    if np.nan in sig_vals:
+        raise Exception("NaN values found.")
+    
+    if sampling_rate <= 0:
+        raise Exception("Sampling rate must be greater or equal to 0")
+    
+    # Initial parameters
+    sig_vals = sig_vals - np.mean(sig_vals)
+    N = len(sig_vals)
+    
+    # Calculate minimum frequency given sampling rate
+    min_frequency = (2 * sampling_rate) / (N / 2)
+    
+    # Calculate window size given sampling rate
+    nperseg = int((2 / min_frequency) * sampling_rate)
+    nfft = nperseg * 2
+    
+    # Apply welch method with hanning window
+    frequency, power = scipy.signal.welch(
+        sig_vals,
+        fs=sampling_rate,
+        scaling='density',
+        detrend=False,
+        nfft=nfft,
+        average='mean',
+        nperseg=nperseg,
+        window='hann'
+    )
+    
+    # Normalize if set to true
+    if normalize is True:
+        power /= np.max(power)
+        
+    # Create dataframe of results
+    psd = pd.DataFrame({'Frequency': frequency, 'Power': power})
+    # Filter given 
+    psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency,
+                                   psd['Frequency'] <= np.inf)]
     
     return psd
 
