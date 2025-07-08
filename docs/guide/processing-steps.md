@@ -1,4 +1,4 @@
-# Getting Started with EMGFlow
+# Processing Steps
 
 ## Download
 
@@ -56,3 +56,14 @@ The "Time" column can generally be omitted when the sampling rate is known, thou
 
 ![Pipeline processing steps](/figures/figure1.png)
 *Figure 1. Decomposition of the EMG signal into individual frequency components.*
+
+## Sample Data Files
+
+The sample data used in EMGFlow is taken from [PeakAffectDS](https://zenodo.org/records/6403363).
+
+| PeakAffectDS Name | EMGFlow Name       | Timeframe             |
+| ----------------- | ------------------ | :-------------------: |
+| 01-03-01.csv      | sample_data_01.csv | 50.0005s : 60.0000s   |
+| 01-04-01.csv      | sample_data_02.csv | 130.0005s : 140.0000s |
+| 02-06-02.csv      | sample_data_03.csv | 10.0005s : 20.0000s   |
+| 02-07-02.csv      | sample_data_04.csv | 15.0005s : 25.0000s   |
