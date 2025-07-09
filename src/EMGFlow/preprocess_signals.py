@@ -157,86 +157,6 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     
     return psd
 
-def emg_to_psd_old(sig_vals, sampling_rate=1000, normalize=True):
-    """
-    Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
-    used as a Long Term Average Spectrum (LTAS).
-
-    Parameters
-    ----------
-    sig_vals : list-float
-        A list of float values. A column of a signal datframe.
-    sampling_rate : float
-        Sampling rate of 'sig_vals'. This is the number of entries recorded per
-        second, or the inverse of the difference between entries.
-    normalize : bool, optional
-        If True, will normalize the result. If False, will not. The default is
-        True.
-
-    Raises
-    ------
-    Exception
-        An exception is raised if 'sig_vals' is a pd.DataFrame, not a column of
-        a dataframe.
-    Exception
-        An exception is raised if 'sig_vals' contains NaN values.
-    Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
-
-    Returns
-    -------
-    psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
-        'Power' column indicates the intensity of each frequency in the Signal
-        provided. Results will be normalized if 'normalize' is set to True.
-    
-    """
-    
-    if isinstance(sig_vals, pd.DataFrame):
-        raise Exception("sig_vals must be a column of the dataframe, not the entire dataframe.")
-    
-    # An exception is raised if 'sig_vals' contains NaN values.
-    if np.nan in sig_vals:
-        raise Exception("NaN values found.")
-    
-    if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater or equal to 0")
-    
-    # Initial parameters
-    sig_vals = sig_vals - np.mean(sig_vals)
-    N = len(sig_vals)
-    
-    # Calculate minimum frequency given sampling rate
-    min_frequency = (2 * sampling_rate) / (N / 2)
-    
-    # Calculate window size given sampling rate
-    nperseg = int((2 / min_frequency) * sampling_rate)
-    nfft = nperseg * 2
-    
-    # Apply welch method with hanning window
-    frequency, power = scipy.signal.welch(
-        sig_vals,
-        fs=sampling_rate,
-        scaling='density',
-        detrend=False,
-        nfft=nfft,
-        average='mean',
-        nperseg=nperseg,
-        window='hann'
-    )
-    
-    # Normalize if set to true
-    if normalize is True:
-        power /= np.max(power)
-        
-    # Create dataframe of results
-    psd = pd.DataFrame({'Frequency': frequency, 'Power': power})
-    # Filter given 
-    psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency,
-                                   psd['Frequency'] <= np.inf)]
-    
-    return psd
-
 #
 # =============================================================================
 #
@@ -313,7 +233,7 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = notch_Signal[min_nan_mask]
@@ -332,16 +252,18 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filters
             for (Hz, Q) in notch_vals:
-                 norm_Hz = Hz / nyq_freq
                 
-                 # Use scipy notch filter using normalized frequency
-                 b, a = scipy.signal.iirnotch(norm_Hz, Q)
-                 filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len, col].copy())
-                 masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+                norm_Hz = Hz / nyq_freq
+                
+                # Use scipy notch filter using normalized frequency
+                b, a = scipy.signal.iirnotch(norm_Hz, Q)
+                filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
+                
+                masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in band_Signal
     notch_Signal.loc[min_nan_mask, col] = masked_data[col]
@@ -553,7 +475,7 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = band_Signal[min_nan_mask]
@@ -572,11 +494,11 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len, col].copy())
-            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in band_Signal
     band_Signal.loc[min_nan_mask, col] = masked_data[col]
@@ -827,7 +749,7 @@ def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = boxcar_Signal[min_nan_mask]
@@ -846,11 +768,11 @@ def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in boxcar_Signal
     boxcar_Signal.loc[min_nan_mask, col] = masked_data[col]
@@ -935,7 +857,7 @@ def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = rms_Signal[min_nan_mask]
@@ -954,11 +876,11 @@ def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = np.sqrt(np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy() ** 2, window, 'same'))
-            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            filtered_section = np.sqrt(np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy() ** 2, window, 'same'))
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in rms_Signal
     rms_Signal.loc[min_nan_mask, col] = masked_data[col]
@@ -1049,7 +971,7 @@ def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = gauss_Signal[min_nan_mask]
@@ -1068,11 +990,11 @@ def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in gauss_Signal
     gauss_Signal.loc[min_nan_mask, col] = masked_data[col]
@@ -1159,7 +1081,7 @@ def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0)
     min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len] = False
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
     masked_data = loess_Signal[min_nan_mask]
@@ -1180,11 +1102,11 @@ def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0)
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in loess_Signal
     loess_Signal.loc[min_nan_mask, col] = masked_data[col]

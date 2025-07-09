@@ -143,8 +143,10 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         ),
     )
     
+    # Create legend names and order label
     legnames = names.copy()
-    legnames.reverse()
+    for i in range(len(legnames)):
+        legnames[i] = str(i+1) + ': ' + legnames[i]
     
     # =================
     # Server definition
@@ -185,7 +187,9 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
             fig, ax = plt.subplots()
             if column == 'All':
                 # Read/plot each file
-                for file_loc in reversed(list(df.loc[filename])[1:]):
+                file_locs = list(df.loc[filename])[1:]
+                for i in range(len(file_locs)):
+                    file_loc = file_locs[i]
                     sigDF = read_file_type(file_loc, file_ext)
                     
                     # Exception for column input
@@ -197,7 +201,8 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
                         if mask_col in list(sigDF.columns.values):
                             sigDF.loc[~sigDF[mask_col], col] = np.nan
                     
-                    ax.plot(sigDF['Time'], sigDF[col], alpha=0.5, linewidth=1)
+                    ax.plot(sigDF['Time'], sigDF[col], color=colours[len(file_locs)-i-1], alpha=0.5, linewidth=1)
+                    
                 # Set legend for multiple plots
                 ax.legend(legnames)
             else:
