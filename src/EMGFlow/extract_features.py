@@ -1117,18 +1117,15 @@ def calc_sbw(psd, p=2):
 
 def extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
     """
-    Extract features from signals by running a series of feature extraction
+    Extracts features from signals by running a series of feature extraction
     functions and saving the output to a feature file.
     
     Generates a 'Features.csv' file of the recorded data in the 'Feature' path
-    in 'path_names'. The locations of each file analyzed are used as the keys.
+    of 'path_names'. The path to each file is used as the keys in the output.
 
-    Time-series features are calculated from data in the 'Filled' directory,
-    while Spectral features are calculated from the 'Bandpass' directory.
-
-    For analysis, the 'Filled' directory of 'path_names' is optional for
-    filling missing data and flagging NaN values. If this folder is left empty,
-    data will be read from the 'Smooth' folder instead.
+    Time-series features are calculated from data in the 'Filled' directory, or
+    if 'Filled' is empty, the 'Smooth' directory. Spectral features are
+    calculated from the 'Bandpass' directory.
 
     Parameters
     ----------
@@ -1140,10 +1137,9 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         Sampling rate for all Signals being read.
     cols : list-str, optional
         List of columns to analyze in each Signal. The default is None, in
-        which case all columns except for 'Time' will be analyzed. All Signals
-        should have at lease these columns in common. If None is used, all
-        Signals will be assumed to have the same colums as the first Signal
-        read.
+        which case all columns except for 'Time' will be analyzed. All files
+        should have at least these columns in common. If None is used, all
+        files will be assumed to have the same colums as the first file read.
     expression : str, optional
         A regular expression. If provided, will only read files whose names
         match the regular expression. The default is None.

@@ -24,6 +24,47 @@ A collection of functions for finding outliers while testing.
 #
 
 def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
+    """
+    Fills NaN values using interpolation methods in a column of the provided
+    data.
+
+    Parameters
+    ----------
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
+        for signal data.
+    col : str
+        Column of 'Signal' to fill NaN values.
+    method : str, optional
+        The interpolation method to use. Valid options are 'pchip' and
+        'spline'. The default is 'pchip'.
+    use_nan_mask : bool, optional
+        If true, fills in values marked as NaN in the NaN mask. If false, fills
+        NaN values directly in the selected column. The default is True.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' is set to 'Time'.
+    Exception
+        An exception is raised if 'Time' is not a column of 'Signal'
+    Exception
+        An exception is raised if 'method' is an invalid interpolation method.
+    Exception
+        An exception is raised if 'use_nan_mask' is True, but there is no NaN
+        mask.
+    Exception
+        An exception is raised if there aren't enough valid points to perform
+        interpolation.
+
+    Returns
+    -------
+    filled_Signal : pd.DataFrame
+        A copy of the 'Signal' dataframe with NaN values filled.
+
+    """
     
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
@@ -88,7 +129,77 @@ def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
 #
 
 def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_nan_mask=True, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+    """
+    Fills NaN values using interpolation methods to all signals in a folder.
+    Writes filled data to an output folder, and generates a file structure
+    matching the input folder.
 
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read signal files.
+    out_path : str
+        Filepath to an output directory.
+    sampling_rate : float
+        Sampling rate of the signal files.
+    method : str, optional
+        The interpolation method to use. Valid options are 'pchip' and
+        'spline'. The default is 'pchip'.
+    use_nan_mask : bool, optional
+        If true, fills in values marked as NaN in the NaN mask. If false, fills
+        NaN values directly in the selected column. The default is True.
+    cols : list-str, optional
+        List of columns of the signal to interpolate values in. The default is
+        None, in which case the interpolation is performed in every column
+        except for 'Time'.
+    expression : str, optional
+        A regular expression. If provided, will only filter files whose names
+        match the regular expression. The default is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
+
+    Raises
+    ------
+    Warning
+        Raises a warning if no files in 'in_path' match with 'expression'.
+    Exception
+        An exception is raised if 'expression' is not None or a valid regular
+        expression.
+    
+    Exception
+        An exception is raised if the file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+    
+    Exception
+        An exception is raised if any column in 'cols' is not found in any of
+        the signal files read.
+    Exception
+        An exception is raised if 'Time' is in 'cols'.
+    Exception
+        An exception is raised if 'Time' is not found in any of the signal
+        files read.
+    Exception
+        An exception is raised if 'method' is an invalid interpolation method.
+    Exception
+        An exception is raised if 'use_nan_mask' is True, but there is no NaN
+        mask in any of the signal files read.
+    Exception
+        An exception is raised if there aren't enough valid points to perform
+        interpolation in any of the signal files read.
+
+    Returns
+    -------
+    None.
+
+    """
+    
     if expression is not None:
         try:
             re.compile(expression)

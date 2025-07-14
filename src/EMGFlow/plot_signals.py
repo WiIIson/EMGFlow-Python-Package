@@ -50,8 +50,12 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         String extension of the files to read. Any file in in_path with this
         extension will be considered to be a Signal file, and treated as such.
         The default is 'csv'.
+    use_mask : bool, optional
+        Boolean controlling behavior of the function. If True will set values
+        to NaN based on the NaN mask. If False will use the unaltered values of
+        the column ignoring the NaN mask. The default is False.
     auto_run : bool, optional
-        Boolean controlling behavior of the function. If true (default), will
+        Boolean controlling behavior of the function. If True (default), will
         automatically run the visual and open it in the default browser. If
         false, will return the visualization object. The default is False.
 
