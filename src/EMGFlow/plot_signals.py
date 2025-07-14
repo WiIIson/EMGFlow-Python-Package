@@ -23,7 +23,7 @@ A collection of functions for plotting subject data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True):
+def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True, colours=None):
     """
     Generate a shiny dashboard of different processing stages for a given
     column.
@@ -127,7 +127,13 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     plt.style.use('fivethirtyeight')
     
     # Get colours
-    colours = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    # Colours taken from colorbrewer2: https://colorbrewer2.org/#type=qualitative&scheme=Set1&n=9
+    if colours is None:
+        colours = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999']
+    
+    # Throw error if the user has too many layers
+    if len(path_names) > len(colours):
+        raise Exception("Not enough colours")
     
     # Create shiny dashboard
     
@@ -205,7 +211,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
                         if mask_col in list(sigDF.columns.values):
                             sigDF.loc[~sigDF[mask_col], col] = np.nan
                     
-                    ax.plot(sigDF['Time'], sigDF[col], color=colours[len(file_locs)-i-1], alpha=0.5, linewidth=1)
+                    ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
                 ax.legend(legnames)
@@ -224,9 +230,9 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
                         sigDF.loc[~sigDF[mask_col], col] = np.nan
                 
                 # Get colour data
-                i = (names.index(column) + 1) % len(colours)
+                i = names.index(column)
                 # Plot file
-                ax.plot(sigDF['Time'], sigDF[col], color=colours[len(names) - i], alpha=0.5, linewidth=1)
+                ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                 
             ax.set_xlim(x_min, x_max)
             ax.set_ylabel('Voltage (mV)')
