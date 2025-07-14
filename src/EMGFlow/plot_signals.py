@@ -58,6 +58,10 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         Boolean controlling behavior of the function. If True (default), will
         automatically run the visual and open it in the default browser. If
         false, will return the visualization object. The default is False.
+    colours : list[str], optional
+        Optional list of hex codes determining the colour of the plot. By
+        leaving this value None, the function will use default colours of
+        length 9. The default is None.
 
     Raises
     ------
@@ -76,6 +80,8 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
+    Exception
+        An exception is raised if 'path_names' is longer than 'colours'.
 
     Returns
     -------

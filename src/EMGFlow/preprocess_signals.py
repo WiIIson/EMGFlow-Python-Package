@@ -22,9 +22,9 @@ A collection of functions for filtering Signals.
 
 def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0, nan_mask=None):
     """
-    Creates a PSD graph of a Signal. Uses the Welch method, meaning it can be
-    used as a Long Term Average Spectrum (LTAS).
-
+    Creates a PSD dataframe of a signal. Uses the Welch method, meaning it can
+    be used as a Long Term Average Spectrum (LTAS).
+    
     Parameters
     ----------
     Signal : pd.DataFrame
@@ -33,24 +33,31 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     col : str
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
-        Sampling rate of 'sig_vals'. This is the number of entries recorded per
-        second, or the inverse of the difference between entries.
+        Sampling rate of 'Signal'.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
     min_gap_ms : float, optional
-        
-    mask : pd.Series, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
+    nan_mask : pd.Series, optional
+        Optional series that controls the calculation of the function. Can be
+        a True/False mask that is the same size as the selected column, and
+        will set all associated False values in the column to NaN in the
+        calculation. The default is None, in which case no NaN masking will be
+        done.
 
     Raises
     ------
     Exception
-        An exception is raised if 'sig_vals' is a pd.DataFrame, not a column of
-        a dataframe.
+        An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sig_vals' contains NaN values.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'nan_mask' is an incorrect data type, or not
+        the same length as the column
 
     Returns
     -------
@@ -63,10 +70,10 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
+        raise Exception("Column " + str(col) + " not in 'Signal'")
     
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater or equal to 0")
+        raise Exception("'sampling_rate' must be greater than 0")
     
     PSD_Signal = Signal.copy()
     
@@ -180,12 +187,12 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter).
-    min_gap_ms : float
-        Minimum length of time (in ms) for missing data. Segments of missing
-        data less than this threshold are ignored in the filter calculation,
-        and segments greater than this are used to divide the data, with the
-        filter applied to each part.
-
+    min_gap_ms : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
+        
     Raises
     ------
     Warning
@@ -196,7 +203,7 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
-        sampling_rate/2 or less than 0.
+        'sampling_rate'/2 or less than 0.
 
     Returns
     -------
@@ -211,7 +218,7 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
     
     # A warning is raised if 'col' contains NaN values.
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("Warning: NaN values detected in dataframe.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -257,6 +264,9 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
             # Apply filters
             for (Hz, Q) in notch_vals:
                 
+                if Hz > sampling_rate/2 or Hz <= 0:
+                    raise Exception("'notch_vals' must be between 0 and" + str(sampling_rate/2) + ".")
+                
                 norm_Hz = Hz / nyq_freq
                 
                 # Use scipy notch filter using normalized frequency
@@ -276,13 +286,14 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
 
 def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     """
-    Apply notch filters to all Signals in a folder. Writes filtered Signals to
-    an output folder, and generates a file structure matching the input folder.
+    Apply notch filters to all signal files in a folder. Writes filtered
+    signal files to an output folder, and generates a file structure matching
+    the input folder.
 
     Parameters
     ----------
     in_path : str
-        Filepath to a directory to read signal files.
+        Filepath to a directory to read data files.
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
@@ -310,38 +321,34 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     Raises
     ------
     Warning
-        Raises a warning if no files in 'in_path' match with 'expression'.
+        A warning is raised if no files in 'in_path' match with 'expression'.
+        
     Warning
-        A warning is raised if any column in 'cols' in any of the Signal
-        files read contain NaN values.
+        A warning is raised if a column in 'cols' contains NaN values.
     Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the signal files read.
+        An exception is raised if a column in 'cols' is not a column of a
+        signal file.
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
-        sampling_rate/2 or less than 0.
-    Exception
-        An exception is raised if a file cannot not be read in 'in_path'.
-    Exception
-        An exception is raised if an unsupported file format was provided for
-        'file_ext'.
+        'sampling_rate'/2 or less than 0.
+        
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
-    
+        
+    Exception
+        An exception is raised if a file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+        
     Returns
     -------
     None.
 
     """
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -349,7 +356,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     
     # Get dictionary of file locations
     if exp_copy:
-        file_dirs = map_files(in_path, file_ext=file_ext)
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
