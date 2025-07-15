@@ -369,7 +369,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -607,7 +607,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1221,7 +1221,7 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
     
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1470,7 +1470,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
     
     # Iterate over detected files
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1676,7 +1676,7 @@ def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', c
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)

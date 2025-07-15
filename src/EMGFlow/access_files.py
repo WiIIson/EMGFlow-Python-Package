@@ -224,13 +224,13 @@ def map_files(in_path, file_ext='csv', expression=None, base=None):
     file_dirs = {}
     for file in os.listdir(in_path):
         new_path = os.path.join(in_path, file)
+        fileName = os.path.relpath(new_path, base)
         # Recursively check folders
         if os.path.isdir(new_path):
             subDir = map_files(new_path, file_ext=file_ext, expression=expression, base=base)
             file_dirs.update(subDir)
         # Record the file path (from base to current folder) and absolute path
-        elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
-            fileName = os.path.relpath(new_path, base)
+        elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, fileName)!=None)):
             file_dirs[fileName] = new_path
     return file_dirs
 

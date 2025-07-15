@@ -220,7 +220,7 @@ def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_n
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file))):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
