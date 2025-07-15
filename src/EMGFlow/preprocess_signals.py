@@ -31,7 +31,7 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        Column of 'Signal' the PSD is created from.
     sampling_rate : float
         Sampling rate of 'Signal'.
     normalize : bool, optional
@@ -304,7 +304,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
         Q-score (an intensity score where a higher number means a less
         extreme filter).
     cols : list-str, optional
-        List of columns of the signal to apply the filter to. The default is
+        List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time'.
     expression : str, optional
@@ -524,14 +524,14 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0
 
 def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv'):
     """
-    Apply bandpass filters to all Signals in a folder. Writes filtered Signals
-    to an output folder, and generates a file structure
-    matching the input folder.
+    Apply bandpass filters to all signal files in a folder. Writes filtered
+    signal files to an output folder, and generates a file structure matching
+    the input folder.
     
     Parameters
     ----------
     in_path : dict-str
-        Filepath to a directory to read Signal files.
+        Filepath to a directory to read signal files.
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
@@ -540,8 +540,8 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
         Lower frequency limit of the bandpass filter. The default is 20.
     high : float, optional
         Upper frequency limit of the bandpass filter. The default is 450.
-    cols : list, optional
-        List of columns of the Signal to apply the filter to. The default is
+    cols : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time'.
     expression : str, optional
@@ -1128,15 +1128,15 @@ def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0)
 
 def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', min_gap_ms=30.0, sigma=1):  
     """
-    Apply smoothing filters to all Signals in a folder. Writes filtered signal
-    files to an output folder, and generates a file structure matching the
-    input folder. The method used to smooth the signals can be specified, but
-    is RMS as default.
+    Apply smoothing filters to all signal files in a folder. Writes filtered
+    signal files to an output folder, and generates a file structure matching
+    the input folder. The method used to smooth the signals can be specified,
+    but is RMS as default.
 
     Parameters
     ----------
     in_path : dict-str
-        Filepath to a directory to read Signal files.
+        Filepath to a directory to read signal files.
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
@@ -1144,9 +1144,9 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
     window_size : int, float
         Size of the window of the filter.
     cols : list-str, optional
-        List of columns of the Signal to apply the filter to. The default is
+        List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
-        'time'.
+        'Time'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
@@ -1161,10 +1161,10 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
         The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or
         'loess'. The default is 'rms'.
     min_gap_ms : float, optional
-        Minimum length of time (in ms) for missing data. Segments of missing
-        data less than this threshold are ignored in the filter calculation,
-        and segments greater than this are used to divide the data, with the
-        filter applied to each part. The default is 30.
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
     sigma: float, optional
         The value of sigma used for a Gaussian filter. Only affects output when
         using Gaussian filtering. The default is 1.
@@ -1276,8 +1276,8 @@ def clean_signals(path_names, sampling_rate=2000):
     Parameters
     ----------
     path_names : dict-str
-        Dictionary containing path locations for writing and reading Signal
-        data between paths.
+        Dictionary containing path locations for writing and reading signal
+        files between paths.
     sampling_rate : float
         Sampling rate of the signal files.
 
@@ -1325,8 +1325,8 @@ def clean_signals(path_names, sampling_rate=2000):
 
 def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
     """
-    Looks at all Signals contained in a filepath, returns a dictionary of file
-    names and locations that have outliers.
+    Looks at all signal files contained in a filepath, returns a dictionary of
+    file names and locations that have outliers.
     
     Works by interpolating an inverse function from the peaks of the signal's
     spectrum. The function then calculates the 'metric' aggregate of the
@@ -1339,16 +1339,16 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
     Parameters
     ----------
     in_path : str
-        Filepath to a directory to read Signal files.
+        Filepath to a directory to read signal files.
     sampling_rate : float
-        Sampling rate of the Signal.
+        Sampling rate of the signal files.
     threshold : float
         The number of times greater than the metric a value has to be to be
         considered an outlier.
     cols : list-str, optional
-        List of columns of the Signal to search for outliers in. The default is
-        None, in which case outliers are searched for in every column except
-        for 'time'.
+        List of columns of the signals to search for outliers in. The default
+        is None, in which case outliers are searched for in every column except
+        for 'Time'.
     low : float, optional
         Lower frequency limit of where to search for outliers. Should be the
         same as lower limit for bandpass filtering, or some value that
@@ -1620,7 +1620,7 @@ def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', c
         The outlier detection method being used. Valid options are 'robust',
         'normal', or None. The default is 'robust'.
     cols : list-str, optional
-        List of columns of the signal to apply the filter to. The default is
+        List of columns of the signals to create NaN masks in. The default is
         None, in which case the filter is applied to every column except for
         'Time'.
     expression : str, optional

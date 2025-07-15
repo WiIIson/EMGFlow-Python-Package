@@ -1126,6 +1126,9 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     Time-series features are calculated from data in the 'Filled' directory, or
     if 'Filled' is empty, the 'Smooth' directory. Spectral features are
     calculated from the 'Bandpass' directory.
+    
+    Columns that begin with 'mask_' are assumed to be NaN mask columns, and are
+    treated as such.
 
     Parameters
     ----------
@@ -1307,7 +1310,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
             # Evaluate the measures of each column
             for col in cols:
                 
-                # Use mask if  (smooth mask for both dataframes)
+                # Use the mask if it is there (smooth mask for both dataframes)
                 mask_col = 'mask_' + str(col)
                 if mask_col in data_s.columns.values:
                     data_s.loc[~data_s[mask_col], col] = np.nan
