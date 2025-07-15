@@ -58,7 +58,7 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         Boolean controlling behavior of the function. If True (default), will
         automatically run the visual and open it in the default browser. If
         false, will return the visualization object. The default is False.
-    colours : list[str], optional
+    colours : list-str, optional
         Optional list of hex codes determining the colour of the plot. By
         leaving this value None, the function will use default colours of
         length 9. The default is None.
@@ -133,13 +133,13 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     plt.style.use('fivethirtyeight')
     
     # Get colours
-    # Colours taken from colorbrewer2: https://colorbrewer2.org/#type=qualitative&scheme=Set1&n=9
+    # Colours taken from Viridis colour scheme (ColorBrewer)
     if colours is None:
-        colours = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999']
+        colours = ['#fde725','#5ec962','#21918c','#3b528b','#440154']
     
     # Throw error if the user has too many layers
     if len(path_names) > len(colours):
-        raise Exception("Not enough colours")
+        raise Exception("Not enough colours, enter a longer list for 'colours'")
     
     # Create shiny dashboard
     
