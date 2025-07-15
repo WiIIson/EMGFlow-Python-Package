@@ -306,7 +306,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
-        'Time'.
+        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
@@ -377,8 +377,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
             
             # Apply filter to columns
             for col in cols:
@@ -543,7 +542,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
-        'Time'.
+        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
@@ -616,8 +615,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
               
             # Apply filter to columns
             for col in cols:
@@ -1146,7 +1144,7 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
-        'Time'.
+        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
@@ -1231,8 +1229,7 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
               
             # Apply filter to columns
             for col in cols:
@@ -1348,7 +1345,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
     cols : list-str, optional
         List of columns of the signals to search for outliers in. The default
         is None, in which case outliers are searched for in every column except
-        for 'Time'.
+        for 'Time' and columns that start with 'mask_'.
     low : float, optional
         Lower frequency limit of where to search for outliers. Should be the
         same as lower limit for bandpass filtering, or some value that
@@ -1484,8 +1481,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
             
             # Set to false
             isOutlier = False
@@ -1622,7 +1618,7 @@ def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', c
     cols : list-str, optional
         List of columns of the signals to create NaN masks in. The default is
         None, in which case the filter is applied to every column except for
-        'Time'.
+        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only filter files whose names
         match the regular expression. The default is None.
@@ -1688,8 +1684,7 @@ def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', c
             # If no columns selected, apply filter to all columns except time
             if cols is None:
                 cols = list(data.columns)
-                if 'Time' in cols:
-                    cols.remove('Time')
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
             
             # Apply filter to columns
             for col in cols:
