@@ -245,8 +245,10 @@ def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_n
         elif (file[-len(file_ext):] == file_ext) and exp_copy:
             # Copy the file even if it doesn't match if exp_copy is true
             data = read_file_type(file_dirs[file], file_ext)
+            
             out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(file)]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
     
