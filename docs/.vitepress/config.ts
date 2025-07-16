@@ -30,7 +30,7 @@ export default withMermaid({
           { text: 'What is EMGFlow?', link: '/guide/what-is-emgflow' },
           { text: 'Processing Steps', link: '/guide/processing-steps' },
           { text: 'Examples', link: '/guide/examples' },
-          { text: 'About electromyography', link: '/guide/about-emg' },
+          { text: 'About Electromyography', link: '/guide/about-emg' },
         ]
       },
 

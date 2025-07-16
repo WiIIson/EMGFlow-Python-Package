@@ -6,10 +6,6 @@ outline: deep
 
 EMGFlow is broken into 5 modules: `access_files` for file IO, `detect_outliers` for detecting outliers, `preprocess_signals` for preprocessing signals, `plot_signals` generating visualizations, and `extract_features` feature extraction.
 
-## File Format
-
-The EMGFlow Python package works with CSV files, but is planned to expand to other file formats in the future. To prepare your data to be compatible with EMGFlow, it needs to be a CSV file with, ideally, a "Time" column, and additional columns for the signals you have recorded. "Time" should contain the time since the beginning of the recording, and the additional columns will have the recording of the signals at that time. Additionally, the file should have a constant sampling rate (time difference between each sequential row).
-
 ## Modules
 
 ### Module Structure
