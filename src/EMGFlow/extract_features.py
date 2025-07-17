@@ -1120,15 +1120,22 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
     Extracts features from signals by running a series of feature extraction
     functions and saving the output to a feature file.
     
-    Generates a 'Features.csv' file of the recorded data in the 'Feature' path
-    of 'path_names'. The path to each file is used as the keys in the output.
+    The input and output locations are controlled by the 'path_names'
+    dictionary. The input data is taken from the 'Filled' and 'Bandpass' paths.
+    The 'Filled' path is an optional step, so 'Smooth' is used if 'Filled' is
+    unused. All files within these folders and subfolders are assumed to be
+    signal files if they match the file extension, and the optional regular
+    expression. Files of the same name should exist in both the
+    'Filled'/'Smooth' and 'Bandpass' folders, being the same file at different
+    stages in processing pipeline.
 
-    Time-series features are calculated from data in the 'Filled' directory, or
-    if 'Filled' is empty, the 'Smooth' directory. Spectral features are
-    calculated from the 'Bandpass' directory.
-    
-    Columns that begin with 'mask_' are assumed to be NaN mask columns, and are
-    treated as such.
+    The 'Filled' or 'Smooth' path is used to calculate time-series features,
+    while the 'Bandpass' path is used to calculate spectral features.
+
+    Columns of these files that begin with 'mask_' are assumed to be NaN mask
+    columns, and are ignored unless specified in cols.
+
+    The output is written as a 'Features.csv' file to the 'Feature' path.
 
     Parameters
     ----------
@@ -1144,8 +1151,9 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         should have at least these columns in common. If None is used, all
         files will be assumed to have the same colums as the first file read.
     expression : str, optional
-        A regular expression. If provided, will only read files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only analyze files whose local
+        paths inside of 'path_names' match the regular expression. The default
+        is None.
     file_ext : str, optional
         File extension for files to read. Only reads files with this extension.
         The default is 'csv'.
@@ -1271,8 +1279,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
         path1 = next(iter(file_dirs_s.values()))
         data1 = read_file_type(path1, file_ext)
         cols = list(data1.columns)
-        if 'Time' in cols:
-            cols.remove('Time')
+        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
     
     
     # Create row labels
@@ -1314,7 +1321,10 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 mask_col = 'mask_' + str(col)
                 if mask_col in data_s.columns.values:
                     data_s.loc[~data_s[mask_col], col] = np.nan
-                    data_b.loc[~data_s[mask_col], col] = np.nan
+                    if mask_col in data_b.columns.values:
+                        data_b.loc[~data_s[mask_col], col] = np.nan
+                    else:
+                        raise Exception('Bandpass file ' + str(file) + ' does not contain column ' + str(mask_col))
                 
                 # Calculate time-series measures
                 Min = np.min(data_s[col])

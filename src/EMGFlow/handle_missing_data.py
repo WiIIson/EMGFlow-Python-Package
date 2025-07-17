@@ -153,8 +153,9 @@ def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_n
         None, in which case the interpolation is performed in every column
         except for 'Time'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only interpolate values in
+        files whose local paths inside of 'in_path' match the regular
+        expression. The default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores

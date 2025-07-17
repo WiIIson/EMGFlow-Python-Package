@@ -308,8 +308,9 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose local
+        paths inside of 'in_path' match the regular expression. The default
+        is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
@@ -546,8 +547,9 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose local
+        paths inside of 'in_path' match the regular expression. The default
+        is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
@@ -1150,8 +1152,9 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only filter files whose local
+        paths inside of 'in_path' match the regular expression. The default
+        is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
@@ -1368,7 +1371,8 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
         be used instead.
     expression : str, optional
         A regular expression. If provided, will only search for outliers in
-        files whose names match the regular expression. The default is None.
+        files whose local paths inside of 'in_path' match the regular
+        expression. The default is None.
     window_size : int, optional
         The window size to use when filtering for local maxima. The default is
         200.
@@ -1626,8 +1630,9 @@ def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', c
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only screen artefacts in files
+        whose local paths inside of 'in_path' match the regular expression.
+        The default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
