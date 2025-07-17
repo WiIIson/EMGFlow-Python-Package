@@ -31,14 +31,14 @@ mindmap
                 calc_mfl
                 calc_ap
             (Spectral Features)
-                calc_spec_flux
                 calc_mdf
                 calc_mnf
                 calc_twitch_ratio
                 calc_twitch_index
                 calc_twitch_slope
                 calc_sc
-                calc_sf
+                calc_sflt
+                calc_sflx
                 calc_ss
                 calc_sd
                 calc_se
@@ -59,14 +59,21 @@ Each extracted feature is available as its own function for easy use.
 
 **Description**
 
-Extracts usable features from two sets of signal files (before and after being smoothed). Writes output to a new folder directory, as specified by the 'Feature' key value of the `path_names` dictionary. Output is both saved to the disk as a plaintext file, 'Features.csv', and is also returned as a dataframe object.
+Extracts features from signal files by running a series of feature extraction functions and saving the output to a feature file.
 
 Components of a `Signal` dataframe:
 - Has a column named `Time` containing time indexes
 - `Time` indexes are all equally spaced apart
 - Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
 
-All files contained within the folder and subfolder with the proper extension are assumed to be signal files. All signal files within the folder and subfolders should have the same change in time between entries.
+The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'Filled' and 'Bandpass' paths. The 'Filled' path is an optional step, so 'Smooth' is used if 'Filled' is unused. All files within these folders and subfolders are assumed to be signal files if they match the file extension, and the optional regular expression. Files of the same name should exist in both the 'Filled'/'Smooth' and 'Bandpass' folders, being the same file at different stages in processing pipeline.
+
+The 'Filled' or 'Smooth' path is used to calculate time-series features, while the 'Bandpass' is used to calculate spectral features.
+
+Columns of these files that begin with 'mask_' are assumed to be NaN mask columns, and are ignored unless specified in `cols`.
+
+The output is written as a 'Features.csv' file to the 'Feature' path.
+
 ```python
 extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
 ```
@@ -78,13 +85,13 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 **Parameters**
 
 `path_names`: dict-str
-- A dictionary of file locations with keys for the stage in the processing pipeline.
+- A dictionary of path names for reading data. Required paths are: 'Bandpass', 'Smooth', 'Feature', and optionally 'Filled'. The dictionary can be created with the `make_paths` function.
 
 `sampling_rate`: int, float
 - Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
 
 `cols`: str, optional (None)
-- List of columns of the signal files to extract features from. The default is None, in which case features are extracted from every column except for 'Time'.
+- List of columns to analyze in each signal file. The default is None, in which case the analysis is performed on every column except for 'Time' and columns that start with 'mask_'. This is taken from the first file detected by `map_files` in the 'Filled' or 'Smooth' folder, and assumes all other files have these columns.
 
 `expression`: str, optional (None)
 - A regular expression. If provided, will only extract features from files whose names match the regular expression. The default is None.
@@ -93,7 +100,7 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 - File extension for files to read. Only reads files with this extension. The default is 'csv'.
 
 `short_names`: bool, optional (True)
-- If true, makes the key column of the feature files the relative path of the file. If false, uses the full system path. The default is True.
+- If True, makes the key column of the feature files the relative path of the file. If False, uses the full system path as the key. The default is True.
 
 **Raises**
 
@@ -101,9 +108,11 @@ A warning is raised if `expression` does not match with any files in the folders
 
 An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not keys of the `path_names` dictionary provided.
 
-An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not contain the same files.
+An exception is raised if the 'Bandpass' and 'Filled'/'Smooth' filepaths do not contain the same files.
 
-An exception is raised if a file cannot not be read in the 'Bandpass' or 'Smooth' filepaths.
+An exception is raised if a file cannot not be read in the 'Bandpass' or 'Filled'/'Smooth' filepaths.
+
+An exception is raised if a file does not contain one of the columns from 'cols'
 
 An exception is raised if an unsupported file format was provided for `file_ext`.
 
@@ -123,8 +132,9 @@ EMGFlow.make_sample_data(path_names)
 sampling_rate = 2000
 cols = ['EMG_zyg', 'EMG_cor']
 
-# Extracts all features from the files in the 'Bandpass' path and the 'Smooth'
-# path. Assumes the same files are in both paths.
+# Extracts all features from the files in the 'Bandpass' path and the 'Filled'
+# path. If the 'Filled' path was empty, it would use 'Smooth' instead. Assumes
+# the same files are in both paths.
 features = EMGFlow.extract_features(path_names, sampling_rate, cols)
 ```
 
