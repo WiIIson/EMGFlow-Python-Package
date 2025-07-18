@@ -57,7 +57,7 @@ def calc_iemg(Signal, col, sampling_rate):
         raise Exception("Sampling rate cannot be less or equal to 0.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     IEMG = np.nansum(np.abs(col_vals) * sampling_rate)
     return IEMG
@@ -95,7 +95,7 @@ def calc_mav(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     MAV = np.sum(np.abs(col_vals)) / N
@@ -134,7 +134,7 @@ def calc_mmav1(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     vals = list(np.abs(col_vals))
@@ -180,7 +180,7 @@ def calc_mmav2(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     vals = list(np.abs(col_vals))
@@ -235,7 +235,7 @@ def calc_ssi(Signal, col, sampling_rate):
         raise Exception("Sampling rate cannot be 0 or negative")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     SSI = np.sum((np.abs(col_vals) * sampling_rate) ** 2)
     return SSI
@@ -272,7 +272,7 @@ def calc_var(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     VAR = 1/(N - 1) * np.sum(col_vals ** 2)
@@ -344,7 +344,7 @@ def calc_rms(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     RMS = np.sqrt((1/N) * np.sum(col_vals ** 2))
@@ -382,7 +382,7 @@ def calc_wl(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -424,7 +424,7 @@ def calc_wamp(Signal, col, threshold):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -463,7 +463,7 @@ def calc_log(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     ex = (1/N) * np.sum(np.log(col_vals))
@@ -503,7 +503,7 @@ def calc_mfl(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -542,7 +542,7 @@ def calc_ap(Signal, col):
         raise Exception("Column '" + str(col) + "' not found in the Signal.")
     
     # Get valid values
-    col_vals = Signal.dropna()[col].values
+    col_vals = Signal[col].dropna().values
     
     AP = np.sum(col_vals ** 2) / len(col_vals)
     return AP
