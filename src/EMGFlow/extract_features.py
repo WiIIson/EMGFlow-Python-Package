@@ -275,7 +275,7 @@ def calc_var(Signal, col):
     col_vals = Signal[col].dropna().values
     
     N = len(col_vals)
-    VAR = 1/(N - 1) * np.sum(col_vals ** 2)
+    VAR = 1/(N - 1) * np.sum((col_vals - np.mean(col_vals)) ** 2)
     return VAR
 
 #
