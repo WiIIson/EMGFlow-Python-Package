@@ -23,7 +23,7 @@ A collection of functions for plotting subject data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True, colours=None):
+def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True):
     """
     Generate a shiny dashboard of different processing stages for a given
     column.
@@ -58,10 +58,6 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
         Boolean controlling behavior of the function. If True (default), will
         automatically run the visual and open it in the default browser. If
         false, will return the visualization object. The default is False.
-    colours : list-str, optional
-        Optional list of hex codes determining the colour of the plot. By
-        leaving this value None, the function will use default colours of
-        length 9. The default is None.
 
     Raises
     ------
@@ -80,8 +76,6 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
-    Exception
-        An exception is raised if 'path_names' is longer than 'colours'.
 
     Returns
     -------
@@ -132,14 +126,10 @@ def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_
     # Set style
     plt.style.use('fivethirtyeight')
     
-    # Get colours
-    # Colours taken from Viridis colour scheme (ColorBrewer)
-    if colours is None:
-        colours = ['#fde725','#5ec962','#21918c','#3b528b','#440154']
-    
-    # Throw error if the user has too many layers
-    if len(path_names) > len(colours):
-        raise Exception("Not enough colours, enter a longer list for 'colours'")
+    # Get colours based on number of paths being plotted
+    n = len(path_names)
+    cmap = plt.cm.get_cmap('viridis', n)
+    colours = [cmap(i) for i in reversed(range(n))]
     
     # Create shiny dashboard
     
