@@ -20,7 +20,7 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0, nan_mask=None):
+def emg_to_psd(Signal, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None):
     """
     Creates a PSD dataframe of a signal. Uses the Welch method, meaning it can
     be used as a Long Term Average Spectrum (LTAS).
@@ -37,11 +37,6 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
-    min_gap_ms : float, optional
-        The minimum length (in ms) for data to be considered valid. If a length
-        of data is less than this time, it is set to NaN. If a length of
-        invalid data is less than this time, it is ignored in calculations. The
-        default is 30.0.
     nan_mask : pd.Series, optional
         Optional series that controls the calculation of the function. Can be
         a True/False mask that is the same size as the selected column, and
@@ -56,6 +51,8 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
+        An exception is raised if 'min_freq' is less or equal to 0.
+    Exception
         An exception is raised if 'nan_mask' is an incorrect data type, or not
         the same length as the column
 
@@ -68,69 +65,50 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
     
     """
     
+    PSD_Signal = Signal.copy()
+    
     # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
+    if col not in list(PSD_Signal.columns.values):
         raise Exception("Column " + str(col) + " not in 'Signal'")
     
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0")
     
-    PSD_Signal = Signal.copy()
-    
-    # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
-    
     if nan_mask is None:
-        
-        # Construct list of NaN locations
-        data = PSD_Signal[col]
-        mask = data.isna()
-        group = (mask != mask.shift()).cumsum()
-        group_sequences = data[mask].groupby(group[mask])
-        nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
-        
-        # Create NaN mask
-        min_nan_mask = pd.Series([True] * len(data))
-        for (nan_ind, nan_len) in nan_sequences:
-            if nan_len < min_gap:
-                min_nan_mask[nan_ind:nan_ind+nan_len] = False
-        
-        # Use mask to remove small NaN groups, construct list of value locations
-        masked_data = PSD_Signal[min_nan_mask]
-        masked_data = masked_data.copy()
+        nan_mask = ~np.isnan(PSD_Signal[col])
     else:
-        # Construct masked data from provided nan mask        
-        if not isinstance(nan_mask, pd.Series):
-            raise Exception('NaN mask must be a Pandas series.')
-        
+        # Clean the array
+        nan_mask = np.asarray(nan_mask, dtype=bool).ravel()
+        # Raise exception if length mismatch
         if len(nan_mask) != len(PSD_Signal):
             raise Exception('NaN mask must be the same length as the Signal dataframe.')
-        
-        masked_data = PSD_Signal[nan_mask]
-        masked_data = masked_data.copy()
+        # Flag additional NaNs not explicitly marked
+        nan_mask &= ~np.isnan(PSD_Signal[col])
     
-    # Construct list of value locations
-    data = masked_data[col]
-    mask = data.notna()
-    group = (mask != mask.shift()).cumsum()
-    group_sequences = data[mask].groupby(group[mask])
-    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    # Define Welch parameters
+    N = len(PSD_Signal[col].values)
+    min_frequency = (2.0 * sampling_rate) / (N / 2.0)
+    max_frequency = sampling_rate / 2.0
+    nperseg = int((2.0 / min_frequency) * sampling_rate)
+    if nperseg >= N/2.0:
+        nperseg = int(N/2.0)
+    nfft = int(nperseg * 2.0) # 50% overlap
+    step = nperseg // 2
     
-    # Make a PSD from every segment
     PSDs = []
-    for i in range(len(val_sequences)):
-        (val_ind, val_len) = val_sequences[i]
-        temp_dat = masked_data.iloc[val_ind:val_ind+val_len].copy()
+    freqs = None
+    
+    for start in range(0, N - nperseg + 1, step):
+        end = start + nperseg
         
-        N = len(temp_dat)
-        min_frequency = (2 * sampling_rate) / (N / 2)
-        nperseg = int((2 / min_frequency) * sampling_rate)
-        nfft = nperseg * 2
+        # Skip window if NaN detected
+        if not nan_mask[start:end].all():
+            continue
         
-        if val_len >= min_gap:
-            # Apply welch method with hanning window
-            frequency, power = scipy.signal.welch(
-                temp_dat[col].values,
+        segment = PSD_Signal.loc[start:end, col].values
+        
+        frequency, power = scipy.signal.welch(
+                segment,
                 fs=sampling_rate,
                 scaling='density',
                 detrend=False,
@@ -139,30 +117,26 @@ def emg_to_psd(Signal, col, sampling_rate=1000, normalize=True, min_gap_ms=30.0,
                 nperseg=nperseg,
                 window='hann'
             )
-            
-            # Normalize if set to true
-            if normalize is True:
-                power /= np.max(power)
-    
-            # Create dataframe of results
-            psd = pd.DataFrame({'Frequency': frequency, 'Power' + str(i): power})
-            
-            # Filter given valid range
-            psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency, psd['Frequency'] <= np.inf)]
-            
-            PSDs.append(psd)
-            
-    psd = PSDs[0]
-    for i in range(1, len(PSDs)):
-        psd = pd.merge(psd, PSDs[i], on='Frequency', how='outer')
         
+        if freqs is None:
+            freqs = frequency
+        PSDs.append(power)
+        
+    if not PSDs:
+        raise Exception('All windows contained NaN data.')
+    
+    total_power = np.mean(PSDs, axis=0)
+    
     # Final cleaning for psd
-    psd = psd.fillna(0)
-    psd['Power'] = psd.drop(columns='Frequency').mean(axis=1)
-    psd = psd[['Frequency', 'Power']]
-    psd = psd.sort_values(by='Frequency')
+    psd = pd.DataFrame({'Frequency':freqs, 'Power':total_power})
+    psd = psd.loc[np.logical_and(psd['Frequency'] >= min_frequency, psd['Frequency'] <= max_frequency)].reset_index(drop=True)
+    
+    # Normalize the psd
+    if normalize and psd['Power'].max() > 0:
+        psd['Power'] /= psd['Power'].max()
     
     return psd
+    
 
 #
 # =============================================================================
