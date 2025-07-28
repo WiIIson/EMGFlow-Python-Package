@@ -20,7 +20,7 @@ A collection of functions for filtering Signals.
 # =============================================================================
 #
 
-def emg_to_psd(Signal, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None):
+def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None):
     """
     Creates a PSD dataframe of a signal. Uses the Welch method, meaning it can
     be used as a Long Term Average Spectrum (LTAS).

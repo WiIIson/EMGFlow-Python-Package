@@ -551,7 +551,7 @@ def calc_ap(Signal, col):
 # =============================================================================
 #
 
-def calc_mdf(psd):
+def calc_mdf(psd: pd.DataFrame):
     """
     Calculate the Median Frequency (MDF) of 'psd'. Ignores NaNs.
 
@@ -573,17 +573,23 @@ def calc_mdf(psd):
     
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("psd must contain columns 'Frequency' and 'Power'.")
     
-    prefix_sum = psd['Power'].cumsum()
-    suffix_sum = psd['Power'][::-1].cumsum()[::-1]
-    diff = np.abs(prefix_sum - suffix_sum)
-
-    min_ind = np.argmin(diff)
-    med_freq = psd.loc[diff.index.values[min_ind]]['Frequency']
+    if psd['Power'].isna().any() or psd['Frequency'].isna().any():
+        raise Exception("psd contains NaN values.")
     
-    return med_freq
+    freq = psd['Frequency'].to_numpy(dtype=float)
+    power = psd['Power'].to_numpy(dtype=float)
+    
+    ind = np.searchsorted(np.cumsum(power), np.sum(power) / 2.0)
+    
+    if ind == 0:
+        return freq[0]
+    elif ind >= len(freq):
+        return freq[-1]
+    else:
+        return freq[ind]
     
 #
 # =============================================================================
@@ -1321,10 +1327,7 @@ def extract_features(path_names, sampling_rate, cols=None, expression=None, file
                 mask_col = 'mask_' + str(col)
                 if mask_col in data_s.columns.values:
                     data_s.loc[~data_s[mask_col], col] = np.nan
-                    if mask_col in data_b.columns.values:
-                        data_b.loc[~data_s[mask_col], col] = np.nan
-                    else:
-                        raise Exception('Bandpass file ' + str(file) + ' does not contain column ' + str(mask_col))
+                    data_b.loc[~data_s[mask_col], col] = np.nan
                 
                 # Calculate time-series measures
                 Min = np.min(data_s[col])
