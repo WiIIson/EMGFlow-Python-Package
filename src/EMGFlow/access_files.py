@@ -15,7 +15,7 @@ A collection of functions for accessing files.
 # =============================================================================
 #
 
-def make_paths(root=None):
+def make_paths(root:str=None):
     """
     Generates a file structure for signal files, and returns a dictionary of
     the locations for these files.
@@ -63,7 +63,7 @@ def make_paths(root=None):
 # =============================================================================
 #
 
-def make_sample_data(path_names):
+def make_sample_data(path_names:dict):
     """
     Generates sample data in the 'Raw' folder of a provided dictionary of file
     locations.
@@ -131,7 +131,7 @@ def make_sample_data(path_names):
 # =============================================================================
 #
 
-def read_file_type(path, file_ext):
+def read_file_type(path:str, file_ext:str):
     """
     Safe wrapper for reading files of a given extension.
     
@@ -176,7 +176,7 @@ def read_file_type(path, file_ext):
 # =============================================================================
 #
 
-def map_files(in_path, file_ext='csv', expression=None, base=None):
+def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=None):
     """
     Generate a dictionary of file names and locations (keys/values) from the
     subfiles of a folder.

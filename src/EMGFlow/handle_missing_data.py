@@ -23,7 +23,7 @@ A collection of functions for finding outliers while testing.
 # =============================================================================
 #
 
-def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
+def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan_mask:bool=True):
     """
     Fills NaN values using interpolation methods in a column of the provided
     data.
@@ -128,7 +128,7 @@ def apply_fill_missing(Signal, col, method='pchip', use_nan_mask=True):
 # =============================================================================
 #
 
-def fill_missing_signals(in_path, out_path, sampling_rate, method='pchip', use_nan_mask=True, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', use_nan_mask:bool=True, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Fills NaN values using interpolation methods to all signals in a folder.
     Writes filled data to an output folder, and generates a file structure

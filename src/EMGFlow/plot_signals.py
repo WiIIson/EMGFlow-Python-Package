@@ -23,7 +23,7 @@ A collection of functions for plotting subject data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names, col, units, expression=None, file_ext='csv', use_mask=False, auto_run=True):
+def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, file_ext:str='csv', use_mask:bool=False, auto_run:bool=True):
     """
     Generate a shiny dashboard of different processing stages for a given
     column.

@@ -142,7 +142,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 # =============================================================================
 #
 
-def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms=30.0):
     """
     Apply a list of notch filters for given frequencies and Q-factors to a
     column of the provided data.
@@ -156,11 +156,11 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    notch_vals : list-tuple
+    notch_vals : list-tuple, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
-        filter).
+        filter). The default is [(50, 5)].
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -258,7 +258,7 @@ def apply_notch_filters(Signal, col, sampling_rate, notch_vals, min_gap_ms=30.0)
 # =============================================================================
 #
 
-def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply notch filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -272,11 +272,11 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
         Filepath to an output directory.
     sampling_rate : float
         Sampling rate of the signal files.
-    notch : list-tuples
+    notch_vals : list-tuples, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less
-        extreme filter).
+        extreme filter). The default is [(50, 5)].
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -356,7 +356,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
             
             # Apply filter to columns
             for col in cols:
-                data = apply_notch_filters(data, col, sampling_rate, notch)
+                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -382,7 +382,7 @@ def notch_filter_signals(in_path, out_path, sampling_rate, notch, cols=None, exp
 # =============================================================================
 #
 
-def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0):
+def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_gap_ms:float=30.0):
     """
     Apply a bandpass filter to for a given lower and upper limit to a column of
     the provided data.
@@ -396,10 +396,10 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    low : float
-        Lower frequency limit of the bandpass filter.
+    low : float, optional
+        Lower frequency limit of the bandpass filter. The default is 20.0.
     high : float
-        Upper frequency limit of the bandpass filter.
+        Upper frequency limit of the bandpass filter. The default is 450.0.
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -498,7 +498,7 @@ def apply_bandpass_filter(Signal, col, sampling_rate, low, high, min_gap_ms=30.0
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply bandpass filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -506,16 +506,16 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
     
     Parameters
     ----------
-    in_path : dict-str
+    in_path : str
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to an output directory.
     sampling_rate : float
         Sampling rate of the signal files.
     low : float, optional
-        Lower frequency limit of the bandpass filter. The default is 20.
+        Lower frequency limit of the bandpass filter. The default is 20.0.
     high : float, optional
-        Upper frequency limit of the bandpass filter. The default is 450.
+        Upper frequency limit of the bandpass filter. The default is 450.0.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -623,7 +623,7 @@ def bandpass_filter_signals(in_path, out_path, sampling_rate, low=20, high=450, 
 # =============================================================================
 #
 
-def apply_fwr(Signal, col):
+def apply_fwr(Signal:pd.DataFrame, col:str):
     """
     Apply a Full Wave Rectifier (FWR) to a column of the provided data.
 
@@ -665,7 +665,7 @@ def apply_fwr(Signal, col):
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
+def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
     """
     Apply a boxcar smoothing filter to a column of the provided data. Uses a
     rolling average with a window size.
@@ -679,8 +679,8 @@ def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    window_size : int, float
-        Size of the window of the filter.
+    window_size : int, optional.
+        Size of the window of the filter. The default is 50.
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -772,7 +772,7 @@ def apply_boxcar_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
+def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
     """
     Apply a Root Mean Square (RMS) smoothing filter to a column of the provided
     data. Uses a rolling average with a window size.
@@ -786,8 +786,8 @@ def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    window_size : int, float
-        Size of the window of the filter.
+    window_size : int, optional
+        Size of the window of the filter. The default is 50
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -880,7 +880,7 @@ def apply_rms_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_gap_ms=30.0):
+def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, sigma:float=1.0, min_gap_ms:float=30.0):
     """
     Apply a Gaussian smoothing filter to a column of the provided data. Uses a
     rolling average with a window size.
@@ -894,10 +894,10 @@ def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    window_size : int, float
-        Size of the window of the filter.
+    window_size : int, optional
+        Size of the window of the filter. The default is 50.
     sigma : float, optional
-        Parameter of sigma in the Gaussian smoothing. The default is 1.
+        Parameter of sigma in the Gaussian smoothing. The default is 1.0.
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -994,7 +994,7 @@ def apply_gaussian_smooth(Signal, col, sampling_rate, window_size, sigma=1, min_
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0):
+def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
     """
     Apply a Loess smoothing filter to a column of the provided data. Uses a
     rolling average with a window size and tri-cubic weight.
@@ -1008,8 +1008,8 @@ def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0)
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    window_size : int, float
-        Size of the window of the filter.
+    window_size : int, optional
+        Size of the window of the filter. The default is 50.
     min_gap_ms : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -1104,7 +1104,7 @@ def apply_loess_smooth(Signal, col, sampling_rate, window_size, min_gap_ms=30.0)
 # =============================================================================
 #
 
-def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=None, expression=None, exp_copy=False, file_ext='csv', method='rms', min_gap_ms=30.0, sigma=1):  
+def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_gap_ms:float=30.0, sigma:float=1.0):  
     """
     Apply smoothing filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -1119,8 +1119,8 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
         Filepath to an output directory.
     sampling_rate : float
         Sampling rate of the signal files.
-    window_size : int, float
-        Size of the window of the filter.
+    window_size : int, optional
+        Size of the window of the filter. The default is 50.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -1248,7 +1248,7 @@ def smooth_filter_signals(in_path, out_path, sampling_rate, window_size, cols=No
 # =============================================================================
 #
 
-def clean_signals(path_names, sampling_rate=2000):
+def clean_signals(path_names:dict, sampling_rate:float=2000.0):
     """
     Automates the EMG preprocessing workflow, performing notch filtering,
     bandpass filtering and smoothing.
@@ -1258,8 +1258,8 @@ def clean_signals(path_names, sampling_rate=2000):
     path_names : dict-str
         Dictionary containing path locations for writing and reading signal
         files between paths.
-    sampling_rate : float
-        Sampling rate of the signal files.
+    sampling_rate : float, optional
+        Sampling rate of the signal files. The default is 2000.0.
 
     Raises
     ------
@@ -1288,22 +1288,18 @@ def clean_signals(path_names, sampling_rate=2000):
         raise Exception('Bandpass path not detected in provided dictionary (path_names)')
     if 'Smooth' not in path_names:
         raise Exception('Smooth path not detected in provided dictionary (path_names)')
-    
-    # Default values for notch filtering and window size
-    notch = [(50,5)]
-    window_size = 50
-    
+        
     # Automatically runs through workflow
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch)
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate)
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate, window_size)
+    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate)
     return
 
 #
 # =============================================================================
 #
 
-def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=None, high=None, metric=np.median, expression=None, window_size=200, file_ext='csv'):
+def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, cols=None, low:float=None, high:float=None, metric=np.median, expression:str=None, window_size:int=200, file_ext:str='csv'):
     """
     Looks at all signal files contained in a filepath, returns a dictionary of
     file names and locations that have outliers.
@@ -1523,7 +1519,7 @@ def detect_spectral_outliers(in_path, sampling_rate, threshold, cols=None, low=N
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal, col, method='robust'):
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, method:str='robust'):
     """
     Creates a NaN mask for a column of a signal dataframe.
 
@@ -1582,7 +1578,7 @@ def apply_screen_artefacts(Signal, col, method='robust'):
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path, out_path, sampling_rate, method='robust', cols=None, expression=None, exp_copy=False, file_ext='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, method:str='robust', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Creates NaN masks for all Signals in a folder. Writes signal masked signal
     files to an output folder, and generates a file structure matching the

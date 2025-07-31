@@ -22,7 +22,7 @@ A collection of functions for extracting features.
 #
 
 
-def calc_iemg(Signal, col, sampling_rate):
+def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
     Calculate the Integreated EMG (IEMG) of a column of 'Signal'. Ignores NaNs.
 
@@ -66,7 +66,7 @@ def calc_iemg(Signal, col, sampling_rate):
 # =============================================================================
 #
 
-def calc_mav(Signal, col):
+def calc_mav(Signal:pd.DataFrame, col:str):
     """
     Calculate the Mean Absolute Value (MAV) of a column of 'Signal'. Ignores
     NaNs.
@@ -105,7 +105,7 @@ def calc_mav(Signal, col):
 # =============================================================================
 #
 
-def calc_mmav1(Signal, col):
+def calc_mmav1(Signal:pd.DataFrame, col:str):
     """
     Calculate the Modified Mean Absolute Value 1 (MMAV1) of a column of
     'Signal'. Ignores NaNs.
@@ -151,7 +151,7 @@ def calc_mmav1(Signal, col):
 # =============================================================================
 #
 
-def calc_mmav2(Signal, col):
+def calc_mmav2(Signal:pd.DataFrame, col:str):
     """
     Calculate the Modified Mean Absolute Value 2 (MMAV2) of a column of
     'Signal'. Ignores NaNs.
@@ -199,7 +199,7 @@ def calc_mmav2(Signal, col):
 # =============================================================================
 #
 
-def calc_ssi(Signal, col, sampling_rate):
+def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
     Calculate the Simple Square Integral (SSI) of a column of 'Signal'.
     Ignores NaNs.
@@ -244,7 +244,7 @@ def calc_ssi(Signal, col, sampling_rate):
 # =============================================================================
 #
 
-def calc_var(Signal, col):
+def calc_var(Signal:pd.DataFrame, col:str):
     """
     Calculate the Variance (VAR) of a column of 'Signal'. Ignores NaNs.
 
@@ -282,7 +282,7 @@ def calc_var(Signal, col):
 # =============================================================================
 #
 
-def calc_vorder(Signal, col):
+def calc_vorder(Signal:pd.DataFrame, col:str):
     """
     Calculate the V-Order of a column of 'Signal'. Ignores NaNs.
 
@@ -316,7 +316,7 @@ def calc_vorder(Signal, col):
 # =============================================================================
 #
 
-def calc_rms(Signal, col):
+def calc_rms(Signal:pd.DataFrame, col:str):
     """
     Calculate the Root Mean Square (RMS) of a column of 'Signal'. Ignores NaNs.
 
@@ -354,7 +354,7 @@ def calc_rms(Signal, col):
 # =============================================================================
 #
 
-def calc_wl(Signal, col):
+def calc_wl(Signal:pd.DataFrame, col:str):
     """
     Calculate the Waveform Length (WL) of a column of 'Signal'. Ignores NaNs.
 
@@ -393,7 +393,7 @@ def calc_wl(Signal, col):
 # =============================================================================
 #
 
-def calc_wamp(Signal, col, threshold):
+def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
     """
     Calculate the Willison Amplitude (WAMP) of a column of 'Signal'. Ignores
     NaNs.
@@ -435,7 +435,7 @@ def calc_wamp(Signal, col, threshold):
 # =============================================================================
 #
 
-def calc_log(Signal, col):
+def calc_log(Signal:pd.DataFrame, col:str):
     """
     Calculate the Log Detector (LOG) of a column of 'Signal'. Ignores NaNs.
     
@@ -474,7 +474,7 @@ def calc_log(Signal, col):
 # =============================================================================
 #
 
-def calc_mfl(Signal, col):
+def calc_mfl(Signal:pd.DataFrame, col:str):
     """
     Calculate the Maximum Fractal Length (MFL) of a column of 'Signal'. Ignores
     NaNs.
@@ -514,7 +514,7 @@ def calc_mfl(Signal, col):
 # =============================================================================
 #
 
-def calc_ap(Signal, col):
+def calc_ap(Signal:pd.DataFrame, col:str):
     """
     Calculate the Average Power (AP) of a column of 'Signal'. Ignores NaNs
 
@@ -551,7 +551,7 @@ def calc_ap(Signal, col):
 # =============================================================================
 #
 
-def calc_mdf(psd: pd.DataFrame):
+def calc_mdf(psd:pd.DataFrame):
     """
     Calculate the Median Frequency (MDF) of 'psd'. Ignores NaNs.
 
@@ -595,7 +595,7 @@ def calc_mdf(psd: pd.DataFrame):
 # =============================================================================
 #
 
-def calc_mnf(psd):
+def calc_mnf(psd:pd.DataFrame):
     """
     Calculate the Mean Frequency (MNF) of 'psd'. Ignores NaNs.
 
@@ -627,7 +627,7 @@ def calc_mnf(psd):
 # =============================================================================
 #
 
-def calc_twitch_ratio(psd, freq=60):
+def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     """
     Calculate the Twitch Ratio of 'psd'. Ignores NaNs.
 
@@ -671,7 +671,7 @@ def calc_twitch_ratio(psd, freq=60):
 # =============================================================================
 #
 
-def calc_twitch_index(psd, freq=60):
+def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     """
     Calculate the Twitch Index of 'psd'. Ignores NaNs.
 
@@ -715,7 +715,7 @@ def calc_twitch_index(psd, freq=60):
 # =============================================================================
 #
 
-def calc_twitch_slope(psd, freq=60):
+def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     """
     Calculate the Twitch Slope of 'psd'. Ignores NaNs.
 
@@ -773,7 +773,7 @@ def calc_twitch_slope(psd, freq=60):
 # =============================================================================
 #
 
-def calc_sc(psd):
+def calc_sc(psd:pd.DataFrame):
     """
     Calculate the Spectral Centroid (SC) of 'psd'. Ignores NaNs.
 
@@ -805,7 +805,7 @@ def calc_sc(psd):
 # =============================================================================
 #
 
-def calc_sflt(psd):
+def calc_sflt(psd:pd.DataFrame):
     """
     Calculate the Spectral Flatness (SFlt) of 'psd'. Ignores NaNs.
 
@@ -838,7 +838,7 @@ def calc_sflt(psd):
 # =============================================================================
 #
 
-def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
+def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:float=None):
     """
     Calculate the Spectral Flux (SFlx) of 'Signal1'. Ignores NaNs.
 
@@ -931,7 +931,7 @@ def calc_sflx(Signal1, diff, col, sampling_rate, diff_sr=None):
 # =============================================================================
 #
 
-def calc_ss(psd):
+def calc_ss(psd:pd.DataFrame):
     """
     Calculate the Spectral Spread (SS) of a 'psd'. Ignores NaNs.
 
@@ -964,7 +964,7 @@ def calc_ss(psd):
 # =============================================================================
 #
 
-def calc_sd(psd):
+def calc_sd(psd:pd.DataFrame):
     """
     Calculate the Spectral Decrease (SDec) of 'psd'. Ignores NaNs.
 
@@ -998,7 +998,7 @@ def calc_sd(psd):
 # =============================================================================
 #
 
-def calc_se(psd):
+def calc_se(psd:pd.DataFrame):
     """
     Calculate the Spectral Entropy (SE) of 'psd'. Ignores NaNs.
 
@@ -1031,7 +1031,7 @@ def calc_se(psd):
 # =============================================================================
 #
 
-def calc_sr(psd, percent=0.85):
+def calc_sr(psd:pd.DataFrame, percent:float=0.85):
     """
     Calculate the Spectral Rolloff (SR) of 'psd'. Ignores NaNs.
 
@@ -1080,7 +1080,7 @@ def calc_sr(psd, percent=0.85):
 # =============================================================================
 #
 
-def calc_sbw(psd, p=2):
+def calc_sbw(psd:pd.DataFrame, p:int=2):
     """
     Calculate the Spectral Bandwidth (SBW) of 'psd'. Ignores NaNs.
 
@@ -1121,7 +1121,7 @@ def calc_sbw(psd, p=2):
 # =============================================================================
 #
 
-def extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True):
+def extract_features(path_names:dict, sampling_rate:float, cols=None, expression:str=None, file_ext:str='csv', short_name:bool=True):
     """
     Extracts features from signals by running a series of feature extraction
     functions and saving the output to a feature file.
