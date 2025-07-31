@@ -479,14 +479,14 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     
     # Apply notch filters to each value sequence set sequences that are too
     # small to NaN
-    b, a = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band')
+    sos = scipy.signal.butter(5, [low, high], fs=sampling_rate, btype='band', output='sos')
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
             masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
+            filtered_section = scipy.signal.sosfiltfilt(sos, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in band_Signal
