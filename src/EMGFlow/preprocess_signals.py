@@ -141,6 +141,12 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 #
 # =============================================================================
 #
+#
+# NOTCH
+#
+#
+# =============================================================================
+#
 
 def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms=30.0):
     """
@@ -378,6 +384,12 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
     
     return
 
+#
+# =============================================================================
+#
+#
+# BANDPASS
+#
 #
 # =============================================================================
 #
@@ -622,8 +634,14 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
 #
 # =============================================================================
 #
+#
+# FWR
+#
+#
+# =============================================================================
+#
 
-def apply_fwr(Signal:pd.DataFrame, col:str):
+def apply_fwr_filter(Signal:pd.DataFrame, col:str):
     """
     Apply a Full Wave Rectifier (FWR) to a column of the provided data.
 
@@ -661,6 +679,544 @@ def apply_fwr(Signal:pd.DataFrame, col:str):
     
     return fwr_Signal
 
+#
+# =============================================================================
+#
+
+def fwr_filter_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+    """
+    Apply Full Wave Rectifier (FWR) filters to all signal files in a folder.
+    Writes filtered signal files to an output folder, and generates a file
+    structure matching the input folder.
+    
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read signal files.
+    out_path : str
+        Filepath to an output directory.
+    cols : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
+    expression : str, optional
+        A regular expression. If provided, will only filter files whose local
+        paths inside of 'in_path' match the regular expression. The default
+        is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
+    
+    Raises
+    ------
+    Warning
+        A warning is raised if no files in 'in_path' match with 'expression'.
+    Exception
+        An exception is raised if 'expression' is not None or a valid regular
+        expression.
+        
+    Warning
+        A warning is raised if 'col' contains NaN values.
+    Exception
+        An exception is raised if 'col' is not a column of 'Signal'.
+        
+    Exception
+        An exception is raised if a file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+    
+    Returns
+    -------
+    None.
+
+    """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+    
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+              
+            # Apply filter to columns
+            for col in cols:
+                data = apply_fwr_filter(data, col)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+    return
+
+#
+# =============================================================================
+#
+#
+# ARTEFACT SCREENING
+#
+#
+# =============================================================================
+#
+
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, method:str='robust'):
+    """
+    Creates a NaN mask for a column of a signal dataframe.
+
+    Parameters
+    ----------
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
+        for signal data.
+    col : str
+        Column of 'Signal' the NaN mask is created from.
+    method : str, optional
+        The outlier detection method being used. Valid options are 'robust',
+        'normal', or None. The default is 'robust'.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
+
+    Returns
+    -------
+    masked_Signal : pd.DataFrame
+        A copy of the 'Signal' dataframe with an added column for the NaN mask.
+
+    """
+    
+    # An exception is raised if 'col' is not a column of 'Signal'.
+    if col not in list(Signal.columns.values):
+        raise Exception("Column " + str(col) + " not in Signal")
+    
+    masked_Signal = Signal.copy()
+    
+    # Identify outlier parameters
+    if method=='robust':
+        # Set high and low with robust method
+        high = np.nanmedian(masked_Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
+        low = np.nanmedian(masked_Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
+    elif method=='normal':
+        # Set high and low with normal method
+        high = np.nanmean(masked_Signal[col]) + 5*np.nanstd(masked_Signal[col])
+        low = np.nanmean(masked_Signal[col]) - 5*np.nanstd(masked_Signal[col])
+    elif method is None:
+        pass
+    else:
+        raise Exception('Invalid outlier detection method chosen: ' + str(method) + ', use "robust", "normal" or None.')
+    
+    # Create NaN mask and add to masked_Signal
+    mask = (masked_Signal[col] > low) & (masked_Signal[col] < high) & (~masked_Signal[col].isna())
+    masked_Signal['mask_' + str(col)] = mask
+    
+    return masked_Signal
+
+#
+# =============================================================================
+#
+
+def screen_artefact_signals(in_path:str, out_path:str, method:str='robust', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+    """
+    Creates NaN masks for all Signals in a folder. Writes signal masked signal
+    files to an output folder, and generates a file structure matching the
+    input folder.
+    
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read signal files.
+    out_path : str
+        Filepath to an output directory.
+    method : str, optional
+        The outlier detection method being used. Valid options are 'robust',
+        'normal', or None. The default is 'robust'.
+    cols : list-str, optional
+        List of columns of the signals to create NaN masks in. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
+    expression : str, optional
+        A regular expression. If provided, will only screen artefacts in files
+        whose local paths inside of 'in_path' match the regular expression.
+        The default is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
+
+    Raises
+    ------
+    Warning
+        Raises a warning if no files in 'in_path' match with 'expression'.
+    Exception
+        An exception is raised if 'expression' is not None or a valid regular
+        expression.
+        
+    Exception
+        An exception is raised if any column in 'cols' is not found in any of
+        the signal files read.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
+        
+    Exception
+        An exception is raised if the file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            
+            # Apply filter to columns
+            for col in cols:
+                data = apply_screen_artefacts(data, col, method=method)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+    
+    return
+
+#
+# =============================================================================
+#
+#
+# FILL MISSING
+#
+#
+# =============================================================================
+#
+
+def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan_mask:bool=True):
+    """
+    Fills NaN values using interpolation methods in a column of the provided
+    data.
+
+    Parameters
+    ----------
+    Signal : pd.DataFrame
+        A Pandas dataframe containing a 'Time' column, and additional columns
+        for signal data.
+    col : str
+        Column of 'Signal' to fill NaN values.
+    method : str, optional
+        The interpolation method to use. Valid options are 'pchip' and
+        'spline'. The default is 'pchip'.
+    use_nan_mask : bool, optional
+        If true, fills in values marked as NaN in the NaN mask. If false, fills
+        NaN values directly in the selected column. The default is True.
+
+    Raises
+    ------
+    Exception
+        An exception is raised if 'col' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'col' is set to 'Time'.
+    Exception
+        An exception is raised if 'Time' is not a column of 'Signal'
+    Exception
+        An exception is raised if 'method' is an invalid interpolation method.
+    Exception
+        An exception is raised if 'use_nan_mask' is True, but there is no NaN
+        mask.
+    Exception
+        An exception is raised if there aren't enough valid points to perform
+        interpolation.
+
+    Returns
+    -------
+    filled_Signal : pd.DataFrame
+        A copy of the 'Signal' dataframe with NaN values filled.
+
+    """
+    
+    # An exception is raised if 'col' is not a column of 'Signal'.
+    if col not in list(Signal.columns.values):
+        raise Exception('Column "' + str(col) + '" not in Signal')
+    
+    if col == 'Time':
+        raise Exception('Column cannot be "Time".')
+    
+    # An exception is raised if 'Signal' does not have a 'Time' column
+    if 'Time' not in list(Signal.columns.values):
+        raise Exception('Signal is missing a "Time" column.')
+    
+    filled_Signal = Signal.copy()
+    filled_Signal.set_index('Time')
+    
+    # Get valid values
+    if use_nan_mask:
+        # Get valid values from mask filter
+        mask_col = 'mask_' + str(col)
+        
+        # Raise an exception if the mask column does not exist
+        if mask_col not in list(filled_Signal.columns.values):
+            raise Exception('Mask column not detected for: ' + str(col))
+        
+        mask = filled_Signal[mask_col]
+        valid_values = filled_Signal[mask][col].dropna().values
+        valid_index = filled_Signal[mask][col].dropna().index.astype(float)
+    else:
+        # Get valid values by dropping NaNs
+        valid_values = filled_Signal[col].dropna().values
+        valid_index = filled_Signal[col].dropna().index.astype(float)
+    
+    # Perform interpolation
+        
+    if method=='pchip':
+        
+        if len(valid_values) < 2:
+            raise Exception('Not enough valid points for PCHIP interpolation.')
+        else:
+            # Perform interpolation
+            pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values)
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal.index.astype(float)), index=filled_Signal.index))
+        
+    elif method=='spline':
+        
+        if len(valid_index) < 4:
+            raise Exception('Not enough valid points for cubic spline interpolation')
+        else:
+            # Perform interpolation
+            cs = scipy.interpolate.CubicSpline(valid_index, valid_values)
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal.index.astype(float)), index=filled_Signal.index))
+
+    else:
+        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip", "spline" or None.')
+    
+    # Update name of column
+    filled_Signal = filled_Signal.rename(columns={mask_col:'interpmask_'+mask_col[5:]})
+    
+    return filled_Signal
+
+#
+# =============================================================================
+#
+
+def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', use_nan_mask:bool=True, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+    """
+    Fills NaN values using interpolation methods to all signals in a folder.
+    Writes filled data to an output folder, and generates a file structure
+    matching the input folder.
+
+    Parameters
+    ----------
+    in_path : str
+        Filepath to a directory to read signal files.
+    out_path : str
+        Filepath to an output directory.
+    method : str, optional
+        The interpolation method to use. Valid options are 'pchip' and
+        'spline'. The default is 'pchip'.
+    use_nan_mask : bool, optional
+        If true, fills in values marked as NaN in the NaN mask. If false, fills
+        NaN values directly in the selected column. The default is True.
+    cols : list-str, optional
+        List of columns of the signal to interpolate values in. The default is
+        None, in which case the interpolation is performed in every column
+        except for 'Time'.
+    expression : str, optional
+        A regular expression. If provided, will only interpolate values in
+        files whose local paths inside of 'in_path' match the regular
+        expression. The default is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without filtering. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        File extension for files to read. Only reads files with this extension.
+        The default is 'csv'.
+
+    Raises
+    ------
+    Warning
+        Raises a warning if no files in 'in_path' match with 'expression'.
+    Exception
+        An exception is raised if 'expression' is not None or a valid regular
+        expression.
+    
+    Exception
+        An exception is raised if the file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
+    
+    Exception
+        An exception is raised if any column in 'cols' is not found in any of
+        the signal files read.
+    Exception
+        An exception is raised if 'Time' is in 'cols'.
+    Exception
+        An exception is raised if 'Time' is not found in any of the signal
+        files read.
+    Exception
+        An exception is raised if 'method' is an invalid interpolation method.
+    Exception
+        An exception is raised if 'use_nan_mask' is True, but there is no NaN
+        mask in any of the signal files read.
+    Exception
+        An exception is raised if there aren't enough valid points to perform
+        interpolation in any of the signal files read.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    if expression is not None:
+        try:
+            re.compile(expression)
+        except:
+            raise Exception("Invalid regex expression provided")
+    
+    # Convert out_path to absolute
+    if not os.path.isabs(out_path):
+        out_path = os.path.abspath(out_path)
+    
+    # Get dictionary of file locations
+    if exp_copy:
+        file_dirs = map_files(in_path, file_ext=file_ext)
+    else:
+        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+        if len(file_dirs) == 0:
+            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        
+    # Apply transformations
+    for file in tqdm(file_dirs):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+            
+            # Read file
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            # If no columns selected, apply filter to all columns except time
+            if cols is None:
+                cols = list(data.columns)
+                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            
+            # Apply filter to columns
+            for col in cols:
+                data = apply_fill_missing(data, col, method=method, use_nan_mask=use_nan_mask)
+            
+            # Construct out path
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            # Make folders and write data
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+            
+        elif (file[-len(file_ext):] == file_ext) and exp_copy:
+            # Copy the file even if it doesn't match if exp_copy is true
+            data = read_file_type(file_dirs[file], file_ext)
+            
+            out_file = out_path + file_dirs[file][len(in_path):]
+            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
+            
+            os.makedirs(out_folder, exist_ok=True)
+            data.to_csv(out_file, index=False)
+    
+    return
+
+#
+# =============================================================================
+#
+#
+# SMOOTH
+#
 #
 # =============================================================================
 #
@@ -722,7 +1278,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     if window_size <= 0:
         raise Exception("window_size must be greater than 0.")
     
-    boxcar_Signal = apply_fwr(Signal, col)
+    boxcar_Signal = apply_fwr_filter(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -944,7 +1500,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    gauss_Signal = apply_fwr(Signal, col)
+    gauss_Signal = apply_fwr_filter(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -1052,7 +1608,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    loess_Signal = apply_fwr(Signal, col)
+    loess_Signal = apply_fwr_filter(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -1248,7 +1804,7 @@ def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=2000.0):
+def clean_signals(path_names:dict, sampling_rate:float=2000.0, use_optional:bool=False):
     """
     Automates the EMG preprocessing workflow, performing notch filtering,
     bandpass filtering and smoothing.
@@ -1260,6 +1816,9 @@ def clean_signals(path_names:dict, sampling_rate:float=2000.0):
         files between paths.
     sampling_rate : float, optional
         Sampling rate of the signal files. The default is 2000.0.
+    use_optional : bool, optional
+        Setting to use the optional preprocessing steps (artefact screening,
+        fill missing data, smooth filter). The default is False.
 
     Raises
     ------
@@ -1268,7 +1827,10 @@ def clean_signals(path_names:dict, sampling_rate:float=2000.0):
         NaN values.
     Exception
         An exception is raised if the provided 'path_names' dictionary doesn't
-        contain a 'Raw', 'Notch', 'Bandpass' or 'Smooth' path key.
+        contain a 'Raw', 'Notch', 'Bandpass' or 'FWR' path key.
+    Exception
+        An exception is raised if the provided 'path_names' dictionary doesn't
+        contain a 'Filled' pr 'Smooth' path key if 'use_optional' is True.
 
     Exception
         An exception is raised if a file cannot not be read.
@@ -1281,18 +1843,30 @@ def clean_signals(path_names:dict, sampling_rate:float=2000.0):
     
     # Raise exceptions if paths not found
     if 'Raw' not in path_names:
-        raise Exception('Raw path not detected in provided dictionary (path_names)')
+        raise Exception('Raw path not detected in provided dictionary (path_names).')
     if 'Notch' not in path_names:
-        raise Exception('Notch path not detected in provided dictionary (path_names)')
+        raise Exception('Notch path not detected in provided dictionary (path_names).')
     if 'Bandpass' not in path_names:
-        raise Exception('Bandpass path not detected in provided dictionary (path_names)')
-    if 'Smooth' not in path_names:
-        raise Exception('Smooth path not detected in provided dictionary (path_names)')
+        raise Exception('Bandpass path not detected in provided dictionary (path_names).')
+    if 'FWR' not in path_names:
+        raise Exception('FWR path not detected in provided dictionary (path_names).')
         
-    # Automatically runs through workflow
+    # Run required preprocessing steps
     notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate)
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate)
+    fwr_filter_signals(path_names['Bandpass'], path_names['FWR'])
+    
+    # Run optional preprocessing steps
+    if use_optional:
+        if 'Filled' not in path_names:
+            raise Exception('Filled path not detected in provided dictionary (path_names).')
+        if 'Smooth' not in path_names:
+            raise Exception('Smooth path not detected in provided dictionary (path_names).')
+        
+        screen_artefact_signals(path_names['FWR'], path_names['FWR'])
+        fill_missing_signals(path_names['FWR'], path_names['Filled'])
+        smooth_filter_signals(path_names['Filled'], path_names['Smooth'], sampling_rate)
+    
     return
 
 #
@@ -1514,415 +2088,3 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
                 outliers[file] = file_dirs[file]
                 
     return outliers
-
-#
-# =============================================================================
-#
-
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, method:str='robust'):
-    """
-    Creates a NaN mask for a column of a signal dataframe.
-
-    Parameters
-    ----------
-    Signal : pd.DataFrame
-        A Pandas dataframe containing a 'Time' column, and additional columns
-        for signal data.
-    col : str
-        Column of 'Signal' the NaN mask is created from.
-    method : str, optional
-        The outlier detection method being used. Valid options are 'robust',
-        'normal', or None. The default is 'robust'.
-
-    Raises
-    ------
-    Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
-    Exception
-        An exception is raised if 'method' is an invalid screening method.
-
-    Returns
-    -------
-    masked_Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with an added column for the NaN mask.
-
-    """
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
-    
-    masked_Signal = Signal.copy()
-    
-    # Identify outlier parameters
-    if method=='robust':
-        # Set high and low with robust method
-        high = np.nanmedian(masked_Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
-        low = np.nanmedian(masked_Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
-    elif method=='normal':
-        # Set high and low with normal method
-        high = np.nanmean(masked_Signal[col]) + 5*np.nanstd(masked_Signal[col])
-        low = np.nanmean(masked_Signal[col]) - 5*np.nanstd(masked_Signal[col])
-    elif method is None:
-        pass
-    else:
-        raise Exception('Invalid outlier detection method chosen: ' + str(method) + ', use "robust", "normal" or None.')
-    
-    # Create NaN mask and add to masked_Signal
-    mask = (masked_Signal[col] > low) & (masked_Signal[col] < high) & (~masked_Signal[col].isna())
-    masked_Signal['mask_' + str(col)] = mask
-    
-    return masked_Signal
-
-#
-# =============================================================================
-#
-
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, method:str='robust', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
-    """
-    Creates NaN masks for all Signals in a folder. Writes signal masked signal
-    files to an output folder, and generates a file structure matching the
-    input folder.
-    
-    Parameters
-    ----------
-    in_path : str
-        Filepath to a directory to read signal files.
-    out_path : str
-        Filepath to an output directory.
-    sampling_rate : float
-        Sampling rate of the signal files.
-    method : str, optional
-        The outlier detection method being used. Valid options are 'robust',
-        'normal', or None. The default is 'robust'.
-    cols : list-str, optional
-        List of columns of the signals to create NaN masks in. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
-    expression : str, optional
-        A regular expression. If provided, will only screen artefacts in files
-        whose local paths inside of 'in_path' match the regular expression.
-        The default is None.
-    exp_copy : bool, optional
-        If True, copies files that don't match the regular expression to the
-        output folder without filtering. The default is False, which ignores
-        files that don't match.
-    file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
-
-    Raises
-    ------
-    Warning
-        Raises a warning if no files in 'in_path' match with 'expression'.
-    Exception
-        An exception is raised if 'expression' is not None or a valid regular
-        expression.
-        
-    Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the signal files read.
-    Exception
-        An exception is raised if 'method' is an invalid screening method.
-        
-    Exception
-        An exception is raised if the file could not be read.
-    Exception
-        An exception is raised if an unsupported file format was provided for
-        'file_ext'.
-
-    Returns
-    -------
-    None.
-
-    """
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
-    
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
-    
-    # Get dictionary of file locations
-    if exp_copy:
-        file_dirs = map_files(in_path, file_ext=file_ext)
-    else:
-        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
-        if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
-        
-    # Apply transformations
-    for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
-            
-            # Read file
-            data = read_file_type(file_dirs[file], file_ext)
-            
-            # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
-            
-            # Apply filter to columns
-            for col in cols:
-                data = apply_screen_artefacts(data, col, method=method)
-            
-            # Construct out path
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
-            
-            # Make folders and write data
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
-            
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = read_file_type(file_dirs[file], file_ext)
-            
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
-            
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
-    
-    return
-
-#
-# =============================================================================
-#
-
-def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan_mask:bool=True):
-    """
-    Fills NaN values using interpolation methods in a column of the provided
-    data.
-
-    Parameters
-    ----------
-    Signal : pd.DataFrame
-        A Pandas dataframe containing a 'Time' column, and additional columns
-        for signal data.
-    col : str
-        Column of 'Signal' to fill NaN values.
-    method : str, optional
-        The interpolation method to use. Valid options are 'pchip' and
-        'spline'. The default is 'pchip'.
-    use_nan_mask : bool, optional
-        If true, fills in values marked as NaN in the NaN mask. If false, fills
-        NaN values directly in the selected column. The default is True.
-
-    Raises
-    ------
-    Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
-    Exception
-        An exception is raised if 'col' is set to 'Time'.
-    Exception
-        An exception is raised if 'Time' is not a column of 'Signal'
-    Exception
-        An exception is raised if 'method' is an invalid interpolation method.
-    Exception
-        An exception is raised if 'use_nan_mask' is True, but there is no NaN
-        mask.
-    Exception
-        An exception is raised if there aren't enough valid points to perform
-        interpolation.
-
-    Returns
-    -------
-    filled_Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with NaN values filled.
-
-    """
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception('Column "' + str(col) + '" not in Signal')
-    
-    if col == 'Time':
-        raise Exception('Column cannot be "Time".')
-    
-    # An exception is raised if 'Signal' does not have a 'Time' column
-    if 'Time' not in list(Signal.columns.values):
-        raise Exception('Signal is missing a "Time" column.')
-    
-    filled_Signal = Signal.copy()
-    filled_Signal.set_index('Time')
-    
-    # Get valid values
-    if use_nan_mask:
-        # Get valid values from mask filter
-        mask_col = 'mask_' + str(col)
-        
-        # Raise an exception if the mask column does not exist
-        if mask_col not in list(filled_Signal.columns.values):
-            raise Exception('Mask column not detected for: ' + str(col))
-        
-        mask = filled_Signal[mask_col]
-        valid_values = filled_Signal[mask][col].dropna().values
-        valid_index = filled_Signal[mask][col].dropna().index.astype(float)
-    else:
-        # Get valid values by dropping NaNs
-        valid_values = filled_Signal[col].dropna().values
-        valid_index = filled_Signal[col].dropna().index.astype(float)
-    
-    # Perform interpolation
-        
-    if method=='pchip':
-        
-        if len(valid_values) < 2:
-            raise Exception('Not enough valid points for PCHIP interpolation.')
-        else:
-            # Perform interpolation
-            pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal.index.astype(float)), index=filled_Signal.index))
-        
-    elif method=='spline':
-        
-        if len(valid_index) < 4:
-            raise Exception('Not enough valid points for cubic spline interpolation')
-        else:
-            # Perform interpolation
-            cs = scipy.interpolate.CubicSpline(valid_index, valid_values)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal.index.astype(float)), index=filled_Signal.index))
-
-    else:
-        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip", "spline" or None.')
-    
-    filled_Signal.reset_index(inplace=True)
-    
-    return filled_Signal
-
-#
-# =============================================================================
-#
-
-def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', use_nan_mask:bool=True, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
-    """
-    Fills NaN values using interpolation methods to all signals in a folder.
-    Writes filled data to an output folder, and generates a file structure
-    matching the input folder.
-
-    Parameters
-    ----------
-    in_path : str
-        Filepath to a directory to read signal files.
-    out_path : str
-        Filepath to an output directory.
-    sampling_rate : float
-        Sampling rate of the signal files.
-    method : str, optional
-        The interpolation method to use. Valid options are 'pchip' and
-        'spline'. The default is 'pchip'.
-    use_nan_mask : bool, optional
-        If true, fills in values marked as NaN in the NaN mask. If false, fills
-        NaN values directly in the selected column. The default is True.
-    cols : list-str, optional
-        List of columns of the signal to interpolate values in. The default is
-        None, in which case the interpolation is performed in every column
-        except for 'Time'.
-    expression : str, optional
-        A regular expression. If provided, will only interpolate values in
-        files whose local paths inside of 'in_path' match the regular
-        expression. The default is None.
-    exp_copy : bool, optional
-        If True, copies files that don't match the regular expression to the
-        output folder without filtering. The default is False, which ignores
-        files that don't match.
-    file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
-
-    Raises
-    ------
-    Warning
-        Raises a warning if no files in 'in_path' match with 'expression'.
-    Exception
-        An exception is raised if 'expression' is not None or a valid regular
-        expression.
-    
-    Exception
-        An exception is raised if the file could not be read.
-    Exception
-        An exception is raised if an unsupported file format was provided for
-        'file_ext'.
-    
-    Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the signal files read.
-    Exception
-        An exception is raised if 'Time' is in 'cols'.
-    Exception
-        An exception is raised if 'Time' is not found in any of the signal
-        files read.
-    Exception
-        An exception is raised if 'method' is an invalid interpolation method.
-    Exception
-        An exception is raised if 'use_nan_mask' is True, but there is no NaN
-        mask in any of the signal files read.
-    Exception
-        An exception is raised if there aren't enough valid points to perform
-        interpolation in any of the signal files read.
-
-    Returns
-    -------
-    None.
-
-    """
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
-    
-    # Convert out_path to absolute
-    if not os.path.isabs(out_path):
-        out_path = os.path.abspath(out_path)
-    
-    # Get dictionary of file locations
-    if exp_copy:
-        file_dirs = map_files(in_path, file_ext=file_ext)
-    else:
-        file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
-        if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
-        
-    # Apply transformations
-    for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
-            
-            # Read file
-            data = read_file_type(file_dirs[file], file_ext)
-            
-            # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
-            
-            # Apply filter to columns
-            for col in cols:
-                data = apply_fill_missing(data, col, method=method, use_nan_mask=use_nan_mask)
-            
-            # Construct out path
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
-            
-            # Make folders and write data
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
-            
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
-            data = read_file_type(file_dirs[file], file_ext)
-            
-            out_file = out_path + file_dirs[file][len(in_path):]
-            out_folder = out_file[:len(out_file) - len(os.path.basename(out_file)) - 1]
-            
-            os.makedirs(out_folder, exist_ok=True)
-            data.to_csv(out_file, index=False)
-    
-    return

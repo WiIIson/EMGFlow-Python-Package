@@ -51,12 +51,43 @@ class TestSimple(unittest.TestCase):
         EMGFlow.bandpass_filter_signals(pathNames['Raw'], pathNames['Bandpass'], 2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Bandpass'], '01', 'sample_data_01.csv')))
     
-    def test_apply_fwr(self):
+    def test_apply_fwr_filter(self):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        SSignal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
+        SSignal = EMGFlow.apply_fwr_filter(Signal, 'EMG_zyg')
         self.assertIsInstance(SSignal, pd.DataFrame)
+    
+    def test_fwr_filter_signals(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.fwr_filter_signals(pathNames['Raw'], pathNames['FWR'])
+        self.assertTrue(os.path.exists(os.path.join(pathNames['FWR'], '01', 'sample_data_01.csv')))
+    
+    def test_apply_screen_artefacts(self):
+        pathNames = EMGFlow.make_paths()
+        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        Signal = EMGFlow.read_file_type(filePath, 'csv')
+        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg')
+        self.assertIsInstance(ASignal, pd.DataFrame)
+    
+    def test_screen_artefact_signals(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'])
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
+    
+    def test_apply_fill_missing(self):
+        pathNames = EMGFlow.make_paths()
+        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        Signal = EMGFlow.read_file_type(filePath, 'csv')
+        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg')
+        FSignal = EMGFlow.apply_fill_missing(ASignal, 'EMG_zyg')
+        self.assertIsInstance(FSignal, pd.DataFrame)
+    
+    def test_fill_missing_signals(self):
+        pathNames = EMGFlow.make_paths()
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'])
+        EMGFlow.fill_missing_signals(pathNames['Filled'], pathNames['Filled'])
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
     
     def test_apply_boxcar_smooth(self):
         pathNames = EMGFlow.make_paths()
@@ -93,7 +124,7 @@ class TestSimple(unittest.TestCase):
     
     def test_clean_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.clean_signals(pathNames)
+        EMGFlow.clean_signals(pathNames, use_optional=True)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
 
     def test_detect_outliers(self):
@@ -101,32 +132,6 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000, 2, window_size=15)
         self.assertIsInstance(outliers, dict)
-    
-    def test_apply_screen_artefacts(self):
-        pathNames = EMGFlow.make_paths()
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
-        Signal = EMGFlow.read_file_type(filePath, 'csv')
-        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg')
-        self.assertIsInstance(ASignal, pd.DataFrame)
-    
-    def test_screen_artefact_signals(self):
-        pathNames = EMGFlow.make_paths()
-        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'], 2000)
-        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
-
-    def test_apply_fill_missing(self):
-        pathNames = EMGFlow.make_paths()
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
-        Signal = EMGFlow.read_file_type(filePath, 'csv')
-        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg')
-        FSignal = EMGFlow.apply_fill_missing(ASignal, 'EMG_zyg')
-        self.assertIsInstance(FSignal, pd.DataFrame)
-    
-    def test_fill_missing_signals(self):
-        pathNames = EMGFlow.make_paths()
-        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'], 2000)
-        EMGFlow.fill_missing_signals(pathNames['Filled'], pathNames['Filled'], 2000)
-        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
 
 #
 # =============================================================================

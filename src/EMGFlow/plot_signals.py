@@ -1,3 +1,4 @@
+import os
 import re
 import matplotlib.pyplot as plt
 import numpy as np
@@ -89,33 +90,21 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
     path_names = path_names.copy()
     path_names.pop("Feature", None)
     
-    # Try to load from "Filled"
-    try:
-        in_paths = list(path_names.values())
-        names = list(path_names.keys())
-        
-        # Convert file paths to directories
-        file_dirs = []
-        for path in in_paths:
-            file_dirs.append(map_files(path))
-        
-        # Convert file directories to data frame
-        df = map_files_fuse(file_dirs, names)
+    # Try to load from each available file location
+    names = list(path_names.keys())
+    file_dirs = []
+    for name in names:
+        if not bool(os.listdir(path_names[name])):
+            path_names.pop(name, None)
     
-    # Load without "Filled"
-    except:
-        path_names.pop("Filled", None)
-        
-        in_paths = list(path_names.values())
-        names = list(path_names.keys())
-        
-        # Convert file paths to directories
-        file_dirs = []
-        for path in in_paths:
-            file_dirs.append(map_files(path))
-        
-        # Convert file directories to data frame
-        df = map_files_fuse(file_dirs, names)
+    in_paths = list(path_names.values())
+    names = list(path_names.keys())
+    file_dirs = []
+    
+    for path in in_paths:
+        file_dirs.append(map_files(path))
+    
+    df = map_files_fuse(file_dirs, names)
     
     if expression is not None:
         try:
@@ -202,10 +191,9 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
                     if col not in list(sigDF.columns.values):
                         raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                     
-                    if use_mask:
-                        mask_col = 'mask_' + str(col)
-                        if mask_col in list(sigDF.columns.values):
-                            sigDF.loc[~sigDF[mask_col], col] = np.nan
+                    mask_col = 'mask_' + str(col)
+                    if mask_col in list(sigDF.columns.values):
+                        sigDF.loc[~sigDF[mask_col], col] = np.nan
                     
                     ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                     
@@ -220,10 +208,9 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
                 if col not in list(sigDF.columns.values):
                     raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                 
-                if use_mask:
-                    mask_col = 'mask_' + str(col)
-                    if mask_col in list(sigDF.columns.values):
-                        sigDF.loc[~sigDF[mask_col], col] = np.nan
+                mask_col = 'mask_' + str(col)
+                if mask_col in list(sigDF.columns.values):
+                    sigDF.loc[~sigDF[mask_col], col] = np.nan
                 
                 # Get colour data
                 i = names.index(column)

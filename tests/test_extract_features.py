@@ -105,7 +105,7 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
+        Signal = EMGFlow.apply_fwr_filter(Signal, 'EMG_zyg')
         Signal += 0.0001
         LOG = EMGFlow.calc_log(Signal, 'EMG_zyg')
         self.assertIsInstance(LOG, float)

@@ -1202,8 +1202,8 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     
     if 'Bandpass' not in path_names:
         raise Exception('Bandpass path not detected in provided dictionary (path_names)')
-    if 'Smooth' not in path_names:
-        raise Exception('Smooth path not detected in provided dictionary (path_names)')
+    if 'FWR' not in path_names:
+        raise Exception('FWR path not detected in provided dictionary (path_names)')
     if 'Feature' not in path_names:
         raise Exception('Feature path not detected in provided dictionary (path_names)')
     
@@ -1224,15 +1224,19 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     # Must have files with the same name
     file_dirs_b = map_files(path_names['Bandpass'], file_ext=file_ext, expression=expression)
     
-    if 'Filled' in path_names:
+    try:
+        file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+        if (len(file_dirs_s)) != (len(file_dirs_b)):
+            raise Exception('Filled files not detected...')
+    except:
         try:
-            file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+            file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
                 raise Exception('Filled files not detected...')
         except:
-            file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
-    else:
-        file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
+            file_dirs_s = map_files(path_names['FWR'], file_ext=file_ext, expression=expression)
+            if (len(file_dirs_s)) != (len(file_dirs_b)):
+                raise Exception('Data not detected in "Filled", "Smooth" and "FWR" paths. Feature extraction could not be completed.')
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
@@ -1285,7 +1289,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         path1 = next(iter(file_dirs_s.values()))
         data1 = read_file_type(path1, file_ext)
         cols = list(data1.columns)
-        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_') and not col.startswith('interpmask_')]
     
     
     # Create row labels
@@ -1325,9 +1329,19 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 
                 # Use the mask if it is there (smooth mask for both dataframes)
                 mask_col = 'mask_' + str(col)
+                interpmask_col = 'interpmask_' + str(col)
                 if mask_col in data_s.columns.values:
                     data_s.loc[~data_s[mask_col], col] = np.nan
                     data_b.loc[~data_s[mask_col], col] = np.nan
+                    Timeseries_Pmissing = data_s[col].isna().mean()
+                    Spectral_Pmissing = data_b[col].isna().mean()
+                else:
+                    if interpmask_col in data_s.columns.values:
+                        Timeseries_Pmissing = sum(~data_s[interpmask_col]) / len(data_s)
+                    else:
+                        Timeseries_Pmissing = data_s[col].isna().mean()
+
+                    Spectral_Pmissing = data_b[col].isna().mean()
                 
                 # Calculate time-series measures
                 Min = np.min(data_s[col])
@@ -1348,9 +1362,6 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 LOG = calc_log(data_s, col)
                 MFL = calc_mfl(data_s, col)
                 AP = calc_ap(data_s, col)
-                
-                # Calculate time-series percent missing
-                Timeseries_Pmissing = data_s[col].isna().mean()
     
                 # Calculate spectral features
                 psd = emg_to_psd(data_b, col, sampling_rate=sampling_rate)
@@ -1368,9 +1379,6 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 Spectral_Entropy = calc_se(psd)
                 Spectral_Rolloff = calc_sr(psd)
                 Spectral_Bandwidth = calc_sbw(psd, 2)
-                
-                # Calculate spectral percent missing
-                Spectral_Pmissing = data_b[col].isna().mean()
                 
                 # Append to list of values
                 col_vals = [
