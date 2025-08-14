@@ -124,7 +124,7 @@ class TestSimple(unittest.TestCase):
     
     def test_clean_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.clean_signals(pathNames, use_optional=True)
+        EMGFlow.clean_signals(pathNames, 2000, use_optional=True)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
 
     def test_detect_outliers(self):
