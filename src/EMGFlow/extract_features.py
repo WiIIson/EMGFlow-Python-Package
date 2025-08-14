@@ -1289,7 +1289,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         path1 = next(iter(file_dirs_s.values()))
         data1 = read_file_type(path1, file_ext)
         cols = list(data1.columns)
-        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_') and not col.startswith('interpmask_')]
+        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
     
     
     # Create row labels
@@ -1329,18 +1329,12 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 
                 # Use the mask if it is there (smooth mask for both dataframes)
                 mask_col = 'mask_' + str(col)
-                interpmask_col = 'interpmask_' + str(col)
                 if mask_col in data_s.columns.values:
-                    data_s.loc[~data_s[mask_col], col] = np.nan
                     data_b.loc[~data_s[mask_col], col] = np.nan
-                    Timeseries_Pmissing = data_s[col].isna().mean()
+                    Timeseries_Pmissing = (~data_s[mask_col]).mean()
                     Spectral_Pmissing = data_b[col].isna().mean()
                 else:
-                    if interpmask_col in data_s.columns.values:
-                        Timeseries_Pmissing = sum(~data_s[interpmask_col]) / len(data_s)
-                    else:
-                        Timeseries_Pmissing = data_s[col].isna().mean()
-
+                    Timeseries_Pmissing = data_s[col].isna().mean()
                     Spectral_Pmissing = data_b[col].isna().mean()
                 
                 # Calculate time-series measures
@@ -1348,8 +1342,8 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 Max = np.max(data_s[col])
                 Mean = np.mean(data_s[col])
                 SD = np.std(data_s[col])
-                Skew = scipy.stats.skew(data_s[col])
-                Kurtosis = scipy.stats.kurtosis(data_s[col])
+                Skew = scipy.stats.skew(data_s[col].dropna())
+                Kurtosis = scipy.stats.kurtosis(data_s[col].dropna())
                 IEMG = calc_iemg(data_s, col, sampling_rate)
                 MAV = calc_mav(data_s, col)
                 MMAV1 = calc_mmav1(data_s, col)

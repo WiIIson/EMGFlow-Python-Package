@@ -148,7 +148,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 # =============================================================================
 #
 
-def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms:float=30.0):
     """
     Apply a list of notch filters for given frequencies and Q-factors to a
     column of the provided data.
@@ -182,6 +182,9 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
+    Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
         'sampling_rate'/2 or less than 0.
 
@@ -208,6 +211,8 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(notch_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = notch_Signal[col]
@@ -217,7 +222,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -264,7 +269,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply notch filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -283,6 +288,11 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less
         extreme filter). The default is [(50, 5)].
+    min_gap_ms : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -314,6 +324,9 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         signal file.
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
         'sampling_rate'/2 or less than 0.
@@ -362,7 +375,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
             
             # Apply filter to columns
             for col in cols:
-                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals)
+                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals, min_gap_ms=min_gap_ms)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -431,6 +444,9 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
         'sampling_rate'.
     Exception
         An exception is raised if 'high' is not higher than 'low'.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
 
     Returns
     -------
@@ -464,6 +480,8 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(band_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = band_Signal[col]
@@ -473,7 +491,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -510,7 +528,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply bandpass filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -528,6 +546,11 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         Lower frequency limit of the bandpass filter. The default is 20.0.
     high : float, optional
         Upper frequency limit of the bandpass filter. The default is 450.0.
+    min_gap_ms : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -564,6 +587,9 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         'sampling_rate'.
     Exception
         An exception is raised if 'high' is not higher than 'low'.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
         
     Exception
         An exception is raised if a file could not be read.
@@ -609,7 +635,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
               
             # Apply filter to columns
             for col in cols:
-                data = apply_bandpass_filter(data, col, sampling_rate, low, high)
+                data = apply_bandpass_filter(data, col, sampling_rate, low, high, min_gap_ms=min_gap_ms)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -641,7 +667,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
 # =============================================================================
 #
 
-def apply_fwr_filter(Signal:pd.DataFrame, col:str):
+def apply_rectify(Signal:pd.DataFrame, col:str):
     """
     Apply a Full Wave Rectifier (FWR) to a column of the provided data.
 
@@ -683,11 +709,11 @@ def apply_fwr_filter(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def fwr_filter_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply Full Wave Rectifier (FWR) filters to all signal files in a folder.
-    Writes filtered signal files to an output folder, and generates a file
-    structure matching the input folder.
+    Apply a Full Wave Rectifier (FWR) to all signal files in a folder. Writes
+    filtered signal files to an output folder, and generates a file structure
+    matching the input folder.
     
     Parameters
     ----------
@@ -768,7 +794,7 @@ def fwr_filter_signals(in_path:str, out_path:str, cols=None, expression:str=None
               
             # Apply filter to columns
             for col in cols:
-                data = apply_fwr_filter(data, col)
+                data = apply_rectify(data, col)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -794,15 +820,15 @@ def fwr_filter_signals(in_path:str, out_path:str, cols=None, expression:str=None
 # =============================================================================
 #
 #
-# ARTEFACT SCREENING
+# HAMPEL FILTER
 #
 #
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, method:str='robust'):
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, n_sigma:float=3.0, min_gap_ms:float=30.0):
     """
-    Creates a NaN mask for a column of a signal dataframe.
+    Apply a Hampel filter to a column of the provided data.
 
     Parameters
     ----------
@@ -810,78 +836,207 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, method:str='robust'):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the NaN mask is created from.
-    method : str, optional
-        The outlier detection method being used. Valid options are 'robust',
-        'normal', or None. The default is 'robust'.
+        Column of 'Signal' the filter is applied to.
+    sampling_rate : float
+        Sampling rate of 'Signal'.
+    window_size : int, optional
+        Size of the outlier detection window. The default is 50.
+    n_sigma : float, optional
+        Number of standard deviations away for a value to be considered an
+        outlier. The default is 3.0.
+    min_gap_ms : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
 
     Raises
     ------
+    Warning
+        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'method' is an invalid screening method.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
+    Exception
+        An exception is raised if 'window_size' is greater than the length of
+        'Signal'.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
+    Exception
+        An exception is raised if 'window_size' is greater than the minimum
+        length created by 'min_gap_ms'.
 
     Returns
     -------
-    masked_Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with an added column for the NaN mask.
+    hamp_Signal : pd.DataFrame
+        A copy of 'Signal' after the Hampel filter is applied.
 
     """
     
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
+        raise Exception("Column " + str(col) + " not in Signal.")
     
-    masked_Signal = Signal.copy()
+    # A warning is raised if 'col' contains NaN values.
+    if Signal[col].isnull().values.any():
+        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
     
-    # Identify outlier parameters
-    if method=='robust':
-        # Set high and low with robust method
-        high = np.nanmedian(masked_Signal[col]) + 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
-        low = np.nanmedian(masked_Signal[col]) - 5*(1.482*scipy.stats.median_abs_deviation(masked_Signal[col], nan_policy='omit'))
-    elif method=='normal':
-        # Set high and low with normal method
-        high = np.nanmean(masked_Signal[col]) + 5*np.nanstd(masked_Signal[col])
-        low = np.nanmean(masked_Signal[col]) - 5*np.nanstd(masked_Signal[col])
-    elif method is None:
-        pass
+    # An exception is raised if 'sampling_rate' is less or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("Sampling rate must be greater than 0.")
+    
+    # Raises an exception if the window size is greater than the length of 'Signal'
+    if window_size > len(Signal):
+        raise Exception("'window_size' is greater than 'Signal' length.")
+    
+    hamp_Signal = Signal.copy()
+    
+    # Calculate gap parameter
+    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(hamp_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+    
+    # Raises an exception if 'window_size' is smaller than the minimum length
+    # created by 'min_gap_ms'
+    if window_size > min_gap:
+        raise Exception("'window_size' must be smaller than the minimum gap created by 'min_gap_ms': " + str(min_gap))
+        
+    # Internal function for applying the Hampel filter
+    def hampel_filter(data, window_size:int=50, n_sigma:float=3.0):
+        n = len(data)
+        half_window = window_size // 2
+        
+        filtered_data = data.copy()
+        mask = np.full(n, True)
+        
+        # Iterate over beginning
+        for i in range(0, half_window):
+            window = data[0:2*half_window+1]
+            median = np.nanmedian(window)
+            mad = np.nanmedian(np.abs(window-median))
+            threshold = n_sigma * 1.4826 * mad
+            
+            if abs(data[i] - median) > threshold:
+                filtered_data[i] = median
+                mask[i] = False
+                
+        # Iterate over middle
+        for i in range(half_window, n - half_window):
+            window = data[i - half_window: i + half_window + 1].copy()
+            median = np.nanmedian(window)
+            mad = np.nanmedian(np.abs(window - median))
+            threshold = n_sigma * 1.4826 * mad
+            
+            if abs(data[i] - median) > threshold:
+                filtered_data[i] = median
+                mask[i] = False
+        
+        # Iterate over end
+        for i in range(n - half_window, n):
+            window = data[n-2*half_window-1:n]
+            median = np.nanmedian(window)
+            mad = np.nanmedian(np.abs(window-median))
+            threshold = n_sigma * 1.4826 * mad
+            
+            if abs(data[i] - median) > threshold:
+                filtered_data[i] = median
+                mask[i] = False
+    
+        return filtered_data, mask
+    
+    # Construct list of NaN locations
+    data = hamp_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create NaN mask
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    for (nan_ind, nan_len) in nan_sequences:
+        if nan_len < min_gap:
+            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+    
+    # Use mask to remove small NaN groups, construct list of value locations
+    masked_data = hamp_Signal[min_nan_mask]
+    masked_data = masked_data.copy()
+    
+    # Construct list of value locations
+    data = masked_data[col]
+    mask = data.notna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Create a mask for masked_data
+    hamp_mask = np.full(len(masked_data), True)
+    
+    # Apply Hampel filters to each value sequence set sequences that are too
+    # small to NaN
+    for (val_ind, val_len) in val_sequences:
+        if val_len < min_gap:
+            # Set value to NaN
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+        else:
+            # Apply filter
+            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, col].copy().to_numpy(), window_size=window_size, n_sigma=n_sigma)
+            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            hamp_mask[val_ind:val_ind+val_len] = mask
+    
+    # Put masked_data back in hamp_Signal
+    hamp_Signal.loc[min_nan_mask, col] = masked_data[col]
+    
+    # Create a mask for the full column and add the masked values
+    full_mask = np.full(len(hamp_Signal), True)
+    full_mask[min_nan_mask] = hamp_mask
+    
+    # Merge with the mask column if it exists
+    mask_col = 'mask_' + col
+    if mask_col not in list(hamp_Signal.columns.values):
+        hamp_Signal[mask_col] = full_mask
     else:
-        raise Exception('Invalid outlier detection method chosen: ' + str(method) + ', use "robust", "normal" or None.')
+        hamp_Signal[mask_col] = hamp_Signal[mask_col] & full_mask
     
-    # Create NaN mask and add to masked_Signal
-    mask = (masked_Signal[col] > low) & (masked_Signal[col] < high) & (~masked_Signal[col].isna())
-    masked_Signal['mask_' + str(col)] = mask
-    
-    return masked_Signal
+    return hamp_Signal
 
 #
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, method:str='robust', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, n_sigma:float=3.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Creates NaN masks for all Signals in a folder. Writes signal masked signal
-    files to an output folder, and generates a file structure matching the
-    input folder.
-    
+    Fills outlier values using the Hampel filter to all signals in a folder.
+    Writes filled data to an output folder, and generates a file structure
+    matching the input folder.
+
     Parameters
     ----------
     in_path : str
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to an output directory.
-    method : str, optional
-        The outlier detection method being used. Valid options are 'robust',
-        'normal', or None. The default is 'robust'.
+    sampling_rate : float
+        Sampling rate of the signal files.
+    window_size : int, optional
+        Size of the outlier detection window. The default is 50.
+    n_sigma : float, optional
+        Number of standard deviations away for a value to be considered an
+        outlier. The default is 3.0.
+    min_gap_ms : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
     cols : list-str, optional
-        List of columns of the signals to create NaN masks in. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
+        List of columns of the signal to interpolate values in. The default is
+        None, in which case the interpolation is performed in every column
+        except for 'Time'.
     expression : str, optional
-        A regular expression. If provided, will only screen artefacts in files
-        whose local paths inside of 'in_path' match the regular expression.
-        The default is None.
+        A regular expression. If provided, will only interpolate values in
+        files whose local paths inside of 'in_path' match the regular
+        expression. The default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
@@ -893,19 +1048,30 @@ def screen_artefact_signals(in_path:str, out_path:str, method:str='robust', cols
     Raises
     ------
     Warning
-        Raises a warning if no files in 'in_path' match with 'expression'.
+        A warning is raised if no files in 'in_path' match with 'expression'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
         
+   Warning
+        A warning is raised if a column in 'cols' contains NaN values.
     Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the signal files read.
+        An exception is raised if a column in 'cols' is not a column of a
+        signal file.
     Exception
-        An exception is raised if 'method' is an invalid screening method.
+        An exception is raised if 'sampling_rate' is less or equal to 0.
+    Exception
+        An exception is raised if 'window_size' is greater than the length of
+        'Signal'.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
+    Exception
+        An exception is raised if 'window_size' is greater than the minimum
+        length created by 'min_gap_ms'.
         
     Exception
-        An exception is raised if the file could not be read.
+        An exception is raised if a file could not be read.
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
@@ -948,7 +1114,7 @@ def screen_artefact_signals(in_path:str, out_path:str, method:str='robust', cols
             
             # Apply filter to columns
             for col in cols:
-                data = apply_screen_artefacts(data, col, method=method)
+                data = apply_screen_artefacts(data, col, sampling_rate, window_size=window_size, n_sigma=n_sigma, min_gap_ms=min_gap_ms)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -980,7 +1146,7 @@ def screen_artefact_signals(in_path:str, out_path:str, method:str='robust', cols
 # =============================================================================
 #
 
-def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan_mask:bool=True):
+def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     """
     Fills NaN values using interpolation methods in a column of the provided
     data.
@@ -995,9 +1161,6 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan
     method : str, optional
         The interpolation method to use. Valid options are 'pchip' and
         'spline'. The default is 'pchip'.
-    use_nan_mask : bool, optional
-        If true, fills in values marked as NaN in the NaN mask. If false, fills
-        NaN values directly in the selected column. The default is True.
 
     Raises
     ------
@@ -1035,24 +1198,26 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan
         raise Exception('Signal is missing a "Time" column.')
     
     filled_Signal = Signal.copy()
-    filled_Signal.set_index('Time')
     
-    # Get valid values
-    if use_nan_mask:
-        # Get valid values from mask filter
-        mask_col = 'mask_' + str(col)
-        
-        # Raise an exception if the mask column does not exist
-        if mask_col not in list(filled_Signal.columns.values):
-            raise Exception('Mask column not detected for: ' + str(col))
-        
-        mask = filled_Signal[mask_col]
-        valid_values = filled_Signal[mask][col].dropna().values
-        valid_index = filled_Signal[mask][col].dropna().index.astype(float)
+    # Get valid values by dropping NaNs
+    view_sig = filled_Signal[['Time', col]].copy()
+    view_sig = view_sig.dropna(subset=[col])
+    
+    valid_values = view_sig[col]
+    valid_index = view_sig['Time']
+    
+    # Ensure values are sorted properly
+    valid_index, valid_values = zip(*sorted(zip(valid_index, valid_values)))
+    
+    # Create NaN mask
+    full_mask = filled_Signal[col].notna()
+    
+    # Merge with the mask column if it exists
+    mask_col = 'mask_' + col
+    if mask_col not in list(filled_Signal.columns.values):
+        filled_Signal[mask_col] = full_mask
     else:
-        # Get valid values by dropping NaNs
-        valid_values = filled_Signal[col].dropna().values
-        valid_index = filled_Signal[col].dropna().index.astype(float)
+        filled_Signal[mask_col] = filled_Signal[mask_col] & full_mask
     
     # Perform interpolation
         
@@ -1062,8 +1227,8 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan
             raise Exception('Not enough valid points for PCHIP interpolation.')
         else:
             # Perform interpolation
-            pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal.index.astype(float)), index=filled_Signal.index))
+            pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values, extrapolate=False)
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal['Time']), index=filled_Signal.index))
         
     elif method=='spline':
         
@@ -1071,14 +1236,11 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan
             raise Exception('Not enough valid points for cubic spline interpolation')
         else:
             # Perform interpolation
-            cs = scipy.interpolate.CubicSpline(valid_index, valid_values)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal.index.astype(float)), index=filled_Signal.index))
-
-    else:
-        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip", "spline" or None.')
+            cs = scipy.interpolate.CubicSpline(valid_index, valid_values, extrapolate=False)
+            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal['Time']), index=filled_Signal.index))
     
-    # Update name of column
-    filled_Signal = filled_Signal.rename(columns={mask_col:'interpmask_'+mask_col[5:]})
+    else:
+        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip" or "spline".')
     
     return filled_Signal
 
@@ -1086,7 +1248,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip', use_nan
 # =============================================================================
 #
 
-def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', use_nan_mask:bool=True, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Fills NaN values using interpolation methods to all signals in a folder.
     Writes filled data to an output folder, and generates a file structure
@@ -1101,9 +1263,6 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', use_nan_
     method : str, optional
         The interpolation method to use. Valid options are 'pchip' and
         'spline'. The default is 'pchip'.
-    use_nan_mask : bool, optional
-        If true, fills in values marked as NaN in the NaN mask. If false, fills
-        NaN values directly in the selected column. The default is True.
     cols : list-str, optional
         List of columns of the signal to interpolate values in. The default is
         None, in which case the interpolation is performed in every column
@@ -1189,7 +1348,7 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', use_nan_
             
             # Apply filter to columns
             for col in cols:
-                data = apply_fill_missing(data, col, method=method, use_nan_mask=use_nan_mask)
+                data = apply_fill_missing(data, col, method=method, )
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1254,6 +1413,9 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
     
     Returns
     -------
@@ -1278,10 +1440,12 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     if window_size <= 0:
         raise Exception("window_size must be greater than 0.")
     
-    boxcar_Signal = apply_fwr_filter(Signal, col)
+    boxcar_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(boxcar_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = boxcar_Signal[col]
@@ -1291,7 +1455,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -1361,6 +1525,9 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
 
     Returns
     -------
@@ -1390,6 +1557,8 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(rms_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = rms_Signal[col]
@@ -1399,7 +1568,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -1471,6 +1640,9 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
 
     Returns
     -------
@@ -1500,10 +1672,12 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    gauss_Signal = apply_fwr_filter(Signal, col)
+    gauss_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(gauss_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = gauss_Signal[col]
@@ -1513,7 +1687,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -1583,6 +1757,9 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
 
     Returns
     -------
@@ -1608,10 +1785,12 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    loess_Signal = apply_fwr_filter(Signal, col)
+    loess_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    if min_gap > len(loess_Signal):
+        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = loess_Signal[col]
@@ -1621,7 +1800,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data))
+    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
             min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
@@ -1660,7 +1839,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_gap_ms:float=30.0, sigma:float=1.0):  
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_gap_ms:float=30.0, sigma:float=1.0):  
     """
     Apply smoothing filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -1725,6 +1904,9 @@ def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window
         the Signal files read.
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
+    Exception
+        An exception is raised if the minimum length created by 'min_gap_ms'
+        is greater than the length of 'Signal'.
     
     Exception
         An exception is raised if a file cannot not be read in 'in_path'.
@@ -1771,13 +1953,13 @@ def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window
             # Apply filter to columns
             for col in cols:
                 if method == 'rms':
-                    data = apply_rms_smooth(data, col, sampling_rate, window_size)
+                    data = apply_rms_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
                 elif method == 'boxcar':
-                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size)
+                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
                 elif method == 'gauss':
-                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma)
+                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma, min_gap_ms=min_gap_ms)
                 elif method == 'loess':
-                    data = apply_loess_smooth(data, col, sampling_rate, window_size)
+                    data = apply_loess_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
                 else:
                     raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
@@ -1804,7 +1986,7 @@ def smooth_filter_signals(in_path:str, out_path:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=2000.0, use_optional:bool=False):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool=False):
     """
     Automates the EMG preprocessing workflow, performing notch filtering,
     bandpass filtering and smoothing.
@@ -1854,7 +2036,7 @@ def clean_signals(path_names:dict, sampling_rate:float=2000.0, use_optional:bool
     # Run required preprocessing steps
     notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate)
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    fwr_filter_signals(path_names['Bandpass'], path_names['FWR'])
+    rectify_signals(path_names['Bandpass'], path_names['FWR'])
     
     # Run optional preprocessing steps
     if use_optional:
@@ -1863,9 +2045,9 @@ def clean_signals(path_names:dict, sampling_rate:float=2000.0, use_optional:bool
         if 'Smooth' not in path_names:
             raise Exception('Smooth path not detected in provided dictionary (path_names).')
         
-        screen_artefact_signals(path_names['FWR'], path_names['FWR'])
-        fill_missing_signals(path_names['FWR'], path_names['Filled'])
-        smooth_filter_signals(path_names['Filled'], path_names['Smooth'], sampling_rate)
+        screen_artefact_signals(path_names['FWR'], path_names['Filled'], sampling_rate)
+        fill_missing_signals(path_names['Filled'], path_names['Filled'])
+        smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate)
     
     return
 

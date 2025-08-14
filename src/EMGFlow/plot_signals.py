@@ -191,10 +191,6 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
                     if col not in list(sigDF.columns.values):
                         raise Exception("Column " + str(col) + " not in Signal " + str(filename))
                     
-                    mask_col = 'mask_' + str(col)
-                    if mask_col in list(sigDF.columns.values):
-                        sigDF.loc[~sigDF[mask_col], col] = np.nan
-                    
                     ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
@@ -207,10 +203,6 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
                 # Exception for column input
                 if col not in list(sigDF.columns.values):
                     raise Exception("Column " + str(col) + " not in Signal " + str(filename))
-                
-                mask_col = 'mask_' + str(col)
-                if mask_col in list(sigDF.columns.values):
-                    sigDF.loc[~sigDF[mask_col], col] = np.nan
                 
                 # Get colour data
                 i = names.index(column)
