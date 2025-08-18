@@ -72,21 +72,19 @@ class TestSimple(unittest.TestCase):
     
     def test_screen_artefact_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'], 2000)
-        self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], 2000)
+        self.assertTrue(os.path.exists(os.path.join(pathNames['Screened'], '01', 'sample_data_01.csv')))
     
     def test_apply_fill_missing(self):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg', 2000)
-        FSignal = EMGFlow.apply_fill_missing(ASignal, 'EMG_zyg')
+        FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg')
         self.assertIsInstance(FSignal, pd.DataFrame)
     
     def test_fill_missing_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Filled'], 2000)
-        EMGFlow.fill_missing_signals(pathNames['Filled'], pathNames['Filled'])
+        EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'])
         self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
     
     def test_apply_boxcar_smooth(self):

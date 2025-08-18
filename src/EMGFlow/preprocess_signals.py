@@ -2045,8 +2045,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool
         if 'Smooth' not in path_names:
             raise Exception('Smooth path not detected in provided dictionary (path_names).')
         
-        screen_artefact_signals(path_names['FWR'], path_names['Filled'], sampling_rate)
-        fill_missing_signals(path_names['Filled'], path_names['Filled'])
+        screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate)
+        fill_missing_signals(path_names['Screened'], path_names['Filled'])
         smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate)
     
     return

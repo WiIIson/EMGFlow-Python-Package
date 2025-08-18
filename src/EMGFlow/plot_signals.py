@@ -130,7 +130,8 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
             ui.sidebar(
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
                 ui.input_select('file_type', 'File:', choices=df['File']),
-                ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1])
+                ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
+                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1])
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
@@ -153,21 +154,29 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
             column = input.sig_type()
         
             if column == 'All':
-                max_x = max(
-                    read_file_type(file_loc, file_ext)['Time'].max()
-                    for file_loc in list(df.loc[filename])[1:]
-                )
-                min_x = min(
-                    read_file_type(file_loc, file_ext)['Time'].min()
-                    for file_loc in list(df.loc[filename])[1:]
-                )
+                min_x = float('inf')
+                max_x = float('-inf')
+                min_y = float('inf')
+                max_y = float('-inf')
+                
+                for file_loc in list(df.loc[filename])[1:]:
+                    data = read_file_type(file_loc, file_ext)
+                    
+                    min_x = min(min_x, data['Time'].min())
+                    max_x = max(max_x, data['Time'].max())
+                    min_y = min(min_y, data[col].min())
+                    max_y = max(max_y, data[col].max())
+                    
             else:
                 file_location = df.loc[filename][column]
-                sigDF = read_file_type(file_location, file_ext)
-                max_x = sigDF['Time'].max()
-                min_x = sigDF['Time'].min()
+                data = read_file_type(file_location, file_ext)
+                max_x = data['Time'].max()
+                min_x = data['Time'].min()
+                max_y = data[col].max()
+                min_y = data[col].min()
         
             ui.update_slider("x_range", min=min_x, max=max_x, value=[min_x, max_x])
+            ui.update_slider("y_range", min=min_y, max=max_y, value=[min_y, max_y])
 
 
         
@@ -176,6 +185,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
             filename = input.file_type()
             column = input.sig_type()
             x_min, x_max = input.x_range()  # Get slider values
+            y_min, y_max = input.y_range()
 
             
             # Plot data
@@ -210,6 +220,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
                 ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                 
             ax.set_xlim(x_min, x_max)
+            ax.set_ylim(y_min, y_max)
             ax.set_ylabel('Voltage (mV)')
             ax.set_xlabel('Time (s)')
             ax.set_title(column + ' filter: ' + filename)

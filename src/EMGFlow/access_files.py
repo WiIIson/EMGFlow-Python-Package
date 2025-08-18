@@ -48,9 +48,10 @@ def make_paths(root:str=None):
         'Notch':os.path.join(root, '2_notch'),
         'Bandpass':os.path.join(root, '3_bandpass'),
         'FWR':os.path.join(root, '4_fwr'),
-        'Filled':os.path.join(root, '5_filled'),
-        'Smooth':os.path.join(root, '6_smooth'),
-        'Feature':os.path.join(root, '7_feature')
+        'Screened':os.path.join(root, '5_screened'),
+        'Filled':os.path.join(root, '6_filled'),
+        'Smooth':os.path.join(root, '7_smoothed'),
+        'Feature':os.path.join(root, '8_feature')
     }
     
     # Create folders
