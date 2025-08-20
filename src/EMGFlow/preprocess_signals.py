@@ -65,7 +65,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     
     """
     
-    PSD_Signal = Signal.copy()
+    PSD_Signal = Signal.copy().reset_index(drop=True)
     
     # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(PSD_Signal.columns.values):
@@ -93,7 +93,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     if nperseg >= N/2.0:
         nperseg = int(N/2.0)
     nfft = int(nperseg * 2.0) # 50% overlap
-    step = nperseg // 2
+    step = int(nperseg // 2)
     
     PSDs = []
     freqs = None
@@ -207,7 +207,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater or equal to 0.")
     
-    notch_Signal = Signal.copy()
+    notch_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -222,14 +222,13 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = notch_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = notch_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -261,7 +260,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
                 masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in band_Signal
-    notch_Signal.loc[min_nan_mask, col] = masked_data[col]
+    notch_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return notch_Signal
 
@@ -476,7 +475,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     if high <= low:
         raise Exception("'high' must be higher than 'low'.")
     
-    band_Signal = Signal.copy()
+    band_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -491,14 +490,13 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    min_nan_mask = pd.Series([True] * len(data), index=data.index)
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = band_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = band_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -520,7 +518,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in band_Signal
-    band_Signal.loc[min_nan_mask, col] = masked_data[col]
+    band_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return band_Signal
 
@@ -700,7 +698,7 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
     if Signal[col].isnull().values.any():
         warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
     
-    fwr_Signal = Signal.copy()
+    fwr_Signal = Signal.copy().reset_index(drop=True)
     fwr_Signal[col] = np.abs(fwr_Signal[col])
     
     return fwr_Signal
@@ -826,7 +824,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, n_sigma:float=3.0, min_gap_ms:float=30.0):
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=3.0, min_gap_ms:float=30.0):
     """
     Apply a Hampel filter to a column of the provided data.
 
@@ -839,8 +837,8 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         Column of 'Signal' the filter is applied to.
     sampling_rate : float
         Sampling rate of 'Signal'.
-    window_size : int, optional
-        Size of the outlier detection window. The default is 50.
+    window_ms : float, optional
+        Size (in ms) of the outlier detection window. The default is 50.0.
     n_sigma : float, optional
         Number of standard deviations away for a value to be considered an
         outlier. The default is 3.0.
@@ -887,26 +885,27 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     if sampling_rate <= 0:
         raise Exception("Sampling rate must be greater than 0.")
     
-    # Raises an exception if the window size is greater than the length of 'Signal'
+    # An exception is raised if the length created by 'window_ms' is greater
+    # than the length of 'Signal'
+    window_size = int(window_ms * sampling_rate / 1000.0)
     if window_size > len(Signal):
         raise Exception("'window_size' is greater than 'Signal' length.")
     
-    hamp_Signal = Signal.copy()
+    hamp_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
     if min_gap > len(hamp_Signal):
         raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
-    # Raises an exception if 'window_size' is smaller than the minimum length
-    # created by 'min_gap_ms'
+    # Raises an exception if 'window_ms' is smaller than 'min_gap_ms'
     if window_size > min_gap:
-        raise Exception("'window_size' must be smaller than the minimum gap created by 'min_gap_ms': " + str(min_gap))
+        raise Exception("'window_size': " + str(window_size) + " must be smaller than 'min_gap_ms': " + str(min_gap))
         
     # Internal function for applying the Hampel filter
     def hampel_filter(data, window_size:int=50, n_sigma:float=3.0):
         n = len(data)
-        half_window = window_size // 2
+        half_window = int(window_size // 2)
         
         filtered_data = data.copy()
         mask = np.full(n, True)
@@ -943,6 +942,10 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
             if abs(data[i] - median) > threshold:
                 filtered_data[i] = median
                 mask[i] = False
+                
+        print('data len :', str(len(filtered_data)))
+        print('mask len :', str(len(mask)))
+        print()
     
         return filtered_data, mask
     
@@ -954,14 +957,13 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    min_nan_mask = pd.Series([True] * len(data))
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = hamp_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = hamp_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -971,7 +973,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     val_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create a mask for masked_data
-    hamp_mask = np.full(len(masked_data), True)
+    hamp_mask = pd.Series(np.full(len(masked_data), True))
     
     # Apply Hampel filters to each value sequence set sequences that are too
     # small to NaN
@@ -981,23 +983,23 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
             masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
         else:
             # Apply filter
-            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, col].copy().to_numpy(), window_size=window_size, n_sigma=n_sigma)
+            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, col].to_numpy(), window_size=window_size, n_sigma=n_sigma)
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
-            hamp_mask[val_ind:val_ind+val_len] = mask
+            hamp_mask.loc[val_ind:val_ind+val_len-1] = mask
     
     # Put masked_data back in hamp_Signal
-    hamp_Signal.loc[min_nan_mask, col] = masked_data[col]
+    hamp_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     # Create a mask for the full column and add the masked values
-    full_mask = np.full(len(hamp_Signal), True)
-    full_mask[min_nan_mask] = hamp_mask
+    full_mask = pd.Series(np.full(len(hamp_Signal), True))
+    full_mask[min_nan_mask] = hamp_mask.values
     
     # Merge with the mask column if it exists
     mask_col = 'mask_' + col
     if mask_col not in list(hamp_Signal.columns.values):
-        hamp_Signal[mask_col] = full_mask
+        hamp_Signal[mask_col] = full_mask.values
     else:
-        hamp_Signal[mask_col] = hamp_Signal[mask_col] & full_mask
+        hamp_Signal[mask_col] = hamp_Signal[mask_col] & full_mask.values
     
     return hamp_Signal
 
@@ -1005,7 +1007,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, n_sigma:float=3.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=3.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Fills outlier values using the Hampel filter to all signals in a folder.
     Writes filled data to an output folder, and generates a file structure
@@ -1019,8 +1021,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         Filepath to an output directory.
     sampling_rate : float
         Sampling rate of the signal files.
-    window_size : int, optional
-        Size of the outlier detection window. The default is 50.
+    window_ms : float, optional
+        Size (in ms) of the outlier detection window. The default is 50.0.
     n_sigma : float, optional
         Number of standard deviations away for a value to be considered an
         outlier. The default is 3.0.
@@ -1114,7 +1116,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
             
             # Apply filter to columns
             for col in cols:
-                data = apply_screen_artefacts(data, col, sampling_rate, window_size=window_size, n_sigma=n_sigma, min_gap_ms=min_gap_ms)
+                data = apply_screen_artefacts(data, col, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_gap_ms=min_gap_ms)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1197,7 +1199,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     if 'Time' not in list(Signal.columns.values):
         raise Exception('Signal is missing a "Time" column.')
     
-    filled_Signal = Signal.copy()
+    filled_Signal = Signal.copy().reset_index(drop=True)
     
     # Get valid values by dropping NaNs
     view_sig = filled_Signal[['Time', col]].copy()
@@ -1458,11 +1460,10 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = boxcar_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = boxcar_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -1484,7 +1485,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in boxcar_Signal
-    boxcar_Signal.loc[min_nan_mask, col] = masked_data[col]
+    boxcar_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return boxcar_Signal
 
@@ -1553,7 +1554,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     if window_size <= 0:
         raise Exception("window_size cannot be 0 or negative")
     
-    rms_Signal = Signal.copy()
+    rms_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
     min_gap = int(min_gap_ms * sampling_rate / 1000.0)
@@ -1571,11 +1572,10 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = rms_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = rms_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -1597,7 +1597,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in rms_Signal
-    rms_Signal.loc[min_nan_mask, col] = masked_data[col]
+    rms_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return rms_Signal
 
@@ -1687,14 +1687,13 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    min_nan_mask = pd.Series([True] * len(data), index=data.index)
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = gauss_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = gauss_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -1716,7 +1715,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in gauss_Signal
-    gauss_Signal.loc[min_nan_mask, col] = masked_data[col]
+    gauss_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return gauss_Signal
 
@@ -1800,14 +1799,13 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
     # Create NaN mask
-    min_nan_mask = pd.Series([True] * len(data), index=data.index).copy()
+    min_nan_mask = pd.Series([True] * len(data), index=data.index)
     for (nan_ind, nan_len) in nan_sequences:
         if nan_len < min_gap:
-            min_nan_mask[nan_ind:nan_ind+nan_len-1] = False
+            min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = loess_Signal[min_nan_mask]
-    masked_data = masked_data.copy()
+    masked_data = loess_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[col]
@@ -1831,7 +1829,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
             masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
     
     # Put masked_data back in loess_Signal
-    loess_Signal.loc[min_nan_mask, col] = masked_data[col]
+    loess_Signal.loc[min_nan_mask, col] = masked_data[col].values
     
     return loess_Signal
 
