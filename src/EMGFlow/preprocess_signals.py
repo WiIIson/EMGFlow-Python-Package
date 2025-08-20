@@ -898,55 +898,34 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     if min_gap > len(hamp_Signal):
         raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
     
-    # Raises an exception if 'window_ms' is smaller than 'min_gap_ms'
-    if window_size > min_gap:
-        raise Exception("'window_size': " + str(window_size) + " must be smaller than 'min_gap_ms': " + str(min_gap))
+    # Raises an exception if 'window_size' is less than 1
+    if window_size < 1:
+        raise Exception("'window_size': " + str(window_size) + " must be 1 or greater.")
         
     # Internal function for applying the Hampel filter
     def hampel_filter(data, window_size:int=50, n_sigma:float=3.0):
         n = len(data)
-        half_window = int(window_size // 2)
+        half_window=int(window_size//2)
         
-        filtered_data = data.copy()
-        mask = np.full(n, True)
+        filtered_data=data.copy()
+        mask=np.full(n,True)
         
-        # Iterate over beginning
-        for i in range(0, half_window):
-            window = data[0:2*half_window+1]
-            median = np.nanmedian(window)
+        # Precompute windows once
+        
+        for i in range(n):
+            # Handle edge cases with slicing
+            start = max(0, i-half_window)
+            end = min(n, i+half_window+1)
+            window=data[start:end]
+            
+            median=np.nanmedian(window)
             mad = np.nanmedian(np.abs(window-median))
-            threshold = n_sigma * 1.4826 * mad
+            threshold=n_sigma*1.4826*mad
             
-            if abs(data[i] - median) > threshold:
+            if abs(data[i]-median) > threshold:
                 filtered_data[i] = median
                 mask[i] = False
-                
-        # Iterate over middle
-        for i in range(half_window, n - half_window):
-            window = data[i - half_window: i + half_window + 1].copy()
-            median = np.nanmedian(window)
-            mad = np.nanmedian(np.abs(window - median))
-            threshold = n_sigma * 1.4826 * mad
             
-            if abs(data[i] - median) > threshold:
-                filtered_data[i] = median
-                mask[i] = False
-        
-        # Iterate over end
-        for i in range(n - half_window, n):
-            window = data[n-2*half_window-1:n]
-            median = np.nanmedian(window)
-            mad = np.nanmedian(np.abs(window-median))
-            threshold = n_sigma * 1.4826 * mad
-            
-            if abs(data[i] - median) > threshold:
-                filtered_data[i] = median
-                mask[i] = False
-                
-        print('data len :', str(len(filtered_data)))
-        print('mask len :', str(len(mask)))
-        print()
-    
         return filtered_data, mask
     
     # Construct list of NaN locations
