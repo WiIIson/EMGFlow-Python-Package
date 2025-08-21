@@ -148,7 +148,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 # =============================================================================
 #
 
-def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms:float=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0):
     """
     Apply a list of notch filters for given frequencies and Q-factors to a
     column of the provided data.
@@ -167,7 +167,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter). The default is [(50, 5)].
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -182,7 +182,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
@@ -210,9 +210,9 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     notch_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(notch_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = notch_Signal[col]
@@ -268,7 +268,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply notch filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -287,7 +287,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         applied. Hz is the frequency to apply the filter to, and Q is the
         Q-score (an intensity score where a higher number means a less
         extreme filter). The default is [(50, 5)].
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -324,7 +324,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
     Exception
         An exception is raised if 'sampling_rate' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
@@ -374,7 +374,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
             
             # Apply filter to columns
             for col in cols:
-                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals, min_gap_ms=min_gap_ms)
+                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -406,7 +406,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
 # =============================================================================
 #
 
-def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_gap_ms:float=30.0):
+def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0):
     """
     Apply a bandpass filter to for a given lower and upper limit to a column of
     the provided data.
@@ -424,7 +424,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
         Lower frequency limit of the bandpass filter. The default is 20.0.
     high : float
         Upper frequency limit of the bandpass filter. The default is 450.0.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -444,7 +444,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     Exception
         An exception is raised if 'high' is not higher than 'low'.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
 
     Returns
@@ -478,9 +478,9 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     band_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(band_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = band_Signal[col]
@@ -526,7 +526,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply bandpass filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -544,7 +544,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         Lower frequency limit of the bandpass filter. The default is 20.0.
     high : float, optional
         Upper frequency limit of the bandpass filter. The default is 450.0.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -586,7 +586,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
     Exception
         An exception is raised if 'high' is not higher than 'low'.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
         
     Exception
@@ -633,7 +633,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
               
             # Apply filter to columns
             for col in cols:
-                data = apply_bandpass_filter(data, col, sampling_rate, low, high, min_gap_ms=min_gap_ms)
+                data = apply_bandpass_filter(data, col, sampling_rate, low, high, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -824,7 +824,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=3.0, min_gap_ms:float=30.0):
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0):
     """
     Apply a Hampel filter to a column of the provided data.
 
@@ -841,8 +841,8 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         Size (in ms) of the outlier detection window. The default is 50.0.
     n_sigma : float, optional
         Number of standard deviations away for a value to be considered an
-        outlier. The default is 3.0.
-    min_gap_ms : float, optional
+        outlier. The default is 5.0.
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -860,11 +860,11 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         An exception is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     Exception
         An exception is raised if 'window_size' is greater than the minimum
-        length created by 'min_gap_ms'.
+        length created by 'min_segment'.
 
     Returns
     -------
@@ -894,16 +894,16 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     hamp_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(hamp_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Raises an exception if 'window_size' is less than 1
     if window_size < 1:
         raise Exception("'window_size': " + str(window_size) + " must be 1 or greater.")
         
     # Internal function for applying the Hampel filter
-    def hampel_filter(data, window_size:int=50, n_sigma:float=3.0):
+    def hampel_filter(data, window_size:int=50, n_sigma:float=5.0):
         n = len(data)
         half_window=int(window_size//2)
         
@@ -986,7 +986,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=3.0, min_gap_ms:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Fills outlier values using the Hampel filter to all signals in a folder.
     Writes filled data to an output folder, and generates a file structure
@@ -1004,8 +1004,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         Size (in ms) of the outlier detection window. The default is 50.0.
     n_sigma : float, optional
         Number of standard deviations away for a value to be considered an
-        outlier. The default is 3.0.
-    min_gap_ms : float, optional
+        outlier. The default is 5.0.
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1045,11 +1045,11 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         An exception is raised if 'window_size' is greater than the length of
         'Signal'.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     Exception
         An exception is raised if 'window_size' is greater than the minimum
-        length created by 'min_gap_ms'.
+        length created by 'min_segment'.
         
     Exception
         An exception is raised if a file could not be read.
@@ -1095,7 +1095,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
             
             # Apply filter to columns
             for col in cols:
-                data = apply_screen_artefacts(data, col, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_gap_ms=min_gap_ms)
+                data = apply_screen_artefacts(data, col, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1361,7 +1361,7 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
+def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
     """
     Apply a boxcar smoothing filter to a column of the provided data. Uses a
     rolling average with a window size.
@@ -1377,7 +1377,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
         Sampling rate of 'Signal'.
     window_size : int, optional.
         Size of the window of the filter. The default is 50.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1395,7 +1395,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     
     Returns
@@ -1424,9 +1424,9 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     boxcar_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(boxcar_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = boxcar_Signal[col]
@@ -1472,7 +1472,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
+def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
     """
     Apply a Root Mean Square (RMS) smoothing filter to a column of the provided
     data. Uses a rolling average with a window size.
@@ -1488,7 +1488,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
         Sampling rate of 'Signal'.
     window_size : int, optional
         Size of the window of the filter. The default is 50
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1506,7 +1506,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
 
     Returns
@@ -1536,9 +1536,9 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     rms_Signal = Signal.copy().reset_index(drop=True)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(rms_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = rms_Signal[col]
@@ -1584,7 +1584,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, sigma:float=1.0, min_gap_ms:float=30.0):
+def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, sigma:float=1.0, min_segment:float=30.0):
     """
     Apply a Gaussian smoothing filter to a column of the provided data. Uses a
     rolling average with a window size.
@@ -1602,7 +1602,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
         Size of the window of the filter. The default is 50.
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.0.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1620,7 +1620,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
 
     Returns
@@ -1654,9 +1654,9 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     gauss_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(gauss_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = gauss_Signal[col]
@@ -1702,7 +1702,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_gap_ms:float=30.0):
+def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
     """
     Apply a Loess smoothing filter to a column of the provided data. Uses a
     rolling average with a window size and tri-cubic weight.
@@ -1718,7 +1718,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
         Sampling rate of 'Signal'.
     window_size : int, optional
         Size of the window of the filter. The default is 50.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1736,7 +1736,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
 
     Returns
@@ -1766,9 +1766,9 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     loess_Signal = apply_rectify(Signal, col)
     
     # Calculate gap parameter
-    min_gap = int(min_gap_ms * sampling_rate / 1000.0)
+    min_gap = int(min_segment * sampling_rate / 1000.0)
     if min_gap > len(loess_Signal):
-        raise Exception("Minimum length created by 'min_gap_ms' is greater than 'Signal' length.")
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = loess_Signal[col]
@@ -1816,7 +1816,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_gap_ms:float=30.0, sigma:float=1.0):  
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_segment:float=30.0, sigma:float=1.0):  
     """
     Apply smoothing filters to all signal files in a folder. Writes filtered
     signal files to an output folder, and generates a file structure matching
@@ -1851,7 +1851,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
     method : str, optional
         The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or
         'loess'. The default is 'rms'.
-    min_gap_ms : float, optional
+    min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
@@ -1882,7 +1882,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
     Exception
         An exception is raised if 'window_size' is less or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_gap_ms'
+        An exception is raised if the minimum length created by 'min_segment'
         is greater than the length of 'Signal'.
     
     Exception
@@ -1930,13 +1930,13 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
             # Apply filter to columns
             for col in cols:
                 if method == 'rms':
-                    data = apply_rms_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
+                    data = apply_rms_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
                 elif method == 'boxcar':
-                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
+                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
                 elif method == 'gauss':
-                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma, min_gap_ms=min_gap_ms)
+                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma, min_segment=min_segment)
                 elif method == 'loess':
-                    data = apply_loess_smooth(data, col, sampling_rate, window_size, min_gap_ms=min_gap_ms)
+                    data = apply_loess_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
                 else:
                     raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
