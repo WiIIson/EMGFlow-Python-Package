@@ -17,17 +17,18 @@ A collection of functions for accessing files.
 
 def make_paths(root:str=None):
     """
-    Generates a file structure for signal files, and returns a dictionary of
-    the locations for these files.
+    Generates a file structure for an EMG workflow, and returns a dictionary of
+    the locations for these files for easy use with EMG processing functions.
     
-    Creates 'Raw', 'Notch', 'Bandpass', 'Smooth', 'Filled', and 'Feature'
-    subfolders at a given location. If no path is given, will create a 'Data'
-    folder in the current working directory, with these subfolders inside.
+    Creates 'Raw', 'Notch', 'Bandpass', 'FWR', 'Screened', 'Filled', 'Smooth',
+    and 'Feature' subfolders at a given location. If no path is given, will
+    create a 'Data' folder in the current working directory, with these
+    subfolders inside.
 
     Parameters
     ----------
     root : str, optional
-        Root of the data to be generated. The default is None.
+        The root where the data is generated. The default is None.
 
     Returns
     -------
@@ -79,13 +80,14 @@ def make_sample_data(path_names:dict):
     Parameters
     ----------
     path_names : dict-str
-        Dictionary of file locations.
+        A dictionary of file locations with keys for stage in the processing
+        pipeline.
 
     Raises
     ------
     Exception
-        An exception is raised if the provided 'path_names' dictionary doesn't
-        contain a 'Raw' path key.
+        An exception is raised if 'Raw' is not a key of the 'path_names'
+        dictionary provided.
     Exception
         An exception is raised if the sample data cannot be loaded.
 
@@ -135,19 +137,19 @@ def make_sample_data(path_names:dict):
 
 def read_file_type(path:str, file_ext:str):
     """
-    Safe wrapper for reading files of a given extension.
+    Wrapper for reading files of a given extension.
     
-    Switches between different reading methods based on the instructions
-    provided.
+    Switches between different reading methods based on the extension provided.
     
     Supported formats that can be read are: 'csv'.
 
     Parameters
     ----------
     path : str
-        Path of the file to read.
+        The path of the file to read.
     file_ext : str
-        File extension to read.
+        The file extension for files to read. Only reads files with this
+        extension. The default is 'csv'.
 
     Raises
     ------
@@ -188,13 +190,14 @@ def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=Non
     in_path : str
         The filepath to a directory to read files.
     file_ext : str, optional
-        File extension for files to read. The default is 'csv'.
+        The file extension for files to read. Only reads files with this
+        extension. The default is 'csv'.
     expression : str, optional
-        A regular expression. If provided, will only count files whose names
-        match the regular expression. The default is None.
+        A regular expression. If provided, will only count files whose relative
+        paths from 'base' match the regular expression. The default is None.
     base : str, optional
-        Path of the root folder the path keys should start from. Used to track
-        the relative path during recursion. The default is None. 
+        The path of the root folder the path keys should start from. Used to
+        track the relative path during recursion. The default is None. 
 
     Raises
     ------
@@ -258,7 +261,7 @@ def map_files_fuse(file_dirs, names):
     ------
     Exception
         An exception is raised if a file contained in the first file directory
-        is not found in the other file directories.
+        (file_dirs[0]) is not found in the other file directories.
 
     Returns
     -------

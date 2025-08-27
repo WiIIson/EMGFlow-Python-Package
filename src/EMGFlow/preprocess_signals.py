@@ -13,7 +13,7 @@ from .access_files import *
 #
 
 """
-A collection of functions for filtering Signals.
+A collection of functions for preprocessing signals and EMG data.
 """
 
 #
@@ -22,8 +22,9 @@ A collection of functions for filtering Signals.
 
 def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None):
     """
-    Creates a PSD dataframe of a signal. Uses the Welch method, meaning it can
-    be used as a Long Term Average Spectrum (LTAS).
+    Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the
+    intensity of each frequency detected in the signal. Uses the Welch method,
+    meaning it can be used as a Long Term Average Spectrum (LTAS).
     
     Parameters
     ----------
@@ -31,9 +32,9 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the PSD is created from.
-    sampling_rate : float
-        Sampling rate of 'Signal'.
+        The column of 'Signal' the PSD is calculated from.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
@@ -51,28 +52,27 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'min_freq' is less or equal to 0.
+        An exception is raised if 'nan_mask' is not the same length as 'col'.
     Exception
-        An exception is raised if 'nan_mask' is an incorrect data type, or not
-        the same length as the column
+        An exception is raised if there are too many NaN values to make a valid
+        window.
 
     Returns
     -------
     psd : pd.DataFrame
         A Pandas dataframe containing a 'Frequency' and 'Power' column. The
-        'Power' column indicates the intensity of each frequency in the Signal
+        'Power' column indicates the intensity of each frequency in the signal
         provided. Results will be normalized if 'normalize' is set to True.
     
     """
     
     PSD_Signal = Signal.copy().reset_index(drop=True)
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(PSD_Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in 'Signal'")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     
     if sampling_rate <= 0:
-        raise Exception("'sampling_rate' must be greater than 0")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     if nan_mask is None:
         nan_mask = ~np.isnan(PSD_Signal[col])
@@ -150,8 +150,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 
 def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0):
     """
-    Apply a list of notch filters for given frequencies and Q-factors to a
-    column of the provided data.
+    Apply a list of notch filters ('notch_vals') to a column of 'Signal'.
 
     Parameters
     ----------
@@ -159,12 +158,12 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the notch filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
+        The sampling rate of 'Signal'.
     notch_vals : list-tuple, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
-        applied. Hz is the frequency to apply the filter to, and Q is the
+        applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter). The default is [(50, 5)].
     min_segment : float, optional
@@ -180,10 +179,10 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
         'sampling_rate'/2 or less than 0.
@@ -191,28 +190,28 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Returns
     -------
     notch_Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with the notch filters are applied.
+        A copy of 'Signal' after the notch filters are applied.
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal.")
-    
-    # A warning is raised if 'col' contains NaN values.
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
-    # An exception is raised if 'sampling_rate' is less or equal to 0.
+    # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater or equal to 0.")
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     notch_Signal = Signal.copy().reset_index(drop=True)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(notch_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = notch_Signal[col]
@@ -270,23 +269,23 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 
 def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply notch filters to all signal files in a folder. Writes filtered
-    signal files to an output folder, and generates a file structure matching
-    the input folder.
+    Apply a list of notch filters ('notch_vals') to all signal files in a
+    folder. Writes filtered signal files to an output folder, and generates a
+    file structure matching the input folder.
 
     Parameters
     ----------
     in_path : str
-        Filepath to a directory to read data files.
+        Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     sampling_rate : float
-        Sampling rate of the signal files.
+        The sampling rate of the signal files.
     notch_vals : list-tuples, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
-        applied. Hz is the frequency to apply the filter to, and Q is the
-        Q-score (an intensity score where a higher number means a less
-        extreme filter). The default is [(50, 5)].
+        applied. Hz is the frequency the filter is applied to, and Q is the
+        Q-score (an intensity score where a higher number means a less extreme
+        filter). The default is [(50, 5)].
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -297,16 +296,16 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose local
-        paths inside of 'in_path' match the regular expression. The default
-        is None.
+        A regular expression. If provided, will only apply the filter to files
+        whose local paths inside of 'in_path' match the regular expression. The
+        default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only filters files with this
+        extension. The default is 'csv'.
     
     Raises
     ------
@@ -317,15 +316,15 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         expression.
         
     Warning
-        A warning is raised if a column in 'cols' contains NaN values.
+        A warning is raised if a column from 'cols' contains NaN values.
     Exception
-        An exception is raised if a column in 'cols' is not a column of a
+        An exception is raised if a column from 'cols' is not a column of a
         signal file.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'min_segment' is longer than a signal
+        recording.
     Exception
         An exception is raised if a Hz value in 'notch_vals' is greater than
         'sampling_rate'/2 or less than 0.
@@ -346,7 +345,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -358,7 +357,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
         
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -408,8 +407,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
 
 def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0):
     """
-    Apply a bandpass filter to for a given lower and upper limit to a column of
-    the provided data.
+    Apply a bandpass filter ('low', 'high') to a column of 'Signal'.
 
     Parameters
     ----------
@@ -417,13 +415,14 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the bandpass filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
+        The sampling rate of 'Signal'.
     low : float, optional
-        Lower frequency limit of the bandpass filter. The default is 20.0.
+        Lower frequency limit (Hz) of the bandpass filter. The default is 20.0.
     high : float
-        Upper frequency limit of the bandpass filter. The default is 450.0.
+        Upper frequency limit (Hz) of the bandpass filter. The default is
+        450.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -437,15 +436,15 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'high' or 'low' are higher than 1/2 of
         'sampling_rate'.
     Exception
         An exception is raised if 'high' is not higher than 'low'.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Returns
     -------
@@ -454,33 +453,31 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal.")
-    
-    # A warning is raised if 'col' contains NaN values.
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater than 0.")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     # An exception is raised if 'high' or 'low' are higher than 1/2 of
-    # 'sampling_rate'.
+    # 'sampling_rate', and if low is greater than or equal to high.
     if high > sampling_rate/2 or low > sampling_rate/2:
         raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
-    
-    # An exception is raised if 'high' is not higher than 'low'.
     if high <= low:
         raise Exception("'high' must be higher than 'low'.")
+        
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("'min_segment' cannot be longer than the recording of 'Signal'.")
     
     band_Signal = Signal.copy().reset_index(drop=True)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(band_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = band_Signal[col]
@@ -528,22 +525,23 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
 def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply bandpass filters to all signal files in a folder. Writes filtered
-    signal files to an output folder, and generates a file structure matching
-    the input folder.
+    Apply a bandpass filter ('low', 'high') to all signal files in a folder.
+    Writes filtered signal files to an output folder, and generates a file
+    structure matching the input folder.
     
     Parameters
     ----------
     in_path : str
         Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     sampling_rate : float
-        Sampling rate of the signal files.
+        The sampling rate of the signal files.
     low : float, optional
-        Lower frequency limit of the bandpass filter. The default is 20.0.
-    high : float, optional
-        Upper frequency limit of the bandpass filter. The default is 450.0.
+        Lower frequency limit (Hz) of the bandpass filter. The default is 20.0.
+    high : float
+        Upper frequency limit (Hz) of the bandpass filter. The default is
+        450.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -554,16 +552,16 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose local
-        paths inside of 'in_path' match the regular expression. The default
-        is None.
+        A regular expression. If provided, will only apply the filter to files
+        whose local paths inside of 'in_path' match the regular expression. The
+        default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only filters files with this
+        extension. The default is 'csv'.
     
     Raises
     ------
@@ -572,22 +570,22 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
-        
-   Warning
-        A warning is raised if a column in 'cols' contains NaN values.
+
+    Warning
+        A warning is raised if a column from 'cols' contains NaN values.
     Exception
-        An exception is raised if a column in 'cols' is not a column of a
+        An exception is raised if a column from 'cols' is not a column of a
         signal file.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'high' or 'low' are higher than 1/2 of
         'sampling_rate'.
     Exception
         An exception is raised if 'high' is not higher than 'low'.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'min_segment' is longer than a signal
+        recording.
         
     Exception
         An exception is raised if a file could not be read.
@@ -605,7 +603,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -617,7 +615,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
     
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -667,7 +665,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
 
 def apply_rectify(Signal:pd.DataFrame, col:str):
     """
-    Apply a Full Wave Rectifier (FWR) to a column of the provided data.
+    Apply a Full Wave Rectifier (FWR) to a column of 'Signal'.
 
     Parameters
     ----------
@@ -675,7 +673,7 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the FWR filter is applied to.
 
     Raises
     ------
@@ -687,16 +685,16 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
     Returns
     -------
     fwr_Signal : pd.DataFrame
-        A copy of 'Signal' after the full wave rectifier filter is applied.
+        A copy of 'Signal' after the FWR filter is applied.
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signals'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
-        
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
     fwr_Signal = Signal.copy().reset_index(drop=True)
     fwr_Signal[col] = np.abs(fwr_Signal[col])
@@ -718,22 +716,22 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
     in_path : str
         Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only filter files whose local
-        paths inside of 'in_path' match the regular expression. The default
-        is None.
+        A regular expression. If provided, will only apply the filter to files
+        whose local paths inside of 'in_path' match the regular expression. The
+        default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only filters files with this
+        extension. The default is 'csv'.
     
     Raises
     ------
@@ -744,9 +742,10 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
         expression.
         
     Warning
-        A warning is raised if 'col' contains NaN values.
+        A warning is raised if a column from 'cols' contains NaN values.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if a column from 'cols' is not a column of a
+        signal file.
         
     Exception
         An exception is raised if a file could not be read.
@@ -764,7 +763,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -776,7 +775,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
     
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -826,7 +825,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
 
 def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0):
     """
-    Apply a Hampel filter to a column of the provided data.
+    Apply a Hampel filter ('window_ms', 'n_sigma') to a column of 'Signal'.
 
     Parameters
     ----------
@@ -834,13 +833,13 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the Hampel filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
+        The sampling rate of 'Signal'.
     window_ms : float, optional
-        Size (in ms) of the outlier detection window. The default is 50.0.
+        The size of the outlier detection window in ms. The default is 50.0.
     n_sigma : float, optional
-        Number of standard deviations away for a value to be considered an
+        The number of standard deviations away for a value to be considered an
         outlier. The default is 5.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
@@ -852,19 +851,18 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     ------
     Warning
         A warning is raised if 'col' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than the recording of 'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'window_size' is greater than the length of
+        An exception is raised if 'window_ms' results in a window size less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than the recording of
         'Signal'.
-    Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
-    Exception
-        An exception is raised if 'window_size' is greater than the minimum
-        length created by 'min_segment'.
 
     Returns
     -------
@@ -873,34 +871,33 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal.")
-    
-    # A warning is raised if 'col' contains NaN values.
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
-        raise Exception("Sampling rate must be greater than 0.")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
-    # An exception is raised if the length created by 'window_ms' is greater
-    # than the length of 'Signal'
+    # A warning is raised if the length created by 'window_ms' is greater than
+    # the length of 'Signal', and an exception is raised if it is less than or
+    # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
     if window_size > len(Signal):
-        raise Exception("'window_size' is greater than 'Signal' length.")
+        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size <= 0:
+        raise Exception("'window_size' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("'min_segment' cannot be longer than the recording of 'Signal'.")
     
     hamp_Signal = Signal.copy().reset_index(drop=True)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(hamp_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
-    
-    # Raises an exception if 'window_size' is less than 1
-    if window_size < 1:
-        raise Exception("'window_size': " + str(window_size) + " must be 1 or greater.")
         
     # Internal function for applying the Hampel filter
     def hampel_filter(data, window_size:int=50, n_sigma:float=5.0):
@@ -909,8 +906,6 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         
         filtered_data=data.copy()
         mask=np.full(n,True)
-        
-        # Precompute windows once
         
         for i in range(n):
             # Handle edge cases with slicing
@@ -988,22 +983,22 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 
 def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Fills outlier values using the Hampel filter to all signals in a folder.
-    Writes filled data to an output folder, and generates a file structure
-    matching the input folder.
+    Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
+    folder. Writes filtered signal files to an output folder, and generates a
+    file structure matching the input folder.
 
     Parameters
     ----------
     in_path : str
         Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     sampling_rate : float
-        Sampling rate of the signal files.
+        The sampling rate of the signal files.
     window_ms : float, optional
-        Size (in ms) of the outlier detection window. The default is 50.0.
+        The size of the outlier detection window in ms. The default is 50.0.
     n_sigma : float, optional
-        Number of standard deviations away for a value to be considered an
+        The number of standard deviations away for a value to be considered an
         outlier. The default is 5.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
@@ -1011,20 +1006,20 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
     cols : list-str, optional
-        List of columns of the signal to interpolate values in. The default is
-        None, in which case the interpolation is performed in every column
-        except for 'Time'.
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only interpolate values in
-        files whose local paths inside of 'in_path' match the regular
-        expression. The default is None.
+        A regular expression. If provided, will only apply the filter to files
+        whose local paths inside of 'in_path' match the regular expression. The
+        default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only filters files with this
+        extension. The default is 'csv'.
 
     Raises
     ------
@@ -1034,23 +1029,22 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         An exception is raised if 'expression' is not None or a valid regular
         expression.
         
-   Warning
-        A warning is raised if a column in 'cols' contains NaN values.
+    Warning
+        A warning is raised if a column from 'cols' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than a signal recording.
     Exception
-        An exception is raised if a column in 'cols' is not a column of a
+        An exception is raised if a column from 'cols' is not a column of a
         signal file.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'window_size' is greater than the length of
-        'Signal'.
+        An exception is raised if 'window_ms' results in a 'window_size' less
+        than or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
-    Exception
-        An exception is raised if 'window_size' is greater than the minimum
-        length created by 'min_segment'.
-        
+        An exception is raised if 'min_segment' is longer than a signal
+        recording.
+          
     Exception
         An exception is raised if a file could not be read.
     Exception
@@ -1067,7 +1061,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -1079,7 +1073,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
         
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -1129,7 +1123,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
 
 def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     """
-    Fills NaN values using interpolation methods in a column of the provided
+    Apply an interpolation method ('method') to a column of 'Signal'. Fills NaN
+    values with interpolated results.
     data.
 
     Parameters
@@ -1138,9 +1133,9 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' to fill NaN values.
+        The column of 'Signal' the interpolation is applied to.
     method : str, optional
-        The interpolation method to use. Valid options are 'pchip' and
+        The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
 
     Raises
@@ -1148,14 +1143,11 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'col' is set to 'Time'.
+        An exception is raised if 'col' is 'Time'.
     Exception
-        An exception is raised if 'Time' is not a column of 'Signal'
+        An exception is raised if 'Time' is not a column of 'Signal'.
     Exception
         An exception is raised if 'method' is an invalid interpolation method.
-    Exception
-        An exception is raised if 'use_nan_mask' is True, but there is no NaN
-        mask.
     Exception
         An exception is raised if there aren't enough valid points to perform
         interpolation.
@@ -1163,20 +1155,20 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     Returns
     -------
     filled_Signal : pd.DataFrame
-        A copy of the 'Signal' dataframe with NaN values filled.
+        A copy of 'Signal' after the NaN values are filled.
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', or is
+    # 'Time'.
     if col not in list(Signal.columns.values):
-        raise Exception('Column "' + str(col) + '" not in Signal')
-    
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if col == 'Time':
-        raise Exception('Column cannot be "Time".')
+        raise Exception("Column cannot be 'Time'.")
     
     # An exception is raised if 'Signal' does not have a 'Time' column
     if 'Time' not in list(Signal.columns.values):
-        raise Exception('Signal is missing a "Time" column.')
+        raise Exception("Column 'Time' not found in 'Signal'.")
     
     filled_Signal = Signal.copy().reset_index(drop=True)
     
@@ -1214,14 +1206,14 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     elif method=='spline':
         
         if len(valid_index) < 4:
-            raise Exception('Not enough valid points for cubic spline interpolation')
+            raise Exception('Not enough valid points for cubic spline interpolation.')
         else:
             # Perform interpolation
             cs = scipy.interpolate.CubicSpline(valid_index, valid_values, extrapolate=False)
             filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal['Time']), index=filled_Signal.index))
     
     else:
-        raise Exception('Invalid interpolation method chosen: ' + str(method), ', use "pchip" or "spline".')
+        raise Exception("Invalid interpolation method chosen: " + str(method), ", use 'pchip' or 'spline'.")
     
     return filled_Signal
 
@@ -1231,65 +1223,61 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
 
 def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Fills NaN values using interpolation methods to all signals in a folder.
-    Writes filled data to an output folder, and generates a file structure
-    matching the input folder.
+    Apply an interpolation method ('method') to all signal files in a folder.
+    Writes interpolated signal files to an output folder, and generates a file
+    structure matching the input structure.
 
     Parameters
     ----------
     in_path : str
         Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     method : str, optional
-        The interpolation method to use. Valid options are 'pchip' and
+        The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
     cols : list-str, optional
-        List of columns of the signal to interpolate values in. The default is
-        None, in which case the interpolation is performed in every column
-        except for 'Time'.
+        List of columns of the signals to apply the interpolation to. The
+        default is None, in which case the interpolation is applied to every
+        column except for 'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only interpolate values in
+        A regular expression. If provided, will only apply the interpolation to
         files whose local paths inside of 'in_path' match the regular
         expression. The default is None.
     exp_copy : bool, optional
         If True, copies files that don't match the regular expression to the
-        output folder without filtering. The default is False, which ignores
-        files that don't match.
+        output folder without interpolating. The default is False, which
+        ignores files that don't match.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only interpolates files with this
+        extension. The default is 'csv'.
 
     Raises
     ------
     Warning
-        Raises a warning if no files in 'in_path' match with 'expression'.
+        A warning is raised if no files in 'in_path' match with 'expression'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
     
     Exception
-        An exception is raised if the file could not be read.
-    Exception
-        An exception is raised if an unsupported file format was provided for
-        'file_ext'.
-    
-    Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the signal files read.
+        An exception is raised if a column from 'cols' is not a column of a
+        signal file.
     Exception
         An exception is raised if 'Time' is in 'cols'.
     Exception
-        An exception is raised if 'Time' is not found in any of the signal
-        files read.
+        An exception is raised if 'Time' is not a column of a signal file.
     Exception
         An exception is raised if 'method' is an invalid interpolation method.
     Exception
-        An exception is raised if 'use_nan_mask' is True, but there is no NaN
-        mask in any of the signal files read.
-    Exception
         An exception is raised if there aren't enough valid points to perform
-        interpolation in any of the signal files read.
+        interpolation on a signal file.
+    
+    Exception
+        An exception is raised if a file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
 
     Returns
     -------
@@ -1301,7 +1289,7 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -1313,7 +1301,7 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
         
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -1361,10 +1349,9 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
+def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
-    Apply a boxcar smoothing filter to a column of the provided data. Uses a
-    rolling average with a window size.
+    Apply a boxcar smoothing filter to a column of 'Signal'.
 
     Parameters
     ----------
@@ -1372,11 +1359,11 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the boxcar smoothing filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
-    window_size : int, optional.
-        Size of the window of the filter. The default is 50.
+        The sampling rate of 'Signal'.
+    window_ms : float, optional.
+        The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -1386,17 +1373,20 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     Raises
     ------
     Warning
-        A warning is raised if 'window_size' is greater than the length of
-        'Signal'.
-    Warning
         A warning is raised if 'col' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than the recording of
+        'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'window_size' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'window_ms' results in a window size less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
     
     Returns
     -------
@@ -1405,28 +1395,33 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 
     """
     
-    # A warning is raised if 'window_size' is greater than the length of
-    # 'Signal'.
-    if window_size > len(Signal.index):
-        warnings.warn("Warning: Selected window size is greater than Signal file.")
-    
-    if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    if Signal[col].isnull().values.any():
+        warnings.warn("NaN values detected in 'Signal'.")
     
-    # An exception is raised if 'window_size' is less or equal to 0.
+    # An exception is raised if 'sampling_rate' is less than or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # A warning is raised if the length created by 'window_ms' is greater than
+    # the length of 'Signal', and an exception is raised if it is less than or
+    # equal to 0.
+    window_size = int(window_ms * sampling_rate / 1000.0)
+    if window_size > len(Signal):
+        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
     if window_size <= 0:
-        raise Exception("window_size must be greater than 0.")
+        raise Exception("'window_size' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     boxcar_Signal = apply_rectify(Signal, col)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(boxcar_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = boxcar_Signal[col]
@@ -1472,10 +1467,9 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
+def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
-    Apply a Root Mean Square (RMS) smoothing filter to a column of the provided
-    data. Uses a rolling average with a window size.
+    Apply a Root Mean Square (RMS) smoothing filter to a column of 'Signal'.
 
     Parameters
     ----------
@@ -1483,11 +1477,11 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the RMS smoothing filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
-    window_size : int, optional
-        Size of the window of the filter. The default is 50
+        The sampling rate of 'Signal'.
+    window_ms : float, optional.
+        The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -1497,17 +1491,20 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
     Raises
     ------
     Warning
-        A warning is raised if 'window_size' is greater than the length of
-        'Signal'.
-    Warning
         A warning is raised if 'col' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than the recording of
+        'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'window_size' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'window_ms' results in a window size less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Returns
     -------
@@ -1516,29 +1513,33 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
 
     """
     
-    # A warning is raised if 'window_size' is greater than the length of
-    # 'Signal'.
-    if window_size > len(Signal.index):
-        warnings.warn("Warning: Selected window size is greater than Signal file.")
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
-        
-    # Check for NaN - warn and remove if found
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
-    # An exception is raised if 'window_size' is less or equal to 0.
+    # An exception is raised if 'sampling_rate' is less than or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # A warning is raised if the length created by 'window_ms' is greater than
+    # the length of 'Signal', and an exception is raised if it is less than or
+    # equal to 0.
+    window_size = int(window_ms * sampling_rate / 1000.0)
+    if window_size > len(Signal):
+        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
     if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+        raise Exception("'window_size' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     rms_Signal = Signal.copy().reset_index(drop=True)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(rms_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = rms_Signal[col]
@@ -1584,10 +1585,9 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_s
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, sigma:float=1.0, min_segment:float=30.0):
+def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0):
     """
-    Apply a Gaussian smoothing filter to a column of the provided data. Uses a
-    rolling average with a window size.
+    Apply a Gaussian smoothing filter to a column of 'Signal'.
 
     Parameters
     ----------
@@ -1595,11 +1595,11 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the Gaussian smoothing filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
-    window_size : int, optional
-        Size of the window of the filter. The default is 50.
+        The sampling rate of 'Signal'.
+    window_ms : float, optional.
+        The size of the smoothing window in ms. The default is 50.0.
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.0.
     min_segment : float, optional
@@ -1611,17 +1611,20 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     Raises
     ------
     Warning
-        A warning is raised if 'window_size' is greater than the length of
-        'Signal'.
-    Warning
         A warning is raised if 'col' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than the recording of
+        'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'window_size' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'window_ms' results in a window size less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Returns
     -------
@@ -1630,33 +1633,38 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 
     """
     
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
+    if col not in list(Signal.columns.values):
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    if Signal[col].isnull().values.any():
+        warnings.warn("NaN values detected in 'Signal'.")
+    
+    # An exception is raised if 'sampling_rate' is less than or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # A warning is raised if the length created by 'window_ms' is greater than
+    # the length of 'Signal', and an exception is raised if it is less than or
+    # equal to 0.
+    window_size = int(window_ms * sampling_rate / 1000.0)
+    if window_size > len(Signal):
+        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size <= 0:
+        raise Exception("'window_size' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
+    
+    gauss_Signal = apply_rectify(Signal, col)
+    
     # Helper function for creating a Gaussian kernel
     def get_gauss(n, sigma):
         r = range(-int(n/2), int(n/2)+1)
         return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
-    
-    # A warning is raised if 'window_size' is greater than the length of
-    # 'Signal'.
-    if window_size > len(Signal.index):
-        warnings.warn("Warning: Selected window size is greater than Signal file.")
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column " + (col) + " not in Signal")
-    
-    if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
-    
-    # An exception is raised if 'window_size' is less or equal to 0.
-    if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
-    
-    gauss_Signal = apply_rectify(Signal, col)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(gauss_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = gauss_Signal[col]
@@ -1702,10 +1710,9 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_size:int=50, min_segment:float=30.0):
+def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
-    Apply a Loess smoothing filter to a column of the provided data. Uses a
-    rolling average with a window size and tri-cubic weight.
+    Apply a Loess smoothing filter to a column of 'Signal'.
 
     Parameters
     ----------
@@ -1713,11 +1720,11 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the filter is applied to.
+        The column of 'Signal' the Loess smoothing filter is applied to.
     sampling_rate : float
-        Sampling rate of 'Signal'.
-    window_size : int, optional
-        Size of the window of the filter. The default is 50.
+        The sampling rate of 'Signal'.
+    window_ms : float, optional.
+        The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -1727,17 +1734,20 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     Raises
     ------
     Warning
-        A warning is raised if 'window_size' is greater than the length of
-        'Signal'.
-    Warning
         A warning is raised if 'col' contains NaN values.
+    Warning
+        A warning is raised if 'window_ms' is longer than the recording of
+        'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'window_size' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'window_ms' results in a window size less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Returns
     -------
@@ -1746,29 +1756,33 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 
     """
     
-    # A warning is raised if 'window_size' is greater than the length of
-    # 'Signal'.
-    if window_size > len(Signal.index):
-        warnings.warn("Warning: Selected window size is greater than Signal file.")
-    
-    # An exception is raised if 'col' is not a column of 'Signal'.
+    # An exception is raised if 'col' is not a column of 'Signal', and a
+    # warning is raised if it contains NaNs.
     if col not in list(Signal.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal")
-    
-    # A warning is raised if 'col' contains NaN values.
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     if Signal[col].isnull().values.any():
-        warnings.warn("Warning: NaN values detected in dataframe. These values will be ignored.")
+        warnings.warn("NaN values detected in 'Signal'.")
     
-    # An exception is raised if 'window_size' is less or equal to 0.
+    # An exception is raised if 'sampling_rate' is less than or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # A warning is raised if the length created by 'window_ms' is greater than
+    # the length of 'Signal', and an exception is raised if it is less than or
+    # equal to 0.
+    window_size = int(window_ms * sampling_rate / 1000.0)
+    if window_size > len(Signal):
+        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
     if window_size <= 0:
-        raise Exception("window_size cannot be 0 or negative")
+        raise Exception("'window_size' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'min_segment' is greater
+    # than the length of 'Signal'.
+    min_gap = int(min_segment * sampling_rate / 1000.0)
+    if min_gap > len(Signal):
+        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     loess_Signal = apply_rectify(Signal, col)
-    
-    # Calculate gap parameter
-    min_gap = int(min_segment * sampling_rate / 1000.0)
-    if min_gap > len(loess_Signal):
-        raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
     # Construct list of NaN locations
     data = loess_Signal[col]
@@ -1816,77 +1830,77 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:int=50, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv', method:str='rms', min_segment:float=30.0, sigma:float=1.0):  
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply smoothing filters to all signal files in a folder. Writes filtered
-    signal files to an output folder, and generates a file structure matching
-    the input folder. The method used to smooth the signals can be specified,
-    but is RMS as default.
+    Apply a smoothing filter ('method') to all signal files in a folder.
+    Writes filtered signal files to an output folder, and generates a file
+    structure matching the input folder.
 
     Parameters
     ----------
-    in_path : dict-str
+    in_path : str
         Filepath to a directory to read signal files.
     out_path : str
-        Filepath to an output directory.
+        Filepath to a directory to write filtered signals.
     sampling_rate : float
-        Sampling rate of the signal files.
-    window_size : int, optional
-        Size of the window of the filter. The default is 50.
-    cols : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
-    expression : str, optional
-        A regular expression. If provided, will only filter files whose local
-        paths inside of 'in_path' match the regular expression. The default
-        is None.
-    exp_copy : bool, optional
-        If True, copies files that don't match the regular expression to the
-        output folder without filtering. The default is False, which ignores
-        files that don't match.
-    file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The sampling rate of the signal files.
     method : str, optional
-        The smoothing method to use. Can be one of 'rms', 'boxcar', 'gauss' or
-        'loess'. The default is 'rms'.
+        The smoothing method to use. Valid methods are 'rms', 'boxcar', 'gauss'
+        and 'loess'. The default is 'rms'.
+    window_ms : float, optional
+        The size of the smoothing window in ms. The default is 50.0.
+    sigma: float, optional
+        The value of sigma used for a Gaussian filter. Only affects output when
+        using a Gaussian filter. The default is 1.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
-    sigma: float, optional
-        The value of sigma used for a Gaussian filter. Only affects output when
-        using Gaussian filtering. The default is 1.
+    cols : list-str, optional
+        List of columns of the signals to apply the smoothing filter to. The
+        default is None, in which case the smoothing filter is applied to every
+        column except for 'Time' and columns that start with 'mask_'.
+    expression : str, optional
+        A regular expression. If provided, will only apply the smoothing filter
+        to files whose local paths inside of 'in_path' match the regular
+        expression. The default is None.
+    exp_copy : bool, optional
+        If True, copies files that don't match the regular expression to the
+        output folder without smoothing. The default is False, which ignores
+        files that don't match.
+    file_ext : str, optional
+        The file extension for files to read. Only smooths files with this
+        extension. The default is 'csv'.
 
     Raises
     ------
     Warning
-        A warning is raised if 'expression' does not match with any files.
+        A warning is raised if no files in 'in_path' match with 'expression'.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
     Exception
         An exception is raised if 'method' is an invalid smoothing method.
-        Valid methods are one of: 'rms', 'boxcar', 'gauss' or 'loess'.
         
     Warning
-        A warning is raised if 'window_size' is greater than the length of
-        'Signal'.
+        A warning is raised if a column from 'cols' contains NaN values.
     Warning
-        A warning is raised if 'col' contains NaN values.
+        A warning is raised if 'window_ms' is longer than a signal recording.
     Exception
-        An exception is raised if any column in 'cols' is not found in any of
-        the Signal files read.
+        An exception is raised if a column from 'cols' is not a column of a
+        signal file.
     Exception
-        An exception is raised if 'window_size' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if the minimum length created by 'min_segment'
-        is greater than the length of 'Signal'.
+        An exception is raised if 'window_ms' results in a 'window_size' less
+        than or equal to 0.
+    Exception
+        An exception is raised if 'min_segment' is longer than a signal
+        recording.
     
     Exception
-        An exception is raised if a file cannot not be read in 'in_path'.
+        An exception is raised if a file could not be read.
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
@@ -1901,7 +1915,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -1913,7 +1927,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
         if len(file_dirs) == 0:
-            warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+            warnings.warn("Warning: The regular expression '" + str(expression) + "' did not match with any files.")
     
     # Apply transformations
     for file in tqdm(file_dirs):
@@ -1930,13 +1944,13 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
             # Apply filter to columns
             for col in cols:
                 if method == 'rms':
-                    data = apply_rms_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
+                    data = apply_rms_smooth(data, col, sampling_rate, window_ms, min_segment)
                 elif method == 'boxcar':
-                    data = apply_boxcar_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
+                    data = apply_boxcar_smooth(data, col, sampling_rate, window_ms, min_segment)
                 elif method == 'gauss':
-                    data = apply_gaussian_smooth(data, col, sampling_rate, window_size, sigma, min_segment=min_segment)
+                    data = apply_gaussian_smooth(data, col, sampling_rate, window_ms, sigma, min_segment)
                 elif method == 'loess':
-                    data = apply_loess_smooth(data, col, sampling_rate, window_size, min_segment=min_segment)
+                    data = apply_loess_smooth(data, col, sampling_rate, window_ms, min_segment)
                 else:
                     raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
@@ -1962,37 +1976,63 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, window_size:i
 #
 # =============================================================================
 #
+# OTHER
+#
+# =============================================================================
+#
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool=False):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, use_optional:bool=False, file_ext:str='csv'):
     """
-    Automates the EMG preprocessing workflow, performing notch filtering,
-    bandpass filtering and smoothing.
-
+    Apply all EMG preprocessing filters to all signal files in a folder. Uses
+    the 'path_names' dictionary, starting with files in the 'Raw' path, and
+    moving through 'Notch', 'Bandpass', and 'FWR' as the filters are applied.
+    
+    Optionally, 'use_optional' can be set to True to apply the 'Screened',
+    'Filled' and 'Smooth' steps.
+    
     Parameters
     ----------
     path_names : dict-str
-        Dictionary containing path locations for writing and reading signal
-        files between paths.
+        A dictionary of file locations with keys for stage in the processing
+        pipeline. Required paths are: 'Raw', 'Notch', 'Bandpass', and 'FWR'.
+        The dictionary can be created with the 'make_paths' function.
     sampling_rate : float, optional
-        Sampling rate of the signal files. The default is 2000.0.
+        The sampling rate of the signal files. The default is 1000.0.
+    min_segment : float, optional
+        The minimum length (in ms) for data to be considered valid. If a length
+        of data is less than this time, it is set to NaN. If a length of
+        invalid data is less than this time, it is ignored in calculations. The
+        default is 30.0.
     use_optional : bool, optional
-        Setting to use the optional preprocessing steps (artefact screening,
-        fill missing data, smooth filter). The default is False.
+        An option to use the non-required preprocessing steps (artefact
+        screening, fill missing data, smooth filter). The default is False.
+    file_ext : str, optional
+        The file extension for files to read. Only processes files with this
+        extension. The default is 'csv'.
 
     Raises
     ------
+    Exception
+        An exception is raised if 'Raw', 'Notch', 'Bandpass', or 'FWR' are not
+        keys of the 'path_names' dictionary provided.
+    Exception
+        An exception is raised if 'Screened', 'Filled', or 'Smooth' are not
+        keys of the 'path_names' dictionary provided.
+
     Warning
-        A warning is raised if any columns of the signal files read contain
-        NaN values.
+        A warning is raised if a column from the signal files contains NaN
+        values.
     Exception
-        An exception is raised if the provided 'path_names' dictionary doesn't
-        contain a 'Raw', 'Notch', 'Bandpass' or 'FWR' path key.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if the provided 'path_names' dictionary doesn't
-        contain a 'Filled' pr 'Smooth' path key if 'use_optional' is True.
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Exception
-        An exception is raised if a file cannot not be read.
+        An exception is raised if a file could not be read.
+    Exception
+        An exception is raised if an unsupported file format was provided for
+        'file_ext'.
 
     Returns
     -------
@@ -2011,9 +2051,9 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate)
-    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate)
-    rectify_signals(path_names['Bandpass'], path_names['FWR'])
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+    rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
     
     # Run optional preprocessing steps
     if use_optional:
@@ -2022,9 +2062,9 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool
         if 'Smooth' not in path_names:
             raise Exception('Smooth path not detected in provided dictionary (path_names).')
         
-        screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate)
-        fill_missing_signals(path_names['Screened'], path_names['Filled'])
-        smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate)
+        screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+        fill_missing_signals(path_names['Screened'], path_names['Filled'], min_segment=min_segment, file_ext=file_ext)
+        smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
     
     return
 
@@ -2032,90 +2072,85 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, use_optional:bool
 # =============================================================================
 #
 
-def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, cols=None, low:float=None, high:float=None, metric=np.median, expression:str=None, window_size:int=200, file_ext:str='csv'):
+def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=50.0, threshold:float=5.0, metric=np.median, low:float=None, high:float=None, cols=None, expression:str=None, file_ext:str='csv'):
     """
-    Looks at all signal files contained in a filepath, returns a dictionary of
-    file names and locations that have outliers.
+    Detect outliers in all signal files in a folder. Returns a dictionary of
+    files that contain outliers.
     
-    Works by interpolating an inverse function from the peaks of the signal's
-    spectrum. The function then calculates the 'metric' aggregate of the
-    differences between the predicted spectrum intensity of the inverse
-    function, and the actual spectrum intensity of the peaks. Finally, if the
-    largest difference between the predicted and actual values is greater than
-    the metric average multiplied by the threshold value, the file is flagged
-    for having an outlier and is added to the dictionary.
+    Determines outliers by interpolating an inverse function from the peaks of
+    the signal's spectrum, then finding the 'metric' aggregate (median by
+    default) of the differences between the predicted spectrum, and the actual
+    spectrum. Files are labelled as having outliers if any points are
+    'threshold' times greater than the predicted value.
 
     Parameters
     ----------
     in_path : str
         Filepath to a directory to read signal files.
     sampling_rate : float
-        Sampling rate of the signal files.
+        The sampling rate of the signal files.
+    window_ms : float, optional
+        The size of the outlier detection window in ms. The default is 50.0.
     threshold : float
-        The number of times greater than the metric a value has to be to be
-        considered an outlier.
-    cols : list-str, optional
-        List of columns of the signals to search for outliers in. The default
-        is None, in which case outliers are searched for in every column except
-        for 'Time' and columns that start with 'mask_'.
-    low : float, optional
-        Lower frequency limit of where to search for outliers. Should be the
-        same as lower limit for bandpass filtering, or some value that
-        eliminates the irrelevant lower frequency ranges. The default is None,
-        in which case no lower threshold is used.
-    high : float, optional
-        Upper frequency limit of where to search for outliers. Should be the
-        same as upper limit for bandpass filtering, or some value that
-        eliminates the irrelevant upper frequency ranges. The default is None,
-        in which case no upper threshold is used.
+        The number of times greater than the metric a value has to be for
+        classification as an outlier. The default is 5.0.
     metric : function, optional
-        Some summary function that defines the metric used for finding
-        outliers. The default is 'np.median', but others such as 'np.mean' can
-        be used instead.
+        The aggregation method to use. Valid methods are any aggregation
+        function that works with a list or array (e.g., np.mean). The default
+        is np.median.
+    low : float, optional
+        Lower frequency limit (Hz) of the outlier detection. The default is
+        None, in which case no lower threshold is used.
+    high : float, optional
+        Upper frequency limit (Hz) of the outlier detection. The default is
+        None, in which case no upper threshold is used.
+    cols : list-str, optional
+        List of columns of the signals to apply the outlier detection to. The
+        default is None, in which case the outlier detection is applied to
+        every column except for 'Time' and columns that start with 'mask_'.
     expression : str, optional
-        A regular expression. If provided, will only search for outliers in
-        files whose local paths inside of 'in_path' match the regular
-        expression. The default is None.
-    window_size : int, optional
-        The window size to use when filtering for local maxima. The default is
-        200.
+        A regular expression. If provided, will only apply the outlier
+        detection to files whose local paths inside of 'in_path' match the
+        regular expression. The default is None.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only detects outliers in files
+        with this extension. The default is 'csv'.
 
     Raises
     ------
     Warning
-        A warning is raised if 'window_size' is greater than half the size of
-        a file read by the function.
+        A warning is raised if no files in 'in_path' match with 'expression'.
+    Warning
+        A warning is raised if 'window_ms' is longer than half of a signal
+        recording.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
         expression.
     Exception
-        An exception is raised if 'window_size' is not an integer greater than
-        0.
+        An exception is raised if 'sampling_rate' is not greater than 0.
     Exception
-        An exception is raised if 'threshold' is less or equal to 0.
+        An exception is raised if 'window_size' is not greater than 0.
+    Exception
+        An exception is raised if 'threshold' is not greater than 0.
+    Exception
+        An exception is raised if 'metric' is not a valid summary function.
+    Exception
+        An exception is raised if 'low' or 'high' are not between 0 and
+        'sampling_rate'/2.
     Exception
         An exception is raised if 'low' is greater than 'high'.
     Exception
-        An exception is raised if 'low' or 'high' are negative.
+        An exception is raised if a column from 'cols' is not a column of a
+        signal file.
     Exception
-        An exception is raised if 'metric' is not a valid summary function.
+        An exception is raised if there is not enough maxima to create an
+        interpolation.
     
     Exception
-        An exception is raised if the file could not be read.
+        An exception is raised if a file could not be read.
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
-        
-    Exception
-        An exception is raised if a column in 'cols' is not in a data file.
-    Exception
-        An exception is raised if 'sampling_rate' is less than or equal to 0.
-    Exception
-        An exception is raised if 'nan_mask' is an incorrect data type, or not
-        the same length as the column
 
     Returns
     -------
@@ -2125,17 +2160,20 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
 
     """
     
-    if not type(window_size) == int:
-        raise Exception("'window_size' must be a valid integer.")
-    
-    if window_size <= 0:
-        raise Exception("'window_size' cannot be 0 or less.")
-    
     if expression is not None:
         try:
             re.compile(expression)
         except:
-            raise Exception("Invalid regex expression provided.")
+            raise Exception("The regular expression '" + str(expression) + "' did not compile.")
+    
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
+    
+    # An exception is raised if the length created by 'window_ms' is less than
+    # or equal to 0.
+    window_size = int(window_ms * sampling_rate / 1000.0)
+    if window_size <= 0:
+        raise Exception("'window_size' must be greater than 0.")
     
     if threshold <= 0:
         raise Exception("'threshold' must be greater than 0.")
@@ -2145,20 +2183,22 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
     except:
         raise Exception("Invalid summary metric provided, 'metric' must be able to take a single numeric list as input.")
     
-    p_deg = 1   # Degree of equation on the top of the fraction
-    q_deg = 2   # Degree of equation on the bottom of the fraction
-    
     # Set low and high if left none
     if low is None:
         low = 0
     if high is None:
         high = sampling_rate/2
     
-    if low >= high:
-        raise Exception("'low' (" + str(low) + ") must be greater than 'high' (" + str(high), ").")
     
     if low < 0 or high < 0:
-        raise Exception("'low' and 'high' must be positive values.")
+        raise Exception("'low' and 'high' must be greater than 0.")
+    if high > sampling_rate/2 or low > sampling_rate/2:
+        raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
+    if low >= high:
+        raise Exception("'high' must be higher than 'low'.")
+    
+    p_deg = 1   # Degree of equation on the top of the fraction
+    q_deg = 2   # Degree of equation on the bottom of the fraction
     
     # Create rational function equation
     def Rational(x, *params):
@@ -2180,6 +2220,8 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
     
     # Get dictionary of files
     file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
+    if len(file_dirs) == 0:
+        warnings.warn("The regular expression '" + str(expression) + "' did not match with any files.")
     
     # Iterate over detected files
     for file in tqdm(file_dirs):
@@ -2189,7 +2231,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
             data = read_file_type(file_dirs[file], file_ext)
             
             if len(data.index)/2 <= window_size:
-                warnings.warn("Warning: window_size is greater than 1/2 of data file, results may be poor.")
+                warnings.warn("'window_size' is greater than 1/2 of data file, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
@@ -2204,7 +2246,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, threshold:float, 
                 col = cols[i]
                 
                 if col not in list(data.columns.values):
-                    raise Exception("Column " + str(col) + " is not in 'Signal': " + str(file))
+                    raise Exception("Column '" + str(col) + "' not found in 'Signal': " + str(file) + ".")
                 
                 psd = emg_to_psd(data, col, sampling_rate=sampling_rate)
                 psd = ZoomIn(psd, low, high)

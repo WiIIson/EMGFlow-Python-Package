@@ -14,7 +14,7 @@ from .preprocess_signals import emg_to_psd
 #
 
 """
-A collection of functions for extracting features.
+A collection of functions for extracting signal and EMG features.
 """
 
 #
@@ -24,7 +24,8 @@ A collection of functions for extracting features.
 
 def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
-    Calculate the Integreated EMG (IEMG) of a column of 'Signal'. Ignores NaNs.
+    Calculate the Integreated EMG (IEMG) from a column of 'Signal'. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -32,16 +33,16 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
     sampling_rate : float
-        Sampling rate of the Signal.
+        The sampling rate of 'Signal'.
 
     Raises
     ------
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
 
     Returns
     -------
@@ -51,10 +52,10 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     
     if sampling_rate <= 0:
-        raise Exception("Sampling rate cannot be less or equal to 0.")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -68,7 +69,7 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
 
 def calc_mav(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Mean Absolute Value (MAV) of a column of 'Signal'. Ignores
+    Calculate the Mean Absolute Value (MAV) from a column of 'Signal'. Ignores
     NaNs.
 
     Parameters
@@ -77,7 +78,7 @@ def calc_mav(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -92,7 +93,7 @@ def calc_mav(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -107,7 +108,7 @@ def calc_mav(Signal:pd.DataFrame, col:str):
 
 def calc_mmav1(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Modified Mean Absolute Value 1 (MMAV1) of a column of
+    Calculate the Modified Mean Absolute Value 1 (MMAV1) from a column of
     'Signal'. Ignores NaNs.
 
     Parameters
@@ -116,7 +117,7 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -131,7 +132,7 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -153,7 +154,7 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
 
 def calc_mmav2(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Modified Mean Absolute Value 2 (MMAV2) of a column of
+    Calculate the Modified Mean Absolute Value 2 (MMAV2) from a column of
     'Signal'. Ignores NaNs.
 
     Parameters
@@ -162,7 +163,7 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -177,7 +178,7 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -201,7 +202,7 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
 
 def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
-    Calculate the Simple Square Integral (SSI) of a column of 'Signal'.
+    Calculate the Simple Square Integral (SSI) from a column of 'Signal'.
     Ignores NaNs.
 
     Parameters
@@ -210,16 +211,16 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
     sampling_rate : float
-        Sampling rate of the Signal.
+        The sampling rate of 'Signal'.
 
     Raises
     ------
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
-        An exception is raised if sampling_rate is less or equal to 0.
+        An exception is raised if sampling_rate is less than or equal to 0.
 
     Returns
     -------
@@ -229,10 +230,10 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     if sampling_rate <= 0:
-        raise Exception("Sampling rate cannot be 0 or negative")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -246,7 +247,7 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
 
 def calc_var(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Variance (VAR) of a column of 'Signal'. Ignores NaNs.
+    Calculate the Variance (VAR) from a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -254,7 +255,7 @@ def calc_var(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -269,7 +270,7 @@ def calc_var(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -284,7 +285,7 @@ def calc_var(Signal:pd.DataFrame, col:str):
 
 def calc_vorder(Signal:pd.DataFrame, col:str):
     """
-    Calculate the V-Order of a column of 'Signal'. Ignores NaNs.
+    Calculate the V-Order from a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -292,7 +293,7 @@ def calc_vorder(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -306,9 +307,6 @@ def calc_vorder(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
-    
     vOrder = np.sqrt(calc_var(Signal, col))
     return vOrder
 
@@ -318,7 +316,8 @@ def calc_vorder(Signal:pd.DataFrame, col:str):
 
 def calc_rms(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Root Mean Square (RMS) of a column of 'Signal'. Ignores NaNs.
+    Calculate the Root Mean Square (RMS) from a column of 'Signal'. Ignores
+    NaNs.
 
     Parameters
     ----------
@@ -326,7 +325,7 @@ def calc_rms(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -341,7 +340,7 @@ def calc_rms(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -356,7 +355,7 @@ def calc_rms(Signal:pd.DataFrame, col:str):
 
 def calc_wl(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Waveform Length (WL) of a column of 'Signal'. Ignores NaNs.
+    Calculate the Waveform Length (WL) from a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -364,7 +363,7 @@ def calc_wl(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -379,7 +378,7 @@ def calc_wl(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -395,7 +394,7 @@ def calc_wl(Signal:pd.DataFrame, col:str):
 
 def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
     """
-    Calculate the Willison Amplitude (WAMP) of a column of 'Signal'. Ignores
+    Calculate the Willison Amplitude (WAMP) from a column of 'Signal'. Ignores
     NaNs.
 
     Parameters
@@ -404,7 +403,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
     threshold : float
         Threshold of the WAMP.
         
@@ -421,7 +420,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -437,7 +436,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
 
 def calc_log(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Log Detector (LOG) of a column of 'Signal'. Ignores NaNs.
+    Calculate the Log Detector (LOG) from a column of 'Signal'. Ignores NaNs.
     
     Parameters
     ----------
@@ -445,7 +444,7 @@ def calc_log(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -460,7 +459,7 @@ def calc_log(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -476,8 +475,8 @@ def calc_log(Signal:pd.DataFrame, col:str):
 
 def calc_mfl(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Maximum Fractal Length (MFL) of a column of 'Signal'. Ignores
-    NaNs.
+    Calculate the Maximum Fractal Length (MFL) from a column of 'Signal'.
+    Ignores NaNs.
 
     Parameters
     ----------
@@ -485,7 +484,7 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -500,7 +499,7 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -516,7 +515,7 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
 
 def calc_ap(Signal:pd.DataFrame, col:str):
     """
-    Calculate the Average Power (AP) of a column of 'Signal'. Ignores NaNs
+    Calculate the Average Power (AP) from a column of 'Signal'. Ignores NaNs.
 
     Parameters
     ----------
@@ -524,7 +523,7 @@ def calc_ap(Signal:pd.DataFrame, col:str):
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     col : str
-        Column of 'Signal' the feature is calculated from.
+        The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
@@ -539,7 +538,7 @@ def calc_ap(Signal:pd.DataFrame, col:str):
     """
     
     if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in the Signal.")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
     
     # Get valid values
     col_vals = Signal[col].dropna().values
@@ -553,7 +552,7 @@ def calc_ap(Signal:pd.DataFrame, col:str):
 
 def calc_mdf(psd:pd.DataFrame):
     """
-    Calculate the Median Frequency (MDF) of 'psd'. Ignores NaNs.
+    Calculate the Median Frequency (MDF) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -563,8 +562,8 @@ def calc_mdf(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -574,10 +573,7 @@ def calc_mdf(psd:pd.DataFrame):
     """
     
     if not {'Frequency', 'Power'}.issubset(psd.columns):
-        raise Exception("psd must contain columns 'Frequency' and 'Power'.")
-    
-    if psd['Power'].isna().any() or psd['Frequency'].isna().any():
-        raise Exception("psd contains NaN values.")
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     freq = psd['Frequency'].to_numpy(dtype=float)
     power = psd['Power'].to_numpy(dtype=float)
@@ -597,7 +593,7 @@ def calc_mdf(psd:pd.DataFrame):
 
 def calc_mnf(psd:pd.DataFrame):
     """
-    Calculate the Mean Frequency (MNF) of 'psd'. Ignores NaNs.
+    Calculate the Mean Frequency (MNF) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -607,8 +603,8 @@ def calc_mnf(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -617,8 +613,8 @@ def calc_mnf(psd:pd.DataFrame):
     
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     mean_freq = np.sum(psd['Frequency'] * psd['Power']) / np.sum(psd['Power'])
     return mean_freq
@@ -629,7 +625,7 @@ def calc_mnf(psd:pd.DataFrame):
 
 def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     """
-    Calculate the Twitch Ratio of 'psd'. Ignores NaNs.
+    Calculate the Twitch Ratio from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -638,14 +634,15 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     freq : float, optional
         Frequency threshold of the Twitch Ratio separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
+        The default is 60.0.
 
     Raises
     ------
     Exception
         An exception is raised if 'freq' is less or equal to 0.
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -655,10 +652,10 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     """
     
     if freq <= 0:
-        raise Exception("freq cannot be less or equal to 0")
+        raise Exception("'freq' cannot be less or equal to 0")
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -673,7 +670,7 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
 
 def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     """
-    Calculate the Twitch Index of 'psd'. Ignores NaNs.
+    Calculate the Twitch Index from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -682,14 +679,15 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     freq : float, optional
         Frequency threshold of the Twitch Index separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
+        The default is 60.0.
 
     Raises
     ------
     Exception
         An exception is raised if 'freq' is less or equal to 0.
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -699,10 +697,10 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     """
     
     if freq <= 0:
-        raise Exception("freq cannot be less or equal to 0")
+        raise Exception("'freq' cannot be less or equal to 0")
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -717,7 +715,7 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
 
 def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     """
-    Calculate the Twitch Slope of 'psd'. Ignores NaNs.
+    Calculate the Twitch Slope from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -726,14 +724,15 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     freq : float, optional
         Frequency threshold of the Twitch Slope separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
+        The default is 60.0.
 
     Raises
     ------
     Exception
         An exception is raised if 'freq' is less or equal to 0.
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -745,10 +744,10 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     """
     
     if freq <= 0:
-        raise Exception("freq cannot be less or equal to 0")
+        raise Exception("'freq' cannot be less or equal to 0")
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     fast_twitch = psd[psd['Frequency'] > freq]
     slow_twitch = psd[psd['Frequency'] < freq]
@@ -775,7 +774,7 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
 
 def calc_sc(psd:pd.DataFrame):
     """
-    Calculate the Spectral Centroid (SC) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Centroid (SC) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -785,8 +784,8 @@ def calc_sc(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -795,8 +794,8 @@ def calc_sc(psd:pd.DataFrame):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     SC = np.sum(psd['Power']*psd['Frequency']) / np.sum(psd['Power'])
     return SC
@@ -807,7 +806,7 @@ def calc_sc(psd:pd.DataFrame):
 
 def calc_sflt(psd:pd.DataFrame):
     """
-    Calculate the Spectral Flatness (SFlt) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Flatness (SFlt) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -817,8 +816,8 @@ def calc_sflt(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -827,8 +826,8 @@ def calc_sflt(psd:pd.DataFrame):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     N = psd.shape[0]
     SF = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
@@ -840,7 +839,7 @@ def calc_sflt(psd:pd.DataFrame):
 
 def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:float=None):
     """
-    Calculate the Spectral Flux (SFlx) of 'Signal1'. Ignores NaNs.
+    Calculate the Spectral Flux (SFlx) from 'Signal1' and 'diff'. Ignores NaNs.
 
     Parameters
     ----------
@@ -853,29 +852,28 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
         parts (diff and 1-diff). If 'diff' is instead a Pandas dataframe, it
         will claculate the spectral flux of 'Signal1' and 'diff'.
     col : str
-        Column of 'Signal1' the feature is calculated from. If a second signal
-        is provided for 'diff', a column of the same name should be available
-        for use.
+        The column of 'Signal1' the feature is calculated from. If a second signal
+        is provided for 'diff', it should have a column of the same name.
     sampling_rate : float
-        Sampling rate of 'Signal1'.
+        The sampling rate of 'Signal1'.
     diff_sr : float, optional
-        Sampling rate for 'diff' if it is a dataframe. The default is None,
-        in which case if 'diff' is a dataframe, it is assumed to have the same
-        sampling rate as 'Signal1'.
+        The sampling rate for 'diff' if it is a dataframe. The default is None,
+        in which case 'diff' is assumed to have the same sampling rate as
+        'Signal1'.
 
     Raises
     ------
     Exception
         An exception is raised if 'col' is not a column of 'Signal1'.
     Exception
-        An exception is raised if 'sampling_rate' is less or equal to 0.
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'diff' is a float, but isn't between 0 and 1.
     Exception
         An exception is raised if 'diff' is a dataframe and does not contain
         'col'.
     Exception
-        An exception is raised if 'diff_sr' is less or equal to 0.
+        An exception is raised if 'diff_sr' is less than or equal to 0.
     Exception
         An exception is raised if 'diff' is an invalid data type.
 
@@ -887,34 +885,35 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
     """
     
     if col not in list(Signal1.columns.values):
-        raise Exception("Column " + str(col) + " not in Signal1")
+        raise Exception("Column '" + str(col) + "' not found in 'Signal1'.")
         
     if sampling_rate <= 0:
-        raise Exception("Sampling rate cannot be 0 or negative")
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     # Separate Signal1 by div and find spectral flux
     if isinstance(diff, float):
         if diff >= 1 or diff <= 0:
-            raise Exception("diff must be a float between 0 and 1")
+            raise Exception("diff must be a float between 0 and 1.")
         
         # Find column divider index
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
         psd1 = emg_to_psd(Signal1.iloc[:diff_ind].reset_index(), col, sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reset_index(), col, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reseSt_index(), col, sampling_rate=sampling_rate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
     # Find spectral flux of Signal1 by div
     elif isinstance(diff, pd.DataFrame):
         if col not in list(diff.columns.values):
-            raise Exception("Column " + str(col) + " not in diff")
+            raise Exception("Column '" + str(col) + "' not found in 'diff'.")
         
         # If no second sampling rate, assume same sampling rate as first Signal
         if diff_sr == None:
             diff_sr = sampling_rate
         elif diff_sr <= 0:
-            raise Exception("Sampling rate cannot be 0 or negative")
+            
+            raise Exception("'diff_sr' must be greater than 0.")
         
         # Take the PSD of each signal
         psd1 = emg_to_psd(Signal1, col, sampling_rate=sampling_rate)
@@ -933,7 +932,7 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
 
 def calc_ss(psd:pd.DataFrame):
     """
-    Calculate the Spectral Spread (SS) of a 'psd'. Ignores NaNs.
+    Calculate the Spectral Spread (SS) from a 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -943,8 +942,8 @@ def calc_ss(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -953,8 +952,8 @@ def calc_ss(psd:pd.DataFrame):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     SC = calc_sc(psd)
     SS = np.sum(((psd['Frequency'] - SC) ** 2) * psd['Power']) / np.sum(psd['Power'])
@@ -966,7 +965,7 @@ def calc_ss(psd:pd.DataFrame):
 
 def calc_sd(psd:pd.DataFrame):
     """
-    Calculate the Spectral Decrease (SDec) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Decrease (SDec) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -976,8 +975,8 @@ def calc_sd(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -986,8 +985,8 @@ def calc_sd(psd:pd.DataFrame):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     N = psd.shape[0]
     vals = np.array(psd['Power'])
@@ -1000,7 +999,7 @@ def calc_sd(psd:pd.DataFrame):
 
 def calc_se(psd:pd.DataFrame):
     """
-    Calculate the Spectral Entropy (SE) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Entropy (SE) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1010,8 +1009,8 @@ def calc_se(psd:pd.DataFrame):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
 
     Returns
     -------
@@ -1020,8 +1019,8 @@ def calc_se(psd:pd.DataFrame):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     prob = psd['Power'] / np.sum(psd['Power'])
     SE = -np.sum(prob * np.log(prob))
@@ -1033,7 +1032,7 @@ def calc_se(psd:pd.DataFrame):
 
 def calc_sr(psd:pd.DataFrame, percent:float=0.85):
     """
-    Calculate the Spectral Rolloff (SR) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Rolloff (SR) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1046,8 +1045,8 @@ def calc_sr(psd:pd.DataFrame, percent:float=0.85):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
     Exception
         An exception is raised if 'percent' is not between 0 and 1.
 
@@ -1058,11 +1057,11 @@ def calc_sr(psd:pd.DataFrame, percent:float=0.85):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
+    if not {'Frequency', 'Power'}.issubset(psd.columns):
+        raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     if percent <= 0 or percent >= 1:
-        raise Exception("percent must be between 0 and 1")
+        raise Exception("'percent' must be between 0 and 1")
     
     total_prob = 0
     total_power = np.sum(psd['Power'])
@@ -1082,7 +1081,7 @@ def calc_sr(psd:pd.DataFrame, percent:float=0.85):
 
 def calc_sbw(psd:pd.DataFrame, p:int=2):
     """
-    Calculate the Spectral Bandwidth (SBW) of 'psd'. Ignores NaNs.
+    Calculate the Spectral Bandwidth (SBW) from 'psd'. Ignores NaNs.
 
     Parameters
     ----------
@@ -1095,10 +1094,10 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
     Raises
     ------
     Exception
-        An exception is raised if 'psd' does not only have columns 'Frequency'
-        and 'Power'.
+        An exception is raised if 'psd' does not have columns 'Frequency' and
+        'Power'.
     Exception
-        An exception is raised if p is not greater than 0.
+        An exception is raised if 'p' is not greater than 0.
 
     Returns
     -------
@@ -1107,11 +1106,8 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
 
     """
     
-    if set(psd.columns.values) != {'Frequency', 'Power'}:
-        raise Exception("psd must be a Power Spectrum Density dataframe with only a 'Frequency' and 'Power' column")
-    
     if p <= 0:
-        raise Exception("p must be greater than 0")
+        raise Exception("'p' must be greater than 0")
     
     cent = calc_sc(psd)
     SBW = (np.sum(psd['Power'] * (psd['Frequency'] - cent) ** p)) ** (1/p)
@@ -1124,18 +1120,20 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
 def extract_features(path_names:dict, sampling_rate:float, cols=None, expression:str=None, file_ext:str='csv', short_name:bool=True):
     """
     Extracts features from signals by running a series of feature extraction
-    functions and saving the output to a feature file.
+    functions and saving the outputs to a feature file.
     
     The input and output locations are controlled by the 'path_names'
-    dictionary. The input data is taken from the 'Filled' and 'Bandpass' paths.
-    The 'Filled' path is an optional step, so 'Smooth' is used if 'Filled' is
-    unused. All files within these folders and subfolders are assumed to be
-    signal files if they match the file extension, and the optional regular
+    dictionary. The input data is taken from the 'Smooth' and 'Bandpass' paths.
+    The 'Smooth' step is optional, if it was not used, data is searched for in
+    the following order: 'Smooth' -> 'Filled' -> 'FWR'.
+    
+    All files within these folders and subfolders are assumed to be valid data
+    if they match the provided file extension, and the optional regular
     expression. Files of the same name should exist in both the
-    'Filled'/'Smooth' and 'Bandpass' folders, being the same file at different
-    stages in processing pipeline.
+    'Smooth'/'Filled'/'FWR' and 'Bandpass' folders, being the same file at
+    different stages in processing pipeline.
 
-    The 'Filled' or 'Smooth' path is used to calculate time-series features,
+    The 'Smooth'/'Filled'/'FWR' path is used to calculate time-series features,
     while the 'Bandpass' path is used to calculate spectral features.
 
     Columns of these files that begin with 'mask_' are assumed to be NaN mask
@@ -1146,26 +1144,28 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     Parameters
     ----------
     path_names : dict-str
-        A dictionary of path names for reading data. Required paths are:
-        'Bandpass', 'Smooth' and 'Feature'. The dictionary can be created with
-        the 'make_paths' function.
+        A dictionary of file locations with keys for stage in the processing
+        pipeline. Required paths are: 'Bandpass', 'FWR', and 'Feature'. The
+        dictionary can be created with the 'make_paths' function.
     sampling_rate : float
-        Sampling rate for all Signals being read.
+        The sampling rate for all signal data being read.
     cols : list-str, optional
-        List of columns to analyze in each Signal. The default is None, in
-        which case all columns except for 'Time' will be analyzed. All files
-        should have at least these columns in common. If None is used, all
-        files will be assumed to have the same colums as the first file read.
+        List of columns to analyze in each file. The default is None, in which
+        case all columns except for 'Time' and columns whose names begin with
+        'mask_' will be analyzed. All files should have at least these columns
+        in common. If None is used, all files will be assumed to have the same
+        colums as the first file read.
     expression : str, optional
         A regular expression. If provided, will only analyze files whose local
         paths inside of 'path_names' match the regular expression. The default
         is None.
     file_ext : str, optional
-        File extension for files to read. Only reads files with this extension.
-        The default is 'csv'.
+        The file extension for files to read. Only extracts features in files
+        with this extension. The default is 'csv'.
     short_name : bool, optional
-        If true, makes the key column of the feature files the relative path of
-        the file. If false, uses the full system path. The default is True.
+        An option to shorten the key names of feature results. If True, makes
+        the key column of the feature files the relative path of the file. If
+        False, uses the full system path. The default is True.
 
     Raises
     ------
@@ -1173,17 +1173,19 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         A warning is raised if 'expression' does not match with any files in
         the folders provided.
     Exception
-        An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not
-        keys of the path_names dictionary provided.
+        An exception is raised if 'Bandpass', 'FWR' or 'Feature' are not keys
+        of the 'path_names' dictionary provided.
     Exception
-        An exception is raised if the 'Bandpass' and 'Smooth' filepaths do not
-        contain the same files.
+        An exception is raised if the 'Bandpass' and 'Smooth'/'Filled'/'FWR'
+        filepaths do not contain the same files.
     Exception
         An exception is raised if a file cannot not be read in the 'Bandpass'
-        or 'Smooth'/'Filled' filepaths.
+        or 'Smooth'/'Filled'/'FWR' filepaths.
     Exception
         An exception is raised if a file does not contain one of the columns
         from 'cols'.
+        
+    
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
@@ -1209,12 +1211,6 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     
     out_path = path_names['Feature']
     
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
-    
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
         out_path = os.path.abspath(out_path)
@@ -1225,22 +1221,22 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     file_dirs_b = map_files(path_names['Bandpass'], file_ext=file_ext, expression=expression)
     
     try:
-        file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+        file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
         if (len(file_dirs_s)) != (len(file_dirs_b)):
-            raise Exception('Filled files not detected...')
+            raise Exception('Smooth files not detected...')
     except:
         try:
-            file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
+            file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
                 raise Exception('Filled files not detected...')
         except:
             file_dirs_s = map_files(path_names['FWR'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
-                raise Exception('Data not detected in "Filled", "Smooth" and "FWR" paths. Feature extraction could not be completed.')
+                raise Exception('Data not detected in "Smooth", "Filled" and "FWR" paths. Feature extraction could not be completed.')
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
-        warnings.warn("Warning: The regular expression " + str(expression) + " did not match with any files.")
+        warnings.warn("The regular expression " + str(expression) + " did not match with any files.")
     
     # List of measure names
     measure_names = [

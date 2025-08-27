@@ -1,7 +1,6 @@
 import os
 import re
 import matplotlib.pyplot as plt
-import numpy as np
 import webbrowser
 
 from shiny import App, render, ui, reactive
@@ -17,17 +16,17 @@ from .access_files import *
 #
 
 """
-A collection of functions for plotting subject data.
+A collection of functions for plotting data.
 """
 
 #
 # =============================================================================
 #
 
-def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, file_ext:str='csv', use_mask:bool=False, auto_run:bool=True):
+def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_mask:bool=False, auto_run:bool=True):
     """
-    Generate a shiny dashboard of different processing stages for a given
-    column.
+    Generate a Shiny dashboard of different processing stages for a given
+    column of signal data.
     
     'CTRL + C' can be entered in the terminal to end the display of the
     dashboard and resume code execution.
@@ -35,48 +34,41 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
     Parameters
     ----------
     path_names : dict-str
-        A dictionary of path names for reading data. The function will generate
-        graphs for as many paths are provided in the dictionary. The dictionary
-        can be created with the make_paths function.
+        A dictionary of file locations with keys for stage in the processing
+        pipeline. The function will generate graphs for as many paths are
+        provided in the dictionary. The dictionary can be created with the
+        make_paths function.
     col : str
-        String column name to display the visualization.
+        The column of the signals display in the visualization.
     units : str
-        Units to use for the y axis of the plot, should be same units used for
-        column values.
-    expression : str, optional
-        String regular expression. If provided, will only create visualizations
-        for Signal files whose names match the regular expression, and will
-        ignore everything else. The default is None.
+        Units to use for the y axis of the plot, should be the same units used
+        for the values in 'col'.
     file_ext : str, optional
-        String extension of the files to read. Any file in in_path with this
-        extension will be considered to be a Signal file, and treated as such.
-        The default is 'csv'.
+        File extension for files to read. Only visualizes files with this
+        extension. The default is 'csv'.
     use_mask : bool, optional
-        Boolean controlling behavior of the function. If True will set values
-        to NaN based on the NaN mask. If False will use the unaltered values of
+        An option to visualize the NaN mask If True, it will set values to NaN
+        based on the NaN mask. If False, it will use the unaltered values of
         the column ignoring the NaN mask. The default is False.
     auto_run : bool, optional
-        Boolean controlling behavior of the function. If True (default), will
-        automatically run the visual and open it in the default browser. If
-        false, will return the visualization object. The default is False.
+        An option to automatically see the visualization. If True, it will run
+        the visual and open it in the default browser. If False, it will return
+        the visualization object. The default is True.
 
     Raises
     ------
     Exception
-        An exception is raised if the directories in 'path_names' don't contain
-        the same files.
+        An exception is raised if 'col' is not a column of a signal file.
+    
     Exception
-        An exception is raised if 'col' is not found as a column in a
-        dataframe.
+        An exception is raised if a file contained in the first file directory
+        (path_names[0]) is not found in the other file directories.
+    
     Exception
-        An exception is raised if a file cannot not be read in a path in
-        'path_names'.
+        An exception is raised if a file could not be read.
     Exception
         An exception is raised if an unsupported file format was provided for
         'file_ext'.
-    Exception
-        An exception is raised if 'expression' is not None or a valid regular
-        expression.
 
     Returns
     -------
@@ -105,12 +97,6 @@ def plot_dashboard(path_names:dict, col:str, units:str, expression:str=None, fil
         file_dirs.append(map_files(path))
     
     df = map_files_fuse(file_dirs, names)
-    
-    if expression is not None:
-        try:
-            re.compile(expression)
-        except:
-            raise Exception("Invalid regex expression provided")
     
     # Set style
     plt.style.use('fivethirtyeight')
