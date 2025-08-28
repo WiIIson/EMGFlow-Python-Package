@@ -2063,7 +2063,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
             raise Exception('Smooth path not detected in provided dictionary (path_names).')
         
         screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
-        fill_missing_signals(path_names['Screened'], path_names['Filled'], min_segment=min_segment, file_ext=file_ext)
+        fill_missing_signals(path_names['Screened'], path_names['Filled'], file_ext=file_ext)
         smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
     
     return

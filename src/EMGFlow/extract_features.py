@@ -899,7 +899,7 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
         diff_ind = int(len(Signal1[col]) * diff)
         # Take the PSD of each signal
         psd1 = emg_to_psd(Signal1.iloc[:diff_ind].reset_index(), col, sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reseSt_index(), col, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reset_index(), col, sampling_rate=sampling_rate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         

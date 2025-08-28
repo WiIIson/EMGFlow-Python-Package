@@ -117,7 +117,7 @@ class TestSimple(unittest.TestCase):
     
     def test_smooth_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.smooth_signals(pathNames['Raw'], pathNames['Smooth'], 2000, 50)
+        EMGFlow.smooth_signals(pathNames['Raw'], pathNames['Smooth'], 2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
     
     def test_clean_signals(self):
@@ -128,7 +128,7 @@ class TestSimple(unittest.TestCase):
     def test_detect_outliers(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000, 2, window_size=15)
+        outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000)
         self.assertIsInstance(outliers, dict)
 
 #
