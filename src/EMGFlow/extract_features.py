@@ -657,7 +657,7 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     if not {'Frequency', 'Power'}.issubset(psd.columns):
         raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
-    fast_twitch = psd[psd['Frequency'] > freq]
+    fast_twitch = psd[psd['Frequency'] >= freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
     twitch_ratio = np.sum(fast_twitch['Power']) / np.sum(slow_twitch['Power'])
@@ -702,7 +702,7 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     if not {'Frequency', 'Power'}.issubset(psd.columns):
         raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
-    fast_twitch = psd[psd['Frequency'] > freq]
+    fast_twitch = psd[psd['Frequency'] >= freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
     twitch_index = np.max(fast_twitch['Power']) / np.max(slow_twitch['Power'])
@@ -749,7 +749,7 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     if not {'Frequency', 'Power'}.issubset(psd.columns):
         raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
-    fast_twitch = psd[psd['Frequency'] > freq]
+    fast_twitch = psd[psd['Frequency'] >= freq]
     slow_twitch = psd[psd['Frequency'] < freq]
     
     x_fast = fast_twitch['Frequency']
