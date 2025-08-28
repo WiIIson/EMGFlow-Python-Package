@@ -39,7 +39,6 @@ export default withMermaid({
         items: [
           { text: 'Overview', link: '/reference/api-overview' },
           { text: 'Access Files', link: '/reference/access-files' },
-          { text: 'Handle Outliers', link: '/reference/handle-outliers' },
           { text: 'Preprocess Signals', link: '/reference/preprocess-signals' },
           { text: 'Plot Signals', link: '/reference/plot-signals' },
           { text: 'Extract Features', link: '/reference/extract-features' },
