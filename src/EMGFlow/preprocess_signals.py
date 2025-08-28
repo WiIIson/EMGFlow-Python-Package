@@ -852,7 +852,8 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     Warning
         A warning is raised if 'col' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than the recording of 'Signal'.
+        A warning is raised if 'window_ms' is longer than half the recording of
+        'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -886,8 +887,8 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     # the length of 'Signal', and an exception is raised if it is less than or
     # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
-    if window_size > len(Signal):
-        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size > len(Signal)/2:
+        warnings.warn("'window_ms' is longer than 1/2 the recording of 'Signal', results may be poor.")
     if window_size <= 0:
         raise Exception("'window_size' must be greater than 0.")
     
@@ -1032,7 +1033,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     Warning
         A warning is raised if a column from 'cols' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than a signal recording.
+        A warning is raised if 'window_ms' is longer than half a signal
+        recording.
     Exception
         An exception is raised if a column from 'cols' is not a column of a
         signal file.
@@ -1375,7 +1377,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     Warning
         A warning is raised if 'col' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than the recording of
+        A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
@@ -1410,8 +1412,8 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     # the length of 'Signal', and an exception is raised if it is less than or
     # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
-    if window_size > len(Signal):
-        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size > len(Signal)/2:
+        warnings.warn("'window_ms' is longer than 1/2 the recording of 'Signal', results may be poor.")
     if window_size <= 0:
         raise Exception("'window_size' must be greater than 0.")
     
@@ -1493,7 +1495,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     Warning
         A warning is raised if 'col' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than the recording of
+        A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
@@ -1528,8 +1530,8 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     # the length of 'Signal', and an exception is raised if it is less than or
     # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
-    if window_size > len(Signal):
-        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size > len(Signal)/2:
+        warnings.warn("'window_ms' is longer than 1/2 the recording of 'Signal', results may be poor.")
     if window_size <= 0:
         raise Exception("'window_size' must be greater than 0.")
     
@@ -1613,7 +1615,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     Warning
         A warning is raised if 'col' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than the recording of
+        A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
@@ -1648,8 +1650,8 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     # the length of 'Signal', and an exception is raised if it is less than or
     # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
-    if window_size > len(Signal):
-        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size > len(Signal)/2:
+        warnings.warn("'window_ms' is longer than 1/2 the recording of 'Signal', results may be poor.")
     if window_size <= 0:
         raise Exception("'window_size' must be greater than 0.")
     
@@ -1736,7 +1738,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     Warning
         A warning is raised if 'col' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than the recording of
+        A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
@@ -1771,8 +1773,8 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     # the length of 'Signal', and an exception is raised if it is less than or
     # equal to 0.
     window_size = int(window_ms * sampling_rate / 1000.0)
-    if window_size > len(Signal):
-        warnings.warn("'window_ms' is longer than the recording of 'Signal'.")
+    if window_size > len(Signal)/2:
+        warnings.warn("'window_ms' is longer than 1/2 the recording of 'Signal', results may be poor.")
     if window_size <= 0:
         raise Exception("'window_size' must be greater than 0.")
     
@@ -1886,7 +1888,8 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     Warning
         A warning is raised if a column from 'cols' contains NaN values.
     Warning
-        A warning is raised if 'window_ms' is longer than a signal recording.
+        A warning is raised if 'window_ms' is longer than half a signal
+        recording.
     Exception
         An exception is raised if a column from 'cols' is not a column of a
         signal file.
@@ -2025,8 +2028,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'min_segment' is longer than the recording of
-        'Signal'.
+        An exception is raised if 'min_segment' is longer than half a signal
+        recording.
 
     Exception
         An exception is raised if a file could not be read.
@@ -2121,7 +2124,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     Warning
         A warning is raised if no files in 'in_path' match with 'expression'.
     Warning
-        A warning is raised if 'window_ms' is longer than half of a signal
+        A warning is raised if 'window_ms' is longer than half a signal
         recording.
     Exception
         An exception is raised if 'expression' is not None or a valid regular
@@ -2231,7 +2234,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
             data = read_file_type(file_dirs[file], file_ext)
             
             if len(data.index)/2 <= window_size:
-                warnings.warn("'window_size' is greater than 1/2 of data file, results may be poor.")
+                warnings.warn("'window_ms' is longer than 1/2 the recording of a signal, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
             if cols is None:
