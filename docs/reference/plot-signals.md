@@ -8,7 +8,6 @@ These functions help visualize individual, or large batches of signal data. This
 mindmap
     root((EMGFlow))
         AF(Access File)
-        HO(Handle Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
             plot_dashboard

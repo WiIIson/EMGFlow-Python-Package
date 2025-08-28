@@ -8,20 +8,25 @@ These functions clean sEMG signals prior to their use in feature extraction. Sig
 mindmap
     root((EMGFlow))
         AF(File Access)
-        HO(Handle Outliers)
         PrS(Preprocess Signals)
             emg_to_psd
             apply_notch_filters
             notch_filter_signals
             apply_bandpass_filter
             bandpass_filter_signals
-            apply_fwr
+            apply_rectify
+            rectify_signals
+            apply_screen_artefacts
+            screen_artefact_signals
+            apply_fill_missing
+            fill_missing_signals
             apply_boxcar_smooth
             apply_rms_smooth
             apply_gaussian_smooth
             apply_loess_smooth
-            smooth_filter_signals
+            smooth_signals
             clean_signals
+            detect_spectral_outliers
         PlS(Plot Signals)
         EF(Extract Features)
 ```

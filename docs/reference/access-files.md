@@ -13,7 +13,6 @@ mindmap
             read_file_type
             map_files
             map_files_fuse
-        HO(Handle Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
