@@ -267,7 +267,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
     folder. Writes filtered signal files to an output folder, and generates a
@@ -286,15 +286,15 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter). The default is [(50, 5)].
+    cols : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
-    cols : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
@@ -523,7 +523,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a bandpass filter ('low', 'high') to all signal files in a folder.
     Writes filtered signal files to an output folder, and generates a file
@@ -542,15 +542,15 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
     high : float
         Upper frequency limit (Hz) of the bandpass filter. The default is
         450.0.
+    cols : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
-    cols : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
@@ -981,7 +981,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
     folder. Writes filtered signal files to an output folder, and generates a
@@ -1000,15 +1000,15 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     n_sigma : float, optional
         The number of standard deviations away for a value to be considered an
         outlier. The default is 5.0.
+    cols : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
-    cols : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
@@ -1830,7 +1830,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a smoothing filter ('method') to all signal files in a folder.
     Writes filtered signal files to an output folder, and generates a file
@@ -1852,15 +1852,15 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     sigma: float, optional
         The value of sigma used for a Gaussian filter. Only affects output when
         using a Gaussian filter. The default is 1.0.
+    cols : list-str, optional
+        List of columns of the signals to apply the smoothing filter to. The
+        default is None, in which case the smoothing filter is applied to every
+        column except for 'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
-    cols : list-str, optional
-        List of columns of the signals to apply the smoothing filter to. The
-        default is None, in which case the smoothing filter is applied to every
-        column except for 'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the smoothing filter
         to files whose local paths inside of 'in_path' match the regular
