@@ -14,7 +14,6 @@ EMGFlow is broken into 5 modules: `access_files` for file IO, `detect_outliers` 
 mindmap
     root((EMGFlow))
         AF(Access Files)
-        DO(Detect Outliers)
         PrS(Preprocess Signals)
         PlS(Plot Signals)
         EF(Extract Features)
