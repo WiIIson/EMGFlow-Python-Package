@@ -26,25 +26,23 @@ mindmap
 
 **Description**
 
-Generates a file structure for signal files, and returns a dictionary of the locations for these files.
+Generates a file structure for an EMG workflow, and returns a dictionary of the locations for these files for easy use with EMG processing functions.
 
-Creates '1_raw', '2_notch', '3_bandpass', '4_smooth', '5_filled' and '6_feature' subfolders at a given location. If no path is given, will create a 'Data' folder in the current working directory, with these subfolders inside.
-
-The paths to these directories can be accessed with the corresponding keys: 'Raw', 'Notch', 'Bandpass', 'Smooth', 'Filled' and 'Feature'.
+Creates 'Raw', 'Notch', 'Bandpass', 'FWR', 'Screened', 'Filled', 'Smooth', and 'Feature' subfolders at a given location. If no path is given, will create a 'Data' folder in the current working directory, with these subfolders inside.
 
 ```python
-make_paths(root=None)
+make_paths(root:str=None)
 ```
 
 **Parameters**
 
 `root`: str, optional (None)
-- Root of the data to be generated. The default is None.
+- The root where the data is generated. The default is None.
 
 **Returns**
 
 `path_names`: dict-str
-- A dictionary of file locations with keys for the stage in the processing pipeline.
+- A dictionary of file locations with keys for stage in the processing pipeline.
 
 **Example**
 
@@ -61,24 +59,25 @@ path_names = EMGFlow.make_paths()
 
 **Description**
 
-Generates sample data in the '1_raw' folder of a provided dictionary of file locations.
+Generates sample data in the 'Raw' folder of a provided dictionary of file locations.
 
 Creates '01' and '02' folders, which each contain two sample data files ('01/sample_data_01.csv', '01/sample_data_02.csv', '02/sample_data_03.csv', '02/sample_data_04.csv')
 
 The sample data will not be written if it already exists in the folder.
 
 ```python
-make_sample_data(path_names)
+make_sample_data(path_names:dict)
 ```
 
 **Parameters**
 
 `path_names`: dict-str
-- Dictionary of file locations.
+- A dictionary of file locations with keys for stage in the processing
+        pipeline.
 
 **Raises**
 
-An exception is raised if the provided `path_names` dictionary doesn't contain a 'Raw' path key.
+An exception is raised if 'Raw' is not a key of the `path_names` dictionary provided.
 
 An exception is raised if the sample data cannot be loaded.
 
@@ -102,23 +101,23 @@ EMGFlow.make_sample_data(path_names)
 
 **Description**
 
-Safe wrapper for reading files of a given extension.
+Wrapper for reading files of a given extension.
 
-Switches between different reading methods based on the instructions provided.
-    
+Switches between different reading methods based on the extension provided.
+
 Supported formats that can be read are: 'csv'.
 
 ```python
-read_file_type(path, file_ext)
+read_file_type(path:str, file_ext:str)
 ```
 
 **Parameters**
 
 `path`: str
-- Path of the file to read.
+- The path of the file to read.
 
 `file_ext`: str
-- File extension to read.
+- The file extension for files to read. Only reads files with this extension. The default is 'csv'.
 
 **Raises**
 
@@ -151,22 +150,22 @@ df = EMGFlow.read_file_type(path, ext)
 Generate a dictionary of file names and locations (keys/values) from the subfiles of a folder.
 
 ```python
-map_files(in_path, file_ext='csv', expression=None, base=None)
+map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=None)
 ```
 
 **Parameters**
 
 `in_path`: str
-- The filepath to a directory to read signal files.
+- The filepath to a directory to read files.
 
 `file_ext`: str, optional ('csv')
-- File extension for files to read. The default is 'csv'.
+- The file extension for files to read. Only reads files with this extension. The default is 'csv'.
 
 `expression`: str, optional (None)
-- A regular expression. If provided, will only count files whose names match the regular expression. The default is None.
+- A regular expression. If provided, will only count files whose relative paths from 'base' match the regular expression. The default is None.
 
 `base`: str, optional (None)
-- Path of the root folder the path keys should start from. The default is None.
+- The path of the root folder the path keys should start from. Used to track the relative path during recursion. The default is None. 
 
 **Raises**
 
@@ -175,7 +174,7 @@ An exception is raised if `expression` is not None or a valid regular expression
 **Returns**
 
 `file_dirs`: dict-str
-- Returns a dictionary of file name keys and file path location values.
+- Returns dictionary of file name keys and file path location values.
 
 **Example**
 
@@ -212,7 +211,7 @@ map_files_fuse(file_dirs, names)
 
 **Raises**
 
-An exception is raised if a file contained in the first file directory is not found in the other file directories.
+An exception is raised if a file contained in the first file directory (file_dirs[0]) is not found in the other file directories.
 
 **Returns**
 

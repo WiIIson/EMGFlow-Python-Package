@@ -58,23 +58,20 @@ Each extracted feature is available as its own function for easy use.
 
 **Description**
 
-Extracts features from signal files by running a series of feature extraction functions and saving the output to a feature file.
+Extracts features from signals by running a series of feature extraction functions and saving the outputs to a feature file.
 
-Components of a `Signal` dataframe:
-- Has a column named `Time` containing time indexes
-- `Time` indexes are all equally spaced apart
-- Has one (or more) columns with any other name, holding the value of the electrical signal read at that time
+The input and output locations are controlled by the 'path\_names' dictionary. The input data is taken from the 'Smooth' and 'Bandpass' paths. The 'Smooth' step is optional, if it was not used, data is searched for in the following order: 'Smooth' -> 'Filled' -> 'FWR'.
 
-The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'Filled' and 'Bandpass' paths. The 'Filled' path is an optional step, so 'Smooth' is used if 'Filled' is unused. All files within these folders and subfolders are assumed to be signal files if they match the file extension, and the optional regular expression. Files of the same name should exist in both the 'Filled'/'Smooth' and 'Bandpass' folders, being the same file at different stages in processing pipeline.
+All files within these folders and subfolders are assumed to be valid data if they match the provided file extension, and the optional regular expression. Files of the same name should exist in both the 'Smooth'/'Filled'/'FWR' and 'Bandpass' folders, being the same file at different stages in processing pipeline.
 
-The 'Filled' or 'Smooth' path is used to calculate time-series features, while the 'Bandpass' is used to calculate spectral features.
+The 'Smooth'/'Filled'/'FWR' path is used to calculate time-series features, while the 'Bandpass' path is used to calculate spectral features.
 
-Columns of these files that begin with 'mask_' are assumed to be NaN mask columns, and are ignored unless specified in `cols`.
+Columns of these files that begin with 'mask\_' are assumed to be NaN mask columns, and are ignored unless specified in cols.
 
 The output is written as a 'Features.csv' file to the 'Feature' path.
 
 ```python
-extract_features(path_names, sampling_rate, cols=None, expression=None, file_ext='csv', short_name=True)
+extract_features(path_names:dict, sampling_rate:float, cols=None, expression:str=None, file_ext:str='csv', short_name:bool=True)
 ```
 
 **Theory**
@@ -84,34 +81,34 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 **Parameters**
 
 `path_names`: dict-str
-- A dictionary of path names for reading data. Required paths are: 'Bandpass', 'Smooth', 'Feature', and optionally 'Filled'. The dictionary can be created with the `make_paths` function.
+- A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'Bandpass', 'FWR', and 'Feature'. The dictionary can be created with the `make_paths` function.
 
 `sampling_rate`: int, float
-- Sampling rate of the signal files. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+- The sampling rate for all signal data being read.
 
 `cols`: str, optional (None)
-- List of columns to analyze in each signal file. The default is None, in which case the analysis is performed on every column except for 'Time' and columns that start with 'mask_'. This is taken from the first file detected by `map_files` in the 'Filled' or 'Smooth' folder, and assumes all other files have these columns.
+- List of columns to analyze in each file. The default is None, in which case all columns except for 'Time' and columns whose names begin with 'mask\_' will be analyzed. All files should have at least these columns in common. If None is used, all files will be assumed to have the same colums as the first file read.
 
 `expression`: str, optional (None)
-- A regular expression. If provided, will only extract features from files whose names match the regular expression. The default is None.
+- A regular expression. If provided, will only analyze files whose local paths inside of 'path\_names' match the regular expression. The default is None.
 
 `file_ext`: str, optional ('csv')
-- File extension for files to read. Only reads files with this extension. The default is 'csv'.
+- The file extension for files to read. Only extracts features in files with this extension. The default is 'csv'.
 
 `short_names`: bool, optional (True)
-- If True, makes the key column of the feature files the relative path of the file. If False, uses the full system path as the key. The default is True.
+- An option to shorten the key names of feature results. If True, makes the key column of the feature files the relative path of the file. If False, uses the full system path. The default is True.
 
 **Raises**
 
 A warning is raised if `expression` does not match with any files in the folders provided.
 
-An exception is raised if 'Bandpass', 'Smooth' or 'Feature' are not keys of the `path_names` dictionary provided.
+An exception is raised if 'Bandpass', 'FWR' or 'Feature' are not keys of the `path_names` dictionary provided.
 
-An exception is raised if the 'Bandpass' and 'Filled'/'Smooth' filepaths do not contain the same files.
+An exception is raised if the 'Bandpass' and 'Smooth'/'Filled'/'FWR' filepaths do not contain the same files.
 
-An exception is raised if a file cannot not be read in the 'Bandpass' or 'Filled'/'Smooth' filepaths.
+An exception is raised if a file cannot not be read in the 'Bandpass' or 'Smooth'/'Filled'/'FWR' filepaths.
 
-An exception is raised if a file does not contain one of the columns from 'cols'
+An exception is raised if a file does not contain one of the columns from `cols`.
 
 An exception is raised if an unsupported file format was provided for `file_ext`.
 
@@ -191,10 +188,12 @@ $$
 
 **Description**
 
-Calculates the Integrated EMG (IEMG) of the signal. The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity. In an EMG signal, the IEMG describes when the muscle begins contracting, and is related to the signal sequence firing point (Phinyomark et al., 2009).
+Calculate the Integreated EMG (IEMG) from a column of `Signal`. Ignores NaNs.
+
+The IEMG measures the area under the curve of the signal, which can provide useful information about muscle activity. In an EMG signal, the IEMG describes when the muscle begins contracting, and is related to the signal sequence firing point (Phinyomark et al., 2009).
 
 ```python
-calc_iemg(Signal, col, sampling_rate)
+calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float)
 ```
 
 **Theory**
@@ -216,21 +215,21 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 `sampling_rate`: int/float
-- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+- The sampling rate of `Signal`.
 
 **Raises**
 
 An exception is raised if `col` is not a column of `Signal`.
 
-An exception is raised if `sampling_rate` is less or equal to 0.
+An exception is raised if `sampling_rate` is less than or equal to 0.
 
 **Returns**
 
 `IEMG`: float
-- The IEMG of `Signal`.
+- The calculated IEMG.
 
 **Example**
 
@@ -247,10 +246,12 @@ IEMG = EMGFlow.calc_iemg(Signal, 'EMG_zyg', 2000)
 
 **Description**
 
-Calculates the Mean Absolute Value (MAV) of the signal. In an EMG signal, the MAV describes the muscle contraction level (Phinyomark et al., 2009).
+Calculate the Mean Absolute Value (MAV) from a column of `Signal`. Ignores NaNs.
+    
+In an EMG signal, the MAV describes the muscle contraction level (Phinyomark et al., 2009).
 
 ```python
-calc_mav(Signal, col)
+calc_mav(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -269,7 +270,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -278,7 +279,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `MAV`: float
-- The MAV of `Signal`.
+- The calculated MAV.
 
 **Example**
 
@@ -296,9 +297,12 @@ MAV = EMGFlow.calc_mav(Signal, 'EMG_zyg', 2000)
 
 **Description**
 
-Calculates the Modified Mean Absolute Value 1 (MMAV1) of the signal. The MMAV1 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+Calculate the Modified Mean Absolute Value 1 (MMAV1) from a column of `Signal`. Ignores NaNs.
+
+The MMAV1 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+
 ```python
-calc_mmav1(Signal, col)
+calc_mmav1(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -322,7 +326,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -331,7 +335,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `MMAV1`: float
-- The MMAV1 of `Signal`.
+- The calculated MMAV1.
 
 **Example**
 
@@ -348,9 +352,12 @@ MMAV1 = EMGFlow.calc_mmav1(Signal, 'EMG_zyg', 2000)
 
 **Description**
 
-Calculates the Modified Mean Absolute Value 2 (MMAV2) of the signal. The MMAV2 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+Calculate the Modified Mean Absolute Value 2 (MMAV2) from a column of `Signal`. Ignores NaNs.
+
+The MMAV2 is an alteration of MAV that gives more weight to values in the middle of the signal to reduce error from the beginning and end of the signal.
+
 ```python
-calc_mmav2(Signal, col)
+calc_mmav2(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -374,7 +381,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -383,7 +390,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `MMAV2`: float
-- The MMAV2 of `Signal`.
+- The calculated MMAV2.
 
 **Example**
 
@@ -400,10 +407,12 @@ MMAV2 = EMGFlow.calc_mmav2(Signal, 'EMG_zyg', 2000)
 
 **Description**
 
-Calculates the Simple Square Integral (SSI) of the signal. In an EMG signal, the SSI describes the energy of the signal (Phinyomark et al., 2009).
+Calculate the Simple Square Integral (SSI) from a column of `Signal`. Ignores NaNs.
+
+In an EMG signal, the SSI describes the energy of the signal (Phinyomark et al., 2009).
 
 ```python
-calc_ssi(Signal, col, sampling_rate)
+calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float)
 ```
 
 **Theory**
@@ -425,21 +434,21 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 `sampling_rate`: int/float
-- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
+- The sampling rate of the `Signal`.
 
 **Raises**
 
 An exception is raised if `col` is not a column of `Signal`.
 
-An exception is raised if `sampling_rate` is less or equal to 0.
+An exception is raised if `sampling_rate` is less than or equal to 0.
 
 **Returns**
 
 `SSI`: float
-- The SSI of `Signal`.
+- The calculated SSI.
 
 **Example**
 
@@ -456,10 +465,12 @@ SSI = EMGFlow.calc_ssi(Signal, 'EMG_zyg', 2000)
 
 **Description**
 
-Calculates the Variance (VAR) of the signal. In an EMG signal, the VAR describes the power of the signal (Phinyomark et al., 2009).
+Calculate the Variance (VAR) from a column of `Signal`. Ignores NaNs.
+
+In an EMG signal, the VAR describes the power of the signal (Phinyomark et al., 2009).
 
 ```python
-calc_var(Signal, col)
+calc_var(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -477,7 +488,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -486,7 +497,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `VAR`: float
-- The VAR of `Signal`.
+- The calculated VAR.
 
 **Example**
 
@@ -503,10 +514,12 @@ VAR = EMGFlow.calc_var(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculates the V-Order of a signal. The V-Order is an alteration of VAR that takes the square root of the result.
+Calculate the V-Order from a column of `Signal`. Ignores NaNs.
+
+The V-Order is an alteration of VAR that takes the square root of the result.
 
 ```python
-calc_vorder(Signal, col)
+calc_vorder(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -526,7 +539,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -535,7 +548,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `VOrder`: float
-- The V-Order of `Signal`.
+- The calculated V-Order.
 
 **Example**
 
@@ -552,10 +565,12 @@ VOrder = EMGFlow.calc_vorder(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculates the Root Mean Square (RMS) of a signal. In an EMG signal, the RMS provides information about the constant force, and non-fatiguing contractions of the muscles (Phinyomark et al., 2009).
+Calculate the Root Mean Square (RMS) from a column of `Signal`. Ignores NaNs.
+
+In an EMG signal, the RMS provides information about the constant force, and non-fatiguing contractions of the muscles (Phinyomark et al., 2009).
 
 ```python
-calc_rms(Signal, col)
+calc_rms(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -574,7 +589,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -583,7 +598,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `RMS`: float
-- The RMS of `Signal`.
+- The calculated RMS.
 
 **Example**
 
@@ -600,10 +615,12 @@ RMS = EMGFlow.calc_rms(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculates the Waveform Length (WL) of a signal. The WL provides information about the amplitude, frequency, and duration of the signal.
+Calculate the Waveform Length (WL) from a column of `Signal`. Ignores NaNs.
+
+The WL provides information about the amplitude, frequency, and duration of the signal.
 
 ```python
-calc_wl(Signal, col)
+calc_wl(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -622,7 +639,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -631,7 +648,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `WL`: float
-- The WL of `Signal`.
+- The calculated WL.
 
 **Example**
 
@@ -648,10 +665,12 @@ WL = EMGFlow.calc_wl(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculate the Willison Amplitude (WAMP) of a signal. The WAMP measures the number of times an EMG amplitude exceeds a given threshold. In an EMG signal, the WAMP describes the firing of Motor Unit Action Potentials (MUAP), and muscle contraction level (Phinyomark et al., 2009).
+Calculate the Willison Amplitude (WAMP) from a column of `Signal`. Ignores NaNs.
+
+The WAMP measures the number of times an EMG amplitude exceeds a given threshold. In an EMG signal, the WAMP describes the firing of Motor Unit Action Potentials (MUAP), and muscle contraction level (Phinyomark et al., 2009).
 
 ```python
-calc_wamp(Signal, col, threshold)
+calc_wamp(Signal:pd.DataFrame, col:str, threshold:float)
 ```
 
 **Theory**
@@ -678,7 +697,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 `threshold`: float
 - Threshold of the WAMP.
@@ -690,7 +709,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `WAMP`: int
-- The WAMP of `Signal`.
+- The calculated WAMP.
 
 **Example**
 
@@ -707,10 +726,12 @@ WAMP = EMGFlow.calc_wamp(Signal, 'EMG_zyg', 55)
 
 **Description**
 
-Calculates the Log-Detector (LOG) of a signal. The LOG provides an estimate of the force exerted by the muscle.
+Calculate the Log Detector (LOG) from a column of `Signal`. Ignores NaNs.
+
+The LOG provides an estimate of the force exerted by the muscle.
 
 ```python
-calc_log(Signal, col)
+calc_log(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -729,7 +750,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -738,7 +759,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `LOG`: float
-- The LOG of `Signal`.
+- The calculated LOG.
 
 **Example**
 
@@ -755,10 +776,12 @@ LOG = EMGFlow.calc_log(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculates the Maximum Fractal Length (MFL) of a signal. The MFL measures the activation of low-level muscle contractions.
+Calculate the Maximum Fractal Length (MFL) from a column of `Signal`. Ignores NaNs.
+    
+The MFL measures the activation of low-level muscle contractions.
 
 ```python
-calc_mfl(Signal, col)
+calc_mfl(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -777,7 +800,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -786,7 +809,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `MFL`: float
-- The MFL of `Signal`.
+- The calculated MFL.
 
 **Example**
 
@@ -803,10 +826,12 @@ MFL = EMGFlow.calc_mfl(Signal, 'EMG_zyg')
 
 **Description**
 
-Calculates the Average Power (AP) of a signal. The AP measures the energy distribution of the signal.
+Calculate the Average Power (AP) from a column of `Signal`. Ignores NaNs.
+
+The AP measures the energy distribution of the signal.
 
 ```python
-calc_ap(Signal, col)
+calc_ap(Signal:pd.DataFrame, col:str)
 ```
 
 **Theory**
@@ -825,7 +850,7 @@ $$
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
 
 `col`: str
-- Column of `Signal` the feature is calculated from.
+- The column of `Signal` the feature is calculated from.
 
 **Raises**
 
@@ -834,7 +859,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Returns**
 
 `AP`: float
-- The AP of `Signal`.
+- The calculated AP.
 
 **Example**
 
@@ -853,86 +878,15 @@ AP = EMGFlow.calc_ap(Signal, 'EMG_zyg')
 
 
 
-### `calc_spec_flux`
-
-**Description**
-
-Calculates the Spectral Flux of a signal. Spectral Flux measures the change in spectrums between two signals, or two sections of a signal.
-
-`calc_spec_flux` behaves differently, depending on if `diff` is a Pandas dataframe or float. A dataframe treats `diff` as a second signal, and finds the spectral flux between it and `Signal1`. Providing a float $n$ will split `Signal1` into the first $n$% of the dataframe, and the remaining $n-1$% of the dataframe, finding the spectral flux between these two parts.
-
-The call to `calc_spec_flux` within `extract_features` uses a default value of `diff=0.5`.
-
-```python
-calc_spec_flux(Signal1, diff, col, sampling_rate, diff_sr=None)
-```
-
-**Theory**
-
-Spectral Flux is used to compare the spectral compositions of two signals. This is complicated to implement, so there is no one function to handle this.
-
-Spectral Flux is calculated as follows:
-$$
-\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2
-$$
-
-(Giannakopoulos & Pikrakis, 2014)
-
-**Parameters**
-
-`Signal1`: pd.DataFrame
-- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
-
-`diff`: pd.DataFrame, float
-- Either a new signal dataframe, or a decimal indicating the percentage of the signal to split.
-
-`col`: str
-- Column of `Signal` the feature is calculated from.
-
-`sampling_rate`: int/float
-- Sampling rate of the `Signal`. This is the number of entries recorded per second, or the inverse of the difference in time between entries.
-
-`diff_sr`: int, float, optional (None)
-- Sampling rate for `diff`, if it has a different sampling rate than `Signal1`. The default is None, in which case if `diff` is a dataframe, the sampling rate is assumed to be the same as `Signal1`.
-
-**Raises**
-
-An exception is raised if `col` is not a column of `Signal1`.
-
-An exception is raised if `sampling_rate` is less or equal to 0.
-
-An exception is raised if `diff` is a float, but isn't between 0 and 1.
-
-An exception is raised if `diff` is a dataframe and does not contain `col`.
-
-An exception is raised if `diff_sr` is less or equal to 0.
-
-An exception is raised if `diff` is an invalid data type.
-
-**Returns**
-
-`flux`: float
-- The Spectral Flux of `Signal`.
-
-**Example**
-
-```python
-# Calculate the Spectral Flux of two signals
-flux1 = EMGFlow.calc_spec_flux(Signal1, Signal2, 'EMG_zyg', 2000)
-
-# Calculate the Spectral Flux of one signal divided at the halfway point
-flux2 = EMGFlow.calc_spec_flux(Signal1, 0.5, 'EMG_zyg', 2000)
-```
-
-
-
-
-
 ### calc_mdf
 
 **Description**
 
-Calculates the Median Frequency (MDF) of a Signal.
+Calculate the Median Frequency (MDF) from `psd`. Ignores NaNs.
+
+```python
+calc_mdf(psd:pd.DataFrame)
+```
 
 **Theory**
 
@@ -943,11 +897,11 @@ Since it may not be possible to perfectly divide the spectrum into two regions o
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -970,7 +924,11 @@ MDF = EMGFlow.calc_mdf(psd)
 
 **Description**
 
-Calculates the Mean Frequency (MNF) of a Signal.
+Calculate the Mean Frequency (MNF) from `psd`. Ignores NaNs.
+
+```python
+calc_mnf(psd:pd.DataFrame)
+```
 
 **Theory**
 
@@ -987,11 +945,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1014,10 +972,10 @@ MNF = EMGFlow.calc_mnf(psd)
 
 **Description**
 
-Calculates the Twitch Ratio of a Signal based on its power distribution. 
+Calculate the Twitch Ratio from `psd`. Ignores NaNs.
 
 ```python
-calc_twitch_ratio(psd, freq=60)
+calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0)
 ```
 
 **Theory**
@@ -1038,16 +996,16 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 `freq`: int, float, optional (60)
-- Frequency threshold separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.
+- Frequency threshold of the Twitch Ratio separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.0.
 
 **Raises**
 
-An exception is raised if `freq` is less or equal to 0.
+An exception is raised if `freq` is less than or equal to 0.
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1070,10 +1028,10 @@ twitch_ratio = EMGFlow.calc_twitch_ratio(psd)
 
 **Description**
 
-Calculates the Twitch Index of a Signal based on its power distribution. 
+Calculate the Twitch Index from `psd`. Ignores NaNs.
 
 ```python
-calc_twitch_index(psd, freq=60)
+calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0)
 ```
 
 **Theory**
@@ -1094,16 +1052,16 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 `freq`: int, float, optional (60)
-- Frequency threshold separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.
+- Frequency threshold of the Twitch Index separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.0.
 
 **Raises**
 
-An exception is raised if `freq` is less or equal to 0.
+An exception is raised if `freq` is less than or equal to 0.
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1126,10 +1084,10 @@ twitch_index = EMGFlow.calc_twitch_index(psd)
 
 **Description**
 
-Calculates the Twitch Slope of a Signal based on its power distribution.
+Calculate the Twitch Slope from `psd`. Ignores NaNs.
 
 ```python
-calc_twitch_slope(psd, freq=60)
+calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0)
 ```
 
 **Theory**
@@ -1143,16 +1101,16 @@ Twitch Slope is an adaptation of spectral slope (Eyben et al., 2016).
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 `freq`: int, float, optional (60)
-- Frequency threshold separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.
+- Frequency threshold of the Twitch Slope separating fast-twitching (high-frequency) muscles from slow-twitching (low-frequency) muscles. The default is 60.0.
 
 **Raises**
 
-An exception is raised if `freq` is less or equal to 0.
+An exception is raised if `freq` is less than or equal to 0.
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1160,7 +1118,7 @@ An exception is raised if `psd` does not only have columns 'Frequency' and 'Powe
 - The Twitch Slope of the fast-twitching muscles of `psd`.
 
 `slow_slope`: float
-- The Twitch Slope of the slow-moving muscles of `psd`
+- The Twitch Slope of the slow-twitching muscles of `psd`
 
 **Example**
 
@@ -1178,10 +1136,12 @@ fast_slope, slow_slope = EMGFlow.calc_twitch_slope(psd)
 
 **Description**
 
-Calculates the Spectral Centroid (SC) of a signal. The SC is the "center of mass" of a signal after a Fourier transform is applied.
+Calculate the Spectral Centroid (SC) from `psd`. Ignores NaNs.
+
+The SC is the "center of mass" of a signal after a Fourier transform is applied.
 
 ```python
-calc_sc(psd)
+calc_sc(psd:pd.DataFrame)
 ```
 
 **Theory**
@@ -1199,11 +1159,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1222,14 +1182,16 @@ SC = EMGFlow.calc_sc(psd)
 
 
 
-### `calc_sf`
+### `calc_sflt`
 
 **Description**
 
-Calculates the Spectral Flatness (SF) of a signal. The SF measures noise in the magnitude spectrum.
+Calculate the Spectral Flatness (SFlt) from `psd`. Ignores NaNs.
+
+The SF measures noise in the magnitude spectrum.
 
 ```python
-calc_sf(psd)
+calc_sflt(psd:pd.DataFrame)
 ```
 
 **Theory**
@@ -1246,11 +1208,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have the columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1269,14 +1231,93 @@ SC = EMGFlow.calc_sf(psd)
 
 
 
+### `calc_sflx`
+
+**Description**
+
+Calculate the Spectral Flux (SFlx) from `Signal1` and `diff`. Ignores NaNs.
+
+Spectral Flux measures the change in spectrums between two signals, or two sections of a signal.
+
+`calc_sflx` behaves differently, depending on if `diff` is a Pandas dataframe or float. A dataframe treats `diff` as a second signal, and finds the spectral flux between it and `Signal1`. Providing a float $n$ will split `Signal1` into the first $n$\% of the dataframe, and the remaining $n-1$\% of the dataframe, finding the spectral flux between these two parts.
+
+The call to `calc_spec_flux` within `extract_features` uses a default value of `diff=0.5`.
+
+```python
+calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:float=None)
+```
+
+**Theory**
+
+Spectral Flux is used to compare the spectral compositions of two signals. This is complicated to implement, so there is no one function to handle this.
+
+Spectral Flux is calculated as follows:
+$$
+\text{FL}_{i,i-1}=\sum_{k=1}^{Wf_L}(\text{EN}_i(k)-\text{EN}_{i-1}(k))^2
+$$
+
+(Giannakopoulos & Pikrakis, 2014)
+
+**Parameters**
+
+`Signal1`: pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`diff`: pd.DataFrame, float
+- The divisor of the calculation. If a percentage is provided, it will calculate the spectral flux of `Signal1`, divided into two different parts (`diff` and 1-`diff`). If `diff` is instead a Pandas dataframe, it will claculate the spectral flux of `Signal1` and `diff`.
+
+`col`: str
+- The column of `Signal1` the feature is calculated from. If a second signal is provided for `diff`, it should have a column of the same name.
+
+`sampling_rate`: int/float
+- The sampling rate of `Signal1`.
+
+`diff_sr`: int, float, optional (None)
+- The sampling rate for `diff` if it is a dataframe. The default is None, in which case `diff` is assumed to have the same sampling rate as `Signal1`.
+
+**Raises**
+
+An exception is raised if `col` is not a column of `Signal1`.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `diff` is a float, but isn't between 0 and 1.
+
+An exception is raised if `diff` is a dataframe and does not contain `col`.
+
+An exception is raised if `diff_sr` is less than or equal to 0.
+
+An exception is raised if `diff` is an invalid data type.
+
+**Returns**
+
+`flux`: float
+- The Spectral Flux of `Signal1` and `diff`.
+
+**Example**
+
+```python
+# Calculate the Spectral Flux of two signals
+flux1 = EMGFlow.calc_spec_flux(Signal1, Signal2, 'EMG_zyg', 2000)
+
+# Calculate the Spectral Flux of one signal divided at the halfway point
+flux2 = EMGFlow.calc_spec_flux(Signal1, 0.5, 'EMG_zyg', 2000)
+```
+
+
+
+
+
 ### `calc_ss`
 
 **Description**
 
-Calculates the Spectral Spread (SS) of a signal. SS is also called the "instantaneous bandwidth", and measures the standard deviation around the SC.
+Calculate the Spectral Spread (SS) from a `psd`. Ignores NaNs.
+
+SS is also called the "instantaneous bandwidth", and measures the standard deviation around the SC.
 
 ```python
-calc_ss(psd)
+calc_ss(psd:pd.DataFrame)
 ```
 
 **Theory**
@@ -1292,11 +1333,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1319,7 +1360,9 @@ SS = EMGFlow.calc_ss(psd)
 
 **Description**
 
-Calculates the Spectral Decrease (SD) of a signal. SD is the decrease of the slope of the spectrum with respect to frequency.
+Calculate the Spectral Decrease (SDec) from `psd`. Ignores NaNs.
+
+SD is the decrease of the slope of the spectrum with respect to frequency.
 
 ```python
 calc_sd(psd)
@@ -1337,11 +1380,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1364,10 +1407,12 @@ SD = EMGFlow.calc_sd(psd)
 
 **Description**
 
-Calculates the Spectral Entropy (SE) of a signal. SE is the Shannon entropy of the spectrum.
+Calculate the Spectral Entropy (SE) from `psd`. Ignores NaNs.
+
+SE is the Shannon entropy of the spectrum.
 
 ```python
-calc_se(psd)
+calc_se(psd:pd.DataFrame)
 ```
 
 **Theory**
@@ -1382,11 +1427,11 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 **Returns**
 
@@ -1409,10 +1454,12 @@ SEntropy = EMGFlow.calc_se(psd)
 
 **Description**
 
-Calculates the Spectral Rolloff (SR) of a signal. The spectral rolloff point is the frequency of the PSD where 85% of the total spectral energy lies below it.
+Calculate the Spectral Rolloff (SR) from `psd`. Ignores NaNs.
+
+The spectral rolloff point is the frequency of the PSD where 85% of the total spectral energy lies below it.
 
 ```python
-calc_sr(psd, percent=0.85)
+calc_sr(psd:pd.DataFrame, percent:float=0.85)
 ```
 
 **Theory**
@@ -1424,20 +1471,20 @@ The actual threshold for SR can be set manually, but literature suggests that 85
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 `percent`: float
 - The percentage of power that should be below the SR point. The default is 0.85.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 An exception is raised if `percent` is not between 0 and 1.
 
 **Returns**
 
-`SR`: float
+`SRoll`: float
 - The SR of `psd`.
 
 **Example**
@@ -1456,10 +1503,12 @@ SR = EMGFlow.calc_sr(psd)
 
 **Description**
 
-Calculates the Spectral Bandwidth (SBW) of a signal. The SBW calculates the difference between the upper and lower freqencies in the frequency band.
+Calculate the Spectral Bandwidth (SBW) from `psd`. Ignores NaNs.
+
+The SBW calculates the difference between the upper and lower freqencies in the frequency band.
 
 ```python
-calc_sbw(psd, p=2)
+calc_sbw(psd:pd.DataFrame, p:int=2)
 ```
 
 **Theory**
@@ -1476,14 +1525,14 @@ $$
 **Parameters**
 
 `psd`: pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. Should be normalized.
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column should be normalized.
 
 `p`: int, optional (2)
 - Order of the SBW. The default is 2, which gives the standard deviation around the centroid.
 
 **Raises**
 
-An exception is raised if `psd` does not only have columns 'Frequency' and 'Power'.
+An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 An exception is raised if `p` is not greater than 0.
 

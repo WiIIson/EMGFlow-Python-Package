@@ -4,7 +4,7 @@ outline: deep
 
 # API Overview
 
-EMGFlow is broken into 5 modules: `access_files` for file IO, `detect_outliers` for detecting outliers, `preprocess_signals` for preprocessing signals, `plot_signals` generating visualizations, and `extract_features` feature extraction.
+EMGFlow is broken into 4 modules: `access_files` for file IO, `preprocess_signals` for preprocessing signals, `plot_signals` generating visualizations, and `extract_features` feature extraction.
 
 ## Modules
 
@@ -23,7 +23,7 @@ mindmap
 
 These functions provide helper methods for accessing files, as well as functions for creating an EMG workflow filestructure.
 
-`make_paths` is the beginning of the EMG processing pipeline. It generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "Smooth" and "Feature" - each for a different stage of processing. This dictionary is passed to many of the processing functions. If you have your own file structure you want to use instead, you can create your own dictionary to use instead, manually setting the locations of the paths under these keys.
+`make_paths` is the beginning of the EMG processing pipeline. It generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "FWR", "Screened", "Filled", "Smooth" and "Feature" - each for a different stage of processing. This dictionary is passed to many of the processing functions. If you have your own file structure you want to use instead, you can create your own dictionary to use instead, manually setting the locations of the paths under these keys.
 
 `make_sample_data` provides built-in data to test out a data processing pipeline. It writes EMG data files to the "Raw" directory of a provided dictionary.
 
@@ -34,18 +34,24 @@ This function forms the basis for the two modes of analysis offered by EMGFlow: 
 The "automated" mode is designed for bulk processing files. In these functions, input/output is handled using your filepath dictionary. The functions loop over the files in the input folder, apply the filters, and write the filtered files to the output folder. Notable functions for this workflow includes:
 - `notch_filter_signals`
 - `bandpass_filter_signals`
-- `smooth_filter_signals`
+- `rectify_signals`
+- `screen_artefact_signals`
+- `fill_missing_signals`
+- `smooth_signals`
 
 The "manual" mode is designed for processing individual files. In these functions, input/output is handled by passing and recieving a dataframe. Notable functions include:
 - `apply_notch_filters`
 - `apply_bandpass_filter`
+- `apply_rectify`
+- `apply_screen_artefacts`
+- `apply_fill_missing`
 - `apply_rms_smooth`
 
 For more information, see the documentation for the [access_files module](./access-files.md).
 
 ### `preprocess_signals` Module
 
-This module contains the functions used for preprocessing and cleaning sEMG signals before extracting features. The preprocessing stage is broken into 3 parts: notch filtering, bandpass filtering, and smoothing.
+This module contains the functions used for preprocessing and cleaning sEMG signals before extracting features. The preprocessing stage is broken into 6 stages: notch filtering, bandpass filtering, full wave rectifier, artefact screening, filling missing data and smoothing.
 
 #### `notch_filter_signals`
 
@@ -57,11 +63,29 @@ For more information, see the documentation for the [preprocess_signals module](
 
 #### `bandpass_filter_signals`
 
-Bandpass filtering involves filtering frequencies outside a specific range. This is because sEMG signals only produce frequencies in a specific range, so any other recorded frequencies can be assumed to be interference.
+Bandpass filtering involves filtering frequencies outside a specific range. This is because sEMG signals only produce frequencies in a specific range, so any frequencies outside this range can be assumed to be interference.
 
 `bandpass_filter_signals` uses bandpass thresholds of outside 20Hz and 450Hz, as this is the standard for EMG signals (De Luca et al., 2010). However, there is some disagreement within literature for different muscles, so `bandpass_filter_signals` provides the option to change these thresholds.
 
 For more information, see the documentation for the [preprocess_signals module](./preprocess-signals.md).
+
+#### `rectify_signals`
+
+Full Wave Rectification (FWR) involves making all values in a signal positive. This is standard practice for extracting features, and before screening for artefacts or performing interpolation.
+
+`rectify_signals` applies a standard FWR filter.
+
+#### `screen_artefact_signals`
+
+Artefact screening involves detecting and removing outlier values that can interfere with results.
+
+`screen_artefact_signals` uses a rolling window, and replaces values greater than a specified number of standard deviations away with the median.
+
+#### `fill_missing_signals`
+
+Filling missing values involves interpolating values for missing data. This allows the smoothing filter to work better
+
+`fill_missing_signals` provides multiple interpolation methods - "spline" and "pchip".
 
 #### `smooth_filter_signals`
 
@@ -76,8 +100,6 @@ For more information, see the documentation for the [preprocess_signals module](
 This module contains the functions used for visualizing individual, or large batches of signal data. This helps to see what is going on in the signal files whether to produce graphics, to make comparisons between files, or to look for outliers.
 
 The `plot_dashboard` function uses an R Shiny Dashboard to dynamically load signal files. This makes it easy to compare different stages of processing, and jump between files.
-
-The `plot_spectrum` function generates image files of power spectral density graphs for signals.
 
 For more information, see the documentation for the [plot_signals module](./plot-signals.md).
 

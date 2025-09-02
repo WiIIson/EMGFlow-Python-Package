@@ -18,53 +18,52 @@ mindmap
 
 **Description:**
 
-Creates an HTML dashboard from a `path_names` filepath dictionary (see `make_paths`). Has a side bar menu to navigate the signal file and stage being displayed.
+Generate a Shiny dashboard of different processing stages for a given column of signal data.
 
-The visualization is created in the default browser, and is opened automatically. The function will automatically create plots for any paths provided in the dictionary, using the keys as the legend.
+Uses a `path_names` filepath dictionary (see `make_paths`). Has a side bar menu to navigate the file and stage being displayed.
 
-Each filepath in the dictionary is expected to contain the same named files to display them at the different stages. To avoid error, the `plot_dashboard` ignores the 'Feature' filepath.
+Each filepath in the dictionary is expected to contain the same named files to display them at the different stages. To avoid error, the function ignores the 'Feature' filepath.
 
-When the dashboard runs, the terminal will pause to host the visualization. To resume normal execution, enter 'CTRL + C'.
+'CTRL + C' can be entered in the terminal to end the display of the dashboard and resume code execution.
 
 ```python
-plot_dashboard(path_names, col, units, expression=None, file_ext='csv', autorun=True)
+plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_mask:bool=False, auto_run:bool=True)
 ```
 
 **Parameters:**
 
-- A dictionary of keys (stage of preprocessing) and values (filepath to that stage). The provided dictionary is required to have a `Raw`, `Notch`, `Bandpass`, and `Smooth` path.
+`path_names`: dict-str
+- A dictionary of file locations with keys for stage in the processing pipeline. The function will generate graphs for as many paths are provided in the dictionary. The dictionary can be created with the `make_paths` function.
 
 `col`: str
-- Column of the signal files being plotted.
+- The column of the files to display in the visualization.
 
 `units`: str
-- Units to use for the y axis of the plot. The same units as recorded in the column values.
+- Units to use for the y axis of the plot, should be the same units used for the values in `col`.
 
-`expression`: str, optional (None)
-- A regular expression. If provided, will only visualize files whose names match the regular expression. The default is None.
+`file_ext`: str, optional ('csv')
+- File extension for files to read. Only visualizes files with this extension. The default is 'csv'.
 
-`file_ext`: str, optional ("csv")
-- File extension for files to read. Only reads files with this extension. The default is 'csv'.
+`use_mask`: bool, optional (False)
+- An option to visualize the NaN mask If True, it will set values to NaN based on the NaN mask. If False, it will use the unaltered values of the column ignoring the NaN mask. The default is False.
 
 `autorun`: bool, optional (True)
-- Boolean controlling the behavior of the function. If True (default), will automatically run the visualization in the default browser. If False, will return a `shiny.App` instance.
+- An option to automatically see the visualization. If True, it will run the visual and open it in the default browser. If False, it will return the visualization object. The default is True.
 
 **Raises**
 
-An exception is raised if the directories in `path_names` don't contain the same files.
+An exception is raised if `col` is not a column of a signal file.
 
-An exception is raised if `col` is not found in any of the signal files read.
+An exception is raised if a file contained in the first file directory (`path_names[0]`) is not found in the other file directories.
 
-An exception is raised if a file cannot not be read in a path in `path_names`.
+An exception is raised if a file could not be read.
 
 An exception is raised if an unsupported file format was provided for `file_ext`.
-
-An exception is raised if `expression` is not None or a valid regular expression.
 
 **Returns**
 
 `app`: None or shiny.app
-- A shiny app containing the visualization. Only returned if `autorun` is True.
+- If `auto_run` is True, returns None. If False, returns a shiny.App instance.
 
 **Example:**
 
