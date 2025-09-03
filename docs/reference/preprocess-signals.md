@@ -332,7 +332,7 @@ These values can also be set manually for specific needs. There is some disagree
 - Upper frequency limit (Hz) of the bandpass filter. The default is 450.0.
 
 `cols`: str, optional (None)
-- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask_'.
+- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
 
 `min_segment`: float, optional (30.0)
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
@@ -424,6 +424,7 @@ An exception is raised if `col` is not a column of `Signal`.
 **Example**
 
 ```python
+# Apply a Full Wave Rectifier (FWR)
 fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 ```
 
@@ -435,15 +436,57 @@ fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 
 **Description**
 
-**Theory**
+Apply a Full Wave Rectifier (FWR) to all signal files in a folder and its subfolders. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
+
+```python
+rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
+```
 
 **Parameters**
 
+`in_path`: str
+- Filepath to a directory to read signal files.
+
+`out_path`: str
+- Filepath to a directory to write filtered signals.
+
+`cols`: list-str, optional (None)
+- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask_'.
+
+`expression`: str, optional (None)
+- A regular expression. If provided, will only apply the filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
+
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
+
+`file_ext`: str, optional ('csv')
+- The file extension for files to read. Only filters files with this extension. The default is 'csv'.
+
 **Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+A warning is raised if a column from `cols` contains NaN values.
+
+An exception is raised if a column from `cols` is not a column of a signal file.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
 
 **Returns**
 
+None.
+
 **Example**
+
+```python
+# Rectify all data from the 'Raw' path, and put the output in the 'FWR' path.
+pathNames = EMGFlow.make_paths()
+EMGFlow.rectify_signals(pathNames['Raw'], pathNames['FWR'])
+```
 
 
 
@@ -453,15 +496,64 @@ fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 
 **Description**
 
-**Theory**
+Apply a Hampel filter (`window_ms`, `n_sigma`) to a column of `Signal`.
+
+The Hampel filter helps identify outliers based on the Median Absolute Deviation (MAD), and replaces them with the median of their window. A threshold is calculated as product of the MAD with `n_sigma` and and a constant 1.4826. If the difference between a value and the median is greater than this threshold, it is considered an outlier and replaced with the median.
+
+To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
+
+```python
+apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0)
+```
 
 **Parameters**
 
+`Signal`: pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`col`: str
+- The column of `Signal` the Hampel filter is applied to.
+
+`sampling_rate`: float
+- The sampling rate of `Signal`.
+
+`window_ms`: float, optional (50.0)
+- The size of the outlier detection window in ms. The default is 50.0.
+
+`n_sigma`: float, optional (5.0)
+- The number of standard deviations away for a value to be considered an outlier. The default is 5.0.
+
+`min_segment`: float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
 **Raises**
+
+A warning is raised if `col` contains NaN values.
+
+A warning is raised if `window_ms` is longer than half the recording of `Signal`.
+
+An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `window_ms` results in a window size less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than the recording of `Signal`.
 
 **Returns**
 
+`hamp_Signal`: pd.DataFrame
+- A copy of `Signal` after the Hampel filter is applied.
+
 **Example**
+
+```python
+# Screen artefacts in a sample data file.
+pathNames = EMGFlow.make_paths()
+filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+Signal = EMGFlow.read_file_type(filePath, 'csv')
+ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg', 2000)
+```
 
 
 
@@ -471,15 +563,82 @@ fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 
 **Description**
 
-**Theory**
+Apply a hampel filter (`window_ms`, `n_sigma`) to all signal files in a folder. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
+
+The Hampel filter helps identify outliers based on the Median Absolute Deviation (MAD), and replaces them with the median of their window. A threshold is calculated as product of the MAD with `n_sigma` and and a constant 1.4826. If the difference between a value and the median is greater than this threshold, it is considered an outlier and replaced with the median.
+
+To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
+
+```python
+screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
+```
 
 **Parameters**
 
+`in_path`: str
+- Filepath to a directory to read signal files.
+
+`out_path`: str
+- Filepath to a directory to write filtered signals.
+
+`sampling_rate`: float
+- The sampling rate of the signal files.
+
+`window_ms`: float, optional (50.0)
+- The size of the outlier detection window in ms. The default is 50.0.
+
+`n_sigma`: float, optional (5.0)
+- The number of standard deviations away for a value to be considered an outlier. The default is 5.0.
+
+`cols`: list-str, optional (None)
+- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask_'.
+
+`min_segment`: float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
+`expression`: str, optional (None)
+- A regular expression. If provided, will only apply the filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
+
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
+
+`file_ext`: str, optional ('csv')
+- The file extension for files to read. Only filters files with this extension. The default is 'csv'.
+
 **Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+A warning is raised if a column from `cols` contains NaN values.
+
+A warning is raised if `window_ms` is longer than half a signal recording.
+
+An exception is raised if a column from `cols` is not a column of a signal file.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `window_ms` results in a `window_size` less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than a signal recording.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
 
 **Returns**
 
+None.
+
 **Example**
+
+```python
+# Screen artefacts in all data from the 'Raw' path, and put the output in the
+# 'Screened' path.
+pathNames = EMGFlow.make_paths()
+EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], 2000)
+```
 
 
 
@@ -489,15 +648,49 @@ fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 
 **Description**
 
-**Theory**
+Apply an interpolation method (`method`) to a column of `Signal`. Fills NaN values with interpolated results.
+
+```python
+apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip')
+```
 
 **Parameters**
 
+`Signal`: pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`col`: str
+- The column of `Signal` the interpolation is applied to.
+
+`method`: str, optional ('pchip')
+- The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
+
 **Raises**
+
+An exception is raised if `col` is not a column of `Signal`.
+
+An exception is raised if `col` is 'Time'.
+
+An exception is raised if 'Time' is not a column of `Signal`.
+
+An exception is raised if `method` is an invalid interpolation method.
+
+An exception is raised if there aren't enough valid points to perform interpolation.
 
 **Returns**
 
+`filled_Signal`: pd.DataFrame
+- A copy of `Signal` after the NaN values are filled.
+
 **Example**
+
+```python
+# Fill missing values in a sample data file.
+pathNames = EMGFlow.make_paths()
+filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+Signal = EMGFlow.read_file_type(filePath, 'csv')
+FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg')
+```
 
 
 
@@ -507,15 +700,67 @@ fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
 
 **Description**
 
-**Theory**
+Apply an interpolation method ('method') to all signal files in a folder. Writes interpolated signal files to an output folder, and generates a file structure matching the input structure.
+
+```python
+fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
+```
 
 **Parameters**
 
+`in_path`: str
+- Filepath to a directory to read signal files.
+
+`out_path`: str
+- Filepath to a directory to write filtered signals.
+
+`method`: str, optional ('pchip')
+- The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
+
+`cols`: list-str, optional (None)
+- List of columns of the signals to apply the interpolation to. The default is None, in which case the interpolation is applied to every column except for 'Time' and columns that start with 'mask_'.
+
+`expression`: str, optional (None)
+- A regular expression. If provided, will only apply the interpolation to files whose local paths inside of 'in_path' match the regular expression. The default is None.
+
+`exp_copy`: bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without interpolating. The default is False, which ignores files that don't match.
+
+`file_ext`: str, optional ('csv')
+- The file extension for files to read. Only interpolates files with this extension. The default is 'csv'.
+
 **Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+An exception is raised if a column from `cols` is not a column of a signal file.
+
+An exception is raised if `Time` is in `cols`.
+
+An exception is raised if `Time` is not a column of a signal file.
+
+An exception is raised if `method` is an invalid interpolation method.
+
+An exception is raised if there aren't enough valid points to perform interpolation on a signal file.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
 
 **Returns**
 
+None.
+
 **Example**
+
+```python
+# Fill missing values in all data from the 'Raw' path, and put the output in
+# the 'Filled' path.
+pathNames = EMGFlow.make_paths()
+EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'])
+```
 
 
 
@@ -826,7 +1071,7 @@ Other smoothing functions are also available for use if needed.
 - The value of sigma used for a Gaussian filter. Only affects output when using a Gaussian filter. The default is 1.0.
 
 `cols`: str, optional (None)
-- List of columns of the signals to apply the smoothing filter to. The default is None, in which case the smoothing filter is applied to every column except for 'Time' and columns that start with 'mask_'.
+- List of columns of the signals to apply the smoothing filter to. The default is None, in which case the smoothing filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
 
 `min_segment`: float, optional (30.0)
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
@@ -982,7 +1227,7 @@ detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=50.0,
 - Upper frequency limit (Hz) of the outlier detection. The default is None, in which case no upper threshold is used.
 
 `cols`: list-str, optional (None)
-- List of columns of the signals to apply the outlier detection to. The default is None, in which case the outlier detection is applied to every column except for 'Time' and columns that start with 'mask_'.
+- List of columns of the signals to apply the outlier detection to. The default is None, in which case the outlier detection is applied to every column except for 'Time' and columns that start with 'mask\_'.
 
 `expression`: str, optional (None)
 - A regular expression. If provided, will only apply the outlier detection to files whose local paths inside of `in_path` match the regular expression. The default is None.
