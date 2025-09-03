@@ -37,9 +37,9 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
         A dictionary of file locations with keys for stage in the processing
         pipeline. The function will generate graphs for as many paths are
         provided in the dictionary. The dictionary can be created with the
-        make_paths function.
+        'make_paths' function.
     col : str
-        The column of the signals display in the visualization.
+        The column of the signals to display in the visualization.
     units : str
         Units to use for the y axis of the plot, should be the same units used
         for the values in 'col'.

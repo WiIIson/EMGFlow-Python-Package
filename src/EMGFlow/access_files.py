@@ -162,7 +162,7 @@ def read_file_type(path:str, file_ext:str):
     Returns
     -------
     file : pd.DataFrame
-        Returns a Pandas dataframe of the file contents.
+        A Pandas dataframe of the file contents.
 
     """
     

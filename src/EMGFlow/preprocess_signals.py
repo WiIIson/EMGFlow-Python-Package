@@ -61,8 +61,8 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     -------
     psd : pd.DataFrame
         A Pandas dataframe containing a 'Frequency' and 'Power' column. The
-        'Power' column indicates the intensity of each frequency in the signal
-        provided. Results will be normalized if 'normalize' is set to True.
+        'Power' column indicates the intensity of each frequency in 'Signal'.
+        Results will be normalized if 'normalize' is set to True.
     
     """
     
@@ -270,8 +270,8 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
-    folder. Writes filtered signal files to an output folder, and generates a
-    file structure matching the input folder.
+    folder and its subfolders. Writes filtered signal files to an output
+    folder, and generates a file structure matching the input folder.
 
     Parameters
     ----------
@@ -525,9 +525,9 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
 def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply a bandpass filter ('low', 'high') to all signal files in a folder.
-    Writes filtered signal files to an output folder, and generates a file
-    structure matching the input folder.
+    Apply a bandpass filter ('low', 'high') to all signal files in a folder and
+    its subfolders. Writes filtered signal files to an output folder, and
+    generates a file structure matching the input folder.
     
     Parameters
     ----------
@@ -707,9 +707,9 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
 
 def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply a Full Wave Rectifier (FWR) to all signal files in a folder. Writes
-    filtered signal files to an output folder, and generates a file structure
-    matching the input folder.
+    Apply a Full Wave Rectifier (FWR) to all signal files in a folder and its
+    subfolders. Writes filtered signal files to an output folder, and generates
+    a file structure matching the input folder.
     
     Parameters
     ----------
@@ -985,8 +985,8 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
-    folder. Writes filtered signal files to an output folder, and generates a
-    file structure matching the input folder.
+    folder and its subfolders. Writes filtered signal files to an output
+    folder, and generates a file structure matching the input folder.
 
     Parameters
     ----------
@@ -1127,7 +1127,6 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     """
     Apply an interpolation method ('method') to a column of 'Signal'. Fills NaN
     values with interpolated results.
-    data.
 
     Parameters
     ----------
@@ -1225,9 +1224,9 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
 
 def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply an interpolation method ('method') to all signal files in a folder.
-    Writes interpolated signal files to an output folder, and generates a file
-    structure matching the input structure.
+    Apply an interpolation method ('method') to all signal files in a folder
+    and its subfolders. Writes interpolated signal files to an output folder,
+    and generates a file structure matching the input structure.
 
     Parameters
     ----------
@@ -1834,9 +1833,9 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 
 def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply a smoothing filter ('method') to all signal files in a folder.
-    Writes filtered signal files to an output folder, and generates a file
-    structure matching the input folder.
+    Apply a smoothing filter ('method') to all signal files in a folder and its
+    subfolders. Writes filtered signal files to an output folder, and generates
+    a file structure matching the input folder.
 
     Parameters
     ----------
@@ -1986,9 +1985,10 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
 
 def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, use_optional:bool=False, file_ext:str='csv'):
     """
-    Apply all EMG preprocessing filters to all signal files in a folder. Uses
-    the 'path_names' dictionary, starting with files in the 'Raw' path, and
-    moving through 'Notch', 'Bandpass', and 'FWR' as the filters are applied.
+    Apply all EMG preprocessing filters to all signal files in a folder and its
+    subfolders. Uses the 'path_names' dictionary, starting with files in the
+    'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the
+    filters are applied.
     
     Optionally, 'use_optional' can be set to True to apply the 'Screened',
     'Filled' and 'Smooth' steps.
@@ -2028,8 +2028,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'min_segment' is longer than half a signal
-        recording.
+        An exception is raised if 'min_segment' is longer than the recording of
+        'Signal'.
 
     Exception
         An exception is raised if a file could not be read.
@@ -2094,7 +2094,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
         The sampling rate of the signal files.
     window_ms : float, optional
         The size of the outlier detection window in ms. The default is 50.0.
-    threshold : float
+    threshold : float, optional
         The number of times greater than the metric a value has to be for
         classification as an outlier. The default is 5.0.
     metric : function, optional

@@ -557,13 +557,14 @@ def calc_mdf(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     
     Raises
     ------
     Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
-        'Power'.
+        'Power'. The 'Power' column should be normalized.
 
     Returns
     -------
@@ -598,7 +599,8 @@ def calc_mnf(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     
     Raises
     ------
@@ -630,7 +632,8 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     freq : float, optional
         Frequency threshold of the Twitch Ratio separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
@@ -639,7 +642,7 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     Raises
     ------
     Exception
-        An exception is raised if 'freq' is less or equal to 0.
+        An exception is raised if 'freq' is less than or equal to 0.
     Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
         'Power'.
@@ -647,7 +650,7 @@ def calc_twitch_ratio(psd:pd.DataFrame, freq:float=60.0):
     Returns
     -------
     twitch_ratio : float
-        Twitch Ratio of 'psd'.
+        The Twitch Ratio of 'psd'.
 
     """
     
@@ -675,7 +678,8 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     freq : float, optional
         Frequency threshold of the Twitch Index separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
@@ -684,7 +688,7 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     Raises
     ------
     Exception
-        An exception is raised if 'freq' is less or equal to 0.
+        An exception is raised if 'freq' is less than or equal to 0.
     Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
         'Power'.
@@ -692,7 +696,7 @@ def calc_twitch_index(psd:pd.DataFrame, freq:float=60.0):
     Returns
     -------
     twitch_index : float
-        Twitch Index of 'psd'.
+        The Twitch Index of 'psd'.
 
     """
     
@@ -720,7 +724,8 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     freq : float, optional
         Frequency threshold of the Twitch Slope separating fast-twitching
         (high-frequency) muscles from slow-twitching (low-frequency) muscles.
@@ -729,7 +734,7 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     Raises
     ------
     Exception
-        An exception is raised if 'freq' is less or equal to 0.
+        An exception is raised if 'freq' is less than or equal to 0.
     Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
         'Power'.
@@ -737,9 +742,9 @@ def calc_twitch_slope(psd:pd.DataFrame, freq:float=60.0):
     Returns
     -------
     fast_slope : float
-        Twitch Slope of the fast-twitching muscles of 'psd'.
+        The Twitch Slope of the fast-twitching muscles of 'psd'.
     slow_slope : float
-        Twitch Slope of the slow-twitching muscles of 'psd'.
+        The Twitch Slope of the slow-twitching muscles of 'psd'.
 
     """
     
@@ -779,7 +784,8 @@ def calc_sc(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
 
     Raises
     ------
@@ -790,7 +796,7 @@ def calc_sc(psd:pd.DataFrame):
     Returns
     -------
     SC : float
-        SC of 'psd'.
+        The SC of 'psd'.
 
     """
     
@@ -811,7 +817,8 @@ def calc_sflt(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
 
     Raises
     ------
@@ -821,8 +828,8 @@ def calc_sflt(psd:pd.DataFrame):
 
     Returns
     -------
-    SF : float
-        SF of 'psd'.
+    SFlt : float
+        The Spectral Flatness of 'psd'.
 
     """
     
@@ -830,8 +837,8 @@ def calc_sflt(psd:pd.DataFrame):
         raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     N = psd.shape[0]
-    SF = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
-    return SF
+    SFlt = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
+    return SFlt
 
 #
 # =============================================================================
@@ -880,7 +887,7 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
     Returns
     -------
     flux : float
-        Spectral flux of 'Signal1' and 'diff'.
+        The Spectral flux of 'Signal1' and 'diff'.
 
     """
     
@@ -937,7 +944,8 @@ def calc_ss(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
 
     Raises
     ------
@@ -970,7 +978,8 @@ def calc_sd(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
 
     Raises
     ------
@@ -1004,7 +1013,8 @@ def calc_se(psd:pd.DataFrame):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
 
     Raises
     ------
@@ -1037,7 +1047,8 @@ def calc_sr(psd:pd.DataFrame, percent:float=0.85):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     percent : float, optional
         The percentage of power to look for the Spectral Rolloff after. The
         default is 0.85.
@@ -1086,7 +1097,8 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
     Parameters
     ----------
     psd : pd.DataFrame
-        A Pandas dataframe containing a 'Frequency' and 'Power' column.
+        A Pandas dataframe containing a 'Frequency' and 'Power' column. The
+        'Power' column should be normalized.
     p : int, optional
         Order of the SBW. The default is 2, which gives the standard deviation
         around the centroid.
