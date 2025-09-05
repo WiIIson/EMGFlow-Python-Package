@@ -79,12 +79,12 @@ class TestSimple(unittest.TestCase):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg')
+        FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg', 2000)
         self.assertIsInstance(FSignal, pd.DataFrame)
     
     def test_fill_missing_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'])
+        EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'], 2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
     
     def test_apply_boxcar_smooth(self):
@@ -122,7 +122,7 @@ class TestSimple(unittest.TestCase):
     
     def test_clean_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.clean_signals(pathNames, 2000, use_optional=True)
+        EMGFlow.clean_signals(pathNames, 2000, do_screen=True, do_smooth=True)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
 
     def test_detect_outliers(self):

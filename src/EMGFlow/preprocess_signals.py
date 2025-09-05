@@ -20,7 +20,7 @@ A collection of functions for preprocessing signals and EMG data.
 # =============================================================================
 #
 
-def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None):
+def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None):
     """
     Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the
     intensity of each frequency detected in the signal. Uses the Welch method,
@@ -35,6 +35,10 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
         The column of 'Signal' the PSD is calculated from.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
+    max_segment : float, optional
+        The maximum length (in ms) of NaN values to fill. If a length of
+        invalid data is longer than this threshold, it will not be
+        interpolated. The default is 2.5
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
@@ -47,6 +51,8 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
 
     Raises
     ------
+    Warning
+        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -66,24 +72,28 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     
     """
     
-    PSD_Signal = Signal.copy().reset_index(drop=True)
-    
-    if col not in list(PSD_Signal.columns.values):
+    if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
     
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
     
-    if nan_mask is None:
-        nan_mask = ~np.isnan(PSD_Signal[col])
-    else:
-        # Clean the array
+    PSD_Signal = Signal.copy().reset_index(drop=True)
+    
+    # Use 'nan_mask' to set additional values to NaN
+    if nan_mask is not None:
+        # Clean 'nan_mask'
         nan_mask = np.asarray(nan_mask, dtype=bool).ravel()
+        
         # Raise exception if length mismatch
         if len(nan_mask) != len(PSD_Signal):
             raise Exception('NaN mask must be the same length as the Signal dataframe.')
-        # Flag additional NaNs not explicitly marked
-        nan_mask &= ~np.isnan(PSD_Signal[col])
+        
+        # Set values to NaN
+        PSD_Signal.loc[~nan_mask, col] = np.nan
+    
+    # Apply interpolation
+    PSD_Signal = apply_fill_missing(PSD_Signal, col, sampling_rate, max_segment=max_segment)
     
     # Define Welch parameters
     N = len(PSD_Signal[col].values)
@@ -98,11 +108,14 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
     PSDs = []
     freqs = None
     
+    nan_found = False
+    
     for start in range(0, N - nperseg + 1, step):
         end = start + nperseg
         
         # Skip window if NaN detected
-        if not nan_mask[start:end].all():
+        if PSD_Signal.loc[start:end, col].isna().any():
+            nan_found = True
             continue
         
         segment = PSD_Signal.loc[start:end, col].values
@@ -124,6 +137,9 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normali
         
     if not PSDs:
         raise Exception('All windows contained NaN data.')
+    
+    if nan_found:
+        warnings.warn("NaN values detected in 'Signal'.")
     
     total_power = np.mean(PSDs, axis=0)
     
@@ -823,7 +839,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0):
+def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0):
     """
     Apply a Hampel filter ('window_ms', 'n_sigma') to a column of 'Signal'.
 
@@ -837,10 +853,10 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     sampling_rate : float
         The sampling rate of 'Signal'.
     window_ms : float, optional
-        The size of the outlier detection window in ms. The default is 50.0.
+        The size of the outlier detection window in ms. The default is 100.0.
     n_sigma : float, optional
         The number of standard deviations away for a value to be considered an
-        outlier. The default is 5.0.
+        outlier. The default is 10.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -982,7 +998,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -997,10 +1013,10 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     sampling_rate : float
         The sampling rate of the signal files.
     window_ms : float, optional
-        The size of the outlier detection window in ms. The default is 50.0.
+        The size of the outlier detection window in ms. The default is 100.0.
     n_sigma : float, optional
         The number of standard deviations away for a value to be considered an
-        outlier. The default is 5.0.
+        outlier. The default is 10.0.
     cols : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
@@ -1123,7 +1139,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
 # =============================================================================
 #
 
-def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
+def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0):
     """
     Apply an interpolation method ('method') to a column of 'Signal'. Fills NaN
     values with interpolated results.
@@ -1135,9 +1151,15 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
         for signal data.
     col : str
         The column of 'Signal' the interpolation is applied to.
+    sampling_rate : float
+        The sampling rate of 'Signal'.
     method : str, optional
         The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
+    max_segment : float, optional
+        The maximum length (in ms) of NaN values to fill. If a length of
+        invalid data is longer than this threshold, it will not be
+        interpolated. The default is 500.0
 
     Raises
     ------
@@ -1171,7 +1193,21 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     if 'Time' not in list(Signal.columns.values):
         raise Exception("Column 'Time' not found in 'Signal'.")
     
+    max_gap = int(max_segment * sampling_rate / 1000.0)
+    if max_gap <= 0:
+        raise Exception("'max_segment' cannot result in a gap size less than 0.")
+    
     filled_Signal = Signal.copy().reset_index(drop=True)
+    
+    # Construct list of NaN locations
+    data = filled_Signal[col]
+    mask = data.isna()
+    group = (mask != mask.shift()).cumsum()
+    group_sequences = data[mask].groupby(group[mask])
+    nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
+    
+    # Drop NaN sequences less than 'max_gap'
+    nan_sequences = [seq for seq in nan_sequences if seq[1] > max_gap]
     
     # Get valid values by dropping NaNs
     view_sig = filled_Signal[['Time', col]].copy()
@@ -1216,13 +1252,17 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip'):
     else:
         raise Exception("Invalid interpolation method chosen: " + str(method), ", use 'pchip' or 'spline'.")
     
+    # Reinsert filtered NaNs
+    for (nan_ind, nan_len) in nan_sequences:
+        filled_Signal.loc[nan_ind:nan_ind+nan_len-1,col] = np.nan
+    
     return filled_Signal
 
 #
 # =============================================================================
 #
 
-def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply an interpolation method ('method') to all signal files in a folder
     and its subfolders. Writes interpolated signal files to an output folder,
@@ -1234,9 +1274,15 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
+    sampling_rate : float
+        The sampling rate of the signal files.
     method : str, optional
         The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
+    max_segment : float, optional
+        The maximum length (in ms) of NaN values to fill. If a length of
+        invalid data is longer than this threshold, it will not be
+        interpolated. The default is 500.0
     cols : list-str, optional
         List of columns of the signals to apply the interpolation to. The
         default is None, in which case the interpolation is applied to every
@@ -1318,7 +1364,7 @@ def fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=Non
             
             # Apply filter to columns
             for col in cols:
-                data = apply_fill_missing(data, col, method=method, )
+                data = apply_fill_missing(data, col, sampling_rate=sampling_rate, method=method, max_segment=max_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1983,15 +2029,15 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, use_optional:bool=False, file_ext:str='csv'):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=False, file_ext:str='csv'):
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
     'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the
     filters are applied.
     
-    Optionally, 'use_optional' can be set to True to apply the 'Screened',
-    'Filled' and 'Smooth' steps.
+    Optionally, 'do_screen', 'do_fill' and 'do_smooth' can be set to True to do
+    the associated step.
     
     Parameters
     ----------
@@ -2006,6 +2052,15 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         of data is less than this time, it is set to NaN. If a length of
         invalid data is less than this time, it is ignored in calculations. The
         default is 30.0.
+    do_screen : bool, optional
+        An option to use the optional processing step of artefact screening.
+        The default is False.
+    do_fill : bool, optional
+        An option to use the optional processing step of filling missing
+        values. The default is True.
+    do_smooth : boool, optional
+        An option to use the optional processing step of smoothing. The default
+        is False.
     use_optional : bool, optional
         An option to use the non-required preprocessing steps (artefact
         screening, fill missing data, smooth filter). The default is False.
@@ -2020,7 +2075,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         keys of the 'path_names' dictionary provided.
     Exception
         An exception is raised if 'Screened', 'Filled', or 'Smooth' are not
-        keys of the 'path_names' dictionary provided.
+        keys of the 'path_names' dictionary provided if the associated
+        parameter is set to True
 
     Warning
         A warning is raised if a column from the signal files contains NaN
@@ -2058,16 +2114,24 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
     rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
     
-    # Run optional preprocessing steps
-    if use_optional:
+    last = 'FWR'
+    
+    if do_screen:
+        if 'Screened' not in path_names:
+            raise Exception("'Screened' path not detected in provided dictionary ('path_names').")
+        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+        last = 'Screened'
+    
+    if do_fill:
         if 'Filled' not in path_names:
-            raise Exception('Filled path not detected in provided dictionary (path_names).')
+            raise Exception("'Filled' path not detected in provided dictionary ('path_names').")
+        fill_missing_signals(path_names[last], path_names['Filled'], sampling_rate, file_ext=file_ext)
+        last = 'Filled'
+    
+    if do_smooth:
         if 'Smooth' not in path_names:
-            raise Exception('Smooth path not detected in provided dictionary (path_names).')
-        
-        screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
-        fill_missing_signals(path_names['Screened'], path_names['Filled'], file_ext=file_ext)
-        smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+            raise Exception("'Smooth' path not detected in provided dictionary ('path_names').")
+        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
     
     return
 
