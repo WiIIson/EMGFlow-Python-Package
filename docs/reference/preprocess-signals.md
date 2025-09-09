@@ -44,7 +44,7 @@ mindmap
 Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the intensity of each frequency detected in the signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
 
 ```python
-emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:bool=True, nan_mask=None)
+emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None)
 ```
 
 ### Parameters
@@ -58,6 +58,9 @@ emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:b
 `sampling_rate`: float, optional (1000)
 - The sampling rate of `Signal`. The default is 1000.0.
 
+`max_segment`: float, optional (2.5)
+- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 2.5.
+
 `normalize`: bool, optional (True)
 - If True, will normalize the result. If False, will not. The default is True.
 
@@ -65,6 +68,8 @@ emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, normalize:b
 - Optional series that controls the calculation of the function. Can be a True/False mask that is the same size as the selected column, and will set all associated False values in the column to NaN in the calculation. The default is None, in which case no NaN masking will be done.
 
 ### Raises
+
+A warning is raised if `col` contains NaN values.
 
 An exception is raised if `col` is not a column of `Signal`.
 
@@ -503,7 +508,7 @@ The Hampel filter helps identify outliers based on the Median Absolute Deviation
 To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
 
 ```python
-apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, min_segment:float=30.0)
+apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0)
 ```
 
 **Parameters**
@@ -517,11 +522,11 @@ apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 `sampling_rate`: float
 - The sampling rate of `Signal`.
 
-`window_ms`: float, optional (50.0)
-- The size of the outlier detection window in ms. The default is 50.0.
+`window_ms`: float, optional (100.0)
+- The size of the outlier detection window in ms. The default is 100.0.
 
-`n_sigma`: float, optional (5.0)
-- The number of standard deviations away for a value to be considered an outlier. The default is 5.0.
+`n_sigma`: float, optional (10.0)
+- The number of standard deviations away for a value to be considered an outlier. The default is 10.0.
 
 `min_segment`: float, optional (30.0)
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
@@ -570,7 +575,7 @@ The Hampel filter helps identify outliers based on the Median Absolute Deviation
 To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
 
 ```python
-screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=50.0, n_sigma:float=5.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
+screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
 ```
 
 **Parameters**
@@ -584,11 +589,11 @@ screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_m
 `sampling_rate`: float
 - The sampling rate of the signal files.
 
-`window_ms`: float, optional (50.0)
-- The size of the outlier detection window in ms. The default is 50.0.
+`window_ms`: float, optional (100.0)
+- The size of the outlier detection window in ms. The default is 100.0.
 
-`n_sigma`: float, optional (5.0)
-- The number of standard deviations away for a value to be considered an outlier. The default is 5.0.
+`n_sigma`: float, optional (10.0)
+- The number of standard deviations away for a value to be considered an outlier. The default is 10.0.
 
 `cols`: list-str, optional (None)
 - List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask_'.
@@ -651,7 +656,7 @@ EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], 2000)
 Apply an interpolation method (`method`) to a column of `Signal`. Fills NaN values with interpolated results.
 
 ```python
-apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip')
+apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0)
 ```
 
 **Parameters**
@@ -662,8 +667,14 @@ apply_fill_missing(Signal:pd.DataFrame, col:str, method:str='pchip')
 `col`: str
 - The column of `Signal` the interpolation is applied to.
 
+`sampling_rate`: float
+- The sampling rate of `Signal`.
+
 `method`: str, optional ('pchip')
 - The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
+
+`max_segment`: float, optional (500.0)
+- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 500.0.
 
 **Raises**
 
@@ -703,7 +714,7 @@ FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg')
 Apply an interpolation method ('method') to all signal files in a folder. Writes interpolated signal files to an output folder, and generates a file structure matching the input structure.
 
 ```python
-fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
+fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv')
 ```
 
 **Parameters**
@@ -716,6 +727,9 @@ fill_missing_signals(in_path:str, out_path:str, method:str='pchip', cols=None, e
 
 `method`: str, optional ('pchip')
 - The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
+
+`max_segment`: float, optional (500.0)
+- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 500.0.
 
 `cols`: list-str, optional (None)
 - List of columns of the signals to apply the interpolation to. The default is None, in which case the interpolation is applied to every column except for 'Time' and columns that start with 'mask_'.
@@ -1134,12 +1148,12 @@ EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], size
 
 **Description**
 
-Apply all EMG preprocessing filters to all signal files in a folder. Uses the 'path_names' dictionary, starting with files in the 'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the filters are applied.
+Apply all EMG preprocessing filters to all signal files in a folder. Uses the `path_names` dictionary, starting with files in the 'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the filters are applied.
 
-Optionally, 'use_optional' can be set to True to apply the 'Screened', 'Filled' and 'Smooth' steps.
+Optionally, `do_screen`, `do_fill` and `do_smooth` can be set to True to do the associated step.
 
 ```python
-clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, use_optional:bool=False, file_ext:str='csv')
+clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=False, file_ext:str='csv')
 ```
 
 **Parameters**
@@ -1153,8 +1167,14 @@ clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.
 `min_segment`: float, optional (30.0)
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
-`use_optional`: bool, optional (False)
-- An option to use the non-required preprocessing steps (artefact screening, fill missing data, smooth filter). The default is False.
+`do_screen` : bool, optional (False)
+- An option to use the optional processing step of artefact screening. The default is False.
+
+do_fill : bool, optional (True)
+- An option to use the optional processing step of filling missing values. The default is True.
+
+do_smooth : boool, optional (False)
+- An option to use the optional processing step of smoothing. The default is False.
 
 `file_ext`: str, optional ('csv')
 - The file extension for files to read. Only processes files with this extension. The default is 'csv'.
@@ -1167,9 +1187,9 @@ An exception is raised if 'Screened', 'Filled', or 'Smooth' are not keys of the 
 
 A warning is raised if a column from the signal files contains NaN values.
 
-A warning is raised if `min_segment` is longer than half a signal recording.
-
 An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than a signal recording.
 
 An exception is raised if a file could not be read.
 
