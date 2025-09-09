@@ -1167,13 +1167,13 @@ clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.
 `min_segment`: float, optional (30.0)
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
-`do_screen` : bool, optional (False)
+`do_screen`: bool, optional (False)
 - An option to use the optional processing step of artefact screening. The default is False.
 
-do_fill : bool, optional (True)
+`do_fill`: bool, optional (True)
 - An option to use the optional processing step of filling missing values. The default is True.
 
-do_smooth : boool, optional (False)
+`do_smooth`: boool, optional (False)
 - An option to use the optional processing step of smoothing. The default is False.
 
 `file_ext`: str, optional ('csv')
