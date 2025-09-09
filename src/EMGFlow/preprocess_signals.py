@@ -38,7 +38,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
     max_segment : float, optional
         The maximum length (in ms) of NaN values to fill. If a length of
         invalid data is longer than this threshold, it will not be
-        interpolated. The default is 2.5
+        interpolated. The default is 2.5.
     normalize : bool, optional
         If True, will normalize the result. If False, will not. The default is
         True.
@@ -1159,7 +1159,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     max_segment : float, optional
         The maximum length (in ms) of NaN values to fill. If a length of
         invalid data is longer than this threshold, it will not be
-        interpolated. The default is 500.0
+        interpolated. The default is 500.0.
 
     Raises
     ------
@@ -1169,6 +1169,8 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
         An exception is raised if 'col' is 'Time'.
     Exception
         An exception is raised if 'Time' is not a column of 'Signal'.
+    Exception
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'method' is an invalid interpolation method.
     Exception
@@ -1192,6 +1194,10 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     # An exception is raised if 'Signal' does not have a 'Time' column
     if 'Time' not in list(Signal.columns.values):
         raise Exception("Column 'Time' not found in 'Signal'.")
+        
+    # An exception is raised if 'sampling_rate' is less or equal to 0.
+    if sampling_rate <= 0:
+        raise Exception("'sampling_rate' must be greater than 0.")
     
     max_gap = int(max_segment * sampling_rate / 1000.0)
     if max_gap <= 0:
@@ -1314,6 +1320,8 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         An exception is raised if 'Time' is in 'cols'.
     Exception
         An exception is raised if 'Time' is not a column of a signal file.
+    Exception
+        An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'method' is an invalid interpolation method.
     Exception
