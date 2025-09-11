@@ -2037,7 +2037,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=False, file_ext:str='csv'):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
@@ -2068,10 +2068,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         values. The default is True.
     do_smooth : boool, optional
         An option to use the optional processing step of smoothing. The default
-        is False.
-    use_optional : bool, optional
-        An option to use the non-required preprocessing steps (artefact
-        screening, fill missing data, smooth filter). The default is False.
+        is True.
     file_ext : str, optional
         The file extension for files to read. Only processes files with this
         extension. The default is 'csv'.

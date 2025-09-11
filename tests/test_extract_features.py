@@ -208,13 +208,13 @@ class TestSimple(unittest.TestCase):
         SS = EMGFlow.calc_ss(PSD)
         self.assertIsInstance(SS, float)
     
-    def test_calc_sd(self):
+    def test_calc_sdec(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
-        SD = EMGFlow.calc_sd(PSD)
+        SD = EMGFlow.calc_sdec(PSD)
         self.assertIsInstance(SD, float)
     
     def test_calc_se(self):

@@ -804,6 +804,7 @@ def calc_sc(psd:pd.DataFrame):
         raise Exception("'psd' must contain columns 'Frequency' and 'Power'.")
     
     SC = np.sum(psd['Power']*psd['Frequency']) / np.sum(psd['Power'])
+    
     return SC
 
 #
@@ -838,6 +839,7 @@ def calc_sflt(psd:pd.DataFrame):
     
     N = psd.shape[0]
     SFlt = np.prod(psd['Power'] ** (1/N)) / ((1/N) * np.sum(psd['Power']))
+    
     return SFlt
 
 #
@@ -965,13 +967,14 @@ def calc_ss(psd:pd.DataFrame):
     
     SC = calc_sc(psd)
     SS = np.sum(((psd['Frequency'] - SC) ** 2) * psd['Power']) / np.sum(psd['Power'])
+    
     return SS
 
 #
 # =============================================================================
 #
 
-def calc_sd(psd:pd.DataFrame):
+def calc_sdec(psd:pd.DataFrame):
     """
     Calculate the Spectral Decrease (SDec) from 'psd'. Ignores NaNs.
 
@@ -989,7 +992,7 @@ def calc_sd(psd:pd.DataFrame):
 
     Returns
     -------
-    SD : float
+    SDec : float
         The SDec of 'psd'.
 
     """
@@ -999,8 +1002,9 @@ def calc_sd(psd:pd.DataFrame):
     
     N = psd.shape[0]
     vals = np.array(psd['Power'])
-    SD = np.sum((vals[1:] - vals[0])/N) / np.sum(vals[1:])
-    return SD
+    SDec = np.sum((vals[1:] - vals[0])/N) / np.sum(vals[1:])
+    
+    return SDec
 
 #
 # =============================================================================
@@ -1034,6 +1038,7 @@ def calc_se(psd:pd.DataFrame):
     
     prob = psd['Power'] / np.sum(psd['Power'])
     SE = -np.sum(prob * np.log(prob))
+    
     return SE
 
 #
@@ -1074,17 +1079,17 @@ def calc_sr(psd:pd.DataFrame, percent:float=0.85):
     if percent <= 0 or percent >= 1:
         raise Exception("'percent' must be between 0 and 1")
     
-    total_prob = 0
-    total_power = np.sum(psd['Power'])
-    # Make copy and reset rows to iterate over them
-    psdCalc = psd.copy()
-    psdCalc = psdCalc.reset_index()
-    for i in range(len(psdCalc)):
-        prob = psdCalc.loc[i, 'Power'] / total_power
-        total_prob += prob
-        if total_power >= percent:
-            SRoll = psdCalc.loc[i, 'Frequency']
-            return SRoll
+    # Make copy and apply transformations
+    psdCalc = psd.copy().reset_index()
+    total_power = psdCalc['Power'].sum()
+    psdCalc['Power'] = psdCalc['Power'] / total_power
+    
+    # Calculate SRoll
+    psdCalc['cumpwr'] = psdCalc['Power'].cumsum()
+    SRoll = psdCalc[psdCalc['cumpwr'] >= percent].iloc[0]
+    SRoll = SRoll['Frequency']
+
+    return SRoll
 
 #
 # =============================================================================
@@ -1121,8 +1126,9 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
     if p <= 0:
         raise Exception("'p' must be greater than 0")
     
-    cent = calc_sc(psd)
-    SBW = (np.sum(psd['Power'] * (psd['Frequency'] - cent) ** p)) ** (1/p)
+    centroid = calc_sc(psd)
+    SBW = (np.sum(psd['Power'] * (psd['Frequency'] - centroid) ** p)) ** (1/p)
+    
     return SBW
 
 #
@@ -1281,14 +1287,14 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         'Twitch_Index',
         'Twitch_Slope_Fast',
         'Twitch_Slope_Slow',
-        'Spec_Centroid',
-        'Spec_Flatness',
-        'Spec_Flux',
-        'Spec_Spread',
-        'Spec_Decrease',
-        'Spec_Entropy',
-        'Spec_Rolloff',
-        'Spec_Bandwidth',
+        'SC',
+        'SFlt',
+        'SFlx',
+        'SS',
+        'SDec',
+        'SE',
+        'SR',
+        'SB',
         'Spec_Pmissing'
     ]
     
@@ -1301,7 +1307,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     
     
     # Create row labels
-    df_names = ['File_ID']
+    df_names = ['File_Path']
     for col in cols:
         for measure in measure_names:
             df_names.append(col + '_' + measure)
@@ -1377,7 +1383,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 Spectral_Flatness = calc_sflt(psd)
                 Spectral_Flux = calc_sflx(data_b, 0.5, col, sampling_rate)
                 Spectral_Spread = calc_ss(psd)
-                Spectral_Decrease = calc_sd(psd)
+                Spectral_Decrease = calc_sdec(psd)
                 Spectral_Entropy = calc_se(psd)
                 Spectral_Rolloff = calc_sr(psd)
                 Spectral_Bandwidth = calc_sbw(psd, 2)
