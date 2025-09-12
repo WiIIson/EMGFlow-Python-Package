@@ -1356,23 +1356,23 @@ SS = EMGFlow.calc_ss(psd)
 
 
 
-### `calc_sd`
+### `calc_sdec`
 
 **Description**
 
 Calculate the Spectral Decrease (SDec) from `psd`. Ignores NaNs.
 
-SD is the decrease of the slope of the spectrum with respect to frequency.
+SDec is the decrease of the slope of the spectrum with respect to frequency.
 
 ```python
-calc_sd(psd)
+calc_sdec(psd)
 ```
 
 **Theory**
 
-SD is calculated as follows:
+SDec is calculated as follows:
 $$
-\text{SD}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}
+\text{SDec}=\frac{\sum_{m=1}^{N-1}\frac{1}{N}(|X(m)|-|X(0)|)}{\sum_{m=1}^{N-1}|X(m)|}
 $$
 
 (Nagineni et al., 2018)
@@ -1388,15 +1388,15 @@ An exception is raised if `psd` does not have columns 'Frequency' and 'Power'.
 
 **Returns**
 
-`SD`: float
-- The SD of `psd`.
+`SDec`: float
+- The SDec of `psd`.
 
 **Example**
 
 ```python
-# Calculate the SD of Signal, for column 'EMG_zyg'
+# Calculate the SDec of Signal, for column 'EMG_zyg'
 psd = EMGFlow.emg_to_psd(Signal['EMG_zyg'], 2000)
-SD = EMGFlow.calc_sd(psd)
+SDec = EMGFlow.calc_sdec(psd)
 ```
 
 

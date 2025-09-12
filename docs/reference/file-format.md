@@ -42,39 +42,39 @@ Column name definitions:
 
 | Column name | Feature | Type |
 | :-- | :-- | :-- |
-| EMG_Min | Minimum voltage | Time-series |
-| EMG_Max | Maximum voltage | Time-series |
-| EMG_Mean | Mean voltage | Time-series |
-| EMG_SD | Standard deviation of voltage | Time-series |
-| EMG_Skew | Skew of voltage | Time-series |
-| EMG_Kurtosis | Kurtosis of voltage | Time-series |
-| EMG_IEMG | Integrated EMG of voltage | Time-series |
-| EMG_MAV | Mean absolute value of voltage | Time-series |
-| EMG_MMAV1 | Modified mean absolute value 1 of voltage | Time-series |
-| EMG_MMAV2 | Modified mean absolute value 2 of voltage | Time-series |
-| EMG_SSI | Simple square integral of voltage | Time-series |
-| EMG_VAR | Variance of voltage | Time-series |
-| EMG_VOrder | V-order of voltage | Time-series |
-| EMG_RMS | Root mean square of voltage | Time-series |
-| EMG_WL | Waveform length of voltage | Time-series |
-| EMG_LOG | Log-detector of voltage | Time-series |
-| EMG_MFL | Maximum fractal length of voltage | Time-series |
-| EMG_AP | Average power of voltage | Time-series |
+| [EMG_Min](./extract-features#basic-time-series-statistics) | Minimum voltage | Time-series |
+| [EMG_Max](./extract-features#basic-time-series-statistics) | Maximum voltage | Time-series |
+| [EMG_Mean](./extract-features#basic-time-series-statistics) | Mean voltage | Time-series |
+| [EMG_SD](./extract-features#basic-time-series-statistics) | Standard deviation of voltage | Time-series |
+| [EMG_Skew](./extract-features#basic-time-series-statistics) | Skew of voltage | Time-series |
+| [EMG_Kurtosis](./extract-features#basic-time-series-statistics) | Kurtosis of voltage | Time-series |
+| [EMG_IEMG](./extract-features.md#calc_iemg) | Integrated EMG of voltage | Time-series |
+| [EMG_MAV](./extract-features.md#calc_mav) | Mean absolute value of voltage | Time-series |
+| [EMG_MMAV1](./extract-features.md#calc_mmav1) | Modified mean absolute value 1 of voltage | Time-series |
+| [EMG_MMAV2](./extract-features.md#calc_mmav2) | Modified mean absolute value 2 of voltage | Time-series |
+| [EMG_SSI](./extract-features.md#calc_ssi) | Simple square integral of voltage | Time-series |
+| [EMG_VAR](./extract-features.md#calc_var) | Variance of voltage | Time-series |
+| [EMG_VOrder](./extract-features.md#calc_vorder) | V-order of voltage | Time-series |
+| [EMG_RMS](./extract-features.md#calc_rms) | Root mean square of voltage | Time-series |
+| [EMG_WL](./extract-features.md#calc_wl) | Waveform length of voltage | Time-series |
+| [EMG_LOG](./extract-features.md#calc_log) | Log-detector of voltage | Time-series |
+| [EMG_MFL](./extract-features.md#calc_mfl) | Maximum fractal length of voltage | Time-series |
+| [EMG_AP](./extract-features.md#calc_ap) | Average power of voltage | Time-series |
 | EMG_Timeseries_Pmissing | Percentage of missing data | Time-series |
-| EMG_Max_Freq | Maximum frequency | Spectral |
-| EMG_MDF | Median frequency | Spectral |
-| EMG_MNF | Mean frequency | Spectral |
-| EMG_Twitch_Ratio | Twitch ratio of frequency | Spectral |
-| EMG_Twitch_Index | Twitch index of frequency | Spectral |
-| EMG_Twitch_Slope | Twitch slope of frequency | Spectral |
-| EMG_SC | Spectral centroid of frequency | Spectral |
-| EMG_SFlt | Spectral flatness of frequency | Spectral |
-| EMG_SFlx | Spectral flux of frequency | Spectral |
-| EMG_SS | Spectral spread of frequency | Spectral |
-| EMG_SD | Spectral decrease of frequency | Spectral |
-| EMG_SE | Spectral entropy of frequency | Spectral |
-| EMG_SR | Spectral rolloff of frequency | Spectral |
-| EMG_SB | Spectral bandwidth | Spectral |
+| [EMG_Max_Freq](./extract-features.md#basic-time-series-statistics) | Maximum frequency | Spectral |
+| [EMG_MDF](./extract-features.md#calc_mdf) | Median frequency | Spectral |
+| [EMG_MNF](./extract-features.md#calc_mnf) | Mean frequency | Spectral |
+| [EMG_Twitch_Ratio](./extract-features.md#calc_twitch_ratio) | Twitch ratio of frequency | Spectral |
+| [EMG_Twitch_Index](./extract-features.md#calc_twitch_index) | Twitch index of frequency | Spectral |
+| [EMG_Twitch_Slope](./extract-features.md#calc_twitch_slope) | Twitch slope of frequency | Spectral |
+| [EMG_SC](./extract-features.md#calc_sc) | Spectral centroid of frequency | Spectral |
+| [EMG_SFlt](./extract-features.md#calc_sflt) | Spectral flatness of frequency | Spectral |
+| [EMG_SFlx](./extract-features.md#calc_sflx) | Spectral flux of frequency | Spectral |
+| [EMG_SS](./extract-features.md#calc_ss) | Spectral spread of frequency | Spectral |
+| [EMG_SDec](./extract-features.md#calc_sdec) | Spectral decrease of frequency | Spectral |
+| [EMG_SE](./extract-features.md#calc_se) | Spectral entropy of frequency | Spectral |
+| [EMG_SR](./extract-features.md#calc_sr) | Spectral rolloff of frequency | Spectral |
+| [EMG_SBw](./extract-features.md#calc_sbw) | Spectral bandwidth | Spectral |
 | EMG_Spec_PMissing | Percentage of missing data | Spectral |
 
 ## Sample Data Files
@@ -82,8 +82,16 @@ Column name definitions:
 The sample data used in EMGFlow is taken from [PeakAffectDS](https://zenodo.org/records/6403363).
 
 | PeakAffectDS Name | EMGFlow Name       | Timeframe             |
-| ----------------- | ------------------ | :-------------------: |
+| :---------------- | :----------------- | :-------------------: |
 | 01-03-01.csv      | sample_data_01.csv | 50.0005s : 60.0000s   |
 | 01-04-01.csv      | sample_data_02.csv | 130.0005s : 140.0000s |
 | 02-06-02.csv      | sample_data_03.csv | 10.0005s : 20.0000s   |
 | 02-07-02.csv      | sample_data_04.csv | 15.0005s : 25.0000s   |
+
+### File Manipulations
+
+The sample data files were manipulated in the following ways:
+- `sample_data_01.csv`: Added chunk of NaN values.
+- `sample_data_02.csv`: Added scattered individual NaN values.
+- `sample_data_03.csv`: Added several large chunks of NaN values creating "data islands"
+- `sample_data_04.csv`: Injected a small high-intensity bandlimited noise pulse.
