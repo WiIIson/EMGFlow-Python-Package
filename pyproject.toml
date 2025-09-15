@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "1.0.17"
+version = "1.1.0"
 description = "A general EMG processing and feature extraction package."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -37,8 +37,7 @@ Documentation = "https://wiiison.github.io/EMGFlow-Python-Package/"
 Issues = "https://github.com/WiIIson/EMGFlow-Python-Package/issues"
 
 [tool.setuptools]
-packages = ["EMGFlow"]
-package-dir = { "" = "src" }
+include-package-data = true
 
 [tool.setuptools.package-data]
 "EMGFlow" = ["data/*.csv"]
