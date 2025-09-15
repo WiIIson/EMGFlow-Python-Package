@@ -570,7 +570,7 @@ ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg', 2000)
 
 Apply a hampel filter (`window_ms`, `n_sigma`) to all signal files in a folder. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
 
-The Hampel filter helps identify outliers based on the Median Absolute Deviation (MAD), and replaces them with the median of their window. A threshold is calculated as product of the MAD with `n_sigma` and and a constant 1.4826. If the difference between a value and the median is greater than this threshold, it is considered an outlier and replaced with the median.
+A wide range of recording artefacts can occur in signal files. Screen_artefacts applies a straight-forward filter approach to limit the affect of some artefacts. We suggest that users manually inspect raw, smoothed, and screened signals with the dashboard to determine the presence and nature of artefacts, and performance of the hampel filter. Users should adjust filter parameters to fit their needs.
 
 To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
 
