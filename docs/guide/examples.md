@@ -64,10 +64,10 @@ import EMGFlow as ef
 
 # PeakAffectDS data
 path_names = {
-    'Raw': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\01_Raw',
-    'Notch': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\02_Notch',
-    'Bandpass': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\03_Bandpass',
-    'Smooth': 'E:\\UOIT\\UOIT-Thesis\\Other_Work\\Data\\04_Smooth'
+    'Raw': os.path.join('Data', '01_Raw'),
+    'Notch': os.path.join('Data', '01_Raw'),
+    'Bandpass': os.path.join('Data', '03_Bandpass'),
+    'Smooth': os.path.join('Data', '04_Smooth')
 }
 
 # Preprocess signals
