@@ -39,14 +39,17 @@ EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_ra
 # 2. Apply bandpass filter
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
 
-# 3. Apply smoothing filter
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], sampling_rate, smooth_window, cols)
+# 3. Apply full wave rectifier
+EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'])
 
 # 4. Apply artefact screening
-EMGFlow.screen_artefact_signals(path_names['Smooth'], path_names['Filled'], sampling_rate, cols=cols)
+EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate, cols=cols)
 
 # 5. Fill missing data
-EMGFlow.fill_missing_signals(path_names['Filled'], path_names['Filled'], sampling_rate, cols=cols)
+EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], sampling_rate, cols=cols)
+
+# 3. Apply smoothing filter
+EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, smooth_window, cols)
 
 # 4. Extract features
 df = EMGFlow.extract_features(path_names, sampling_rate, cols)
@@ -85,6 +88,7 @@ A simple example outlining EMG preprocessing using a loaded dataframe.
 import EMGFlow
 import os
 import pandas as pd
+import numpy as np
 
 # Get path dictionary
 path_names = EMGFlow.make_paths()
@@ -110,12 +114,12 @@ cols = ['EMG_zyg', 'EMG_cor']
 # Preprocess first column of signals ('EMG_zyg')
 sampleData = EMGFlow.apply_notch_filters(sampleData, cols[0], sampling_rate, notch_vals)
 sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[0], sampling_rate, band_low, band_high)
-sampleData = EMGFlow.apply_rms_smooth(sampleData, cols[0], smooth_window)
+sampleData = np.abs(sampleData[cols[0]])
 
 # Preprocess second column of signals ('EMG_cor')
 sampleData = EMGFlow.apply_notch_filters(sampleData, cols[1], sampling_rate, notch_vals)
 sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[1], sampling_rate, band_low, band_high)
-sampleData = EMGFlow.apply_rms_smooth(sampleData, cols[1], smooth_window)
+sampleData = np.abs(sampleData[cols[1]])
 ```
 
 ## Advanced Examples
@@ -153,7 +157,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_s, cols, expression=reg_str)
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
+EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'], cols)
 
 # Extract features
 df = EMGFlow.extract_features(path_names, sampling_rate, cols)
@@ -190,7 +194,7 @@ cols = ['EMG_zyg', 'EMG_cor']
 # Preprocess signals
 EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
+EMGFlow.rectify_signals(path_names['Bandpass'], path_names['Smooth'], cols)
 
 # Map locations of files to process
 file_dirs_b = EMGFlow.map_files(path_names['Bandpass'])
