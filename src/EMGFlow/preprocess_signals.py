@@ -51,8 +51,6 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
 
     Raises
     ------
-    Warning
-        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -108,14 +106,11 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
     PSDs = []
     freqs = None
     
-    nan_found = False
-    
     for start in range(0, N - nperseg + 1, step):
         end = start + nperseg
         
         # Skip window if NaN detected
         if PSD_Signal.loc[start:end, col].isna().any():
-            nan_found = True
             continue
         
         segment = PSD_Signal.loc[start:end, col].values
@@ -137,9 +132,6 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
         
     if not PSDs:
         raise Exception('All windows contained NaN data.')
-    
-    if nan_found:
-        warnings.warn("NaN values detected in 'Signal'.")
     
     total_power = np.mean(PSDs, axis=0)
     
@@ -190,8 +182,6 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
         
     Raises
     ------
-    Warning
-        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -210,12 +200,9 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -331,8 +318,6 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         An exception is raised if 'expression' is not None or a valid regular
         expression.
         
-    Warning
-        A warning is raised if a column from 'cols' contains NaN values.
     Exception
         An exception is raised if a column from 'cols' is not a column of a
         signal file.
@@ -447,8 +432,6 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
     Raises
     ------
-    Warning
-        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
     Exception
@@ -469,12 +452,9 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -587,8 +567,6 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         An exception is raised if 'expression' is not None or a valid regular
         expression.
 
-    Warning
-        A warning is raised if a column from 'cols' contains NaN values.
     Exception
         An exception is raised if a column from 'cols' is not a column of a
         signal file.
@@ -693,8 +671,6 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
 
     Raises
     ------
-    Warning
-        A warning is raised if 'col' contains NaN values.
     Exception
         An exception is raised if 'col' is not a column of 'Signal'.
 
@@ -705,12 +681,9 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     fwr_Signal = Signal.copy().reset_index(drop=True)
     fwr_Signal[col] = np.abs(fwr_Signal[col])
@@ -757,8 +730,6 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
         An exception is raised if 'expression' is not None or a valid regular
         expression.
         
-    Warning
-        A warning is raised if a column from 'cols' contains NaN values.
     Exception
         An exception is raised if a column from 'cols' is not a column of a
         signal file.
@@ -866,8 +837,6 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
@@ -888,12 +857,9 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -1046,8 +1012,6 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         An exception is raised if 'expression' is not None or a valid regular
         expression.
         
-    Warning
-        A warning is raised if a column from 'cols' contains NaN values.
     Warning
         A warning is raised if 'window_ms' is longer than half a signal
         recording.
@@ -1428,8 +1392,6 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
@@ -1450,12 +1412,9 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1546,8 +1505,6 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
@@ -1568,12 +1525,9 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1666,8 +1620,6 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
@@ -1688,12 +1640,9 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1789,8 +1738,6 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     Raises
     ------
     Warning
-        A warning is raised if 'col' contains NaN values.
-    Warning
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
@@ -1811,12 +1758,9 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', and a
-    # warning is raised if it contains NaNs.
+    # An exception is raised if 'col' is not a column of 'Signal'.
     if col not in list(Signal.columns.values):
         raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if Signal[col].isnull().values.any():
-        warnings.warn("NaN values detected in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1938,8 +1882,6 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     Exception
         An exception is raised if 'method' is an invalid smoothing method.
         
-    Warning
-        A warning is raised if a column from 'cols' contains NaN values.
     Warning
         A warning is raised if 'window_ms' is longer than half a signal
         recording.
@@ -2083,9 +2025,6 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         keys of the 'path_names' dictionary provided if the associated
         parameter is set to True
 
-    Warning
-        A warning is raised if a column from the signal files contains NaN
-        values.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception

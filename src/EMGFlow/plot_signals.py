@@ -97,6 +97,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
         file_dirs.append(map_files(path))
     
     df = map_files_fuse(file_dirs, names)
+    df.sort_values(by='File', inplace=True)
     
     # Set style
     plt.style.use('fivethirtyeight')
