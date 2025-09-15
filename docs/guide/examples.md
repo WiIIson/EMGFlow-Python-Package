@@ -49,7 +49,7 @@ EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampl
 EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], sampling_rate, cols=cols)
 
 # 3. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, smooth_window, cols)
+EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, window_ms=smooth_window, cols=cols)
 
 # 4. Extract features
 df = EMGFlow.extract_features(path_names, sampling_rate, cols)
