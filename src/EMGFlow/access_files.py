@@ -220,29 +220,26 @@ def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=Non
             raise Exception("Invalid regex expression provided")
     
     # Set base path and ensure in_path is absolute
-    is_base = False
     if base is None:
         if not os.path.isabs(in_path):
             in_path = os.path.join(os.getcwd(), in_path)
         base = in_path
-        is_base = True
     
     # Build file directory dictionary
     file_dirs = {}
     for file in os.listdir(in_path):
         new_path = os.path.join(in_path, file)
         fileName = os.path.relpath(new_path, base)
+        
         # Recursively check folders
         if os.path.isdir(new_path):
             subDir = map_files(new_path, file_ext=file_ext, expression=expression, base=base)
             file_dirs.update(subDir)
+        
         # Record the file path (from base to current folder) and absolute path
         elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, fileName)!=None)):
             file_dirs[fileName] = new_path
-    
-    if is_base: 
-        file_dirs.sort_values(by='File', inplace=True)
-    
+            
     return file_dirs
 
 #
@@ -292,5 +289,6 @@ def map_files_fuse(file_dirs, names):
     # Create data frame
     path_df = pd.DataFrame(data, columns=['ID', 'File'] + names)
     path_df.set_index('ID',inplace=True)
+    path_df.sort_values(by='File', inplace=True)
     
     return path_df
