@@ -1,6 +1,8 @@
 import os
 import re
 import matplotlib.pyplot as plt
+import threading
+import uvicorn
 import webbrowser
 
 from shiny import App, render, ui, reactive
@@ -8,8 +10,10 @@ from shiny import App, render, ui, reactive
 import nest_asyncio
 nest_asyncio.apply()
 
-from .preprocess_signals import emg_to_psd
 from .access_files import *
+from .preprocess_signals import emg_to_psd
+
+_SERVER_HANDLE = {'server': None, 'thread': None}
 
 #
 # =============================================================================
@@ -83,21 +87,13 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
     path_names.pop("Feature", None)
     
     # Try to load from each available file location
-    names = list(path_names.keys())
-    file_dirs = []
-    for name in names:
+    for name in list(path_names.keys()):
         if not bool(os.listdir(path_names[name])):
             path_names.pop(name, None)
     
-    in_paths = list(path_names.values())
     names = list(path_names.keys())
-    file_dirs = []
-    
-    for path in in_paths:
-        file_dirs.append(map_files(path))
-    
+    file_dirs = [map_files(p) for p in path_names.values()]
     df = map_files_fuse(file_dirs, names)
-    df.sort_values(by='File', inplace=True)
     
     # Set style
     plt.style.use('fivethirtyeight')
@@ -118,7 +114,8 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
                 ui.input_select('file_type', 'File:', choices=df['File']),
                 ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1])
+                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1]),
+                ui.input_action_button('shutdown', 'Stop Server', class_='btn-danger')
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
@@ -127,9 +124,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
     )
     
     # Create legend names and order label
-    legnames = names.copy()
-    for i in range(len(legnames)):
-        legnames[i] = str(i+1) + ': ' + legnames[i]
+    legnames = [f"{i+1}: {nm}" for i, nm in enumerate(names)]
     
     # =================
     # Server definition
@@ -213,12 +208,31 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
             ax.set_title(column + ' filter: ' + filename)
             
             return fig
+        
+        # Kill button to stop the server
+        @reactive.effect
+        @reactive.event(input.shutdown)
+        def _stop_server():
+            srv = _SERVER_HANDLE.get('server')
+            if srv is not None:
+                srv.should_exit = True # Tell loop to stop
     
     app = App(app_ui, server)
     
     if auto_run:
-        webbrowser.open('http://127.0.0.1:8000')
-        app.run()
+        host, port = "127.0.0.1", "8000"
+        url = f"http://{host}:{port}"
+        
+        config = uvicorn.Config(app, host=host, port=port, log_level="warning", reload=False)
+        server = uvicorn.Server(config)
+        
+        _SERVER_HANDLE['server'] = server
+        t = threading.Thread(target=server.run, daemon=True)
+        _SERVER_HANDLE['thread'] = t
+        t.start()
+        
+        webbrowser.open(url)
         return
-    else:
-        return app
+    
+    # Return the app if requested
+    return app

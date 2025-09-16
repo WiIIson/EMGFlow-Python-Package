@@ -220,10 +220,12 @@ def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=Non
             raise Exception("Invalid regex expression provided")
     
     # Set base path and ensure in_path is absolute
+    is_base = False
     if base is None:
         if not os.path.isabs(in_path):
             in_path = os.path.join(os.getcwd(), in_path)
         base = in_path
+        is_base = True
     
     # Build file directory dictionary
     file_dirs = {}
@@ -237,6 +239,10 @@ def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=Non
         # Record the file path (from base to current folder) and absolute path
         elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, fileName)!=None)):
             file_dirs[fileName] = new_path
+    
+    if is_base: 
+        file_dirs.sort_values(by='File', inplace=True)
+    
     return file_dirs
 
 #
