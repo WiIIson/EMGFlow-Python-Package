@@ -1433,6 +1433,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
             
             # Add values to the dataframe
             Features.loc[len(Features.index)] = df_vals
-            
+    
+    Features.sort_values(by='File_Path', inplace=True)
     Features.to_csv(os.path.join(out_path, 'Features.csv'), index=False)
     return Features
