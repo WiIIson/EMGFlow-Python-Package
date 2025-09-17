@@ -115,7 +115,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 ui.input_select('file_type', 'File:', choices=df['File']),
                 ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
                 ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_action_button('shutdown', 'Stop Server', style='background-color: #f37d82; color: white; border: none;')
+                ui.input_action_button('shutdown', 'End Dashboard', style='background-color: #7daaf3; color: white; border: none;')
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
