@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import threading
 import uvicorn
 import webbrowser
+import numpy as np
 
 from shiny import App, render, ui, reactive
 
@@ -148,6 +149,9 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     max_x = max(max_x, data['Time'].max())
                     min_y = min(min_y, data[col].min())
                     max_y = max(max_y, data[col].max())
+                    # Round y-axis to 2 decimal places
+                    min_y = np.floor(min_y * 100) / 100
+                    max_y = np.ceil(max_y * 100) / 100
                     
             else:
                 file_location = df.loc[filename][column]
