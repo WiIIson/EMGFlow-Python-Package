@@ -115,8 +115,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
                 ui.input_select('file_type', 'File:', choices=df['File']),
                 ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_action_button('shutdown', 'Stop Dashboard', style='background-color: #7daaf3; color: white; border: none;')
+                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1])
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
@@ -214,14 +213,6 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
             ax.set_title(column + ' filter: ' + filename)
             
             return fig
-        
-        # Kill button to stop the server
-        @reactive.effect
-        @reactive.event(input.shutdown)
-        def _stop_server():
-            srv = _SERVER_HANDLE.get('server')
-            if srv is not None:
-                srv.should_exit = True # Tell loop to stop
                 
         def _close_tab():
             srv = _SERVER_HANDLE.get('server')
