@@ -28,7 +28,7 @@ A collection of functions for plotting data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_mask:bool=False, auto_run:bool=True):
+def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True):
     """
     Generate a Shiny dashboard of different processing stages for a given
     column of signal data.
@@ -55,6 +55,9 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
         An option to visualize the NaN mask If True, it will set values to NaN
         based on the NaN mask. If False, it will use the unaltered values of
         the column ignoring the NaN mask. The default is False.
+    show_legend : bool, optional
+        An option to show the legend on the plot. If True, it will show the
+        legend. If False, the legend will be hidden. The default is True.
     auto_run : bool, optional
         An option to automatically see the visualization. If True, it will run
         the visual and open it in the default browser. If False, it will return
@@ -191,7 +194,8 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
-                ax.legend(legnames)
+                if show_legend:
+                    ax.legend(legnames)
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
