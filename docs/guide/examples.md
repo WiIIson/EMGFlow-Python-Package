@@ -63,15 +63,17 @@ A simple example constructing a custom `path_names` dictionary for predefined da
 import EMGFlow as ef
 
 # PeakAffectDS data
+root = os.getcwd()
 path_names = {
-    'Raw': os.path.join('Data', '01_Raw'),
-    'Notch': os.path.join('Data', '01_Raw'),
-    'Bandpass': os.path.join('Data', '03_Bandpass'),
-    'Smooth': os.path.join('Data', '04_Smooth')
+    'Raw': os.path.join(root, 'Data', '1_raw'),
+    'Notch': os.path.join(root, 'Data', '2_notch'),
+    'Bandpass': os.path.join(root, 'Data', '3_bandpass'),
+    'FWR': os.path.join(root, 'Data', '4_fwr'),
+    'Feature': os.path.join(root, 'Data', '8_feature')
 }
 
 # Preprocess signals
-ef.clean_signals(path_names, sampling_rate=2000)
+ef.clean_signals(path_names, sampling_rate=2000, do_fill=False, do_smooth=False)
 
 # Plot data on the "EMG_zyg" column
 ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
@@ -97,7 +99,8 @@ path_names = EMGFlow.make_paths()
 EMGFlow.make_sample_data(path_names)
 
 # Load dataframe from generated data
-sampleData = pd.read_csv(os.path.join(path_names['Raw'], '01', 'sample_data_01.csv'))
+root = os.getcwd()
+sampleData = pd.read_csv(os.path.join(root, 'Data', '1_raw', '01', 'sample_data_01.csv'))
 
 # Sampling rate
 sampling_rate = 2000
@@ -114,12 +117,12 @@ cols = ['EMG_zyg', 'EMG_cor']
 # Preprocess first column of signals ('EMG_zyg')
 sampleData = EMGFlow.apply_notch_filters(sampleData, cols[0], sampling_rate, notch_vals)
 sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[0], sampling_rate, band_low, band_high)
-sampleData = np.abs(sampleData[cols[0]])
+sampleData[cols[0]] = np.abs(sampleData[cols[0]])
 
 # Preprocess second column of signals ('EMG_cor')
 sampleData = EMGFlow.apply_notch_filters(sampleData, cols[1], sampling_rate, notch_vals)
 sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[1], sampling_rate, band_low, band_high)
-sampleData = np.abs(sampleData[cols[1]])
+sampleData[cols[1]] = np.abs(sampleData[cols[1]])
 ```
 
 ## Advanced Examples
@@ -148,7 +151,7 @@ smooth_window = 50
 
 # Filter parameters for the "sample_data_01.csv" file
 notch_vals_s = [(45, 1), (60, 5)]
-reg_str = '^sample_data_01'
+reg_str = '^01'
 
 # Columns containing data for preprocessing
 cols = ['EMG_zyg', 'EMG_cor']

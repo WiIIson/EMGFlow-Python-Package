@@ -69,8 +69,6 @@ emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_segment
 
 ### Raises
 
-A warning is raised if `col` contains NaN values.
-
 An exception is raised if `col` is not a column of `Signal`.
 
 An exception is raised if `sampling_rate` is less than or equal to 0.
@@ -123,8 +121,6 @@ apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_val
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
 **Raises**
-
-A warning is raised if `col` contains NaN values.
 
 An exception is raised if `col` is not a column of `Signal`.
 
@@ -196,8 +192,6 @@ notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=
 A warning is raised if no files in `in_path` match with `expression`.
 
 An exception is raised if `expression` is not None or a valid regular expression.
-
-A warning is raised if a column from `cols` contains NaN values.
 
 An exception is raised if a column from `cols` is not a column of a signal file.
 
@@ -273,8 +267,6 @@ apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:flo
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
 **Raises**
-
-A warning is raised if `col` contains NaN values.
 
 An exception is raised if `col` is not a column of `Signal`.
 
@@ -357,8 +349,6 @@ A warning is raised if no files in `in_path` match with `expression`.
 
 An exception is raised if `expression` is not None or a valid regular expression.
 
-A warning is raised if a column from `cols` contains NaN values.
-
 An exception is raised if a column from `cols` is not a column of a signal file.
 
 An exception is raised if `sampling_rate` is less than or equal to 0.
@@ -417,8 +407,6 @@ apply_rectify(Signal:pd.DataFrame, col:str)
 
 **Raises**
 
-A warning is raised if `col` contains NaN values.
-
 An exception is raised if `col` is not a column of `Signal`.
 
 **Returns**
@@ -472,8 +460,6 @@ rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_c
 A warning is raised if no files in `in_path` match with `expression`.
 
 An exception is raised if `expression` is not None or a valid regular expression.
-
-A warning is raised if a column from `cols` contains NaN values.
 
 An exception is raised if a column from `cols` is not a column of a signal file.
 
@@ -532,8 +518,6 @@ apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
 **Raises**
-
-A warning is raised if `col` contains NaN values.
 
 A warning is raised if `window_ms` is longer than half the recording of `Signal`.
 
@@ -615,8 +599,6 @@ screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_m
 A warning is raised if no files in `in_path` match with `expression`.
 
 An exception is raised if `expression` is not None or a valid regular expression.
-
-A warning is raised if a column from `cols` contains NaN values.
 
 A warning is raised if `window_ms` is longer than half a signal recording.
 
@@ -814,8 +796,6 @@ $$
 
 **Raises**
 
-A warning is raised if `col` contains NaN values.
-
 A warning is raised if `window_ms` is longer than half the recording of `Signal`.
 
 An exception is raised if `col` is not a column of `Signal`.
@@ -879,8 +859,6 @@ $$
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
 **Raises**
-
-A warning is raised if `col` contains NaN values.
 
 A warning is raised if `window_ms` is longer than half the recording of `Signal`.
 
@@ -950,8 +928,6 @@ $$
 
 **Raises**
 
-A warning is raised if `col` contains NaN values.
-
 A warning is raised if `window_ms` is longer than half the recording of `Signal`.
 
 An exception is raised if `col` is not a column of `Signal`.
@@ -1019,8 +995,6 @@ $$
 - The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
 
 **Raises**
-
-A warning is raised if 'col' contains NaN values.
 
 A warning is raised if 'window_ms' is longer than half the recording of 'Signal'.
 
@@ -1106,8 +1080,6 @@ A warning is raised if no files in `in_path` match with `expression`.
 An exception is raised if `expression` is not None or a valid regular expression.
 
 An exception is raised if `method` is an invalid smoothing method.
-        
-A warning is raised if a column from `cols` contains NaN values.
 
 A warning is raised if `window_ms` is longer than half a signal recording.
 
@@ -1184,8 +1156,6 @@ clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.
 An exception is raised if 'Raw', 'Notch', 'Bandpass', or 'FWR' are not keys of the `path_names` dictionary provided.
 
 An exception is raised if 'Screened', 'Filled', or 'Smooth' are not keys of the `path_names` dictionary provided, and `use_optional` is True.
-
-A warning is raised if a column from the signal files contains NaN values.
 
 An exception is raised if `sampling_rate` is less than or equal to 0.
 
