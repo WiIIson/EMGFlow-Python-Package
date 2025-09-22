@@ -241,7 +241,7 @@ for file in tqdm.tqdm(file_dirs_b):
             MMAV1 = EMGFlow.calc_mmav1(data_S, col)
     		# ... calculate additional time-series features here
     
-            psd = EMGFlow.emg_to_psd(data_B[col], sampling_rate)
+            psd = EMGFlow.emg_to_psd(data_B, col, sampling_rate)
             specCentroid = EMGFlow.calc_sc(psd)
     		# ... calculate additional spectral features here
     		
