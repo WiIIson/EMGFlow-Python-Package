@@ -38,7 +38,7 @@ export default withMermaid({
         text: 'Reference',
         items: [
           { text: 'Overview', link: '/reference/api-overview' },
-          { text: 'File Format', link: 'reference/file-format' },
+          { text: 'File Format', link: '/reference/file-format' },
           { text: 'Access Files', link: '/reference/access-files' },
           { text: 'Preprocess Signals', link: '/reference/preprocess-signals' },
           { text: 'Plot Signals', link: '/reference/plot-signals' },
