@@ -60,9 +60,14 @@ df = EMGFlow.extract_features(path_names, sampling_rate, cols)
 A simple example constructing a custom `path_names` dictionary for predefined data paths.
 
 ```python
+import os
 import EMGFlow as ef
 
-# PeakAffectDS data
+# Create sample data
+path_names = ef.make_paths()
+ef.make_sample_data(path_names)
+
+# Define custom path locations
 root = os.getcwd()
 path_names = {
     'Raw': os.path.join(root, 'Data', '1_raw'),
