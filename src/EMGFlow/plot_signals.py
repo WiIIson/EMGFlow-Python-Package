@@ -164,6 +164,11 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 min_x = data['Time'].min()
                 max_y = data[col].max()
                 min_y = data[col].min()
+                # Round the x and y-axis to 2 decimal places
+                min_x = np.floor(min_x * 100) / 100
+                max_x = np.ceil(max_x * 100) / 100
+                min_y = np.floor(min_y * 100) / 100
+                max_y = np.ceil(max_y * 100) / 100
         
             ui.update_slider("x_range", min=min_x, max=max_x, value=[min_x, max_x])
             ui.update_slider("y_range", min=min_y, max=max_y, value=[min_y, max_y])
@@ -195,7 +200,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     
                 # Set legend for multiple plots
                 if show_legend:
-                    ax.legend(legnames)
+                    ax.legend(legnames, loc='lower right', fontsize='small')
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
@@ -214,7 +219,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
             ax.set_ylim(y_min, y_max)
             ax.set_ylabel('Voltage (mV)')
             ax.set_xlabel('Time (s)')
-            ax.set_title(column + ' filter: ' + filename)
+            ax.set_title(col)
             
             return fig
                 

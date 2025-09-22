@@ -1979,7 +1979,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
@@ -1997,18 +1997,13 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         The dictionary can be created with the 'make_paths' function.
     sampling_rate : float, optional
         The sampling rate of the signal files. The default is 1000.0.
-    min_segment : float, optional
-        The minimum length (in ms) for data to be considered valid. If a length
-        of data is less than this time, it is set to NaN. If a length of
-        invalid data is less than this time, it is ignored in calculations. The
-        default is 30.0.
     do_screen : bool, optional
         An option to use the optional processing step of artefact screening.
         The default is False.
     do_fill : bool, optional
         An option to use the optional processing step of filling missing
         values. The default is True.
-    do_smooth : boool, optional
+    do_smooth : bool, optional
         An option to use the optional processing step of smoothing. The default
         is True.
     file_ext : str, optional
@@ -2054,8 +2049,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
-    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, file_ext=file_ext)
+    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, file_ext=file_ext)
     rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
     
     last = 'FWR'
@@ -2063,7 +2058,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
     if do_screen:
         if 'Screened' not in path_names:
             raise Exception("'Screened' path not detected in provided dictionary ('path_names').")
-        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate, file_ext=file_ext)
         last = 'Screened'
     
     if do_fill:
@@ -2075,7 +2070,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float
     if do_smooth:
         if 'Smooth' not in path_names:
             raise Exception("'Smooth' path not detected in provided dictionary ('path_names').")
-        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate, min_segment=min_segment, file_ext=file_ext)
+        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate, file_ext=file_ext)
     
     return
 

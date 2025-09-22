@@ -1,4 +1,4 @@
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 from .access_files import *
 from .extract_features import *
 from .plot_signals import *

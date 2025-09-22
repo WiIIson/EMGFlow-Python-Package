@@ -1,14 +1,14 @@
-# EMGFlow <img src="HexSticker.png"  width="100" height="110" align="right">
+# EMGFlow <img src="https://raw.githubusercontent.com/WiIIson/EMGFlow-Python-Package/refs/heads/main/HexSticker.png"  width="100" height="110" align="right">
 
 [![Versions](https://img.shields.io/pypi/pyversions/EMGFlow.svg?logo=python&logoColor=FFE873)](https://pypi.python.org/pypi/emgflow)
-[![Coverage](badges/coverage.svg)](https://github.com/WiIIson/EMGFlow-Python-Package)
+[![Coverage](https://raw.githubusercontent.com/WiIIson/EMGFlow-Python-Package/main/badges/coverage.svg)](https://github.com/WiIIson/EMGFlow-Python-Package)
 [![pypi](https://img.shields.io/pypi/v/emgflow.svg)](https://pypi.python.org/pypi/emgflow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
 
 The open workflow for EMG signal processing and feature extraction.
 
-**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract 32 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract 33 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
 
 EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
@@ -23,39 +23,24 @@ The EMGFlow package – a portmanteau of EMG and Workflow - fills this gap. Our 
 
 ## Example
 
-As a quick example, the following will create a feature file, starting with a folder of raw data:
+As a quick example, the following will create a feature file, and create a plot of the "EMG_zyg" column:
 ```python
-import EMGFlow
+import EMGFlow as ef
 
 # Get path dictionary
-path_names = EMGFlow.make_paths()
+path_names = ef.make_paths()
 
 # Load sample data
-EMGFlow.make_sample_data(path_names)
+ef.make_sample_data(path_names)
 
-# Sampling rate
-sampling_rate = 2000
+# Preprocess signals
+ef.clean_signals(path_names, sampling_rate=2000)
 
-# Filter parameters
-notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
-smooth_window = 50
+# Plot data on the "EMG_zyg" column
+ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
 
-# Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
-
-# 1. Apply notch filters
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
-
-# 2. Apply bandpass filter
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
-
-# 3. Apply smoothing filter
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], smooth_window, cols)
-
-# 4. Extract features
-df = EMGFlow.extract_features(path_names, sampling_rate, cols)
+# Extract features and save results in "Features.csv" in feature_path
+df = ef.extract_features(path_names, sampling_rate=2000)
 ```
 
 ## Documentation
@@ -87,7 +72,7 @@ Once installed, the package can be loaded as follows:
 import EMGFlow
 ```
 
-Project dependencies can be seen [here](pyproject.toml).
+Project dependencies can be seen [here](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/pyproject.toml).
 
 ## Contributions
 
@@ -100,11 +85,11 @@ This package can be cited as follows:
 ```bibtex
 @software{Conley_EMGFlow_2024,
   author = {Conley, William and Livingstone, Steven R},
-  month = {03},
+  month = {09},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.1.0},
-  year = {2024},
+  version = {1.1.1},
+  year = {2025},
   note = "{\tt william@cconley.ca}"
 }
 ```
