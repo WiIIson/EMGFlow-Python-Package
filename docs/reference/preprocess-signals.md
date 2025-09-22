@@ -1125,7 +1125,7 @@ Apply all EMG preprocessing filters to all signal files in a folder. Uses the `p
 Optionally, `do_screen`, `do_fill` and `do_smooth` can be set to True to do the associated step.
 
 ```python
-clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.0, do_screen=False, do_fill=True, do_smooth=False, file_ext:str='csv')
+clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, do_fill=True, do_smooth=False, file_ext:str='csv')
 ```
 
 **Parameters**
@@ -1136,17 +1136,14 @@ clean_signals(path_names:dict, sampling_rate:float=1000.0, min_segment:float=30.
 `sampling_rate`: int, float
 - The sampling rate of the signal files. The default is 1000.0.
 
-`min_segment`: float, optional (30.0)
-- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
-
 `do_screen`: bool, optional (False)
 - An option to use the optional processing step of artefact screening. The default is False.
 
 `do_fill`: bool, optional (True)
 - An option to use the optional processing step of filling missing values. The default is True.
 
-`do_smooth`: boool, optional (False)
-- An option to use the optional processing step of smoothing. The default is False.
+`do_smooth`: bool, optional (True)
+- An option to use the optional processing step of smoothing. The default is True.
 
 `file_ext`: str, optional ('csv')
 - The file extension for files to read. Only processes files with this extension. The default is 'csv'.
