@@ -200,7 +200,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     
                 # Set legend for multiple plots
                 if show_legend:
-                    ax.legend(legnames, loc='lower right', fontsize='small')
+                    ax.legend(legnames, loc='upper right', fontsize=8, borderpad=0, bbox_to_anchor=(1.02,1.06))
             else:
                 # Read/plot single file
                 file_location = df.loc[filename][column]
