@@ -20,7 +20,7 @@ A collection of functions for preprocessing signals and EMG data.
 # =============================================================================
 #
 
-def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None):
+def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None):
     """
     Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the
     intensity of each frequency detected in the signal. Uses the Welch method,
@@ -31,7 +31,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the PSD is calculated from.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
@@ -52,11 +52,11 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'nan_mask' is not the same length as 'col'.
+        An exception is raised if 'nan_mask' is not the same length as 'column_name'.
     Exception
         An exception is raised if there are too many NaN values to make a valid
         window.
@@ -70,8 +70,8 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
     
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
@@ -88,13 +88,13 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
             raise Exception('NaN mask must be the same length as the Signal dataframe.')
         
         # Set values to NaN
-        PSD_Signal.loc[~nan_mask, col] = np.nan
+        PSD_Signal.loc[~nan_mask, column_name] = np.nan
     
     # Apply interpolation
-    PSD_Signal = apply_fill_missing(PSD_Signal, col, sampling_rate, max_segment=max_segment)
+    PSD_Signal = apply_fill_missing(PSD_Signal, column_name, sampling_rate, max_segment=max_segment)
     
     # Define Welch parameters
-    N = len(PSD_Signal[col].values)
+    N = len(PSD_Signal[column_name].values)
     min_frequency = (2.0 * sampling_rate) / (N / 2.0)
     max_frequency = sampling_rate / 2.0
     nperseg = int((2.0 / min_frequency) * sampling_rate)
@@ -110,10 +110,10 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
         end = start + nperseg
         
         # Skip window if NaN detected
-        if PSD_Signal.loc[start:end, col].isna().any():
+        if PSD_Signal.loc[start:end, column_name].isna().any():
             continue
         
-        segment = PSD_Signal.loc[start:end, col].values
+        segment = PSD_Signal.loc[start:end, column_name].values
         
         frequency, power = scipy.signal.welch(
                 segment,
@@ -156,7 +156,7 @@ def emg_to_psd(Signal:pd.DataFrame, col:str, sampling_rate:float=1000.0, max_seg
 # =============================================================================
 #
 
-def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0):
     """
     Apply a list of notch filters ('notch_vals') to a column of 'Signal'.
 
@@ -165,7 +165,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the notch filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -183,7 +183,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
@@ -200,9 +200,9 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -217,7 +217,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     notch_Signal = Signal.copy().reset_index(drop=True)
     
     # Construct list of NaN locations
-    data = notch_Signal[col]
+    data = notch_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -233,7 +233,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     masked_data = notch_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -245,7 +245,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filters
             for (Hz, Q) in notch_vals:
@@ -257,12 +257,12 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
                 
                 # Use scipy notch filter using normalized frequency
                 b, a = scipy.signal.iirnotch(norm_Hz, Q)
-                filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
+                filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy())
                 
-                masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+                masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in band_Signal
-    notch_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    notch_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return notch_Signal
 
@@ -270,7 +270,7 @@ def apply_notch_filters(Signal:pd.DataFrame, col:str, sampling_rate:float, notch
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -289,7 +289,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter). The default is [(50, 5)].
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
@@ -319,7 +319,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         expression.
         
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
@@ -368,13 +368,13 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
             
             # Apply filter to columns
-            for col in cols:
-                data = apply_notch_filters(data, col, sampling_rate, notch_vals=notch_vals, min_segment=min_segment)
+            for column_name in column_names:
+                data = apply_notch_filters(data, column_name, sampling_rate, notch_vals=notch_vals, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -406,24 +406,22 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
 # =============================================================================
 #
 
-def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low:float=20.0, high:float=450.0, min_segment:float=30.0):
+def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0):
     """
-    Apply a bandpass filter ('low', 'high') to a column of 'Signal'.
+    Apply a bandpass filter ('passband_edges') to a column of 'Signal'.
 
     Parameters
     ----------
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the bandpass filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
-    low : float, optional
-        Lower frequency limit (Hz) of the bandpass filter. The default is 20.0.
-    high : float
-        Upper frequency limit (Hz) of the bandpass filter. The default is
-        450.0.
+    passband_edges : tuple[float,float]
+        Lower and upper frequency limit (Hz) of the bandpass filter. The
+        default is (20.0, 450.0).
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -433,14 +431,15 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'high' or 'low' are higher than 1/2 of
-        'sampling_rate'.
+        An exception is raised if the limits in 'passband_edges' are higher
+        than 1/2 of 'sampling_rate'.
     Exception
-        An exception is raised if 'high' is not higher than 'low'.
+        An exception is raised if the upper limit of 'passband_edges' is not
+        higher than the lower limit.
     Exception
         An exception is raised if 'min_segment' is longer than the recording of
         'Signal'.
@@ -452,9 +451,9 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -462,6 +461,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     
     # An exception is raised if 'high' or 'low' are higher than 1/2 of
     # 'sampling_rate', and if low is greater than or equal to high.
+    (low,high)=passband_edges
     if high > sampling_rate/2 or low > sampling_rate/2:
         raise Exception("'high' and 'low' cannot be greater than 1/2 the sampling rate.")
     if high <= low:
@@ -476,7 +476,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     band_Signal = Signal.copy().reset_index(drop=True)
     
     # Construct list of NaN locations
-    data = band_Signal[col]
+    data = band_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -492,7 +492,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     masked_data = band_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -504,14 +504,14 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section = scipy.signal.sosfiltfilt(sos, masked_data.loc[val_ind:val_ind+val_len-1, col].copy())
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section = scipy.signal.sosfiltfilt(sos, masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy())
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in band_Signal
-    band_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    band_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return band_Signal
 
@@ -519,10 +519,10 @@ def apply_bandpass_filter(Signal:pd.DataFrame, col:str, sampling_rate:float, low
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:float=20.0, high:float=450.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
-    Apply a bandpass filter ('low', 'high') to all signal files in a folder and
-    its subfolders. Writes filtered signal files to an output folder, and
+    Apply a bandpass filter ('passband_edges') to all signal files in a folder
+    and its subfolders. Writes filtered signal files to an output folder, and
     generates a file structure matching the input folder.
     
     Parameters
@@ -533,12 +533,10 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         Filepath to a directory to write filtered signals.
     sampling_rate : float
         The sampling rate of the signal files.
-    low : float, optional
-        Lower frequency limit (Hz) of the bandpass filter. The default is 20.0.
-    high : float
-        Upper frequency limit (Hz) of the bandpass filter. The default is
-        450.0.
-    cols : list-str, optional
+    passband_edges : tuple[float,float]
+        Lower and upper frequency limit (Hz) of the bandpass filter. The
+        default is (20.0, 450.0).
+    column_names : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
@@ -568,15 +566,16 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
         expression.
 
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
-        An exception is raised if 'high' or 'low' are higher than 1/2 of
-        'sampling_rate'.
+        An exception is raised if the limits in 'passband_edges' are higher
+        than 1/2 of 'sampling_rate'.
     Exception
-        An exception is raised if 'high' is not higher than 'low'.
+        An exception is raised if the upper limit of 'passband_edges' is not
+        higher than the lower limit.
     Exception
         An exception is raised if 'min_segment' is longer than a signal
         recording.
@@ -619,13 +618,13 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
               
             # Apply filter to columns
-            for col in cols:
-                data = apply_bandpass_filter(data, col, sampling_rate, low, high, min_segment=min_segment)
+            for column_name in column_names:
+                data = apply_bandpass_filter(data, column_name, sampling_rate, passband_edges=passband_edges, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -657,7 +656,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, low:
 # =============================================================================
 #
 
-def apply_rectify(Signal:pd.DataFrame, col:str):
+def apply_rectify(Signal:pd.DataFrame, column_name:str):
     """
     Apply a Full Wave Rectifier (FWR) to a column of 'Signal'.
 
@@ -666,13 +665,13 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the FWR filter is applied to.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -681,12 +680,12 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     fwr_Signal = Signal.copy().reset_index(drop=True)
-    fwr_Signal[col] = np.abs(fwr_Signal[col])
+    fwr_Signal[column_name] = np.abs(fwr_Signal[column_name])
     
     return fwr_Signal
 
@@ -694,7 +693,7 @@ def apply_rectify(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a Full Wave Rectifier (FWR) to all signal files in a folder and its
     subfolders. Writes filtered signal files to an output folder, and generates
@@ -706,7 +705,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
@@ -731,7 +730,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
         expression.
         
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
         
     Exception
@@ -772,13 +771,13 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
               
             # Apply filter to columns
-            for col in cols:
-                data = apply_rectify(data, col)
+            for column_name in column_names:
+                data = apply_rectify(data, column_name)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -810,7 +809,7 @@ def rectify_signals(in_path:str, out_path:str, cols=None, expression:str=None, e
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0):
+def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0):
     """
     Apply a Hampel filter ('window_ms', 'n_sigma') to a column of 'Signal'.
 
@@ -819,7 +818,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the Hampel filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -840,7 +839,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
@@ -857,9 +856,9 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less or equal to 0.
     if sampling_rate <= 0:
@@ -907,7 +906,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
         return filtered_data, mask
     
     # Construct list of NaN locations
-    data = hamp_Signal[col]
+    data = hamp_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -923,7 +922,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     masked_data = hamp_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -937,22 +936,22 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, col].to_numpy(), window_size=window_size, n_sigma=n_sigma)
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, n_sigma=n_sigma)
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
             hamp_mask.loc[val_ind:val_ind+val_len-1] = mask
     
     # Put masked_data back in hamp_Signal
-    hamp_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    hamp_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     # Create a mask for the full column and add the masked values
     full_mask = pd.Series(np.full(len(hamp_Signal), True))
     full_mask[min_nan_mask] = hamp_mask.values
     
     # Merge with the mask column if it exists
-    mask_col = 'mask_' + col
+    mask_col = 'mask_' + column_name
     if mask_col not in list(hamp_Signal.columns.values):
         hamp_Signal[mask_col] = full_mask.values
     else:
@@ -964,7 +963,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, col:str, sampling_rate:float, wi
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -983,7 +982,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     n_sigma : float, optional
         The number of standard deviations away for a value to be considered an
         outlier. The default is 10.0.
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
@@ -1016,7 +1015,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         A warning is raised if 'window_ms' is longer than half a signal
         recording.
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
@@ -1065,13 +1064,13 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
             
             # Apply filter to columns
-            for col in cols:
-                data = apply_screen_artefacts(data, col, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_segment=min_segment)
+            for column_name in column_names:
+                data = apply_screen_artefacts(data, column_name, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1103,7 +1102,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
 # =============================================================================
 #
 
-def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0):
+def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0):
     """
     Apply an interpolation method ('method') to a column of 'Signal'. Fills NaN
     values with interpolated results.
@@ -1113,7 +1112,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the interpolation is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -1128,9 +1127,9 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
-        An exception is raised if 'col' is 'Time'.
+        An exception is raised if 'column_name' is 'Time'.
     Exception
         An exception is raised if 'Time' is not a column of 'Signal'.
     Exception
@@ -1148,11 +1147,11 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal', or is
+    # An exception is raised if 'column_name' is not a column of 'Signal', or is
     # 'Time'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
-    if col == 'Time':
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
+    if column_name == 'Time':
         raise Exception("Column cannot be 'Time'.")
     
     # An exception is raised if 'Signal' does not have a 'Time' column
@@ -1170,7 +1169,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     filled_Signal = Signal.copy().reset_index(drop=True)
     
     # Construct list of NaN locations
-    data = filled_Signal[col]
+    data = filled_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1180,20 +1179,20 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
     nan_sequences = [seq for seq in nan_sequences if seq[1] > max_gap]
     
     # Get valid values by dropping NaNs
-    view_sig = filled_Signal[['Time', col]].copy()
-    view_sig = view_sig.dropna(subset=[col])
+    view_sig = filled_Signal[['Time', column_name]].copy()
+    view_sig = view_sig.dropna(subset=[column_name])
     
-    valid_values = view_sig[col]
+    valid_values = view_sig[column_name]
     valid_index = view_sig['Time']
     
     # Ensure values are sorted properly
     valid_index, valid_values = zip(*sorted(zip(valid_index, valid_values)))
     
     # Create NaN mask
-    full_mask = filled_Signal[col].notna()
+    full_mask = filled_Signal[column_name].notna()
     
     # Merge with the mask column if it exists
-    mask_col = 'mask_' + col
+    mask_col = 'mask_' + column_name
     if mask_col not in list(filled_Signal.columns.values):
         filled_Signal[mask_col] = full_mask
     else:
@@ -1208,7 +1207,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
         else:
             # Perform interpolation
             pchip = scipy.interpolate.PchipInterpolator(valid_index, valid_values, extrapolate=False)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(pchip(filled_Signal['Time']), index=filled_Signal.index))
+            filled_Signal[column_name] = filled_Signal[column_name].combine_first(pd.Series(pchip(filled_Signal['Time']), index=filled_Signal.index))
         
     elif method=='spline':
         
@@ -1217,14 +1216,14 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
         else:
             # Perform interpolation
             cs = scipy.interpolate.CubicSpline(valid_index, valid_values, extrapolate=False)
-            filled_Signal[col] = filled_Signal[col].combine_first(pd.Series(cs(filled_Signal['Time']), index=filled_Signal.index))
+            filled_Signal[column_name] = filled_Signal[column_name].combine_first(pd.Series(cs(filled_Signal['Time']), index=filled_Signal.index))
     
     else:
         raise Exception("Invalid interpolation method chosen: " + str(method), ", use 'pchip' or 'spline'.")
     
     # Reinsert filtered NaNs
     for (nan_ind, nan_len) in nan_sequences:
-        filled_Signal.loc[nan_ind:nan_ind+nan_len-1,col] = np.nan
+        filled_Signal.loc[nan_ind:nan_ind+nan_len-1,column_name] = np.nan
     
     return filled_Signal
 
@@ -1232,7 +1231,7 @@ def apply_fill_missing(Signal:pd.DataFrame, col:str, sampling_rate:float, method
 # =============================================================================
 #
 
-def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, cols=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, column_names=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply an interpolation method ('method') to all signal files in a folder
     and its subfolders. Writes interpolated signal files to an output folder,
@@ -1253,7 +1252,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         The maximum length (in ms) of NaN values to fill. If a length of
         invalid data is longer than this threshold, it will not be
         interpolated. The default is 500.0
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the interpolation to. The
         default is None, in which case the interpolation is applied to every
         column except for 'Time' and columns that start with 'mask_'.
@@ -1278,10 +1277,10 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         expression.
     
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
-        An exception is raised if 'Time' is in 'cols'.
+        An exception is raised if 'Time' is in 'column_names'.
     Exception
         An exception is raised if 'Time' is not a column of a signal file.
     Exception
@@ -1330,13 +1329,13 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
             
             # Apply filter to columns
-            for col in cols:
-                data = apply_fill_missing(data, col, sampling_rate=sampling_rate, method=method, max_segment=max_segment)
+            for column_name in column_names:
+                data = apply_fill_missing(data, column_name, sampling_rate=sampling_rate, method=method, max_segment=max_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1368,7 +1367,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a boxcar smoothing filter to a column of 'Signal'.
 
@@ -1377,7 +1376,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the boxcar smoothing filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -1395,7 +1394,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
@@ -1412,9 +1411,9 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1435,10 +1434,10 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     if min_gap > len(Signal):
         raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
-    boxcar_Signal = apply_rectify(Signal, col)
+    boxcar_Signal = apply_rectify(Signal, column_name)
     
     # Construct list of NaN locations
-    data = boxcar_Signal[col]
+    data = boxcar_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1454,7 +1453,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     masked_data = boxcar_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1466,14 +1465,14 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in boxcar_Signal
-    boxcar_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    boxcar_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return boxcar_Signal
 
@@ -1481,7 +1480,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, windo
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a Root Mean Square (RMS) smoothing filter to a column of 'Signal'.
 
@@ -1490,7 +1489,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the RMS smoothing filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -1508,7 +1507,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
@@ -1525,9 +1524,9 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1551,7 +1550,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     rms_Signal = Signal.copy().reset_index(drop=True)
     
     # Construct list of NaN locations
-    data = rms_Signal[col]
+    data = rms_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1567,7 +1566,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     masked_data = rms_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1579,14 +1578,14 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section = np.sqrt(np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy() ** 2, window, 'same'))
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section = np.sqrt(np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy() ** 2, window, 'same'))
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in rms_Signal
-    rms_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    rms_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return rms_Signal
 
@@ -1594,7 +1593,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_m
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0):
+def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0):
     """
     Apply a Gaussian smoothing filter to a column of 'Signal'.
 
@@ -1603,7 +1602,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the Gaussian smoothing filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -1623,7 +1622,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
@@ -1640,9 +1639,9 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1663,7 +1662,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     if min_gap > len(Signal):
         raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
-    gauss_Signal = apply_rectify(Signal, col)
+    gauss_Signal = apply_rectify(Signal, column_name)
     
     # Helper function for creating a Gaussian kernel
     def get_gauss(n, sigma):
@@ -1671,7 +1670,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
         return [1 / (sigma * np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
     
     # Construct list of NaN locations
-    data = gauss_Signal[col]
+    data = gauss_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1687,7 +1686,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     masked_data = gauss_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1699,14 +1698,14 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in gauss_Signal
-    gauss_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    gauss_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return gauss_Signal
 
@@ -1714,7 +1713,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, win
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a Loess smoothing filter to a column of 'Signal'.
 
@@ -1723,7 +1722,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the Loess smoothing filter is applied to.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -1741,7 +1740,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
         A warning is raised if 'window_ms' is longer than half the recording of
         'Signal'.
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0
     Exception
@@ -1758,9 +1757,9 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 
     """
     
-    # An exception is raised if 'col' is not a column of 'Signal'.
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    # An exception is raised if 'column_name' is not a column of 'Signal'.
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     # An exception is raised if 'sampling_rate' is less than or equal to 0.
     if sampling_rate <= 0:
@@ -1781,10 +1780,10 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     if min_gap > len(Signal):
         raise Exception("Minimum length created by 'min_segment' is greater than 'Signal' length.")
     
-    loess_Signal = apply_rectify(Signal, col)
+    loess_Signal = apply_rectify(Signal, column_name)
     
     # Construct list of NaN locations
-    data = loess_Signal[col]
+    data = loess_Signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1800,7 +1799,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     masked_data = loess_Signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
-    data = masked_data[col]
+    data = masked_data[column_name]
     mask = data.notna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -1814,14 +1813,14 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = np.nan
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, col].copy(), window, 'same')
-            masked_data.loc[val_ind:val_ind+val_len-1, col] = filtered_section
+            filtered_section = np.convolve(masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy(), window, 'same')
+            masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
     # Put masked_data back in loess_Signal
-    loess_Signal.loc[min_nan_mask, col] = masked_data[col].values
+    loess_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     return loess_Signal
 
@@ -1829,7 +1828,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, col:str, sampling_rate:float, window
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, cols=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
     """
     Apply a smoothing filter ('method') to all signal files in a folder and its
     subfolders. Writes filtered signal files to an output folder, and generates
@@ -1851,7 +1850,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     sigma: float, optional
         The value of sigma used for a Gaussian filter. Only affects output when
         using a Gaussian filter. The default is 1.0.
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the smoothing filter to. The
         default is None, in which case the smoothing filter is applied to every
         column except for 'Time' and columns that start with 'mask_'.
@@ -1886,7 +1885,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
         A warning is raised if 'window_ms' is longer than half a signal
         recording.
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
@@ -1935,20 +1934,20 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
             data = read_file_type(file_dirs[file], file_ext)
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
               
             # Apply filter to columns
-            for col in cols:
+            for column_name in column_names:
                 if method == 'rms':
-                    data = apply_rms_smooth(data, col, sampling_rate, window_ms, min_segment)
+                    data = apply_rms_smooth(data, column_name, sampling_rate, window_ms, min_segment)
                 elif method == 'boxcar':
-                    data = apply_boxcar_smooth(data, col, sampling_rate, window_ms, min_segment)
+                    data = apply_boxcar_smooth(data, column_name, sampling_rate, window_ms, min_segment)
                 elif method == 'gauss':
-                    data = apply_gaussian_smooth(data, col, sampling_rate, window_ms, sigma, min_segment)
+                    data = apply_gaussian_smooth(data, column_name, sampling_rate, window_ms, sigma, min_segment)
                 elif method == 'loess':
-                    data = apply_loess_smooth(data, col, sampling_rate, window_ms, min_segment)
+                    data = apply_loess_smooth(data, column_name, sampling_rate, window_ms, min_segment)
                 else:
                     raise Exception('Invalid smoothing method chosen: ', str(method), ', use "rms", "boxcar", "gauss" or "loess"')
                 
@@ -2078,7 +2077,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
 # =============================================================================
 #
 
-def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=50.0, threshold:float=5.0, metric=np.median, low:float=None, high:float=None, cols=None, expression:str=None, file_ext:str='csv'):
+def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=50.0, threshold:float=5.0, metric=np.median, low:float=None, high:float=None, column_names=None, expression:str=None, file_ext:str='csv'):
     """
     Detect outliers in all signal files in a folder. Returns a dictionary of
     files that contain outliers.
@@ -2110,7 +2109,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     high : float, optional
         Upper frequency limit (Hz) of the outlier detection. The default is
         None, in which case no upper threshold is used.
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns of the signals to apply the outlier detection to. The
         default is None, in which case the outlier detection is applied to
         every column except for 'Time' and columns that start with 'mask_'.
@@ -2146,7 +2145,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     Exception
         An exception is raised if 'low' is greater than 'high'.
     Exception
-        An exception is raised if a column from 'cols' is not a column of a
+        An exception is raised if a column from 'column_names' is not a column of a
         signal file.
     Exception
         An exception is raised if there is not enough maxima to create an
@@ -2240,21 +2239,21 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
                 warnings.warn("'window_ms' is longer than 1/2 the recording of a signal, results may be poor.")
             
             # If no columns selected, apply filter to all columns except time
-            if cols is None:
-                cols = list(data.columns)
-                cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+            if column_names is None:
+                column_names = list(data.columns)
+                column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
             
             # Set to false
             isOutlier = False
             
             # Iterate over columns
-            for i in range(len(cols)):
-                col = cols[i]
+            for i in range(len(column_names)):
+                column_name = column_names[i]
                 
-                if col not in list(data.columns.values):
-                    raise Exception("Column '" + str(col) + "' not found in 'Signal': " + str(file) + ".")
+                if column_name not in list(data.columns.values):
+                    raise Exception("Column '" + str(column_name) + "' not found in 'Signal': " + str(file) + ".")
                 
-                psd = emg_to_psd(data, col, sampling_rate=sampling_rate)
+                psd = emg_to_psd(data, column_name, sampling_rate=sampling_rate)
                 psd = ZoomIn(psd, low, high)
                 
                 # Create column containing local maxima

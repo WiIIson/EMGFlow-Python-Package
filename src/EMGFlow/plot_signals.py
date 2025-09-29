@@ -28,7 +28,7 @@ A collection of functions for plotting data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True):
+def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True):
     """
     Generate a Shiny dashboard of different processing stages for a given
     column of signal data.
@@ -43,11 +43,11 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
         pipeline. The function will generate graphs for as many paths are
         provided in the dictionary. The dictionary can be created with the
         'make_paths' function.
-    col : str
+    column_name : str
         The column of the signals to display in the visualization.
     units : str
         Units to use for the y axis of the plot, should be the same units used
-        for the values in 'col'.
+        for the values in 'column_name'.
     file_ext : str, optional
         File extension for files to read. Only visualizes files with this
         extension. The default is 'csv'.
@@ -66,7 +66,7 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of a signal file.
+        An exception is raised if 'column_name' is not a column of a signal file.
     
     Exception
         An exception is raised if a file contained in the first file directory
@@ -149,8 +149,8 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     
                     min_x = min(min_x, data['Time'].min())
                     max_x = max(max_x, data['Time'].max())
-                    min_y = min(min_y, data[col].min())
-                    max_y = max(max_y, data[col].max())
+                    min_y = min(min_y, data[column_name].min())
+                    max_y = max(max_y, data[column_name].max())
                     # Round the x and y-axis to 2 decimal places
                     min_x = np.floor(min_x * 100) / 100
                     max_x = np.ceil(max_x * 100) / 100
@@ -162,8 +162,8 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 data = read_file_type(file_location, file_ext)
                 max_x = data['Time'].max()
                 min_x = data['Time'].min()
-                max_y = data[col].max()
-                min_y = data[col].min()
+                max_y = data[column_name].max()
+                min_y = data[column_name].min()
                 # Round the x and y-axis to 2 decimal places
                 min_x = np.floor(min_x * 100) / 100
                 max_x = np.ceil(max_x * 100) / 100
@@ -193,10 +193,10 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                     sigDF = read_file_type(file_loc, file_ext)
                     
                     # Exception for column input
-                    if col not in list(sigDF.columns.values):
-                        raise Exception("Column " + str(col) + " not in Signal " + str(filename))
+                    if column_name not in list(sigDF.columns.values):
+                        raise Exception("Column " + str(column_name) + " not in Signal " + str(filename))
                     
-                    ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
+                    ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
                 if show_legend:
@@ -207,19 +207,19 @@ def plot_dashboard(path_names:dict, col:str, units:str, file_ext:str='csv', use_
                 sigDF = read_file_type(file_location, file_ext)
                 
                 # Exception for column input
-                if col not in list(sigDF.columns.values):
-                    raise Exception("Column " + str(col) + " not in Signal " + str(filename))
+                if column_name not in list(sigDF.columns.values):
+                    raise Exception("Column " + str(column_name) + " not in Signal " + str(filename))
                 
                 # Get colour data
                 i = names.index(column)
                 # Plot file
-                ax.plot(sigDF['Time'], sigDF[col], color=colours[i], alpha=0.5, linewidth=1)
+                ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
                 
             ax.set_xlim(x_min, x_max)
             ax.set_ylim(y_min, y_max)
             ax.set_ylabel('Voltage (mV)')
             ax.set_xlabel('Time (s)')
-            ax.set_title(col)
+            ax.set_title(column_name)
             
             return fig
                 

@@ -43,7 +43,7 @@ class TestSimple(unittest.TestCase):
         pathNames = EMGFlow.make_paths()
         filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
-        BSignal = EMGFlow.apply_bandpass_filter(Signal, 'EMG_zyg', 2000, 20, 450)
+        BSignal = EMGFlow.apply_bandpass_filter(Signal, 'EMG_zyg', 2000, (20, 450))
         self.assertIsInstance(BSignal, pd.DataFrame)
     
     def test_bandpass_filter_signals(self):

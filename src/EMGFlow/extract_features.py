@@ -22,7 +22,7 @@ A collection of functions for extracting signal and EMG features.
 #
 
 
-def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
+def calc_iemg(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
     """
     Calculate the Integreated EMG (IEMG) from a column of 'Signal'. Ignores
     NaNs.
@@ -32,7 +32,7 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -40,7 +40,7 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
 
@@ -51,14 +51,14 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'.")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     IEMG = np.nansum(np.abs(col_vals) * sampling_rate)
     return IEMG
@@ -67,7 +67,7 @@ def calc_iemg(Signal:pd.DataFrame, col:str, sampling_rate:float):
 # =============================================================================
 #
 
-def calc_mav(Signal:pd.DataFrame, col:str):
+def calc_mav(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Mean Absolute Value (MAV) from a column of 'Signal'. Ignores
     NaNs.
@@ -77,13 +77,13 @@ def calc_mav(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -92,11 +92,11 @@ def calc_mav(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     MAV = np.sum(np.abs(col_vals)) / N
@@ -106,7 +106,7 @@ def calc_mav(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_mmav1(Signal:pd.DataFrame, col:str):
+def calc_mmav1(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Modified Mean Absolute Value 1 (MMAV1) from a column of
     'Signal'. Ignores NaNs.
@@ -116,13 +116,13 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -131,11 +131,11 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     vals = list(np.abs(col_vals))
@@ -152,7 +152,7 @@ def calc_mmav1(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_mmav2(Signal:pd.DataFrame, col:str):
+def calc_mmav2(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Modified Mean Absolute Value 2 (MMAV2) from a column of
     'Signal'. Ignores NaNs.
@@ -162,13 +162,13 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -177,11 +177,11 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     vals = list(np.abs(col_vals))
@@ -200,7 +200,7 @@ def calc_mmav2(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
+def calc_ssi(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
     """
     Calculate the Simple Square Integral (SSI) from a column of 'Signal'.
     Ignores NaNs.
@@ -210,7 +210,7 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
     sampling_rate : float
         The sampling rate of 'Signal'.
@@ -218,7 +218,7 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
     Exception
         An exception is raised if sampling_rate is less than or equal to 0.
 
@@ -229,14 +229,14 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     SSI = np.sum((np.abs(col_vals) * sampling_rate) ** 2)
     return SSI
@@ -245,7 +245,7 @@ def calc_ssi(Signal:pd.DataFrame, col:str, sampling_rate:float):
 # =============================================================================
 #
 
-def calc_var(Signal:pd.DataFrame, col:str):
+def calc_var(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Variance (VAR) from a column of 'Signal'. Ignores NaNs.
 
@@ -254,13 +254,13 @@ def calc_var(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -269,11 +269,11 @@ def calc_var(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     VAR = 1/(N - 1) * np.sum((col_vals - np.mean(col_vals)) ** 2)
@@ -283,7 +283,7 @@ def calc_var(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_vorder(Signal:pd.DataFrame, col:str):
+def calc_vorder(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the V-Order from a column of 'Signal'. Ignores NaNs.
 
@@ -292,13 +292,13 @@ def calc_vorder(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -307,14 +307,14 @@ def calc_vorder(Signal:pd.DataFrame, col:str):
 
     """
     
-    vOrder = np.sqrt(calc_var(Signal, col))
+    vOrder = np.sqrt(calc_var(Signal, column_name))
     return vOrder
 
 #
 # =============================================================================
 #
 
-def calc_rms(Signal:pd.DataFrame, col:str):
+def calc_rms(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Root Mean Square (RMS) from a column of 'Signal'. Ignores
     NaNs.
@@ -324,13 +324,13 @@ def calc_rms(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -339,11 +339,11 @@ def calc_rms(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     RMS = np.sqrt((1/N) * np.sum(col_vals ** 2))
@@ -353,7 +353,7 @@ def calc_rms(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_wl(Signal:pd.DataFrame, col:str):
+def calc_wl(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Waveform Length (WL) from a column of 'Signal'. Ignores NaNs.
 
@@ -362,13 +362,13 @@ def calc_wl(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -377,11 +377,11 @@ def calc_wl(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -392,7 +392,7 @@ def calc_wl(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
+def calc_wamp(Signal:pd.DataFrame, column_name:str, threshold:float):
     """
     Calculate the Willison Amplitude (WAMP) from a column of 'Signal'. Ignores
     NaNs.
@@ -402,7 +402,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
     threshold : float
         Threshold of the WAMP.
@@ -410,7 +410,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -419,11 +419,11 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -434,7 +434,7 @@ def calc_wamp(Signal:pd.DataFrame, col:str, threshold:float):
 # =============================================================================
 #
 
-def calc_log(Signal:pd.DataFrame, col:str):
+def calc_log(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Log Detector (LOG) from a column of 'Signal'. Ignores NaNs.
     
@@ -443,13 +443,13 @@ def calc_log(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -458,11 +458,11 @@ def calc_log(Signal:pd.DataFrame, col:str):
     
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     ex = (1/N) * np.sum(np.log(col_vals))
@@ -473,7 +473,7 @@ def calc_log(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_mfl(Signal:pd.DataFrame, col:str):
+def calc_mfl(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Maximum Fractal Length (MFL) from a column of 'Signal'.
     Ignores NaNs.
@@ -483,13 +483,13 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -498,11 +498,11 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     N = len(col_vals)
     diff = np.array([np.abs(col_vals[i + 1] - col_vals[i]) for i in range(N - 1)])
@@ -513,7 +513,7 @@ def calc_mfl(Signal:pd.DataFrame, col:str):
 # =============================================================================
 #
 
-def calc_ap(Signal:pd.DataFrame, col:str):
+def calc_ap(Signal:pd.DataFrame, column_name:str):
     """
     Calculate the Average Power (AP) from a column of 'Signal'. Ignores NaNs.
 
@@ -522,13 +522,13 @@ def calc_ap(Signal:pd.DataFrame, col:str):
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    col : str
+    column_name : str
         The column of 'Signal' the feature is calculated from.
 
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal'.
+        An exception is raised if 'column_name' is not a column of 'Signal'.
 
     Returns
     -------
@@ -537,11 +537,11 @@ def calc_ap(Signal:pd.DataFrame, col:str):
 
     """
     
-    if col not in list(Signal.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal'")
+    if column_name not in list(Signal.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'")
     
     # Get valid values
-    col_vals = Signal[col].dropna().values
+    col_vals = Signal[column_name].dropna().values
     
     AP = np.sum(col_vals ** 2) / len(col_vals)
     return AP
@@ -846,7 +846,7 @@ def calc_sflt(psd:pd.DataFrame):
 # =============================================================================
 #
 
-def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:float=None):
+def calc_sflx(Signal1:pd.DataFrame, diff, column_name:str, sampling_rate:float, diff_sr:float=None):
     """
     Calculate the Spectral Flux (SFlx) from 'Signal1' and 'diff'. Ignores NaNs.
 
@@ -860,7 +860,7 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
         calculate the spectral flux of 'Signal1', divided into two different
         parts (diff and 1-diff). If 'diff' is instead a Pandas dataframe, it
         will claculate the spectral flux of 'Signal1' and 'diff'.
-    col : str
+    column_name : str
         The column of 'Signal1' the feature is calculated from. If a second signal
         is provided for 'diff', it should have a column of the same name.
     sampling_rate : float
@@ -873,14 +873,14 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
     Raises
     ------
     Exception
-        An exception is raised if 'col' is not a column of 'Signal1'.
+        An exception is raised if 'column_name' is not a column of 'Signal1'.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
         An exception is raised if 'diff' is a float, but isn't between 0 and 1.
     Exception
         An exception is raised if 'diff' is a dataframe and does not contain
-        'col'.
+        'column_name'.
     Exception
         An exception is raised if 'diff_sr' is less than or equal to 0.
     Exception
@@ -893,8 +893,8 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
 
     """
     
-    if col not in list(Signal1.columns.values):
-        raise Exception("Column '" + str(col) + "' not found in 'Signal1'.")
+    if column_name not in list(Signal1.columns.values):
+        raise Exception("Column '" + str(column_name) + "' not found in 'Signal1'.")
         
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
@@ -905,17 +905,17 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
             raise Exception("diff must be a float between 0 and 1.")
         
         # Find column divider index
-        diff_ind = int(len(Signal1[col]) * diff)
+        diff_ind = int(len(Signal1[column_name]) * diff)
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1.iloc[:diff_ind].reset_index(), col, sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reset_index(), col, sampling_rate=sampling_rate)
+        psd1 = emg_to_psd(Signal1.iloc[:diff_ind].reset_index(), column_name, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(Signal1.iloc[diff_ind:].reset_index(), column_name, sampling_rate=sampling_rate)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
         
     # Find spectral flux of Signal1 by div
     elif isinstance(diff, pd.DataFrame):
-        if col not in list(diff.columns.values):
-            raise Exception("Column '" + str(col) + "' not found in 'diff'.")
+        if column_name not in list(diff.columns.values):
+            raise Exception("Column '" + str(column_name) + "' not found in 'diff'.")
         
         # If no second sampling rate, assume same sampling rate as first Signal
         if diff_sr == None:
@@ -925,8 +925,8 @@ def calc_sflx(Signal1:pd.DataFrame, diff, col:str, sampling_rate:float, diff_sr:
             raise Exception("'diff_sr' must be greater than 0.")
         
         # Take the PSD of each signal
-        psd1 = emg_to_psd(Signal1, col, sampling_rate=sampling_rate)
-        psd2 = emg_to_psd(diff, col, sampling_rate=diff_sr)
+        psd1 = emg_to_psd(Signal1, column_name, sampling_rate=sampling_rate)
+        psd2 = emg_to_psd(diff, column_name, sampling_rate=diff_sr)
         # Calculate the spectral flux
         flux = np.sum((psd1['Power'] - psd2['Power']) ** 2)
     
@@ -1135,7 +1135,7 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
 # =============================================================================
 #
 
-def extract_features(path_names:dict, sampling_rate:float, cols=None, expression:str=None, file_ext:str='csv', short_name:bool=True):
+def extract_features(path_names:dict, sampling_rate:float, column_names=None, expression:str=None, file_ext:str='csv', short_name:bool=True):
     """
     Extracts features from signals by running a series of feature extraction
     functions and saving the outputs to a feature file.
@@ -1155,7 +1155,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     while the 'Bandpass' path is used to calculate spectral features.
 
     Columns of these files that begin with 'mask_' are assumed to be NaN mask
-    columns, and are ignored unless specified in cols.
+    columns, and are ignored unless specified in column_names.
 
     The output is written as a 'Features.csv' file to the 'Feature' path.
 
@@ -1167,12 +1167,12 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         dictionary can be created with the 'make_paths' function.
     sampling_rate : float
         The sampling rate for all signal data being read.
-    cols : list-str, optional
+    column_names : list-str, optional
         List of columns to analyze in each file. The default is None, in which
         case all columns except for 'Time' and columns whose names begin with
         'mask_' will be analyzed. All files should have at least these columns
         in common. If None is used, all files will be assumed to have the same
-        colums as the first file read.
+        columns as the first file read.
     expression : str, optional
         A regular expression. If provided, will only analyze files whose local
         paths inside of 'path_names' match the regular expression. The default
@@ -1201,7 +1201,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
         or 'Smooth'/'Filled'/'FWR' filepaths.
     Exception
         An exception is raised if a file does not contain one of the columns
-        from 'cols'.
+        from 'column_names'.
         
     
     Exception
@@ -1299,18 +1299,18 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
     ]
     
     # Read the first file to get column names
-    if cols == None:
+    if column_names == None:
         path1 = next(iter(file_dirs_s.values()))
         data1 = read_file_type(path1, file_ext)
-        cols = list(data1.columns)
-        cols = [col for col in cols if col != 'Time' and not col.startswith('mask_')]
+        column_names = list(data1.columns)
+        column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
     
     
     # Create row labels
     df_names = ['File_Path']
-    for col in cols:
+    for column_name in column_names:
         for measure in measure_names:
-            df_names.append(col + '_' + measure)
+            df_names.append(column_name + '_' + measure)
     
     Features = pd.DataFrame(columns=df_names)
     
@@ -1325,10 +1325,10 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
             except:
                 raise Exception("Could not find file: " + str(file))
             
-            if col not in list(data_b.columns.values):
-                raise Exception("Bandpass file " + str(file) + " does not contain column " + str(col))
-            if col not in list(data_s.columns.values):
-                raise Exception("Smooth file " + str(file) + " does not contain column " + str(col))
+            if column_name not in list(data_b.columns.values):
+                raise Exception("Bandpass file " + str(file) + " does not contain column " + str(column_name))
+            if column_name not in list(data_s.columns.values):
+                raise Exception("Smooth file " + str(file) + " does not contain column " + str(column_name))
             
             # Calculate ID
             if short_name:
@@ -1339,40 +1339,40 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
             df_vals = [File_ID]
            
             # Evaluate the measures of each column
-            for col in cols:
+            for column_name in column_names:
                 
                 # Use the mask if it is there (smooth mask for both dataframes)
-                mask_col = 'mask_' + str(col)
+                mask_col = 'mask_' + str(column_name)
                 if mask_col in data_s.columns.values:
-                    data_b.loc[~data_s[mask_col], col] = np.nan
+                    data_b.loc[~data_s[mask_col], column_name] = np.nan
                     Timeseries_Pmissing = (~data_s[mask_col]).mean()
-                    Spectral_Pmissing = data_b[col].isna().mean()
+                    Spectral_Pmissing = data_b[column_name].isna().mean()
                 else:
-                    Timeseries_Pmissing = data_s[col].isna().mean()
-                    Spectral_Pmissing = data_b[col].isna().mean()
+                    Timeseries_Pmissing = data_s[column_name].isna().mean()
+                    Spectral_Pmissing = data_b[column_name].isna().mean()
                 
                 # Calculate time-series measures
-                Min = np.min(data_s[col])
-                Max = np.max(data_s[col])
-                Mean = np.mean(data_s[col])
-                SD = np.std(data_s[col])
-                Skew = scipy.stats.skew(data_s[col].dropna())
-                Kurtosis = scipy.stats.kurtosis(data_s[col].dropna())
-                IEMG = calc_iemg(data_s, col, sampling_rate)
-                MAV = calc_mav(data_s, col)
-                MMAV1 = calc_mmav1(data_s, col)
-                MMAV2 = calc_mmav2(data_s, col)
-                SSI = calc_ssi(data_s, col, sampling_rate)
-                VAR = calc_var(data_s, col)
-                VOrder = calc_vorder(data_s, col)
-                RMS = calc_rms(data_s, col)
-                WL = calc_wl(data_s, col)
-                LOG = calc_log(data_s, col)
-                MFL = calc_mfl(data_s, col)
-                AP = calc_ap(data_s, col)
+                Min = np.min(data_s[column_name])
+                Max = np.max(data_s[column_name])
+                Mean = np.mean(data_s[column_name])
+                SD = np.std(data_s[column_name])
+                Skew = scipy.stats.skew(data_s[column_name].dropna())
+                Kurtosis = scipy.stats.kurtosis(data_s[column_name].dropna())
+                IEMG = calc_iemg(data_s, column_name, sampling_rate)
+                MAV = calc_mav(data_s, column_name)
+                MMAV1 = calc_mmav1(data_s, column_name)
+                MMAV2 = calc_mmav2(data_s, column_name)
+                SSI = calc_ssi(data_s, column_name, sampling_rate)
+                VAR = calc_var(data_s, column_name)
+                VOrder = calc_vorder(data_s, column_name)
+                RMS = calc_rms(data_s, column_name)
+                WL = calc_wl(data_s, column_name)
+                LOG = calc_log(data_s, column_name)
+                MFL = calc_mfl(data_s, column_name)
+                AP = calc_ap(data_s, column_name)
     
                 # Calculate spectral features
-                psd = emg_to_psd(data_b, col, sampling_rate=sampling_rate)
+                psd = emg_to_psd(data_b, column_name, sampling_rate=sampling_rate)
                 Max_Freq = psd.iloc[psd['Power'].idxmax()]['Frequency']
                 MDF = calc_mdf(psd)
                 MNF = calc_mnf(psd)
@@ -1381,7 +1381,7 @@ def extract_features(path_names:dict, sampling_rate:float, cols=None, expression
                 Fast_Twitch_Slope, Slow_Twitch_Slope = calc_twitch_slope(psd)
                 Spectral_Centroid = calc_sc(psd)
                 Spectral_Flatness = calc_sflt(psd)
-                Spectral_Flux = calc_sflx(data_b, 0.5, col, sampling_rate)
+                Spectral_Flux = calc_sflx(data_b, 0.5, column_name, sampling_rate)
                 Spectral_Spread = calc_ss(psd)
                 Spectral_Decrease = calc_sdec(psd)
                 Spectral_Entropy = calc_se(psd)
