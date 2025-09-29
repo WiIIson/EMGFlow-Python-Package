@@ -270,7 +270,7 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -302,7 +302,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
         default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
@@ -353,7 +353,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -362,7 +362,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -384,8 +384,8 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -519,7 +519,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a bandpass filter ('passband_edges') to all signal files in a folder
     and its subfolders. Writes filtered signal files to an output folder, and
@@ -549,7 +549,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, pass
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
         default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
@@ -603,7 +603,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, pass
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -612,7 +612,7 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, pass
     
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -634,8 +634,8 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, pass
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -693,7 +693,7 @@ def apply_rectify(Signal:pd.DataFrame, column_name:str):
 # =============================================================================
 #
 
-def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a Full Wave Rectifier (FWR) to all signal files in a folder and its
     subfolders. Writes filtered signal files to an output folder, and generates
@@ -713,7 +713,7 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
         default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
@@ -756,7 +756,7 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -765,7 +765,7 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
     
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -787,8 +787,8 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -963,7 +963,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -995,7 +995,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         A regular expression. If provided, will only apply the filter to files
         whose local paths inside of 'in_path' match the regular expression. The
         default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without filtering. The default is False, which ignores
         files that don't match.
@@ -1049,7 +1049,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -1058,7 +1058,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1080,8 +1080,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1231,7 +1231,7 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
 # =============================================================================
 #
 
-def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, column_names=None, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, column_names=None, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply an interpolation method ('method') to all signal files in a folder
     and its subfolders. Writes interpolated signal files to an output folder,
@@ -1260,7 +1260,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         A regular expression. If provided, will only apply the interpolation to
         files whose local paths inside of 'in_path' match the regular
         expression. The default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without interpolating. The default is False, which
         ignores files that don't match.
@@ -1314,7 +1314,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -1323,7 +1323,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1345,8 +1345,8 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
             
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1828,7 +1828,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, column_names=None, min_segment:float=30.0, expression:str=None, exp_copy:bool=False, file_ext:str='csv'):
+def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a smoothing filter ('method') to all signal files in a folder and its
     subfolders. Writes filtered signal files to an output folder, and generates
@@ -1863,7 +1863,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
         A regular expression. If provided, will only apply the smoothing filter
         to files whose local paths inside of 'in_path' match the regular
         expression. The default is None.
-    exp_copy : bool, optional
+    copy_unmatched : bool, optional
         If True, copies files that don't match the regular expression to the
         output folder without smoothing. The default is False, which ignores
         files that don't match.
@@ -1919,7 +1919,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
         out_path = os.path.abspath(out_path)
     
     # Get dictionary of file locations
-    if exp_copy:
+    if copy_unmatched:
         file_dirs = map_files(in_path, file_ext=file_ext)
     else:
         file_dirs = map_files(in_path, file_ext=file_ext, expression=expression)
@@ -1928,7 +1928,7 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     
     # Apply transformations
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
@@ -1959,8 +1959,8 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
             os.makedirs(out_folder, exist_ok=True)
             data.to_csv(out_file, index=False)
         
-        elif (file[-len(file_ext):] == file_ext) and exp_copy:
-            # Copy the file even if it doesn't match if exp_copy is true
+        elif (file[-len(file_ext):] == file_ext) and copy_unmatched:
+            # Copy the file even if it doesn't match if copy_unmatched is true
             data = read_file_type(file_dirs[file], file_ext)
             
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -2230,7 +2230,7 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     
     # Iterate over detected files
     for file in tqdm(file_dirs):
-        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, file)!=None)):
+        if (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, file)!=None)):
             
             # Read file
             data = read_file_type(file_dirs[file], file_ext)
