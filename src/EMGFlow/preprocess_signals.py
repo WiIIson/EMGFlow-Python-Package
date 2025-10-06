@@ -156,7 +156,7 @@ def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0,
 # =============================================================================
 #
 
-def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float, notch_vals=[(50,5)], min_segment:float=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, notch_vals=[(50,5)], min_segment:float=30.0):
     """
     Apply a list of notch filters ('notch_vals') to a column of 'Signal'.
 
@@ -167,8 +167,8 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
         for signal data.
     column_name : str
         The column of 'Signal' the notch filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     notch_vals : list-tuple, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency the filter is applied to, and Q is the
@@ -270,7 +270,7 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_vals=[(50,5)], column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, notch_vals=[(50,5)], min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -282,17 +282,17 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    sampling_rate : float
-        The sampling rate of the signal files.
+    column_names : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0.
     notch_vals : list-tuples, optional
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
         filter). The default is [(50, 5)].
-    column_names : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -406,7 +406,7 @@ def notch_filter_signals(in_path:str, out_path:str, sampling_rate:float, notch_v
 # =============================================================================
 #
 
-def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0):
+def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0):
     """
     Apply a bandpass filter ('passband_edges') to a column of 'Signal'.
 
@@ -417,8 +417,8 @@ def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
         for signal data.
     column_name : str
         The column of 'Signal' the bandpass filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     passband_edges : tuple[float,float]
         Lower and upper frequency limit (Hz) of the bandpass filter. The
         default is (20.0, 450.0).
@@ -519,7 +519,7 @@ def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
 # =============================================================================
 #
 
-def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, passband_edges:tuple[float,float]=(20.0,450.0), column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def bandpass_filter_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a bandpass filter ('passband_edges') to all signal files in a folder
     and its subfolders. Writes filtered signal files to an output folder, and
@@ -531,15 +531,15 @@ def bandpass_filter_signals(in_path:str, out_path:str, sampling_rate:float, pass
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    sampling_rate : float
-        The sampling rate of the signal files.
-    passband_edges : tuple[float,float]
-        Lower and upper frequency limit (Hz) of the bandpass filter. The
-        default is (20.0, 450.0).
     column_names : list-str, optional
         List of columns of the signals to apply the filter to. The default is
         None, in which case the filter is applied to every column except for
         'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0.
+    passband_edges : tuple[float,float]
+        Lower and upper frequency limit (Hz) of the bandpass filter. The
+        default is (20.0, 450.0).
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -803,15 +803,15 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
 # =============================================================================
 #
 #
-# HAMPEL FILTER
+# SCREENING FILTER
 #
 #
 # =============================================================================
 #
 
-def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0):
+def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, method='hampel', window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0):
     """
-    Apply a Hampel filter ('window_ms', 'n_sigma') to a column of 'Signal'.
+    Apply a screening filter to a column of 'Signal'.
 
     Parameters
     ----------
@@ -820,8 +820,11 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
         for signal data.
     column_name : str
         The column of 'Signal' the Hampel filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
+    method : str, optional
+        The screening method to use. Valid methods are 'hampel' and 'wiener'.
+        The default is 'hampel'.
     window_ms : float, optional
         The size of the outlier detection window in ms. The default is 100.0.
     n_sigma : float, optional
@@ -848,10 +851,12 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
     Exception
         An exception is raised if 'min_segment' is longer than the recording of
         'Signal'.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
 
     Returns
     -------
-    hamp_Signal : pd.DataFrame
+    screened_signal : pd.DataFrame
         A copy of 'Signal' after the Hampel filter is applied.
 
     """
@@ -879,7 +884,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
     if min_gap > len(Signal):
         raise Exception("'min_segment' cannot be longer than the recording of 'Signal'.")
     
-    hamp_Signal = Signal.copy().reset_index(drop=True)
+    screened_signal = Signal.copy().reset_index(drop=True)
         
     # Internal function for applying the Hampel filter
     def hampel_filter(data, window_size:int=50, n_sigma:float=5.0):
@@ -905,8 +910,30 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
             
         return filtered_data, mask
     
+    # Internal function for applying the Wiener filter
+    def wiener_filter(data: np.ndarray, window_size:int=50, sampling_rate:float=1000.0):
+        """
+        Wrapper around scipy.signal.wiener that is robust to very short segments.
+        Returns filtered data and a mask of True (no explicit outlier flagging).
+        """
+        n = len(data)
+        if n == 0:
+            return data.copy(), np.array([], dtype=bool)
+        if n < 3:
+            # Too short to meaningfully filter; return as-is
+            return data.copy(), np.full(n, True, dtype=bool)
+
+        # Clamp window to segment length; prefer odd size; min 3
+        ws = max(3, min(window_size, n))
+        if ws % 2 == 0:
+            ws = ws - 1 if ws > 3 else 3
+
+        filtered = scipy.signal.wiener(data, mysize=ws)  # noise=None -> auto-estimate
+        mask = np.isclose(data, filtered, atol=1e-8)
+        return filtered, mask
+    
     # Construct list of NaN locations
-    data = hamp_Signal[column_name]
+    data = screened_signal[column_name]
     mask = data.isna()
     group = (mask != mask.shift()).cumsum()
     group_sequences = data[mask].groupby(group[mask])
@@ -919,7 +946,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
             min_nan_mask.loc[nan_ind:nan_ind+nan_len-1] = False
     
     # Use mask to remove small NaN groups, construct list of value locations
-    masked_data = hamp_Signal[min_nan_mask].copy().reset_index(drop=True)
+    masked_data = screened_signal[min_nan_mask].copy().reset_index(drop=True)
     
     # Construct list of value locations
     data = masked_data[column_name]
@@ -939,35 +966,40 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
             masked_data.loc[val_ind:val_ind+val_len-1, column_name] = np.nan
         else:
             # Apply filter
-            filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, n_sigma=n_sigma)
+            if method=='hampel':
+                filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, n_sigma=n_sigma)
+            elif method=='wiener':
+                filtered_section, mask = wiener_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, sampling_rate=sampling_rate)
+            else:
+                raise Exception("Invalid screening method chosen: " + str(method), ", use 'hampel' or 'wiener'.")
             masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
             hamp_mask.loc[val_ind:val_ind+val_len-1] = mask
     
-    # Put masked_data back in hamp_Signal
-    hamp_Signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
+    # Put masked_data back in screened_signal
+    screened_signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     # Create a mask for the full column and add the masked values
-    full_mask = pd.Series(np.full(len(hamp_Signal), True))
+    full_mask = pd.Series(np.full(len(screened_signal), True))
     full_mask[min_nan_mask] = hamp_mask.values
     
     # Merge with the mask column if it exists
     mask_col = 'mask_' + column_name
-    if mask_col not in list(hamp_Signal.columns.values):
-        hamp_Signal[mask_col] = full_mask.values
+    if mask_col not in list(screened_signal.columns.values):
+        screened_signal[mask_col] = full_mask.values
     else:
-        hamp_Signal[mask_col] = hamp_Signal[mask_col] & full_mask.values
+        screened_signal[mask_col] = screened_signal[mask_col] & full_mask.values
     
-    return hamp_Signal
+    return screened_signal
 
 #
 # =============================================================================
 #
 
-def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, window_ms:float=100.0, n_sigma:float=10.0, column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def screen_artefact_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method='hampel', window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
-    Apply a hampel filter ('window_ms', 'n_sigma') to all signal files in a
-    folder and its subfolders. Writes filtered signal files to an output
-    folder, and generates a file structure matching the input folder.
+    Apply a screening filter to all signal files in a folder and its
+    subfolders. Writes filtered signal files to an output folder, and generates
+    a file structure matching the input folder.
 
     Parameters
     ----------
@@ -975,17 +1007,19 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    sampling_rate : float
-        The sampling rate of the signal files.
+    column_names : list-str, optional
+        List of columns of the signals to apply the filter to. The default is
+        None, in which case the filter is applied to every column except for
+        'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0.
+    method : str, optional
+        The screening method to use. Valid methods are 'hampel' and 'wiener'.
     window_ms : float, optional
         The size of the outlier detection window in ms. The default is 100.0.
     n_sigma : float, optional
         The number of standard deviations away for a value to be considered an
         outlier. The default is 10.0.
-    column_names : list-str, optional
-        List of columns of the signals to apply the filter to. The default is
-        None, in which case the filter is applied to every column except for
-        'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -1025,6 +1059,8 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
     Exception
         An exception is raised if 'min_segment' is longer than a signal
         recording.
+    Exception
+        An exception is raised if 'method' is an invalid screening method.
           
     Exception
         An exception is raised if a file could not be read.
@@ -1070,7 +1106,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
             
             # Apply filter to columns
             for column_name in column_names:
-                data = apply_screen_artefacts(data, column_name, sampling_rate, window_ms=window_ms, n_sigma=n_sigma, min_segment=min_segment)
+                data = apply_screen_artefacts(data, column_name, sampling_rate, method=method, window_ms=window_ms, n_sigma=n_sigma, min_segment=min_segment)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]
@@ -1102,7 +1138,7 @@ def screen_artefact_signals(in_path:str, out_path:str, sampling_rate:float, wind
 # =============================================================================
 #
 
-def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0):
+def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, method:str='pchip', max_segment:float=500.0):
     """
     Apply an interpolation method ('method') to a column of 'Signal'. Fills NaN
     values with interpolated results.
@@ -1114,8 +1150,8 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
         for signal data.
     column_name : str
         The column of 'Signal' the interpolation is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     method : str, optional
         The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
@@ -1231,7 +1267,7 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
 # =============================================================================
 #
 
-def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:str='pchip', max_segment:float=500.0, column_names=None, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def fill_missing_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='pchip', max_segment:float=500.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply an interpolation method ('method') to all signal files in a folder
     and its subfolders. Writes interpolated signal files to an output folder,
@@ -1243,8 +1279,12 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    sampling_rate : float
-        The sampling rate of the signal files.
+    column_names : list-str, optional
+        List of columns of the signals to apply the interpolation to. The
+        default is None, in which case the interpolation is applied to every
+        column except for 'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0
     method : str, optional
         The interpolation method to use. Valid methods are 'pchip' and
         'spline'. The default is 'pchip'.
@@ -1252,10 +1292,6 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
         The maximum length (in ms) of NaN values to fill. If a length of
         invalid data is longer than this threshold, it will not be
         interpolated. The default is 500.0
-    column_names : list-str, optional
-        List of columns of the signals to apply the interpolation to. The
-        default is None, in which case the interpolation is applied to every
-        column except for 'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the interpolation to
         files whose local paths inside of 'in_path' match the regular
@@ -1367,7 +1403,7 @@ def fill_missing_signals(in_path:str, out_path:str, sampling_rate:float, method:
 # =============================================================================
 #
 
-def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a boxcar smoothing filter to a column of 'Signal'.
 
@@ -1378,8 +1414,8 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
         for signal data.
     column_name : str
         The column of 'Signal' the boxcar smoothing filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     window_ms : float, optional.
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
@@ -1480,7 +1516,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
 # =============================================================================
 #
 
-def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a Root Mean Square (RMS) smoothing filter to a column of 'Signal'.
 
@@ -1491,8 +1527,8 @@ def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, 
         for signal data.
     column_name : str
         The column of 'Signal' the RMS smoothing filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     window_ms : float, optional.
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
@@ -1593,7 +1629,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, 
 # =============================================================================
 #
 
-def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0):
+def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0):
     """
     Apply a Gaussian smoothing filter to a column of 'Signal'.
 
@@ -1604,8 +1640,8 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
         for signal data.
     column_name : str
         The column of 'Signal' the Gaussian smoothing filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     window_ms : float, optional.
         The size of the smoothing window in ms. The default is 50.0.
     sigma : float, optional
@@ -1713,7 +1749,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
 # =============================================================================
 #
 
-def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float, window_ms:float=50.0, min_segment:float=30.0):
+def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, window_ms:float=50.0, min_segment:float=30.0):
     """
     Apply a Loess smoothing filter to a column of 'Signal'.
 
@@ -1724,8 +1760,8 @@ def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float
         for signal data.
     column_name : str
         The column of 'Signal' the Loess smoothing filter is applied to.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
     window_ms : float, optional.
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
@@ -1828,7 +1864,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float
 # =============================================================================
 #
 
-def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='rms', window_ms:float=50.0, sigma:float=1.0, column_names=None, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def smooth_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='rms', window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a smoothing filter ('method') to all signal files in a folder and its
     subfolders. Writes filtered signal files to an output folder, and generates
@@ -1840,8 +1876,12 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
         Filepath to a directory to read signal files.
     out_path : str
         Filepath to a directory to write filtered signals.
-    sampling_rate : float
-        The sampling rate of the signal files.
+    column_names : list-str, optional
+        List of columns of the signals to apply the smoothing filter to. The
+        default is None, in which case the smoothing filter is applied to every
+        column except for 'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0.
     method : str, optional
         The smoothing method to use. Valid methods are 'rms', 'boxcar', 'gauss'
         and 'loess'. The default is 'rms'.
@@ -1850,10 +1890,6 @@ def smooth_signals(in_path:str, out_path:str, sampling_rate:float, method:str='r
     sigma: float, optional
         The value of sigma used for a Gaussian filter. Only affects output when
         using a Gaussian filter. The default is 1.0.
-    column_names : list-str, optional
-        List of columns of the signals to apply the smoothing filter to. The
-        default is None, in which case the smoothing filter is applied to every
-        column except for 'Time' and columns that start with 'mask_'.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -2048,8 +2084,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, file_ext=file_ext)
-    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, file_ext=file_ext)
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate=sampling_rate, file_ext=file_ext)
+    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate=sampling_rate, file_ext=file_ext)
     rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
     
     last = 'FWR'
@@ -2057,19 +2093,19 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
     if do_screen:
         if 'Screened' not in path_names:
             raise Exception("'Screened' path not detected in provided dictionary ('path_names').")
-        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate, file_ext=file_ext)
+        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate=sampling_rate, file_ext=file_ext)
         last = 'Screened'
     
     if do_fill:
         if 'Filled' not in path_names:
             raise Exception("'Filled' path not detected in provided dictionary ('path_names').")
-        fill_missing_signals(path_names[last], path_names['Filled'], sampling_rate, file_ext=file_ext)
+        fill_missing_signals(path_names[last], path_names['Filled'], sampling_rate=sampling_rate, file_ext=file_ext)
         last = 'Filled'
     
     if do_smooth:
         if 'Smooth' not in path_names:
             raise Exception("'Smooth' path not detected in provided dictionary ('path_names').")
-        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate, file_ext=file_ext)
+        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate=sampling_rate, file_ext=file_ext)
     
     return
 
@@ -2077,7 +2113,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
 # =============================================================================
 #
 
-def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=50.0, threshold:float=5.0, metric=np.median, low:float=None, high:float=None, column_names=None, expression:str=None, file_ext:str='csv'):
+def detect_spectral_outliers(in_path:str, column_names=None, sampling_rate:float=1000.0, window_ms:float=50.0, threshold:float=5.0, metric=np.median, low:float=None, high:float=None, expression:str=None, file_ext:str='csv'):
     """
     Detect outliers in all signal files in a folder. Returns a dictionary of
     files that contain outliers.
@@ -2092,8 +2128,12 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     ----------
     in_path : str
         Filepath to a directory to read signal files.
-    sampling_rate : float
-        The sampling rate of the signal files.
+    column_names : list-str, optional
+        List of columns of the signals to apply the outlier detection to. The
+        default is None, in which case the outlier detection is applied to
+        every column except for 'Time' and columns that start with 'mask_'.
+    sampling_rate : float, optional
+        The sampling rate of the signal files. The default is 1000.0.
     window_ms : float, optional
         The size of the outlier detection window in ms. The default is 50.0.
     threshold : float, optional
@@ -2109,10 +2149,6 @@ def detect_spectral_outliers(in_path:str, sampling_rate:float, window_ms:float=5
     high : float, optional
         Upper frequency limit (Hz) of the outlier detection. The default is
         None, in which case no upper threshold is used.
-    column_names : list-str, optional
-        List of columns of the signals to apply the outlier detection to. The
-        default is None, in which case the outlier detection is applied to
-        every column except for 'Time' and columns that start with 'mask_'.
     expression : str, optional
         A regular expression. If provided, will only apply the outlier
         detection to files whose local paths inside of 'in_path' match the

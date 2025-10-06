@@ -36,7 +36,7 @@ class TestSimple(unittest.TestCase):
     
     def test_notch_filter_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], 2000, [(40, 4)])
+        EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], sampling_rate=2000, notch_vals=[(40, 4)])
         self.assertTrue(os.path.exists(os.path.join(pathNames['Notch'], '01', 'sample_data_01.csv')))
     
     def test_apply_bandpass_filter(self):
@@ -48,7 +48,7 @@ class TestSimple(unittest.TestCase):
     
     def test_bandpass_filter_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.bandpass_filter_signals(pathNames['Raw'], pathNames['Bandpass'], 2000)
+        EMGFlow.bandpass_filter_signals(pathNames['Raw'], pathNames['Bandpass'], sampling_rate=2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Bandpass'], '01', 'sample_data_01.csv')))
     
     def test_apply_rectify(self):
@@ -72,7 +72,8 @@ class TestSimple(unittest.TestCase):
     
     def test_screen_artefact_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], 2000)
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], sampling_rate=2000)
+        EMGFlow.screen_artefact_signals(pathNames['Raw'], pathNames['Screened'], sampling_rate=2000, method='wiener')
         self.assertTrue(os.path.exists(os.path.join(pathNames['Screened'], '01', 'sample_data_01.csv')))
     
     def test_apply_fill_missing(self):
@@ -84,7 +85,7 @@ class TestSimple(unittest.TestCase):
     
     def test_fill_missing_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'], 2000)
+        EMGFlow.fill_missing_signals(pathNames['Raw'], pathNames['Filled'], sampling_rate=2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Filled'], '01', 'sample_data_01.csv')))
     
     def test_apply_boxcar_smooth(self):
@@ -117,7 +118,7 @@ class TestSimple(unittest.TestCase):
     
     def test_smooth_signals(self):
         pathNames = EMGFlow.make_paths()
-        EMGFlow.smooth_signals(pathNames['Raw'], pathNames['Smooth'], 2000)
+        EMGFlow.smooth_signals(pathNames['Raw'], pathNames['Smooth'], sampling_rate=2000)
         self.assertTrue(os.path.exists(os.path.join(pathNames['Smooth'], '01', 'sample_data_01.csv')))
     
     def test_clean_signals(self):
@@ -128,7 +129,7 @@ class TestSimple(unittest.TestCase):
     def test_detect_outliers(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], 2000)
+        outliers = EMGFlow.detect_spectral_outliers(pathNames['Raw'], sampling_rate=2000)
         self.assertIsInstance(outliers, dict)
 
 #

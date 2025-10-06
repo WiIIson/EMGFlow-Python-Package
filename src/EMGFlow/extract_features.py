@@ -22,7 +22,7 @@ A collection of functions for extracting signal and EMG features.
 #
 
 
-def calc_iemg(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
+def calc_iemg(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0):
     """
     Calculate the Integreated EMG (IEMG) from a column of 'Signal'. Ignores
     NaNs.
@@ -34,8 +34,8 @@ def calc_iemg(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
         for signal data.
     column_name : str
         The column of 'Signal' the feature is calculated from.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
 
     Raises
     ------
@@ -200,7 +200,7 @@ def calc_mmav2(Signal:pd.DataFrame, column_name:str):
 # =============================================================================
 #
 
-def calc_ssi(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
+def calc_ssi(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0):
     """
     Calculate the Simple Square Integral (SSI) from a column of 'Signal'.
     Ignores NaNs.
@@ -212,8 +212,8 @@ def calc_ssi(Signal:pd.DataFrame, column_name:str, sampling_rate:float):
         for signal data.
     column_name : str
         The column of 'Signal' the feature is calculated from.
-    sampling_rate : float
-        The sampling rate of 'Signal'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
 
     Raises
     ------
@@ -846,7 +846,7 @@ def calc_sflt(psd:pd.DataFrame):
 # =============================================================================
 #
 
-def calc_sflx(Signal1:pd.DataFrame, diff, column_name:str, sampling_rate:float, diff_sr:float=None):
+def calc_sflx(Signal1:pd.DataFrame, diff, column_name:str, sampling_rate:float=1000.0, diff_sr:float=None):
     """
     Calculate the Spectral Flux (SFlx) from 'Signal1' and 'diff'. Ignores NaNs.
 
@@ -863,8 +863,8 @@ def calc_sflx(Signal1:pd.DataFrame, diff, column_name:str, sampling_rate:float, 
     column_name : str
         The column of 'Signal1' the feature is calculated from. If a second signal
         is provided for 'diff', it should have a column of the same name.
-    sampling_rate : float
-        The sampling rate of 'Signal1'.
+    sampling_rate : float, optional
+        The sampling rate of 'Signal1'. The default is 1000.0.
     diff_sr : float, optional
         The sampling rate for 'diff' if it is a dataframe. The default is None,
         in which case 'diff' is assumed to have the same sampling rate as
@@ -1111,10 +1111,11 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
     Raises
     ------
     Exception
+        An exception is raised if 'p' is not greater than 0.
+        
+    Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
         'Power'.
-    Exception
-        An exception is raised if 'p' is not greater than 0.
 
     Returns
     -------
@@ -1135,7 +1136,7 @@ def calc_sbw(psd:pd.DataFrame, p:int=2):
 # =============================================================================
 #
 
-def extract_features(path_names:dict, sampling_rate:float, column_names=None, expression:str=None, file_ext:str='csv', short_name:bool=True):
+def extract_features(path_names:dict, column_names=None, sampling_rate:float=1000.0, expression:str=None, file_ext:str='csv', short_name:bool=True):
     """
     Extracts features from signals by running a series of feature extraction
     functions and saving the outputs to a feature file.
@@ -1165,14 +1166,15 @@ def extract_features(path_names:dict, sampling_rate:float, column_names=None, ex
         A dictionary of file locations with keys for stage in the processing
         pipeline. Required paths are: 'Bandpass', 'FWR', and 'Feature'. The
         dictionary can be created with the 'make_paths' function.
-    sampling_rate : float
-        The sampling rate for all signal data being read.
     column_names : list-str, optional
         List of columns to analyze in each file. The default is None, in which
         case all columns except for 'Time' and columns whose names begin with
         'mask_' will be analyzed. All files should have at least these columns
         in common. If None is used, all files will be assumed to have the same
         columns as the first file read.
+    sampling_rate : float, optional
+        The sampling rate for all signal data being read. The default is
+        1000.0.
     expression : str, optional
         A regular expression. If provided, will only analyze files whose local
         paths inside of 'path_names' match the regular expression. The default
@@ -1277,7 +1279,7 @@ def extract_features(path_names:dict, sampling_rate:float, column_names=None, ex
         'LOG',
         'MFL',
         'AP',
-        'Timeseries_Pmissing',
+        'Temporal_PCT_Missing',
         
         # Spectral features
         'Max_Freq',
@@ -1295,7 +1297,7 @@ def extract_features(path_names:dict, sampling_rate:float, column_names=None, ex
         'SE',
         'SR',
         'SB',
-        'Spec_Pmissing'
+        'Spectral_PCT_Missing'
     ]
     
     # Read the first file to get column names
