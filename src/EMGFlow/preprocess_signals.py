@@ -913,15 +913,15 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
     # Internal function for applying the Wiener filter
     def wiener_filter(data: np.ndarray, window_size:int=50, sampling_rate:float=1000.0):
         """
-        Wrapper around scipy.signal.wiener that is robust to very short segments.
-        Returns filtered data and a mask of True (no explicit outlier flagging).
+        Wrapper around scipy.signal.wiener that is robust to very short
+        segments. Returns filtered data.
         """
         n = len(data)
         if n == 0:
-            return data.copy(), np.array([], dtype=bool)
+            return data.copy()
         if n < 3:
             # Too short to meaningfully filter; return as-is
-            return data.copy(), np.full(n, True, dtype=bool)
+            return data.copy()
 
         # Clamp window to segment length; prefer odd size; min 3
         ws = max(3, min(window_size, n))
@@ -929,8 +929,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
             ws = ws - 1 if ws > 3 else 3
 
         filtered = scipy.signal.wiener(data, mysize=ws)  # noise=None -> auto-estimate
-        mask = np.isclose(data, filtered, atol=1e-8)
-        return filtered, mask
+        return filtered
     
     # Construct list of NaN locations
     data = screened_signal[column_name]
@@ -969,25 +968,27 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
             if method=='hampel':
                 filtered_section, mask = hampel_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, n_sigma=n_sigma)
             elif method=='wiener':
-                filtered_section, mask = wiener_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, sampling_rate=sampling_rate)
+                filtered_section = wiener_filter(masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy(), window_size=window_size, sampling_rate=sampling_rate)
             else:
                 raise Exception("Invalid screening method chosen: " + str(method), ", use 'hampel' or 'wiener'.")
             masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
-            hamp_mask.loc[val_ind:val_ind+val_len-1] = mask
+            if method != 'wiener':
+                hamp_mask.loc[val_ind:val_ind+val_len-1] = mask
     
     # Put masked_data back in screened_signal
     screened_signal.loc[min_nan_mask, column_name] = masked_data[column_name].values
     
     # Create a mask for the full column and add the masked values
-    full_mask = pd.Series(np.full(len(screened_signal), True))
-    full_mask[min_nan_mask] = hamp_mask.values
+    if method != 'wiener':
+        full_mask = pd.Series(np.full(len(screened_signal), True))
+        full_mask[min_nan_mask] = hamp_mask.values
     
-    # Merge with the mask column if it exists
-    mask_col = 'mask_' + column_name
-    if mask_col not in list(screened_signal.columns.values):
-        screened_signal[mask_col] = full_mask.values
-    else:
-        screened_signal[mask_col] = screened_signal[mask_col] & full_mask.values
+        # Merge with the mask column if it exists
+        mask_col = 'mask_' + column_name
+        if mask_col not in list(screened_signal.columns.values):
+            screened_signal[mask_col] = full_mask.values
+        else:
+            screened_signal[mask_col] = screened_signal[mask_col] & full_mask.values
     
     return screened_signal
 

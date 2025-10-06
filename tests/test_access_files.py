@@ -17,6 +17,12 @@ class TestSimple(unittest.TestCase):
 #
 # =============================================================================
 #
+
+    def test_package_version(self):
+        EMGFlow.package_version()
+    
+    def test_package_citation(self):
+        EMGFlow.package_citation()
     
     def test_make_paths(self):
         pathNames = EMGFlow.make_paths()

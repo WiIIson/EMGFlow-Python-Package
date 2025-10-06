@@ -1,4 +1,6 @@
 import importlib_resources
+from importlib import metadata
+from datetime import date
 import pandas as pd
 import re
 import os
@@ -14,6 +16,75 @@ A collection of functions for accessing files.
 #
 # =============================================================================
 #
+
+def package_version():
+    """
+    Prints the package version.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    try:
+        __version__ = metadata.version("emgflow")
+    except metadata.PackageNotFoundError:
+        __version__ = "0+unknown"
+        
+    print(f"EMGFlow {__version__}")
+
+def package_citation(pkg:str="emgflow"):
+    """
+    Prints citation information.
+
+    Parameters
+    ----------
+    pkg : str, optional
+        The package to print citation information for. The default is
+        "emgflow".
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    try:
+        md = metadata.metadata(pkg)
+    except metadata.PackageNotFoundError:
+        md = {}
+    
+    name = md.get("Name", pkg)
+    version = md.get("Version", "")
+    year = (md.get("Release-Date") or str(date.today().year))[:4]
+    url = md.get("Home-page", "") or md.get("Project-URL", "")
+    # Build authors: prefer 'Author', then 'Author-email'
+    authors_raw = md.get_all("Author") or []
+    if not authors_raw:
+        ae = md.get("Author-email", "")
+        if ae:
+            authors_raw = [ae]
+        # Strip emails like "Name <a@b>"
+        parts = re.split(r",\s*(?=[^,]+<[^>]+>|[^,]+$)", ", ".join(authors_raw)) if authors_raw else []
+        authors = " and ".join(re.sub(r"\s*<[^>]+>\s*", "", p).strip() for p in parts if p.strip()) or "EMGFlow Contributors"
+
+    key = f"{name.lower()}_{(version or year).replace('.', '_')}"
+    bib = (
+        f"@software{{{key},\n"
+        f"  author = {{{authors}}},\n"
+        f"  title = {{{name}}},\n"
+        f"  version = {{{version}}},\n"
+        f"  year = {{{year}}},\n"
+        f"  url = {{{url}}}\n"
+        f"}}"
+    )
+    print(bib)
+
+#
+# =============================================================================
+#
+
 
 def make_paths(root:str=None):
     """
