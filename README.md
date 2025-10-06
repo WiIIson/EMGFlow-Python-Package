@@ -13,7 +13,7 @@ The open workflow for EMG signal processing and feature extraction.
 EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
 The simple navigation menu allows you to switch between which files you see as well as which layers are overlayed:
-![Example 1](EMGFlow_GUI.gif)
+![Example 1](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/EMGFlow_GUI.gif?raw=true)
 
 ## Statement Of Need
 
@@ -95,3 +95,5 @@ This package can be cited as follows:
 ```
 
 If you are using a different version of EMGFlow, change the `version` tag to the version you are using.
+
+You can also use the `EMGFlow.package_citation()` function to print the citation for the version of EMGFlow you are using, or use the `EMGFlow.package_version()` function to view the package version you are using.
