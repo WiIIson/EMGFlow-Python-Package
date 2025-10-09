@@ -51,11 +51,10 @@ df = ef.extract_features(path_names, sampling_rate=2000)
 General:
 - [EMG processing background](https://wiiison.github.io/EMGFlow-Python-Package/guide/about-emg.html)
 - [EMGFlow processing pipeline overview](https://wiiison.github.io/EMGFlow-Python-Package/reference/api-overview.html)
-- [FileAccess module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/access-files.html)
+- [AccessFiles module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/access-files.html)
 - [PreprocessSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/preprocess-signals.html)
-- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/extract-features.html)
-- [OutlierFinder module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/detect-outliers.html)
 - [PlotSignals module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/plot-signals.html)
+- [ExtractFeatures module API](https://wiiison.github.io/EMGFlow-Python-Package/reference/extract-features.html)
 
 Examples:
 - [Processing pipeline examples](https://wiiison.github.io/EMGFlow-Python-Package/guide/examples.html)
