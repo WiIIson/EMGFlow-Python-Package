@@ -62,19 +62,9 @@ A simple example constructing a custom `path_names` dictionary for predefined da
 import os
 import EMGFlow as ef
 
-# Create sample data
-path_names = ef.make_paths()
+# Create sample data with custom raw location
+path_names = ef.make_paths(raw='workspace/sample_data_raw')
 ef.make_sample_data(path_names)
-
-# Define custom path locations
-root = os.getcwd()
-path_names = {
-    'Raw': os.path.join(root, 'Data', '1_raw'),
-    'Notch': os.path.join(root, 'Data', '2_notch'),
-    'Bandpass': os.path.join(root, 'Data', '3_bandpass'),
-    'FWR': os.path.join(root, 'Data', '4_fwr'),
-    'Feature': os.path.join(root, 'Data', '8_feature')
-}
 
 # Preprocess signals
 ef.clean_signals(path_names, sampling_rate=2000, do_fill=False, do_smooth=False)
