@@ -8,7 +8,7 @@ This page demonstrates how to use EMGFlow with simple and more advanced examples
 
 ## Simple Examples
 
-### Using Custom Filter Parameters
+### Standard Preprocessing Workflow
 
 A simple example outlining EMG preprocessing and feature extraction using manual parameter selection.
 

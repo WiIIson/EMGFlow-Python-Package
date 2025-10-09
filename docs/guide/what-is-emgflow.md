@@ -2,7 +2,7 @@
 
 ---
 
-# What is EMGFLow?
+# What is EMGFlow?
 
 _EMGFlow_ is an open-source Python package for preprocessing and extracting features from surface electromyographic (sEMG) signals. It has been designed to facilitate the analysis of large datasets through batch processing of signal files, a common requirement in machine learning.
 
