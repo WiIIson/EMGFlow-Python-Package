@@ -1172,6 +1172,9 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
+        An exception is raised if 'max_segment' results in a gap size less than
+        or equal to 0.
+    Exception
         An exception is raised if 'method' is an invalid interpolation method.
     Exception
         An exception is raised if there aren't enough valid points to perform
@@ -1199,9 +1202,11 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
     if sampling_rate <= 0:
         raise Exception("'sampling_rate' must be greater than 0.")
     
+    # An exception is raised if 'max_segment' results in a gap size less than
+    # or equal to 0.
     max_gap = int(max_segment * sampling_rate / 1000.0)
     if max_gap <= 0:
-        raise Exception("'max_segment' cannot result in a gap size less than 0.")
+        raise Exception("'max_segment' cannot result in a gap size less than or equal to 0.")
     
     filled_Signal = Signal.copy().reset_index(drop=True)
     
@@ -1212,7 +1217,7 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
     group_sequences = data[mask].groupby(group[mask])
     nan_sequences = [(group.index[0], len(group)) for _, group in group_sequences]
     
-    # Drop NaN sequences less than 'max_gap'
+    # Get NaN sequences longer than 'max_gap' for reinsertion later
     nan_sequences = [seq for seq in nan_sequences if seq[1] > max_gap]
     
     # Get valid values by dropping NaNs
@@ -1258,7 +1263,7 @@ def apply_fill_missing(Signal:pd.DataFrame, column_name:str, sampling_rate:float
     else:
         raise Exception("Invalid interpolation method chosen: " + str(method), ", use 'pchip' or 'spline'.")
     
-    # Reinsert filtered NaNs
+    # Reinsert NaN sequences longer than 'max_gap'
     for (nan_ind, nan_len) in nan_sequences:
         filled_Signal.loc[nan_ind:nan_ind+nan_len-1,column_name] = np.nan
     
@@ -1322,6 +1327,9 @@ def fill_missing_signals(in_path:str, out_path:str, column_names=None, sampling_
         An exception is raised if 'Time' is not a column of a signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
+    Exception
+        An exception is raised if 'max_segment' results in a gap size less than
+        or equal to 0.
     Exception
         An exception is raised if 'method' is an invalid interpolation method.
     Exception
