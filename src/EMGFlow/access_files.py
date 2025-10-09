@@ -120,7 +120,7 @@ def make_paths(root:str=None, raw:str=None):
     if raw is None:
         raw = os.path.join(root, '1_raw')
     else:
-        raw = os.normpath(raw)
+        raw = os.path.abspath(raw)
     
     # Create dictionary
     path_names = {
