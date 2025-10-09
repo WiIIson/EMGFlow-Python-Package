@@ -86,7 +86,7 @@ def package_citation(pkg:str="emgflow"):
 #
 
 
-def make_paths(root:str=None):
+def make_paths(root:str=None, raw:str=None):
     """
     Generates a file structure for an EMG workflow, and returns a dictionary of
     the locations for these files for easy use with EMG processing functions.
@@ -100,6 +100,9 @@ def make_paths(root:str=None):
     ----------
     root : str, optional
         The root where the data is generated. The default is None.
+    raw : str, optional
+        The path for the raw data. The default is None, in which case a default
+        location is generated.
 
     Returns
     -------
@@ -114,9 +117,14 @@ def make_paths(root:str=None):
     else:
         root = os.path.normpath(root)
     
+    if raw is None:
+        raw = os.path.join(root, '1_raw')
+    else:
+        raw = os.normpath(raw)
+    
     # Create dictionary
     path_names = {
-        'Raw':os.path.join(root, '1_raw'),
+        'Raw':raw,
         'Notch':os.path.join(root, '2_notch'),
         'Bandpass':os.path.join(root, '3_bandpass'),
         'FWR':os.path.join(root, '4_fwr'),
