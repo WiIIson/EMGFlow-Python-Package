@@ -13,7 +13,7 @@ The open workflow for EMG signal processing and feature extraction.
 EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
 
 The simple navigation menu allows you to switch between which files you see as well as which layers are overlayed:
-![Example 1](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/EMGFlow_GUI.gif?raw=true)
+![Example 1](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/EMGFlow_GUI.webp?raw=true)
 
 ## Statement Of Need
 
