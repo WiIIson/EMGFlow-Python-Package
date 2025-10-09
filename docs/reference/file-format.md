@@ -25,6 +25,8 @@ EMGFlow uses `pd.read_csv()` from the Pandas package to read in files. Continuin
 
 " ", "#N/A", "#N/A N/A", "#NA", "-1.#IND", "-1.#QNAN", "-NaN", "-nan", "1.#IND", "1.#QNAN", "\<NA\>", "N/A", "NA", "NULL", "NaN", "None", "n/a", "nan", "null"
 
+Columns containing EMG data should not be named "Time", or begin with "mask\_", as some functions use these as indicators.
+
 ## Output Data Format
 
 *EMGFlow* outputs a single plaintext .CSV file format containing features extracted from all processed input files. The output file has the following format:
