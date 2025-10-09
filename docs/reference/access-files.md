@@ -8,6 +8,8 @@ These functions access files, set up file structures for working with sEMG signa
 mindmap
     root((EMGFlow))
         AF(Access Files)
+            package_version
+            package_citation
             make_paths
             make_sample_data
             read_file_type
@@ -17,6 +19,18 @@ mindmap
         PlS(Plot Signals)
         EF(Extract Features)
 ```
+
+
+
+
+
+## `package_version`
+
+
+
+
+
+## `package_citation`
 
 
 

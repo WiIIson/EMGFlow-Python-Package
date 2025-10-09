@@ -26,33 +26,32 @@ sampling_rate = 2000
 
 # Filter parameters
 notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
+passband_edges = (20, 140)
 smooth_window = 50
 
 # Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
+column_names = ['EMG_zyg', 'EMG_cor']
 
 # 1. Apply notch filters
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
 
 # 2. Apply bandpass filter
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
 
 # 3. Apply full wave rectifier
 EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'])
 
 # 4. Apply artefact screening
-EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], sampling_rate, cols=cols)
+EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], column_names, sampling_rate)
 
 # 5. Fill missing data
-EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], sampling_rate, cols=cols)
+EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], column_names, sampling_rate)
 
-# 3. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], sampling_rate, window_ms=smooth_window, cols=cols)
+# 6. Apply smoothing filter
+EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], column_names, sampling_rate, window_ms=smooth_window)
 
-# 4. Extract features
-df = EMGFlow.extract_features(path_names, sampling_rate, cols)
+# 7. Extract features
+df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
 ```
 
 ### Using Your Own Data Paths
@@ -105,29 +104,28 @@ EMGFlow.make_sample_data(path_names)
 
 # Load dataframe from generated data
 root = os.getcwd()
-sampleData = pd.read_csv(os.path.join(root, 'Data', '1_raw', '01', 'sample_data_01.csv'))
+sample_data = pd.read_csv(os.path.join(root, 'Data', '1_raw', '01', 'sample_data_01.csv'))
 
 # Sampling rate
 sampling_rate = 2000
 
 # Custom filter parameters
 notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
+passband_edges = (20, 140)
 smooth_window = 50
 
 # Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
+column_names = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess first column of signals ('EMG_zyg')
-sampleData = EMGFlow.apply_notch_filters(sampleData, cols[0], sampling_rate, notch_vals)
-sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[0], sampling_rate, band_low, band_high)
-sampleData[cols[0]] = np.abs(sampleData[cols[0]])
+sample_data = EMGFlow.apply_notch_filters(sample_data, column_names[0], sampling_rate, notch_vals)
+sample_data = EMGFlow.apply_bandpass_filter(sample_data, column_names[0], sampling_rate, passband_edges)
+sample_data[column_names[0]] = np.abs(sample_data[column_names[0]])
 
 # Preprocess second column of signals ('EMG_cor')
-sampleData = EMGFlow.apply_notch_filters(sampleData, cols[1], sampling_rate, notch_vals)
-sampleData = EMGFlow.apply_bandpass_filter(sampleData, cols[1], sampling_rate, band_low, band_high)
-sampleData[cols[1]] = np.abs(sampleData[cols[1]])
+sample_data = EMGFlow.apply_notch_filters(sample_data, column_names[1], sampling_rate, notch_vals)
+sample_data = EMGFlow.apply_bandpass_filter(sample_data, column_names[1], sampling_rate, passband_edges)
+sample_data[column_names[1]] = np.abs(sample_data[column_names[1]])
 ```
 
 ## Advanced Examples
@@ -150,25 +148,24 @@ sampling_rate = 2000
 
 # Filter parameters for all files
 notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
+passband_edges = (20, 140)
 smooth_window = 50
 
 # Filter parameters for the "sample_data_01.csv" file
 notch_vals_s = [(45, 1), (60, 5)]
-reg_str = '^01'
+expression = '^01'
 
 # Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
+column_names = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
-EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], sampling_rate, notch_vals_s, cols, expression=reg_str)
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'], cols)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], column_names, sampling_rate, notch_vals_s, expression=expression)
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
+EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'], column_names)
 
 # Extract features
-df = EMGFlow.extract_features(path_names, sampling_rate, cols)
+df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
 ```
 
 ### Calling native feature extraction routines
@@ -192,17 +189,16 @@ sampling_rate = 2000
 
 # Custom filter parameters
 notch_vals = [(50, 5)]
-band_low = 20
-band_high = 140
+passband_edges = (20, 140)
 smooth_window = 50
 
 # Columns containing data for preprocessing
-cols = ['EMG_zyg', 'EMG_cor']
+column_names = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate, notch_vals, cols)
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate, band_low, band_high, cols)
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['Smooth'], cols)
+EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
+EMGFlow.rectify_signals(path_names['Bandpass'], path_names['Smooth'], column_names)
 
 # Map locations of files to process
 file_dirs_b = EMGFlow.map_files(path_names['Bandpass'])
@@ -219,7 +215,7 @@ measureNames = [
 
 # Construct columns for each combination of data file column and features
 df_names = ['File_ID']
-for col in cols:
+for col in column_names:
     for measure in measureNames:
         df_names.append(col + '_' + measure)
 
@@ -235,7 +231,7 @@ for file in tqdm.tqdm(file_dirs_b):
         df_vals = [file]
         
         # Make sure to make the same calculations as in measure_names
-        for col in cols:
+        for col in column_names:
             IEMG = EMGFlow.calc_iemg(data_S, col, sampling_rate)
             MAV = EMGFlow.calc_mav(data_S, col)
             MMAV1 = EMGFlow.calc_mmav1(data_S, col)
