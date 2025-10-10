@@ -156,7 +156,7 @@ def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0,
 # =============================================================================
 #
 
-def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, notch_vals=[(50,5)], min_segment:float=30.0):
+def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, notch_vals=[(60,5)], min_segment:float=30.0):
     """
     Apply a list of notch filters ('notch_vals') to a column of 'Signal'.
 
@@ -173,7 +173,7 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
-        filter). The default is [(50, 5)].
+        filter). The default is [(60, 5)].
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -270,7 +270,7 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
 # =============================================================================
 #
 
-def notch_filter_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, notch_vals=[(50,5)], min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
+def notch_filter_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, notch_vals=[(60,5)], min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv'):
     """
     Apply a list of notch filters ('notch_vals') to all signal files in a
     folder and its subfolders. Writes filtered signal files to an output
@@ -292,7 +292,7 @@ def notch_filter_signals(in_path:str, out_path:str, column_names=None, sampling_
         A list of (Hz, Q) tuples corresponding to the notch filters being
         applied. Hz is the frequency the filter is applied to, and Q is the
         Q-score (an intensity score where a higher number means a less extreme
-        filter). The default is [(50, 5)].
+        filter). The default is [(60, 5)].
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
         of data is less than this time, it is set to NaN. If a length of
@@ -2023,7 +2023,7 @@ def smooth_signals(in_path:str, out_path:str, column_names=None, sampling_rate:f
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
@@ -2041,6 +2041,8 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
         The dictionary can be created with the 'make_paths' function.
     sampling_rate : float, optional
         The sampling rate of the signal files. The default is 1000.0.
+    notch_f0 : float, optional
+        The Hz value of the notch filter. The default is 60.0.
     do_screen : bool, optional
         An option to use the optional processing step of artefact screening.
         The default is False.
@@ -2093,7 +2095,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, do_screen=False, 
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate=sampling_rate, file_ext=file_ext)
+    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate=sampling_rate, notch_vals=[(notch_f0,5)], file_ext=file_ext)
     bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate=sampling_rate, file_ext=file_ext)
     rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
     

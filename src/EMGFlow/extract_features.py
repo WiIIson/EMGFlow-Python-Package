@@ -564,7 +564,7 @@ def calc_mdf(psd:pd.DataFrame):
     ------
     Exception
         An exception is raised if 'psd' does not have columns 'Frequency' and
-        'Power'. The 'Power' column should be normalized.
+        'Power'.
 
     Returns
     -------
