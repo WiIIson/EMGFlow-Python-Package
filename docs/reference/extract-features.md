@@ -153,19 +153,6 @@ The `extract_features` function calculates some basic statistics that don't invo
 
 Skew and kurtosis are less common, and have a more detailed explanation below.
 
-#### Skew
-
-Skewness describes the symmetry of a dataset, considered more skewed the less symmetrical the left and right distributions of the median are.
-
-Skew is calculated as follows:
-$$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
-- $\mu$ <-- Mean
-- $\sigma$ <-- Standard deviation
-- $M_o$ <-- Mode
-- $M_d$ <-- Median
-
-**Skew** is calculated with `scipy.stats.skew`.
-
 #### Kurtosis
 
 Kurtosis describes the amount of data in the tails of a bell curve of a distribution.
@@ -179,6 +166,19 @@ $$
 - $N$ <-- Number of data points
 
 **Kurtosis** is calculated with `scipy.stats.kurtosis`.
+
+#### Skew
+
+Skewness describes the symmetry of a dataset, considered more skewed the less symmetrical the left and right distributions of the median are.
+
+Skew is calculated as follows:
+$$s=\frac{\frac{\mu-M_o}{\sigma}}{\frac{3(\mu-M_d)}{\sigma}}$$
+- $\mu$ <-- Mean
+- $\sigma$ <-- Standard deviation
+- $M_o$ <-- Mode
+- $M_d$ <-- Median
+
+**Skew** is calculated with `scipy.stats.skew`.
 
 
 
