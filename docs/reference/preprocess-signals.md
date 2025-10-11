@@ -1,3 +1,7 @@
+---
+outline: 'deep'
+---
+
 # `preprocess_signals` Module
 
 These functions clean sEMG signals prior to their use in feature extraction. Signal processing is broken into 3 parts: notch filtering, bandpass filtering and smoothing. Each part has additional functions that support more specific needs, explained in more detail in the module descriptions.
