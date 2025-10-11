@@ -22,7 +22,7 @@ path_names = ef.make_paths()
 ef.make_sample_data(path_names)
 
 # Preprocess signals
-ef.clean_signals(path_names, sampling_rate=2000)
+ef.clean_signals(path_names, sampling_rate=2000, notch_f0=50)
 
 # Plot data on the "EMG_zyg" column
 ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
