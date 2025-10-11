@@ -43,7 +43,7 @@ mindmap
 
 ## `emg_to_psd`
 
-### Description
+**Description**
 
 Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the intensity of each frequency detected in the signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
 
@@ -51,7 +51,7 @@ Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the inte
 def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None)
 ```
 
-### Parameters
+**Parameters**
 
 `Signal` : pd.DataFrame
 - A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
@@ -71,7 +71,7 @@ def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0,
 `nan_mask` : pd.Series, optional (None)
 - Optional series that controls the calculation of the function. Can be a True/False mask that is the same size as the selected column, and will set all associated False values in the column to NaN in the calculation. The default is None, in which case no NaN masking will be done.
 
-### Raises
+**Raises**
 
 An exception is raised if `column_name` is not a column of `Signal`.
 
@@ -81,12 +81,12 @@ An exception is raised if `nan_mask` is not the same length as `column_name`.
 
 An exception is raised if there are too many NaN values to make a valid window.
 
-### Returns
+**Returns**
 
 `psd` : pd.DataFrame
 - A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column indicates the intensity of each frequency in `Signal`. Results will be normalized if `normalize` is set to True.
 
-### Example
+**Example**
 
 ```python
 column_name = 'EMG_zyg'
