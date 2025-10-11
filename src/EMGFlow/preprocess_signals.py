@@ -819,7 +819,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
     column_name : str
-        The column of 'Signal' the Hampel filter is applied to.
+        The column of 'Signal' the screening filter is applied to.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
     method : str, optional
@@ -857,7 +857,7 @@ def apply_screen_artefacts(Signal:pd.DataFrame, column_name:str, sampling_rate:f
     Returns
     -------
     screened_signal : pd.DataFrame
-        A copy of 'Signal' after the Hampel filter is applied.
+        A copy of 'Signal' after the screening filter is applied.
 
     """
     
@@ -1016,6 +1016,7 @@ def screen_artefact_signals(in_path:str, out_path:str, column_names=None, sampli
         The sampling rate of the signal files. The default is 1000.0.
     method : str, optional
         The screening method to use. Valid methods are 'hampel' and 'wiener'.
+        The default is 'hampel'.
     window_ms : float, optional
         The size of the outlier detection window in ms. The default is 100.0.
     n_sigma : float, optional
@@ -1297,7 +1298,7 @@ def fill_missing_signals(in_path:str, out_path:str, column_names=None, sampling_
     max_segment : float, optional
         The maximum length (in ms) of NaN values to fill. If a length of
         invalid data is longer than this threshold, it will not be
-        interpolated. The default is 500.0
+        interpolated. The default is 500.0.
     expression : str, optional
         A regular expression. If provided, will only apply the interpolation to
         files whose local paths inside of 'in_path' match the regular
@@ -1425,7 +1426,7 @@ def apply_boxcar_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
         The column of 'Signal' the boxcar smoothing filter is applied to.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
-    window_ms : float, optional.
+    window_ms : float, optional
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
@@ -1538,7 +1539,7 @@ def apply_rms_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1
         The column of 'Signal' the RMS smoothing filter is applied to.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
-    window_ms : float, optional.
+    window_ms : float, optional
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
@@ -1651,7 +1652,7 @@ def apply_gaussian_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:fl
         The column of 'Signal' the Gaussian smoothing filter is applied to.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
-    window_ms : float, optional.
+    window_ms : float, optional
         The size of the smoothing window in ms. The default is 50.0.
     sigma : float, optional
         Parameter of sigma in the Gaussian smoothing. The default is 1.0.
@@ -1771,7 +1772,7 @@ def apply_loess_smooth(Signal:pd.DataFrame, column_name:str, sampling_rate:float
         The column of 'Signal' the Loess smoothing filter is applied to.
     sampling_rate : float, optional
         The sampling rate of 'Signal'. The default is 1000.0.
-    window_ms : float, optional.
+    window_ms : float, optional
         The size of the smoothing window in ms. The default is 50.0.
     min_segment : float, optional
         The minimum length (in ms) for data to be considered valid. If a length
