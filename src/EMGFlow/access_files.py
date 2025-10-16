@@ -124,14 +124,14 @@ def make_paths(root:str=None, raw:str=None):
     
     # Create dictionary
     path_names = {
-        'Raw':raw,
-        'Notch':os.path.join(root, '2_notch'),
-        'Bandpass':os.path.join(root, '3_bandpass'),
-        'FWR':os.path.join(root, '4_fwr'),
-        'Screened':os.path.join(root, '5_screened'),
-        'Filled':os.path.join(root, '6_filled'),
-        'Smooth':os.path.join(root, '7_smoothed'),
-        'Feature':os.path.join(root, '8_feature')
+        'raw':raw,
+        'notch':os.path.join(root, '2_notch'),
+        'bandpass':os.path.join(root, '3_bandpass'),
+        'fwr':os.path.join(root, '4_fwr'),
+        'screened':os.path.join(root, '5_screened'),
+        'filled':os.path.join(root, '6_filled'),
+        'smooth':os.path.join(root, '7_smoothed'),
+        'feature':os.path.join(root, '8_feature')
     }
     
     # Create folders
@@ -165,7 +165,7 @@ def make_sample_data(path_names:dict):
     Raises
     ------
     Exception
-        An exception is raised if 'Raw' is not a key of the 'path_names'
+        An exception is raised if 'raw' is not a key of the 'path_names'
         dictionary provided.
     Exception
         An exception is raised if the sample data cannot be loaded.
@@ -177,8 +177,8 @@ def make_sample_data(path_names:dict):
     """
     
     # An exception is raised if the provided 'path_names' dictionary doesn't
-    # contain a 'Raw' path key.
-    if 'Raw' not in path_names:
+    # contain a 'raw' path key.
+    if 'raw' not in path_names:
         raise Exception('Raw path not detected in path_names.')
     
     # Load the sample data
@@ -192,13 +192,13 @@ def make_sample_data(path_names:dict):
         raise Exception('Failed to load EMGFlow sample data.')
     
     # Write the sample data
-    os.makedirs(os.path.join(path_names['Raw'], '01'), exist_ok=True)
-    os.makedirs(os.path.join(path_names['Raw'], '02'), exist_ok=True)
+    os.makedirs(os.path.join(path_names['raw'], '01'), exist_ok=True)
+    os.makedirs(os.path.join(path_names['raw'], '02'), exist_ok=True)
     
-    data_path_01 = os.path.join(path_names['Raw'], '01', 'sample_data_01.csv')
-    data_path_02 = os.path.join(path_names['Raw'], '01', 'sample_data_02.csv')
-    data_path_03 = os.path.join(path_names['Raw'], '02', 'sample_data_03.csv')
-    data_path_04 = os.path.join(path_names['Raw'], '02', 'sample_data_04.csv')
+    data_path_01 = os.path.join(path_names['raw'], '01', 'sample_data_01.csv')
+    data_path_02 = os.path.join(path_names['raw'], '01', 'sample_data_02.csv')
+    data_path_03 = os.path.join(path_names['raw'], '02', 'sample_data_03.csv')
+    data_path_04 = os.path.join(path_names['raw'], '02', 'sample_data_04.csv')
     
     if not os.path.exists(data_path_01):
         sample_data_01.to_csv(data_path_01, index=False)

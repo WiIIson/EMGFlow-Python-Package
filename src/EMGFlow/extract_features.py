@@ -1142,29 +1142,29 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
     functions and saving the outputs to a feature file.
     
     The input and output locations are controlled by the 'path_names'
-    dictionary. The input data is taken from the 'Smooth' and 'Bandpass' paths.
-    The 'Smooth' step is optional, if it was not used, data is searched for in
-    the following order: 'Smooth' -> 'Filled' -> 'FWR'.
+    dictionary. The input data is taken from the 'Smooth' and 'bandpass' paths.
+    The 'smooth' step is optional, if it was not used, data is searched for in
+    the following order: 'smooth' -> 'filled' -> 'fwr'.
     
     All files within these folders and subfolders are assumed to be valid data
     if they match the provided file extension, and the optional regular
     expression. Files of the same name should exist in both the
-    'Smooth'/'Filled'/'FWR' and 'Bandpass' folders, being the same file at
+    'smooth'/'filled'/'fwr' and 'bandpass' folders, being the same file at
     different stages in processing pipeline.
 
-    The 'Smooth'/'Filled'/'FWR' path is used to calculate time-series features,
-    while the 'Bandpass' path is used to calculate spectral features.
+    The 'smooth'/'filled'/'fwr' path is used to calculate time-series features,
+    while the 'bandpass' path is used to calculate spectral features.
 
     Columns of these files that begin with 'mask_' are assumed to be NaN mask
     columns, and are ignored unless specified in column_names.
 
-    The output is written as a 'Features.csv' file to the 'Feature' path.
+    The output is written as a 'Features.csv' file to the 'feature' path.
 
     Parameters
     ----------
     path_names : dict-str
         A dictionary of file locations with keys for stage in the processing
-        pipeline. Required paths are: 'Bandpass', 'FWR', and 'Feature'. The
+        pipeline. Required paths are: 'bandpass', 'fwr', and 'feature'. The
         dictionary can be created with the 'make_paths' function.
     column_names : list-str, optional
         List of columns to analyze in each file. The default is None, in which
@@ -1193,14 +1193,14 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
         A warning is raised if 'expression' does not match with any files in
         the folders provided.
     Exception
-        An exception is raised if 'Bandpass', 'FWR' or 'Feature' are not keys
+        An exception is raised if 'bandpass', 'fwr' or 'feature' are not keys
         of the 'path_names' dictionary provided.
     Exception
-        An exception is raised if the 'Bandpass' and 'Smooth'/'Filled'/'FWR'
+        An exception is raised if the 'bandpass' and 'smooth'/'filled'/'fwr'
         filepaths do not contain the same files.
     Exception
-        An exception is raised if a file cannot not be read in the 'Bandpass'
-        or 'Smooth'/'Filled'/'FWR' filepaths.
+        An exception is raised if a file cannot not be read in the 'bandpass'
+        or 'smooth'/'filled'/'fwr' filepaths.
     Exception
         An exception is raised if a file does not contain one of the columns
         from 'column_names'.
@@ -1222,14 +1222,14 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
 
     """
     
-    if 'Bandpass' not in path_names:
+    if 'bandpass' not in path_names:
         raise Exception('Bandpass path not detected in provided dictionary (path_names)')
-    if 'FWR' not in path_names:
+    if 'fwr' not in path_names:
         raise Exception('FWR path not detected in provided dictionary (path_names)')
-    if 'Feature' not in path_names:
+    if 'feature' not in path_names:
         raise Exception('Feature path not detected in provided dictionary (path_names)')
     
-    out_path = path_names['Feature']
+    out_path = path_names['feature']
     
     # Convert out_path to absolute
     if not os.path.isabs(out_path):
@@ -1238,21 +1238,21 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
     
     # Directories don't have to have the same file structure, but
     # Must have files with the same name
-    file_dirs_b = map_files(path_names['Bandpass'], file_ext=file_ext, expression=expression)
+    file_dirs_b = map_files(path_names['bandpass'], file_ext=file_ext, expression=expression)
     
     try:
-        file_dirs_s = map_files(path_names['Smooth'], file_ext=file_ext, expression=expression)
+        file_dirs_s = map_files(path_names['smooth'], file_ext=file_ext, expression=expression)
         if (len(file_dirs_s)) != (len(file_dirs_b)):
             raise Exception('Smooth files not detected...')
     except:
         try:
-            file_dirs_s = map_files(path_names['Filled'], file_ext=file_ext, expression=expression)
+            file_dirs_s = map_files(path_names['filled'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
                 raise Exception('Filled files not detected...')
         except:
-            file_dirs_s = map_files(path_names['FWR'], file_ext=file_ext, expression=expression)
+            file_dirs_s = map_files(path_names['fwr'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
-                raise Exception('Data not detected in "Smooth", "Filled" and "FWR" paths. Feature extraction could not be completed.')
+                raise Exception('Data not detected in "smooth", "filled" and "fwr" paths. Feature extraction could not be completed.')
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:

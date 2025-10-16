@@ -2028,7 +2028,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
-    'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the
+    'raw' path, and moving through 'notch', 'bandpass', and 'fwr' as the
     filters are applied.
     
     Optionally, 'do_screen', 'do_fill' and 'do_smooth' can be set to True to do
@@ -2038,7 +2038,7 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
     ----------
     path_names : dict-str
         A dictionary of file locations with keys for stage in the processing
-        pipeline. Required paths are: 'Raw', 'Notch', 'Bandpass', and 'FWR'.
+        pipeline. Required paths are: 'raw', 'notch', 'bandpass', and 'fwr'.
         The dictionary can be created with the 'make_paths' function.
     sampling_rate : float, optional
         The sampling rate of the signal files. The default is 1000.0.
@@ -2060,10 +2060,10 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
     Raises
     ------
     Exception
-        An exception is raised if 'Raw', 'Notch', 'Bandpass', or 'FWR' are not
+        An exception is raised if 'raw', 'notch', 'bandpass', or 'fwr' are not
         keys of the 'path_names' dictionary provided.
     Exception
-        An exception is raised if 'Screened', 'Filled', or 'Smooth' are not
+        An exception is raised if 'screened', 'filled', or 'smooth' are not
         keys of the 'path_names' dictionary provided if the associated
         parameter is set to True
 
@@ -2086,38 +2086,38 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
     """
     
     # Raise exceptions if paths not found
-    if 'Raw' not in path_names:
+    if 'raw' not in path_names:
         raise Exception('Raw path not detected in provided dictionary (path_names).')
-    if 'Notch' not in path_names:
+    if 'notch' not in path_names:
         raise Exception('Notch path not detected in provided dictionary (path_names).')
-    if 'Bandpass' not in path_names:
+    if 'bandpass' not in path_names:
         raise Exception('Bandpass path not detected in provided dictionary (path_names).')
-    if 'FWR' not in path_names:
+    if 'fwr' not in path_names:
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['Raw'], path_names['Notch'], sampling_rate=sampling_rate, notch_vals=[(notch_f0,5)], file_ext=file_ext)
-    bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], sampling_rate=sampling_rate, file_ext=file_ext)
-    rectify_signals(path_names['Bandpass'], path_names['FWR'], file_ext=file_ext)
+    notch_filter_signals(path_names['raw'], path_names['notch'], sampling_rate=sampling_rate, notch_vals=[(notch_f0,5)], file_ext=file_ext)
+    bandpass_filter_signals(path_names['notch'], path_names['bandpass'], sampling_rate=sampling_rate, file_ext=file_ext)
+    rectify_signals(path_names['bandpass'], path_names['fwr'], file_ext=file_ext)
     
-    last = 'FWR'
+    last = 'fwr'
     
     if do_screen:
-        if 'Screened' not in path_names:
-            raise Exception("'Screened' path not detected in provided dictionary ('path_names').")
-        screen_artefact_signals(path_names[last], path_names['Screened'], sampling_rate=sampling_rate, file_ext=file_ext)
-        last = 'Screened'
+        if 'screened' not in path_names:
+            raise Exception("'screened' path not detected in provided dictionary ('path_names').")
+        screen_artefact_signals(path_names[last], path_names['screened'], sampling_rate=sampling_rate, file_ext=file_ext)
+        last = 'screened'
     
     if do_fill:
-        if 'Filled' not in path_names:
-            raise Exception("'Filled' path not detected in provided dictionary ('path_names').")
-        fill_missing_signals(path_names[last], path_names['Filled'], sampling_rate=sampling_rate, file_ext=file_ext)
-        last = 'Filled'
+        if 'filled' not in path_names:
+            raise Exception("'filled' path not detected in provided dictionary ('path_names').")
+        fill_missing_signals(path_names[last], path_names['filled'], sampling_rate=sampling_rate, file_ext=file_ext)
+        last = 'filled'
     
     if do_smooth:
-        if 'Smooth' not in path_names:
-            raise Exception("'Smooth' path not detected in provided dictionary ('path_names').")
-        smooth_signals(path_names[last], path_names['Smooth'], sampling_rate=sampling_rate, file_ext=file_ext)
+        if 'smooth' not in path_names:
+            raise Exception("'smooth' path not detected in provided dictionary ('path_names').")
+        smooth_signals(path_names[last], path_names['smooth'], sampling_rate=sampling_rate, file_ext=file_ext)
     
     return
 

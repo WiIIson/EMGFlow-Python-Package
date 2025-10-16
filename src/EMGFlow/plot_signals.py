@@ -88,7 +88,7 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
     
     # Remove feature path, and convert dictionary to lists
     path_names = path_names.copy()
-    path_names.pop("Feature", None)
+    path_names.pop("feature", None)
     
     # Try to load from each available file location
     for name in list(path_names.keys()):
