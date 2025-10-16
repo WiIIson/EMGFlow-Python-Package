@@ -22,7 +22,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_iemg(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         IEMG = EMGFlow.calc_iemg(Signal, 'EMG_zyg', 2000)
         self.assertIsInstance(IEMG, float)
@@ -30,7 +30,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mav(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         MAV = EMGFlow.calc_mav(Signal, 'EMG_zyg')
         self.assertIsInstance(MAV, float)
@@ -38,7 +38,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mmav1(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         MMAV1 = EMGFlow.calc_mmav1(Signal, 'EMG_zyg')
         self.assertIsInstance(MMAV1, float)
@@ -46,7 +46,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mmav2(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         MMAV2 = EMGFlow.calc_mmav2(Signal, 'EMG_zyg')
         self.assertIsInstance(MMAV2, float)
@@ -54,7 +54,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_ssi(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         SSI = EMGFlow.calc_ssi(Signal, 'EMG_zyg', 2000)
         self.assertIsInstance(SSI, float)
@@ -62,7 +62,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_var(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         VAR = EMGFlow.calc_var(Signal, 'EMG_zyg')
         self.assertIsInstance(VAR, float)
@@ -70,7 +70,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_vorder(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         VOrder = EMGFlow.calc_vorder(Signal, 'EMG_zyg')
         self.assertIsInstance(VOrder, float)
@@ -78,7 +78,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_rms(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         RMS = EMGFlow.calc_rms(Signal, 'EMG_zyg')
         self.assertIsInstance(RMS, float)
@@ -86,7 +86,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_wl(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         WL = EMGFlow.calc_wl(Signal, 'EMG_zyg')
         self.assertIsInstance(WL, float)
@@ -94,7 +94,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_wamp(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         WAMP = EMGFlow.calc_wamp(Signal, 'EMG_zyg', 0.001)
         self.assertIsInstance(WAMP, np.integer)
@@ -103,7 +103,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_log(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         Signal = EMGFlow.apply_rectify(Signal, 'EMG_zyg')
         Signal += 0.0001
@@ -113,7 +113,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mfl(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         MFL = EMGFlow.calc_mfl(Signal, 'EMG_zyg')
         self.assertIsInstance(MFL, float)
@@ -121,7 +121,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_ap(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         AP = EMGFlow.calc_ap(Signal, 'EMG_zyg')
         self.assertIsInstance(AP, float)
@@ -129,7 +129,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mdf(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         MDF = EMGFlow.calc_mdf(PSD)
@@ -138,7 +138,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_mnf(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         MNF = EMGFlow.calc_mnf(PSD)
@@ -147,7 +147,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_twitch_ratio(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchRatio = EMGFlow.calc_twitch_ratio(PSD)
@@ -156,7 +156,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_twitch_index(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchIndex = EMGFlow.calc_twitch_index(PSD)
@@ -165,7 +165,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_twitch_slope(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         twitchSlope = EMGFlow.calc_twitch_slope(PSD)
@@ -176,7 +176,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sc(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SC = EMGFlow.calc_sc(PSD)
@@ -185,7 +185,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sflt(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SF = EMGFlow.calc_sflt(PSD)
@@ -194,7 +194,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sflx(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         specFlux = EMGFlow.calc_sflx(Signal, 0.5, 'EMG_zyg', 2000)
         self.assertIsInstance(specFlux, float)
@@ -202,7 +202,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_ss(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SS = EMGFlow.calc_ss(PSD)
@@ -211,7 +211,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sdec(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SD = EMGFlow.calc_sdec(PSD)
@@ -220,7 +220,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_se(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SE = EMGFlow.calc_se(PSD)
@@ -229,7 +229,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sr(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SR = EMGFlow.calc_sr(PSD)
@@ -238,7 +238,7 @@ class TestSimple(unittest.TestCase):
     def test_calc_sbw(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.make_sample_data(pathNames)
-        filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
         Signal = EMGFlow.read_file_type(filePath, 'csv')
         PSD = EMGFlow.emg_to_psd(Signal, 'EMG_zyg', 2000)
         SBW = EMGFlow.calc_sbw(PSD)
@@ -249,11 +249,11 @@ class TestSimple(unittest.TestCase):
         EMGFlow.make_sample_data(pathNames)
         samplingRate = 2000
         column_names = ['EMG_zyg', 'EMG_cor']
-        EMGFlow.notch_filter_signals(pathNames['Raw'], pathNames['Notch'], column_names, samplingRate, [(50, 5)])
-        EMGFlow.bandpass_filter_signals(pathNames['Notch'], pathNames['Bandpass'], column_names, samplingRate, (20, 140))
-        EMGFlow.smooth_signals(pathNames['Bandpass'], pathNames['Smooth'], column_names, samplingRate)
+        EMGFlow.notch_filter_signals(pathNames['raw'], pathNames['notch'], column_names, samplingRate, [(50, 5)])
+        EMGFlow.bandpass_filter_signals(pathNames['notch'], pathNames['bandpass'], column_names, samplingRate, (20, 140))
+        EMGFlow.smooth_signals(pathNames['bandpass'], pathNames['smooth'], column_names, samplingRate)
         EMGFlow.extract_features(pathNames, column_names, samplingRate)
-        self.assertTrue(os.path.exists(os.path.join(pathNames['Feature'], 'Features.csv')))
+        self.assertTrue(os.path.exists(os.path.join(pathNames['feature'], 'Features.csv')))
 
 #
 # =============================================================================
