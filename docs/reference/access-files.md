@@ -30,7 +30,7 @@ mindmap
 
 Generates a file structure for an EMG workflow, and returns a dictionary of the locations for these files for easy use with EMG processing functions.
 
-Creates 'Raw', 'Notch', 'Bandpass', 'FWR', 'Screened', 'Filled', 'Smooth', and 'Feature' subfolders at a given location. If no path is given, will create a 'Data' folder in the current working directory, with these subfolders inside.
+Creates '1_raw', '2_notch', '3_bandpass', '4_fwr', '5_screened', '6_filled', '7_smoothed', and '8_feature' subfolders at a given location. If no path is given, will create a 'Data' folder in the current working directory, with these subfolders inside.
 
 ```python
 def make_paths(root:str=None, raw:str=None)
@@ -64,7 +64,7 @@ path_names = EMGFlow.make_paths()
 
 **Description**
 
-Generates sample data in the 'Raw' folder of a provided dictionary of file locations.
+Generates sample data in the 'raw' folder of a provided dictionary of file locations.
 
 Creates '01' and '02' folders, which each contain two sample data files ('01/sample_data_01.csv', '01/sample_data_02.csv', '02/sample_data_03.csv', '02/sample_data_04.csv')
 
@@ -81,7 +81,7 @@ def make_sample_data(path_names:dict)
 
 **Raises**
 
-An exception is raised if 'Raw' is not a key of the `path_names` dictionary provided.
+An exception is raised if 'raw' is not a key of the `path_names` dictionary provided.
 
 An exception is raised if the sample data cannot be loaded.
 
@@ -179,13 +179,13 @@ An exception is raised if a file contained in the first file directory (`file_di
 
 ```python
 # Create file directory dictionaries
-raw_path = EMGFlow.map_files('/Data/Raw')
-notch_path = EMGFlow.map_files('/Data/Notch')
-band_path = EMGFlow.map_files('/Data/Bandpass')
+raw_path = EMGFlow.map_files('Data/1_raw')
+notch_path = EMGFlow.map_files('Data/2_notch')
+band_path = EMGFlow.map_files('Data/3_bandpass')
 
 # Create dictionary list and names
 file_dirs = [raw_path, notch_path, band_path]
-names = ['Raw', 'Notch', 'Bandpass']
+names = ['1_raw', '2_notch', '3_bandpass']
 
 # Create data frame
 dfDirs = EMGFlow.map_files_fuse(file_dirs, names)

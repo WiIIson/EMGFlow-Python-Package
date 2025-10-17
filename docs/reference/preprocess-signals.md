@@ -13,26 +13,26 @@ mindmap
     root((EMGFlow))
         AF(File Access)
         PrS(Preprocess Signals)
-            emg_to_psd
-            (Main Pipeline)
-                apply_bandpass_filter
-                apply_notch_filters
-                apply_rectify
+            (Core Methods)
                 bandpass_filter_signals
+                clean_signals
+                fill_missing_signals
                 notch_filter_signals
                 rectify_signals
-            (Optional)
+                screen_artefact_signals
+                smooth_signals
+            (Supporting Methods)
+                apply_bandpass_filter
                 apply_boxcar_smooth
                 apply_fill_missing
                 apply_gaussian_smooth
                 apply_loess_smooth
+                apply_notch_filters
+                apply_rectify
                 apply_rms_smooth
                 apply_screen_artefacts
-                fill_missing_signals
-                screen_artefact_signals
-                smooth_signals
-            clean_signals
-            detect_spectral_outliers
+                detect_spectral_outliers
+                emg_to_psd
         PlS(Plot Signals)
         EF(Extract Features)
 ```
@@ -41,212 +41,7 @@ mindmap
 
 
 
-## `emg_to_psd`
-
-**Description**
-
-Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the intensity of each frequency detected in the signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
-
-```python
-def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None)
-```
-
-**Parameters**
-
-`Signal` : pd.DataFrame
-- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
-
-`column_name` : str
-- The column of `Signal` the PSD is calculated from.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of 'Signal'. The default is 1000.0.
-
-`max_segment` : float, optional (2.5)
-- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 2.5.
-
-`normalize` : bool, optional (True)
-- If True, will normalize the result. If False, will not. The default is True.
-
-`nan_mask` : pd.Series, optional (None)
-- Optional series that controls the calculation of the function. Can be a True/False mask that is the same size as the selected column, and will set all associated False values in the column to NaN in the calculation. The default is None, in which case no NaN masking will be done.
-
-**Raises**
-
-An exception is raised if `column_name` is not a column of `Signal`.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `nan_mask` is not the same length as `column_name`.
-
-An exception is raised if there are too many NaN values to make a valid window.
-
-**Returns**
-
-`psd` : pd.DataFrame
-- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column indicates the intensity of each frequency in `Signal`. Results will be normalized if `normalize` is set to True.
-
-**Example**
-
-```python
-column_name = 'EMG_zyg'
-sampling_rate = 2000
-PSD = EMGFlow.emg_to_psd(Signal, column_name, sampling_rate)
-```
-
-
-
-
-
-## Main Pipeline
-
-
-
-
-### `apply_bandpass_filter`
-
-**Description**
-
-Apply a bandpass filter (`passband_edges`) to a column of `Signal`.
-
-```python
-def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0)
-```
-
-**Parameters**
-
-`Signal` : pd.DataFrame
-- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
-
-`column_name` : str
-- The column of `Signal` the bandpass filter is applied to.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of `Signal`. The default is 1000.0.
-
-`passband_edges` : tuple[float,float], optional ([20.0, 450.0])
-- Lower and upper frequency limit (Hz) of the bandpass filter. The default is (20.0, 450.0).
-
-`min_segment` : float, optional (30.0)
-- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
-
-**Raises**
-
-An exception is raised if `column_name` is not a column of `Signal`.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if the limits in `passband_edges` are higher than 1/2 of `sampling_rate`.
-
-An exception is raised if the upper limit of `passband_edges` is not higher than the lower limit.
-
-An exception is raised if `min_segment` is longer than the recording of `Signal`.
-
-**Returns**
-
-`band_Signal` : pd.DataFrame
-- A copy of `Signal` after the bandpass filter is applied.
-
-**Example**
-
-```python
-# Apply a bandpass filter below 20Hz, and above 250Hz.
-sampling_rate = 2000
-band_Signal = EMGFlow.apply_bandpass_filter(Signal, 'EMG_zyg', sampling_rate, (20, 250))
-```
-
-
-
-
-
-### `apply_notch_filters`
-
-**Description**
-
-Apply a list of notch filters (`notch_vals`) to a column of `Signal`.
-
-```python
-def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, notch_vals=[(60,5)], min_segment:float=30.0)
-```
-
-**Parameters**
-
-`Signal` : pd.DataFrame
-- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
-
-`column_name` : str
-- The column of `Signal` the notch filter is applied to.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of 'Signal'. The default is 1000.0.
-
-`notch_vals` : list-tuple, optional ([(60, 5)])
-- A list of (Hz, Q) tuples corresponding to the notch filters being applied. Hz is the frequency the filter is applied to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter). The default is [(60, 5)].
-
-`min_segment` : float, optional (30.0)
-- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
-
-**Raises**
-
-An exception is raised if `column_name` is not a column of `Signal`.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `min_segment` is longer than the recording of `Signal`.
-
-An exception is raised if a Hz value in `notch_vals` is greater than `sampling_rate`/2 or less than 0.
-
-**Returns**
-
-`notch_Signal` : pd.DataFrame
-- A copy of `Signal` after the notch filters are applied.
-
-**Example**
-
-```python
-# Apply a notch filter of 150Hz at a Q-score of 5, and of 250Hz at a Q-score of
-# 5.
-sampling_rate = 2000
-notch_Signal = EMGFlow.apply_notch_filters(Signal, 'EMG_zyg', sampling_rate, [(150, 5), (250, 5)])
-```
-
-
-
-
-
-### `apply_rectify`
-
-**Description**
-
-Applies a Full Wave Rectifier (FWR) to a column of `Signal`.
-
-```python
-def apply_rectify(Signal:pd.DataFrame, column_name:str)
-```
-
-**Parameters**
-
-`Signal` : pd.DataFrame 
-- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
-
-`column_name` : str
-- The column of `Signal` the FWR filter is applied to.
-
-**Raises**
-
-An exception is raised if `column_name` is not a column of `Signal`.
-
-**Returns**
-
-`fwr_Signal` : pd.DataFrame
-- A copy of `Signal` after the FWR filter is applied.
-
-**Example**
-
-```python
-# Apply a Full Wave Rectifier (FWR)
-fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
-```
+## Core Methods
 
 
 
@@ -334,6 +129,152 @@ passband_edges = (20, 200)
 # Apply bandpass filters of below 20Hz and above 200Hz to the files in the
 # 'Notch' path, and write the output to the 'Bandpass' path.
 EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
+```
+
+
+
+
+
+### `clean_signals`
+
+**Description**
+
+Apply all EMG preprocessing filters to all signal files in a folder and its subfolders. Uses the 'path_names' dictionary, starting with files in the 'raw' path, and moving through 'notch', 'bandpass', and 'fwr' as the filters are applied.
+    
+Optionally, 'do_screen', 'do_fill' and 'do_smooth' can be set to True to do the associated step.
+
+```python
+def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv')
+```
+
+**Parameters**
+
+`path_names` : dict-str
+- A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'raw', 'notch', 'bandpass', and 'fwr'. The dictionary can be created with the `make_paths` function.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of the signal files. The default is 1000.0.
+
+`notch_f0` : float, optional (60.0)
+- The Hz value of the notch filter. The default is 60.0.
+
+`do_screen` : bool, optional (False)
+- An option to use the optional processing step of artefact screening. The default is False.
+
+`do_fill` : bool, optional (True)
+- An option to use the optional processing step of filling missing values. The default is True.
+
+`do_smooth` : bool, optional (True)
+- An option to use the optional processing step of smoothing. The default is True.
+
+`file_ext` : str, optional ('csv')
+- The file extension for files to read. Only processes files with this extension. The default is 'csv'.
+
+**Raises**
+
+An exception is raised if 'raw', 'notch', 'bandpass', or 'fwr' are not keys of the `path_names` dictionary provided.
+
+An exception is raised if 'screened', 'filled', or 'smooth' are not keys of the `path_names` dictionary provided if the associated parameter is set to True.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than the recording of `Signal`.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+**Returns**
+
+None.
+
+**Example**
+
+```python
+# Create path dictionary, then clean the signals.
+path_names = EMGFlow.make_paths()
+sampling_rate = 2000
+EMGFlow.clean_signals(path_names, sampling_rate)
+```
+
+
+
+
+
+### `fill_missing_signals`
+
+**Description**
+
+Apply an interpolation method ('method') to all signal files in a folder. Writes interpolated signal files to an output folder, and generates a file structure matching the input structure.
+
+```python
+def fill_missing_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='pchip', max_segment:float=500.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
+```
+
+**Parameters**
+
+`in_path` : str
+- Filepath to a directory to read signal files.
+
+`out_path` : str
+- Filepath to a directory to write filtered signals.
+
+`column_names` : list-str, optional (None)
+- List of columns of the signals to apply the interpolation to. The default is None, in which case the interpolation is applied to every column except for 'Time' and columns that start with 'mask\_'.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of the signal files. The default is 1000.0
+
+`method` : str, optional ('pchip')
+- The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
+
+`max_segment` : float, optional (500.0)
+- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 500.0.
+
+`expression` : str, optional (None)
+- A regular expression. If provided, will only apply the interpolation to files whose local paths inside of `in_path` match the regular expression. The default is None.
+
+`copy_unmatched` : bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without interpolating. The default is False, which ignores files that don't match.
+
+`file_ext` : str, optional ('csv')
+- The file extension for files to read. Only interpolates files with this extension. The default is 'csv'.
+
+**Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+An exception is raised if a column from `column_names` is not a column of a signal file.
+
+An exception is raised if 'Time' is in `column_names`.
+
+An exception is raised if 'Time' is not a column of a signal file.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `max_segment` results in a gap size less than or equal to 0.
+
+An exception is raised if `method` is an invalid interpolation method.
+
+An exception is raised if there aren't enough valid points to perform interpolation on a signal file.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+**Returns**
+
+None.
+
+**Example**
+
+```python
+# Fill missing values in all data from the 'Raw' path, and put the output in
+# the 'Filled' path.
+path_names = EMGFlow.make_paths()
+EMGFlow.fill_missing_signals(path_names['Raw'], path_names['Filled'])
 ```
 
 
@@ -485,7 +426,248 @@ EMGFlow.rectify_signals(pathNames['Raw'], pathNames['FWR'])
 
 
 
-## Optional Methods
+### `screen_artefact_signals`
+
+**Description**
+
+Apply a screening filter to all signal files in a folder and its subfolders. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
+
+The Hampel filter helps identify outliers based on the Median Absolute Deviation (MAD), and replaces them with the median of their window. A threshold is calculated as product of the MAD with `n_sigma` and and a constant 1.4826. If the difference between a value and the median is greater than this threshold, it is considered an outlier and replaced with the median.
+
+To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
+
+The Wiener filter improves the quality of signals by minimizing the effect of noise on the output signal. This allows better interpretation of muscular movement.
+
+```python
+def screen_artefact_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method='hampel', window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
+```
+
+**Parameters**
+
+`in_path` : str
+- Filepath to a directory to read signal files.
+
+`out_path` : str
+- Filepath to a directory to write filtered signals.
+
+`column_names` : list-str, optional (None)
+- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of the signal files. The default is 1000.0.
+
+`method` : str, optional ('hampel')
+- The screening method to use. Valid methods are 'hampel' and 'wiener'. The default is 'hampel'.
+
+`window_ms` : float, optional (100.0)
+- The size of the outlier detection window in ms. The default is 100.0.
+
+`n_sigma` : float, optional (10.0)
+- The number of standard deviations away for a value to be considered an outlier. The default is 10.0.
+
+`min_segment` : float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
+`expression` : str, optional (None)
+- A regular expression. If provided, will only apply the filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
+
+`copy_unmatched` : bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
+
+`file_ext` : str, optional ('csv')
+- The file extension for files to read. Only filters files with this extension. The default is 'csv'.
+
+**Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+A warning is raised if `window_ms` is longer than half a signal recording.
+
+An exception is raised if a column from `column_names` is not a column of a signal file.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `window_ms` results in a `window_size` less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than a signal recording.
+
+An exception is raised if `method` is an invalid screening method.
+ 
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+**Returns**
+
+None.
+
+**Example**
+
+```python
+# Screen artefacts in all data from the 'Raw' path, and put the output in the
+# 'Screened' path.
+path_names = EMGFlow.make_paths()
+EMGFlow.screen_artefact_signals(path_names['Raw'], path_names['Screened'], sampling_rate=2000)
+```
+
+
+
+
+
+### `smooth_signals`
+
+**Description**
+
+Apply a smoothing filter (`method`) to all signal files in a folder and its subfolders. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
+
+```python
+def smooth_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='rms', window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
+```
+
+**Theory**
+
+By default, the `smooth_filter_signals` function uses the RMS smoothing method. This is because for EMG signals, RMS smoothing is considered to be the best method (RENSHAW et al., 2010).
+
+Other smoothing functions are also available for use if needed.
+
+**Parameters**
+
+`in_path` : str
+- Filepath to a directory to read signal files.
+
+`out_path` : str
+- Filepath to a directory to write filtered signals.
+
+`column_names` : list-str, optional (None)
+- List of columns of the signals to apply the smoothing filter to. The default is None, in which case the smoothing filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of the signal files. The default is 1000.0.
+
+`method` : str, optional ('rms')
+- The smoothing method to use. Valid methods are 'rms', 'boxcar', 'gauss' and 'loess'. The default is 'rms'.
+
+`window_ms` : float, optional (50.0)
+- The size of the smoothing window in ms. The default is 50.0.
+
+`sigma`: float, optional (1.0)
+- The value of sigma used for a Gaussian filter. Only affects output when using a Gaussian filter. The default is 1.0.
+
+`min_segment` : float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
+`expression` : str, optional (None)
+- A regular expression. If provided, will only apply the smoothing filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
+
+`copy_unmatched` : bool, optional (False)
+- If True, copies files that don't match the regular expression to the output folder without smoothing. The default is False, which ignores files that don't match.
+
+`file_ext` : str, optional ('csv')
+- The file extension for files to read. Only smooths files with this extension. The default is 'csv'.
+
+**Raises**
+
+A warning is raised if no files in `in_path` match with `expression`.
+
+An exception is raised if `expression` is not None or a valid regular expression.
+
+An exception is raised if `method` is an invalid smoothing method.
+
+A warning is raised if `window_ms` is longer than half a signal recording.
+
+An exception is raised if a column from `column_names` is not a column of a signal file.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `window_ms` results in a `window_size` less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than a signal recording.
+
+An exception is raised if a file could not be read.
+
+An exception is raised if an unsupported file format was provided for `file_ext`.
+
+**Returns**
+
+None.
+
+**Example**
+
+```python
+path_names = EMGFlow.make_paths()
+EMGFlow.make_sample_data(path_names)
+column_names = ['EMG_zyg', 'EMG_cor']
+sampling_rate = 2000
+window_ms = 120
+
+# Apply smoothing filter with window size 20 to all files in the 'Bandpass'
+# path and write the output to the 'Smooth' path.
+EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], column_names, sampling_rate, window_ms=window_ms)
+```
+
+
+
+
+
+## Supporting Methods
+
+
+
+
+
+### `apply_bandpass_filter`
+
+**Description**
+
+Apply a bandpass filter (`passband_edges`) to a column of `Signal`.
+
+```python
+def apply_bandpass_filter(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, passband_edges:tuple[float,float]=(20.0,450.0), min_segment:float=30.0)
+```
+
+**Parameters**
+
+`Signal` : pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`column_name` : str
+- The column of `Signal` the bandpass filter is applied to.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of `Signal`. The default is 1000.0.
+
+`passband_edges` : tuple[float,float], optional ([20.0, 450.0])
+- Lower and upper frequency limit (Hz) of the bandpass filter. The default is (20.0, 450.0).
+
+`min_segment` : float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
+**Raises**
+
+An exception is raised if `column_name` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if the limits in `passband_edges` are higher than 1/2 of `sampling_rate`.
+
+An exception is raised if the upper limit of `passband_edges` is not higher than the lower limit.
+
+An exception is raised if `min_segment` is longer than the recording of `Signal`.
+
+**Returns**
+
+`band_Signal` : pd.DataFrame
+- A copy of `Signal` after the bandpass filter is applied.
+
+**Example**
+
+```python
+# Apply a bandpass filter below 20Hz, and above 250Hz.
+sampling_rate = 2000
+band_Signal = EMGFlow.apply_bandpass_filter(Signal, 'EMG_zyg', sampling_rate, (20, 250))
+```
 
 
 
@@ -756,6 +938,99 @@ loess_Signal = EMGFlow.apply_loess_smooth(Signal, 'EMG_zyg', width)
 
 
 
+### `apply_notch_filters`
+
+**Description**
+
+Apply a list of notch filters (`notch_vals`) to a column of `Signal`.
+
+```python
+def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, notch_vals=[(60,5)], min_segment:float=30.0)
+```
+
+**Parameters**
+
+`Signal` : pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`column_name` : str
+- The column of `Signal` the notch filter is applied to.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of 'Signal'. The default is 1000.0.
+
+`notch_vals` : list-tuple, optional ([(60, 5)])
+- A list of (Hz, Q) tuples corresponding to the notch filters being applied. Hz is the frequency the filter is applied to, and Q is the Q-score (an intensity score where a higher number means a less extreme filter). The default is [(60, 5)].
+
+`min_segment` : float, optional (30.0)
+- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
+
+**Raises**
+
+An exception is raised if `column_name` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `min_segment` is longer than the recording of `Signal`.
+
+An exception is raised if a Hz value in `notch_vals` is greater than `sampling_rate`/2 or less than 0.
+
+**Returns**
+
+`notch_Signal` : pd.DataFrame
+- A copy of `Signal` after the notch filters are applied.
+
+**Example**
+
+```python
+# Apply a notch filter of 150Hz at a Q-score of 5, and of 250Hz at a Q-score of
+# 5.
+sampling_rate = 2000
+notch_Signal = EMGFlow.apply_notch_filters(Signal, 'EMG_zyg', sampling_rate, [(150, 5), (250, 5)])
+```
+
+
+
+
+
+### `apply_rectify`
+
+**Description**
+
+Applies a Full Wave Rectifier (FWR) to a column of `Signal`.
+
+```python
+def apply_rectify(Signal:pd.DataFrame, column_name:str)
+```
+
+**Parameters**
+
+`Signal` : pd.DataFrame 
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`column_name` : str
+- The column of `Signal` the FWR filter is applied to.
+
+**Raises**
+
+An exception is raised if `column_name` is not a column of `Signal`.
+
+**Returns**
+
+`fwr_Signal` : pd.DataFrame
+- A copy of `Signal` after the FWR filter is applied.
+
+**Example**
+
+```python
+# Apply a Full Wave Rectifier (FWR)
+fwr_Signal = EMGFlow.apply_fwr(Signal, 'EMG_zyg')
+```
+
+
+
+
+
 ### `apply_rms_smooth`
 
 **Description**
@@ -896,338 +1171,7 @@ ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg', 2000)
 
 
 
-### `fill_missing_signals`
-
-**Description**
-
-Apply an interpolation method ('method') to all signal files in a folder. Writes interpolated signal files to an output folder, and generates a file structure matching the input structure.
-
-```python
-def fill_missing_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='pchip', max_segment:float=500.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
-```
-
-**Parameters**
-
-`in_path` : str
-- Filepath to a directory to read signal files.
-
-`out_path` : str
-- Filepath to a directory to write filtered signals.
-
-`column_names` : list-str, optional (None)
-- List of columns of the signals to apply the interpolation to. The default is None, in which case the interpolation is applied to every column except for 'Time' and columns that start with 'mask\_'.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of the signal files. The default is 1000.0
-
-`method` : str, optional ('pchip')
-- The interpolation method to use. Valid methods are 'pchip' and 'spline'. The default is 'pchip'.
-
-`max_segment` : float, optional (500.0)
-- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 500.0.
-
-`expression` : str, optional (None)
-- A regular expression. If provided, will only apply the interpolation to files whose local paths inside of `in_path` match the regular expression. The default is None.
-
-`copy_unmatched` : bool, optional (False)
-- If True, copies files that don't match the regular expression to the output folder without interpolating. The default is False, which ignores files that don't match.
-
-`file_ext` : str, optional ('csv')
-- The file extension for files to read. Only interpolates files with this extension. The default is 'csv'.
-
-**Raises**
-
-A warning is raised if no files in `in_path` match with `expression`.
-
-An exception is raised if `expression` is not None or a valid regular expression.
-
-An exception is raised if a column from `column_names` is not a column of a signal file.
-
-An exception is raised if 'Time' is in `column_names`.
-
-An exception is raised if 'Time' is not a column of a signal file.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `max_segment` results in a gap size less than or equal to 0.
-
-An exception is raised if `method` is an invalid interpolation method.
-
-An exception is raised if there aren't enough valid points to perform interpolation on a signal file.
-
-An exception is raised if a file could not be read.
-
-An exception is raised if an unsupported file format was provided for `file_ext`.
-
-**Returns**
-
-None.
-
-**Example**
-
-```python
-# Fill missing values in all data from the 'Raw' path, and put the output in
-# the 'Filled' path.
-path_names = EMGFlow.make_paths()
-EMGFlow.fill_missing_signals(path_names['Raw'], path_names['Filled'])
-```
-
-
-
-
-
-### `screen_artefact_signals`
-
-**Description**
-
-Apply a screening filter to all signal files in a folder and its subfolders. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
-
-The Hampel filter helps identify outliers based on the Median Absolute Deviation (MAD), and replaces them with the median of their window. A threshold is calculated as product of the MAD with `n_sigma` and and a constant 1.4826. If the difference between a value and the median is greater than this threshold, it is considered an outlier and replaced with the median.
-
-To keep track of which values have been replaced, a "NaN mask" column is created which determines if each value is valid (True) or NaN (False).
-
-The Wiener filter improves the quality of signals by minimizing the effect of noise on the output signal. This allows better interpretation of muscular movement.
-
-```python
-def screen_artefact_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method='hampel', window_ms:float=100.0, n_sigma:float=10.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
-```
-
-**Parameters**
-
-`in_path` : str
-- Filepath to a directory to read signal files.
-
-`out_path` : str
-- Filepath to a directory to write filtered signals.
-
-`column_names` : list-str, optional (None)
-- List of columns of the signals to apply the filter to. The default is None, in which case the filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of the signal files. The default is 1000.0.
-
-`method` : str, optional ('hampel')
-- The screening method to use. Valid methods are 'hampel' and 'wiener'. The default is 'hampel'.
-
-`window_ms` : float, optional (100.0)
-- The size of the outlier detection window in ms. The default is 100.0.
-
-`n_sigma` : float, optional (10.0)
-- The number of standard deviations away for a value to be considered an outlier. The default is 10.0.
-
-`min_segment` : float, optional (30.0)
-- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
-
-`expression` : str, optional (None)
-- A regular expression. If provided, will only apply the filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
-
-`copy_unmatched` : bool, optional (False)
-- If True, copies files that don't match the regular expression to the output folder without filtering. The default is False, which ignores files that don't match.
-
-`file_ext` : str, optional ('csv')
-- The file extension for files to read. Only filters files with this extension. The default is 'csv'.
-
-**Raises**
-
-A warning is raised if no files in `in_path` match with `expression`.
-
-An exception is raised if `expression` is not None or a valid regular expression.
-
-A warning is raised if `window_ms` is longer than half a signal recording.
-
-An exception is raised if a column from `column_names` is not a column of a signal file.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `window_ms` results in a `window_size` less than or equal to 0.
-
-An exception is raised if `min_segment` is longer than a signal recording.
-
-An exception is raised if `method` is an invalid screening method.
- 
-An exception is raised if a file could not be read.
-
-An exception is raised if an unsupported file format was provided for `file_ext`.
-
-**Returns**
-
-None.
-
-**Example**
-
-```python
-# Screen artefacts in all data from the 'Raw' path, and put the output in the
-# 'Screened' path.
-path_names = EMGFlow.make_paths()
-EMGFlow.screen_artefact_signals(path_names['Raw'], path_names['Screened'], sampling_rate=2000)
-```
-
-
-
-
-
-### `smooth_signals`
-
-**Description**
-
-Apply a smoothing filter (`method`) to all signal files in a folder and its subfolders. Writes filtered signal files to an output folder, and generates a file structure matching the input folder.
-
-```python
-def smooth_signals(in_path:str, out_path:str, column_names=None, sampling_rate:float=1000.0, method:str='rms', window_ms:float=50.0, sigma:float=1.0, min_segment:float=30.0, expression:str=None, copy_unmatched:bool=False, file_ext:str='csv')
-```
-
-**Theory**
-
-By default, the `smooth_filter_signals` function uses the RMS smoothing method. This is because for EMG signals, RMS smoothing is considered to be the best method (RENSHAW et al., 2010).
-
-Other smoothing functions are also available for use if needed.
-
-**Parameters**
-
-`in_path` : str
-- Filepath to a directory to read signal files.
-
-`out_path` : str
-- Filepath to a directory to write filtered signals.
-
-`column_names` : list-str, optional (None)
-- List of columns of the signals to apply the smoothing filter to. The default is None, in which case the smoothing filter is applied to every column except for 'Time' and columns that start with 'mask\_'.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of the signal files. The default is 1000.0.
-
-`method` : str, optional ('rms')
-- The smoothing method to use. Valid methods are 'rms', 'boxcar', 'gauss' and 'loess'. The default is 'rms'.
-
-`window_ms` : float, optional (50.0)
-- The size of the smoothing window in ms. The default is 50.0.
-
-`sigma`: float, optional (1.0)
-- The value of sigma used for a Gaussian filter. Only affects output when using a Gaussian filter. The default is 1.0.
-
-`min_segment` : float, optional (30.0)
-- The minimum length (in ms) for data to be considered valid. If a length of data is less than this time, it is set to NaN. If a length of invalid data is less than this time, it is ignored in calculations. The default is 30.0.
-
-`expression` : str, optional (None)
-- A regular expression. If provided, will only apply the smoothing filter to files whose local paths inside of `in_path` match the regular expression. The default is None.
-
-`copy_unmatched` : bool, optional (False)
-- If True, copies files that don't match the regular expression to the output folder without smoothing. The default is False, which ignores files that don't match.
-
-`file_ext` : str, optional ('csv')
-- The file extension for files to read. Only smooths files with this extension. The default is 'csv'.
-
-**Raises**
-
-A warning is raised if no files in `in_path` match with `expression`.
-
-An exception is raised if `expression` is not None or a valid regular expression.
-
-An exception is raised if `method` is an invalid smoothing method.
-
-A warning is raised if `window_ms` is longer than half a signal recording.
-
-An exception is raised if a column from `column_names` is not a column of a signal file.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `window_ms` results in a `window_size` less than or equal to 0.
-
-An exception is raised if `min_segment` is longer than a signal recording.
-
-An exception is raised if a file could not be read.
-
-An exception is raised if an unsupported file format was provided for `file_ext`.
-
-**Returns**
-
-None.
-
-**Example**
-
-```python
-path_names = EMGFlow.make_paths()
-EMGFlow.make_sample_data(path_names)
-column_names = ['EMG_zyg', 'EMG_cor']
-sampling_rate = 2000
-window_ms = 120
-
-# Apply smoothing filter with window size 20 to all files in the 'Bandpass'
-# path and write the output to the 'Smooth' path.
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], column_names, sampling_rate, window_ms=window_ms)
-```
-
-
-
-
-
-## `clean_signals`
-
-**Description**
-
-Apply all EMG preprocessing filters to all signal files in a folder and its subfolders. Uses the 'path_names' dictionary, starting with files in the 'Raw' path, and moving through 'Notch', 'Bandpass', and 'FWR' as the filters are applied.
-    
-Optionally, 'do_screen', 'do_fill' and 'do_smooth' can be set to True to do the associated step.
-
-```python
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv')
-```
-
-**Parameters**
-
-`path_names` : dict-str
-- A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'Raw', 'Notch', 'Bandpass', and 'FWR'. The dictionary can be created with the `make_paths` function.
-
-`sampling_rate` : float, optional (1000.0)
-- The sampling rate of the signal files. The default is 1000.0.
-
-`notch_f0` : float, optional (60.0)
-- The Hz value of the notch filter. The default is 60.0.
-
-`do_screen` : bool, optional (False)
-- An option to use the optional processing step of artefact screening. The default is False.
-
-`do_fill` : bool, optional (True)
-- An option to use the optional processing step of filling missing values. The default is True.
-
-`do_smooth` : bool, optional (True)
-- An option to use the optional processing step of smoothing. The default is True.
-
-`file_ext` : str, optional ('csv')
-- The file extension for files to read. Only processes files with this extension. The default is 'csv'.
-
-**Raises**
-
-An exception is raised if 'Raw', 'Notch', 'Bandpass', or 'FWR' are not keys of the `path_names` dictionary provided.
-
-An exception is raised if 'Screened', 'Filled', or 'Smooth' are not keys of the `path_names` dictionary provided if the associated parameter is set to True.
-
-An exception is raised if `sampling_rate` is less than or equal to 0.
-
-An exception is raised if `min_segment` is longer than the recording of `Signal`.
-
-An exception is raised if a file could not be read.
-
-An exception is raised if an unsupported file format was provided for `file_ext`.
-
-**Returns**
-
-None.
-
-**Example**
-
-```python
-# Create path dictionary, then clean the signals.
-path_names = EMGFlow.make_paths()
-sampling_rate = 2000
-EMGFlow.clean_signals(path_names, sampling_rate)
-```
-
-
-
-
-
-## `detect_spectral_outliers`
+### `detect_spectral_outliers`
 
 **Description:**
 
@@ -1314,6 +1258,67 @@ window_ms = 120
 
 outliers = EMGFlow.detect_spectral_outliers(path_names['Notch'], column_names, sampling_rate, window_ms)
 ```
+
+
+
+
+
+### `emg_to_psd`
+
+**Description**
+
+Creates a Power Spectrum Density (PSD) dataframe from a signal, showing the intensity of each frequency detected in the signal. Uses the Welch method, meaning it can be used as a Long Term Average Spectrum (LTAS).
+
+```python
+def emg_to_psd(Signal:pd.DataFrame, column_name:str, sampling_rate:float=1000.0, max_segment:float=2.5, normalize:bool=True, nan_mask=None)
+```
+
+**Parameters**
+
+`Signal` : pd.DataFrame
+- A Pandas dataframe containing a 'Time' column, and additional columns for signal data.
+
+`column_name` : str
+- The column of `Signal` the PSD is calculated from.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate of `Signal`. The default is 1000.0.
+
+`max_segment` : float, optional (2.5)
+- The maximum length (in ms) of NaN values to fill. If a length of invalid data is longer than this threshold, it will not be interpolated. The default is 2.5.
+
+`normalize` : bool, optional (True)
+- If True, will normalize the result. If False, will not. The default is True.
+
+`nan_mask` : pd.Series, optional (None)
+- Optional series that controls the calculation of the function. Can be a True/False mask that is the same size as the selected column, and will set all associated False values in the column to NaN in the calculation. The default is None, in which case no NaN masking will be done.
+
+**Raises**
+
+An exception is raised if `column_name` is not a column of `Signal`.
+
+An exception is raised if `sampling_rate` is less than or equal to 0.
+
+An exception is raised if `nan_mask` is not the same length as `column_name`.
+
+An exception is raised if there are too many NaN values to make a valid window.
+
+**Returns**
+
+`psd` : pd.DataFrame
+- A Pandas dataframe containing a 'Frequency' and 'Power' column. The 'Power' column indicates the intensity of each frequency in `Signal`. Results will be normalized if `normalize` is set to True.
+
+**Example**
+
+```python
+column_name = 'EMG_zyg'
+sampling_rate = 2000
+PSD = EMGFlow.emg_to_psd(Signal, column_name, sampling_rate)
+```
+
+
+
+
 
 ## Sources
 

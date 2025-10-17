@@ -22,9 +22,7 @@ Generate a Shiny dashboard of different processing stages for a given column of 
 
 Uses a `path_names` filepath dictionary (see `make_paths`). Has a side bar menu to navigate the file and stage being displayed.
 
-Each filepath in the dictionary is expected to contain the same named files to display them at the different stages. To avoid error, the function ignores the 'Feature' filepath.
-
-'CTRL + C' can be entered in the terminal to end the display of the dashboard and resume code execution.
+The function ignores the 'feature' filepath. The remaining filepaths are tested for files, and included if found.
 
 ```python
 def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True)

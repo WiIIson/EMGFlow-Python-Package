@@ -60,11 +60,11 @@ Each extracted feature is available as its own function for easy use.
 
 Extracts features from signals by running a series of feature extraction functions and saving the outputs to a feature file.
 
-The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'Smooth' and 'Bandpass' paths. The 'Smooth' step is optional, if it was not used, data is searched for in the following order: 'Smooth' -> 'Filled' -> 'FWR'.
+The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'smooth' and 'bandpass' paths. The 'smooth' step is optional, if it was not used, data is searched for in the following order: 'smooth' -> 'filled' -> 'fwr'.
 
-All files within these folders and subfolders are assumed to be valid data if they match the provided file extension, and the optional regular expression. Files of the same name should exist in both the 'Smooth'/'Filled'/'FWR' and 'Bandpass' folders, being the same file at different stages in processing pipeline.
+All files within these folders and subfolders are assumed to be valid data if they match the provided file extension, and the optional regular expression. Files of the same name should exist in both the 'smooth'/'filled'/'fwr' and 'bandpass' folders, being the same file at different stages in processing pipeline.
 
-The 'Smooth'/'Filled'/'FWR' path is used to calculate time-series features, while the 'Bandpass' path is used to calculate spectral features.
+The 'smooth'/'filled'/'fwr' path is used to calculate time-series features, while the 'bandpass' path is used to calculate spectral features.
 
 Columns of these files that begin with 'mask\_' are assumed to be NaN mask columns, and are ignored unless specified in `column_names`.
 
@@ -81,7 +81,7 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 **Parameters**
 
 `path_names` : dict-str
-- A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'Bandpass', 'FWR', and 'Feature'. The dictionary can be created with the `make_paths` function.
+- A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'bandpass', 'fwr', and 'feature'. The dictionary can be created with the `make_paths` function.
 
 `column_names` : list-str, optional (None)
 - List of columns to analyze in each file. The default is None, in which case all columns except for 'Time' and columns whose names begin with 'mask_' will be analyzed. All files should have at least these columns in common. If None is used, all files will be assumed to have the same columns as the first file read.
@@ -102,11 +102,11 @@ This function requires a path to smoothed and unsmoothed data. This is because w
 
 A warning is raised if `expression` does not match with any files in the folders provided.
 
-An exception is raised if 'Bandpass', 'FWR' or 'Feature' are not keys of the `path_names` dictionary provided.
+An exception is raised if 'bandpass', 'fwr' or 'feature' are not keys of the `path_names` dictionary provided.
 
-An exception is raised if the 'Bandpass' and 'Smooth'/'Filled'/'FWR' filepaths do not contain the same files.
+An exception is raised if the 'bandpass' and 'smooth'/'filled'/'fwr' filepaths do not contain the same files.
 
-An exception is raised if a file cannot not be read in the 'Bandpass' or 'Smooth'/'Filled'/'FWR' filepaths.
+An exception is raised if a file cannot not be read in the 'bandpass' or 'smooth'/'filled'/'fwr' filepaths.
 
 An exception is raised if a file does not contain one of the columns from `column_names`.
 
