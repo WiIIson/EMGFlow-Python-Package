@@ -127,8 +127,8 @@ sampling_rate = 2000
 passband_edges = (20, 200)
 
 # Apply bandpass filters of below 20Hz and above 200Hz to the files in the
-# 'Notch' path, and write the output to the 'Bandpass' path.
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
+# 'notch' path, and write the output to the 'bandpass' path.
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
 ```
 
 
@@ -271,10 +271,10 @@ None.
 **Example**
 
 ```python
-# Fill missing values in all data from the 'Raw' path, and put the output in
-# the 'Filled' path.
+# Fill missing values in all data from the 'raw' path, and put the output in
+# the 'filled' path.
 path_names = EMGFlow.make_paths()
-EMGFlow.fill_missing_signals(path_names['Raw'], path_names['Filled'])
+EMGFlow.fill_missing_signals(path_names['raw'], path_names['filled'])
 ```
 
 
@@ -356,12 +356,12 @@ notch_vals_spec = [(317,25)]
 expression = "^(08|11)"
 column_names = ['EMG_zyg', 'EMG_cor']
 
-# Apply notch_vals filters to all files in the 'Raw' path, and write them to
-# the 'Notch' path.
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
+# Apply notch_vals filters to all files in the 'raw' path, and write them to
+# the 'notch' path.
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
 
 # Apply an additional special case filter to files in the '08' or '11' folder
-EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], column_names, sampling_rate, notch_vals_spec, expression=expression)
+EMGFlow.notch_filter_signals(path_names['notch'], path_names['notch'], column_names, sampling_rate, notch_vals_spec, expression=expression)
 ```
 
 
@@ -417,9 +417,9 @@ None.
 **Example**
 
 ```python
-# Rectify all data from the 'Raw' path, and put the output in the 'FWR' path.
+# Rectify all data from the 'raw' path, and put the output in the 'fwr' path.
 pathNames = EMGFlow.make_paths()
-EMGFlow.rectify_signals(pathNames['Raw'], pathNames['FWR'])
+EMGFlow.rectify_signals(pathNames['raw'], pathNames['fwr'])
 ```
 
 
@@ -506,10 +506,10 @@ None.
 **Example**
 
 ```python
-# Screen artefacts in all data from the 'Raw' path, and put the output in the
-# 'Screened' path.
+# Screen artefacts in all data from the 'raw' path, and put the output in the
+# 'screened' path.
 path_names = EMGFlow.make_paths()
-EMGFlow.screen_artefact_signals(path_names['Raw'], path_names['Screened'], sampling_rate=2000)
+EMGFlow.screen_artefact_signals(path_names['raw'], path_names['screened'], sampling_rate=2000)
 ```
 
 
@@ -791,7 +791,7 @@ An exception is raised if there aren't enough valid points to perform interpolat
 ```python
 # Fill missing values in a sample data file.
 pathNames = EMGFlow.make_paths()
-filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
 Signal = EMGFlow.read_file_type(filePath, 'csv')
 FSignal = EMGFlow.apply_fill_missing(Signal, 'EMG_zyg')
 ```
@@ -1162,7 +1162,7 @@ An exception is raised if `method` is an invalid screening method.
 ```python
 # Screen artefacts in a sample data file.
 pathNames = EMGFlow.make_paths()
-filePath = os.path.join(pathNames['Raw'], '01', 'sample_data_01.csv')
+filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
 Signal = EMGFlow.read_file_type(filePath, 'csv')
 ASignal = EMGFlow.apply_screen_artefacts(Signal, 'EMG_zyg', 2000)
 ```
