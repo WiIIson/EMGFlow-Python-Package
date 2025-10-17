@@ -144,13 +144,16 @@ Apply all EMG preprocessing filters to all signal files in a folder and its subf
 Optionally, 'do_screen', 'do_fill' and 'do_smooth' can be set to True to do the associated step.
 
 ```python
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv')
+def clean_signals(path_names:dict, column_names=None, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv')
 ```
 
 **Parameters**
 
 `path_names` : dict-str
 - A dictionary of file locations with keys for stage in the processing pipeline. Required paths are: 'raw', 'notch', 'bandpass', and 'fwr'. The dictionary can be created with the `make_paths` function.
+
+`column_names` : list-str, optional (None)
+- List of columns of the signals to apply the filtera to. The default is None, in which case the filters are applied to every column except for 'Time' and columns that start with 'mask_'.
 
 `sampling_rate` : float, optional (1000.0)
 - The sampling rate of the signal files. The default is 1000.0.
@@ -176,6 +179,8 @@ An exception is raised if 'raw', 'notch', 'bandpass', or 'fwr' are not keys of t
 
 An exception is raised if 'screened', 'filled', or 'smooth' are not keys of the `path_names` dictionary provided if the associated parameter is set to True.
 
+An exception is raised if a column from `column_names` is less than or equal to 0.
+
 An exception is raised if `sampling_rate` is less than or equal to 0.
 
 An exception is raised if `min_segment` is longer than the recording of `Signal`.
@@ -194,7 +199,7 @@ None.
 # Create path dictionary, then clean the signals.
 path_names = EMGFlow.make_paths()
 sampling_rate = 2000
-EMGFlow.clean_signals(path_names, sampling_rate)
+EMGFlow.clean_signals(path_names, sampling_rate=sampling_rate)
 ```
 
 
