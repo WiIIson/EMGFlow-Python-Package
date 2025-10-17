@@ -33,22 +33,22 @@ smooth_window = 50
 column_names = ['EMG_zyg', 'EMG_cor']
 
 # 1. Apply notch filters
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
 
 # 2. Apply bandpass filter
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
 
 # 3. Apply full wave rectifier
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'])
+EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'])
 
 # 4. Apply artefact screening
-EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], column_names, sampling_rate)
+EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], column_names, sampling_rate)
 
 # 5. Fill missing data
-EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], column_names, sampling_rate)
+EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], column_names, sampling_rate)
 
 # 6. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], column_names, sampling_rate, window_ms=smooth_window)
+EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], column_names, sampling_rate, window_ms=smooth_window)
 
 # 7. Extract features
 df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
@@ -67,7 +67,7 @@ path_names = ef.make_paths(raw='workspace/sample_data_raw')
 ef.make_sample_data(path_names)
 
 # Preprocess signals
-ef.clean_signals(path_names, sampling_rate=2000, do_fill=False, do_smooth=False)
+ef.clean_signals(path_names, sampling_rate=2000, do_fill=False, do_smooth=False, notch_f0=50)
 
 # Plot data on the "EMG_zyg" column
 ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
@@ -149,10 +149,10 @@ expression = '^01'
 column_names = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
-EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], column_names, sampling_rate, notch_vals_s, expression=expression)
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'], column_names)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.notch_filter_signals(path_names['notch'], path_names['notch'], column_names, sampling_rate, notch_vals_s, expression=expression)
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
+EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'], column_names)
 
 # Extract features
 df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
@@ -186,13 +186,13 @@ smooth_window = 50
 column_names = ['EMG_zyg', 'EMG_cor']
 
 # Preprocess signals
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], column_names, sampling_rate, notch_vals)
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], column_names, sampling_rate, passband_edges)
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['Smooth'], column_names)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
+EMGFlow.rectify_signals(path_names['bandpass'], path_names['smooth'], column_names)
 
 # Map locations of files to process
-file_dirs_b = EMGFlow.map_files(path_names['Bandpass'])
-file_dirs_s = EMGFlow.map_files(path_names['Smooth'])
+file_dirs_b = EMGFlow.map_files(path_names['bandpass'])
+file_dirs_s = EMGFlow.map_files(path_names['smooth'])
 
 # List of measures to extract
 measureNames = [
@@ -247,5 +247,5 @@ for file in tqdm.tqdm(file_dirs_b):
         SignalDF.loc[len(SignalDF.index)] = df_vals
 
 # Save results in "Features.csv" file
-SignalDF.to_csv(os.path.join(path_names['Feature'], 'Features.csv'), index=False)
+SignalDF.to_csv(os.path.join(path_names['feature'], 'Features.csv'), index=False)
 ```
