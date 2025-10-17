@@ -91,10 +91,10 @@ def make_paths(root:str=None, raw:str=None):
     Generates a file structure for an EMG workflow, and returns a dictionary of
     the locations for these files for easy use with EMG processing functions.
     
-    Creates 'Raw', 'Notch', 'Bandpass', 'FWR', 'Screened', 'Filled', 'Smooth',
-    and 'Feature' subfolders at a given location. If no path is given, will
-    create a 'Data' folder in the current working directory, with these
-    subfolders inside.
+    Creates '1_raw', '2_notch', '3_bandpass', '4_fwr', '5_screened',
+    '6_filled', '7_smoothed', and '8_feature' subfolders at a given location.
+    If no path is given, will create a 'Data' folder in the current working
+    directory, with these subfolders inside.
 
     Parameters
     ----------

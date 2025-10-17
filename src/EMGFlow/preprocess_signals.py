@@ -241,7 +241,6 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
     
     # Apply notch filters to each value sequence set sequences that are too
     # small to NaN
-    nyq_freq = sampling_rate / 2
     for (val_ind, val_len) in val_sequences:
         if val_len < min_gap:
             # Set value to NaN
@@ -252,8 +251,6 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
                 
                 if Hz > sampling_rate/2 or Hz <= 0:
                     raise Exception("'notch_vals' must be between 0 and" + str(sampling_rate/2) + ".")
-                
-                norm_Hz = Hz / nyq_freq
                 
                 # Use scipy notch filter using normalized frequency
                 b, a = scipy.signal.iirnotch(w0=Hz, Q=Q, fs=sampling_rate)
