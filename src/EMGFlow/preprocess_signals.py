@@ -256,8 +256,8 @@ def apply_notch_filters(Signal:pd.DataFrame, column_name:str, sampling_rate:floa
                 norm_Hz = Hz / nyq_freq
                 
                 # Use scipy notch filter using normalized frequency
-                b, a = scipy.signal.iirnotch(norm_Hz, Q)
-                filtered_section = scipy.signal.lfilter(b, a, masked_data.loc[val_ind:val_ind+val_len-1, column_name].copy())
+                b, a = scipy.signal.iirnotch(w0=Hz, Q=Q, fs=sampling_rate)
+                filtered_section = scipy.signal.filtfilt(b, a, masked_data.loc[val_ind:val_ind+val_len-1, column_name].to_numpy())
                 
                 masked_data.loc[val_ind:val_ind+val_len-1, column_name] = filtered_section
     
@@ -2024,7 +2024,7 @@ def smooth_signals(in_path:str, out_path:str, column_names=None, sampling_rate:f
 # =============================================================================
 #
 
-def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
+def clean_signals(path_names:dict, column_names=None, sampling_rate:float=1000.0, notch_f0:float=60.0, do_screen=False, do_fill=True, do_smooth=True, file_ext:str='csv'):
     """
     Apply all EMG preprocessing filters to all signal files in a folder and its
     subfolders. Uses the 'path_names' dictionary, starting with files in the
@@ -2040,6 +2040,10 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
         A dictionary of file locations with keys for stage in the processing
         pipeline. Required paths are: 'raw', 'notch', 'bandpass', and 'fwr'.
         The dictionary can be created with the 'make_paths' function.
+    column_names : list-str, optional
+        List of columns of the signals to apply the filtera to. The default is
+        None, in which case the filters are applied to every column except for
+        'Time' and columns that start with 'mask_'.
     sampling_rate : float, optional
         The sampling rate of the signal files. The default is 1000.0.
     notch_f0 : float, optional
@@ -2067,6 +2071,9 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
         keys of the 'path_names' dictionary provided if the associated
         parameter is set to True
 
+    Exception
+        An exception is raised if a column from 'column_names' is not a column of a
+        signal file.
     Exception
         An exception is raised if 'sampling_rate' is less than or equal to 0.
     Exception
@@ -2096,28 +2103,28 @@ def clean_signals(path_names:dict, sampling_rate:float=1000.0, notch_f0:float=60
         raise Exception('FWR path not detected in provided dictionary (path_names).')
         
     # Run required preprocessing steps
-    notch_filter_signals(path_names['raw'], path_names['notch'], sampling_rate=sampling_rate, notch_vals=[(notch_f0,5)], file_ext=file_ext)
-    bandpass_filter_signals(path_names['notch'], path_names['bandpass'], sampling_rate=sampling_rate, file_ext=file_ext)
-    rectify_signals(path_names['bandpass'], path_names['fwr'], file_ext=file_ext)
+    notch_filter_signals(path_names['raw'], path_names['notch'], column_names=column_names, sampling_rate=sampling_rate, notch_vals=[(notch_f0,5)], file_ext=file_ext)
+    bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
+    rectify_signals(path_names['bandpass'], path_names['fwr'], column_names=column_names, file_ext=file_ext)
     
     last = 'fwr'
     
     if do_screen:
         if 'screened' not in path_names:
             raise Exception("'screened' path not detected in provided dictionary ('path_names').")
-        screen_artefact_signals(path_names[last], path_names['screened'], sampling_rate=sampling_rate, file_ext=file_ext)
+        screen_artefact_signals(path_names[last], path_names['screened'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
         last = 'screened'
     
     if do_fill:
         if 'filled' not in path_names:
             raise Exception("'filled' path not detected in provided dictionary ('path_names').")
-        fill_missing_signals(path_names[last], path_names['filled'], sampling_rate=sampling_rate, file_ext=file_ext)
+        fill_missing_signals(path_names[last], path_names['filled'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
         last = 'filled'
     
     if do_smooth:
         if 'smooth' not in path_names:
             raise Exception("'smooth' path not detected in provided dictionary ('path_names').")
-        smooth_signals(path_names[last], path_names['smooth'], sampling_rate=sampling_rate, file_ext=file_ext)
+        smooth_signals(path_names[last], path_names['smooth'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
     
     return
 
