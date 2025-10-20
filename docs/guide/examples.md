@@ -24,10 +24,11 @@ EMGFlow.make_sample_data(path_names)
 # Sampling rate
 sampling_rate = 2000
 
-# Filter parameters
-notch_vals = [(50, 5)]
-passband_edges = (20, 140)
-smooth_window = 50
+# Notch filter for mains hum (Hz, Q-score)
+notch_main = [(50, 5)]
+
+# Passband edges (low, high)
+passband_edges = [20, 450]
 
 # Columns containing data for preprocessing
 column_names = ['EMG_zyg', 'EMG_cor']
@@ -48,7 +49,7 @@ EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], colum
 EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], column_names, sampling_rate)
 
 # 6. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], column_names, sampling_rate, window_ms=smooth_window)
+EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], column_names, sampling_rate)
 
 # 7. Extract features
 df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
@@ -72,7 +73,7 @@ ef.clean_signals(path_names, sampling_rate=2000, do_fill=False, do_smooth=False,
 # Plot data on the "EMG_zyg" column
 ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
 
-# Extract features and save results in "Features.csv" in feature_path
+# Extract features and save results in "Features.csv"
 df = ef.extract_features(path_names, sampling_rate=2000)
 ```
 
@@ -110,12 +111,12 @@ column_names = ['EMG_zyg', 'EMG_cor']
 # Preprocess first column of signals ('EMG_zyg')
 sample_data = EMGFlow.apply_notch_filters(sample_data, column_names[0], sampling_rate, notch_vals)
 sample_data = EMGFlow.apply_bandpass_filter(sample_data, column_names[0], sampling_rate, passband_edges)
-sample_data[column_names[0]] = np.abs(sample_data[column_names[0]])
+sample_data = EMGFlow.apply_rectify(sample_data, column_names[0])
 
 # Preprocess second column of signals ('EMG_cor')
 sample_data = EMGFlow.apply_notch_filters(sample_data, column_names[1], sampling_rate, notch_vals)
 sample_data = EMGFlow.apply_bandpass_filter(sample_data, column_names[1], sampling_rate, passband_edges)
-sample_data[column_names[1]] = np.abs(sample_data[column_names[1]])
+sample_data = EMGFlow.apply_rectify(sample_data, column_names[1])
 ```
 
 ## Advanced Examples
