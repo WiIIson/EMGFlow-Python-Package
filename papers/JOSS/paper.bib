@@ -4,7 +4,7 @@
 	volume = {6},
 	issn = {1949-3045},
 	shorttitle = {{DECAF}},
-	url = {https://ieeexplore.ieee.org/abstract/document/7010926},
+	url = {https://doi.org/10.1109/TAFFC.2015.2392932},
 	doi = {10.1109/TAFFC.2015.2392932},
 	language = {en},
 	number = {3},
@@ -18,12 +18,54 @@
 	pages = {209--222},
 }
 
+@article{allen_hampel_2009,
+	title = {A frequency domain Hampel filter for blind rejection of sinusoidal interference from electromyograms},
+	journal = {Journal of Neuroscience Methods},
+	volume = {177},
+	number = {2},
+	pages = {303-310},
+	year = {2009},
+	issn = {0165-0270},
+	doi = {https://doi.org/10.1016/j.jneumeth.2008.10.019},
+	url = {https://www.sciencedirect.com/science/article/pii/S0165027008006353},
+	author = {David P. Allen},
+	keywords = {Hampel filter, Power-line interference, Noise rejection, EMG},
+	abstract = {A frequency domain filtering method is presented for the removal of power-line and other sinusoidal interference from electromyograms. The presence of such interference results in spikes in the complex-valued fast Fourier transform which can be considered to be outliers. The filter uses the outlier-robust Hampel identifier to detect spikes and replaces them with the median value of local values. The performance of the filter was tested using a set of simulated electromyograms and on experimental data. It was shown that the filter is more effective at rejecting interference than multiple notch filtering and spectral interpolation. The main advantages of using this method are that the frequencies at which the interference occurs need not be known a priori and that signals are not distorted in the absence of interference. In the case of single-frequency interference added to simulated and experimental data, errors in root-mean-squared amplitude and median frequency of <5% are reported.}
+}
+
+@INPROCEEDINGS{bhowmik_outlier_2017,
+	author={Bhowmik, Susmit and Jelfs, Beth and Arjunan, Sridhar P. and Kumar, Dinesh K.},
+	booktitle={2017 IEEE Life Sciences Conference (LSC)}, 
+	title={Outlier removal in facial surface electromyography through Hampel filtering technique}, 
+	year={2017},
+	volume={},
+	number={},
+	pages={258-261},
+	keywords={Muscles;Standards;Electromyography;Crosstalk;Electrodes;Facial muscles;Frequency-domain analysis},
+	doi={10.1109/LSC.2017.8268192},
+	url={https://doi.org/10.1109/LSC.2017.8268192}
+}
+
+@article{bizzego_pyphysio_2019,
+	title = {pyphysio: A physiological signal processing library for data science approaches in physiology},
+	journal = {SoftwareX},
+	volume = {10},
+	pages = {100287},
+	year = {2019},
+	issn = {2352-7110},
+	doi = {https://doi.org/10.1016/j.softx.2019.100287},
+	url = {https://www.sciencedirect.com/science/article/pii/S2352711019301839},
+	author = {Andrea Bizzego and Alessandro Battisti and Giulio Gabrieli and Gianluca Esposito and Cesare Furlanello},
+	keywords = {Physiological signal processing, Psychophysiology, Autonomic indicators, Data science, Python},
+	abstract = {The lack of open-source tools for physiological signal processing hinders the development of standardized pipelines in physiology. Researchers usually must rely on commercial software that, by implementing black-box algorithms, undermines the control on the analysis and prevents the comparison of the results, ultimately affecting the scientific reproducibility. We introduce pyphysio as a step towards a data science approach oriented to compute physiological indicators, in particular of the Autonomic Nervous System activity. pyphysio serves as a basis for machine learning modules and it implements a suite of combinable algorithms for processing of signals from either by wearable or medical-grade quality devices.}
+}
+
 @article{bota_biosppy_2024,
 	title = {{BioSPPy}: {A} {Python} toolbox for physiological signal processing},
 	volume = {26},
 	issn = {2352-7110},
 	shorttitle = {{BioSPPy}},
-	url = {https://www.sciencedirect.com/science/article/pii/S2352711024000839},
+	url = {https://doi.org/10.1016/j.softx.2024.101712},
 	doi = {10.1016/j.softx.2024.101712},
 	language = {en},
 	urldate = {2024-04-30},
@@ -35,12 +77,27 @@
 	pages = {101712},
 }
 
+@Article{boyer_reducing_2023,
+	AUTHOR = {Boyer, Marianne and Bouyer, Laurent and Roy, Jean-Sébastien and Campeau-Lecours, Alexandre},
+	TITLE = {Reducing Noise, Artifacts and Interference in Single-Channel EMG Signals: A Review},
+	JOURNAL = {Sensors},
+	VOLUME = {23},
+	YEAR = {2023},
+	NUMBER = {6},
+	ARTICLE-NUMBER = {2927},
+	URL = {https://doi.org/10.3390/s23062927},
+	PubMedID = {36991639},
+	ISSN = {1424-8220},
+	ABSTRACT = {Electromyography (EMG) is gaining importance in many research and clinical applications, including muscle fatigue detection, control of robotic mechanisms and prostheses, clinical diagnosis of neuromuscular diseases and quantification of force. However, EMG signals can be contaminated by various types of noise, interference and artifacts, leading to potential data misinterpretation. Even assuming best practices, the acquired signal may still contain contaminants. The aim of this paper is to review methods employed to reduce the contamination of single channel EMG signals. Specifically, we focus on methods which enable a full reconstruction of the EMG signal without loss of information. This includes subtraction methods used in the time domain, denoising methods performed after the signal decomposition and hybrid approaches that combine multiple methods. Finally, this paper provides a discussion on the suitability of the individual methods based on the type of contaminant(s) present in the signal and the specific requirements of the application.},
+	DOI = {10.3390/s23062927}
+}
+
 @article{chen_emotion_2022,
 	title = {Emotion {Recognition} {With} {Audio}, {Video}, {EEG}, and {EMG}: {A} {Dataset} and {Baseline} {Approaches}},
 	volume = {10},
 	issn = {2169-3536},
 	shorttitle = {Emotion {Recognition} {With} {Audio}, {Video}, {EEG}, and {EMG}},
-	url = {https://ieeexplore.ieee.org/abstract/document/9693926},
+	url = {https://doi.org/10.1109/ACCESS.2022.3146729},
 	doi = {10.1109/ACCESS.2022.3146729},
 	language = {en},
 	urldate = {2024-04-30},
@@ -52,6 +109,33 @@
 	pages = {13229--13242},
 }
 
+@ARTICLE{clifford_quantifying_2005,
+  author={Clifford, G.D. and Tarassenko, L.},
+  journal={IEEE Transactions on Biomedical Engineering}, 
+  title={Quantifying errors in spectral estimates of HRV due to beat replacement and resampling}, 
+  year={2005},
+  volume={52},
+  number={4},
+  pages={630-638},
+  keywords={Heart rate variability;Frequency estimation;Fast Fourier transforms;Timing;Spline;Power generation;Interpolation;Imaging phantoms;Sleep;Active noise reduction;Beat replacement;fast Fourier transform;heart rate variability;interpolation;irregular sampling;Lomb periodogram;resampling;sleep;uneven sampling},
+  doi={10.1109/TBME.2005.844028},
+  url={https://doi.org/10.1109/TBME.2005.844028}
+}
+
+@article{dakin_rectification_2014,
+	author = {Dakin, Christopher J. and Dalton, Brian H. and Luu, Billy L. and Blouin, Jean-S\'{e}bastien},
+	title = {Rectification is required to extract oscillatory envelope modulation from surface electromyographic signals},
+	journal = {Journal of Neurophysiology},
+	volume = {112},
+	number = {7},
+	pages = {1685-1691},
+	year = {2014},
+	doi = {10.1152/jn.00296.2014},
+	note = {PMID: 24990563},
+	URL = {https://doi.org/10.1152/jn.00296.2014},
+	eprint = {https://doi.org/10.1152/jn.00296.2014
+}
+
 @article{de_luca_practicum_2008,
 	title = {A practicum on the use of {sEMG} signals in movement sciences.},
 	journal = {Delsys Inc.},
@@ -60,49 +144,50 @@
 }
 
 @article{eyben_geneva_2016,
-	title = {The {Geneva} {Minimalistic} {Acoustic} {Parameter} {Set} ({GeMAPS}) for {Voice} {Research} and {Affective} {Computing}},
-	volume = {7},
-	issn = {1949-3045},
-	url = {https://ieeexplore.ieee.org/abstract/document/7160715},
-	doi = {10.1109/TAFFC.2015.2457417},
-	language = {en},
-	number = {2},
-	urldate = {2024-04-30},
-	journal = {IEEE Transactions on Affective Computing},
-	author = {Eyben, Florian and Scherer, Klaus R. and Schuller, Björn W. and Sundberg, Johan and André, Elisabeth and Busso, Carlos and Devillers, Laurence Y. and Epps, Julien and Laukka, Petri and Narayanan, Shrikanth S. and Truong, Khiet P.},
-	month = apr,
-	year = {2016},
-	note = {Conference Name: IEEE Transactions on Affective Computing},
-	keywords = {acoustic features, Acoustic Features, Affective computing, Affective Computing, emotion recognition, Emotion Recognition, Frequency measurement, geneva minimalistic parameter set, Geneva Minimalistic Parameter Set, Harmonic analysis, Licenses, Mel frequency cepstral coefficient, Speech, speech analysis, Speech Analysis, standard, Standard, Standards},
-	pages = {190--202},
+  author={Eyben, Florian and Scherer, Klaus R. and Schuller, Björn W. and Sundberg, Johan and André, Elisabeth and Busso, Carlos and Devillers, Laurence Y. and Epps, Julien and Laukka, Petri and Narayanan, Shrikanth S. and Truong, Khiet P.},
+  journal={IEEE Transactions on Affective Computing}, 
+  title={The Geneva Minimalistic Acoustic Parameter Set (GeMAPS) for Voice Research and Affective Computing}, 
+  year={2016},
+  volume={7},
+  number={2},
+  pages={190-202},
+  keywords={Speech;Mel frequency cepstral coefficient;Standards;Harmonic analysis;Licenses;Frequency measurement;Affective Computing;Acoustic Features;Standard;Emotion Recognition;Speech Analysis;Geneva Minimalistic Parameter Set;Affective computing;acoustic features;standard;emotion recognition;speech analysis;geneva minimalistic parameter set},
+  doi={10.1109/TAFFC.2015.2457417},
+  url={https://doi.org/10.1109/TAFFC.2015.2457417}
+}
+
+@article{farina_identification_2013,
+	author = {Farina, Dario and Negro, Francesco and Jiang, Ning},
+	title = {Identification of common synaptic inputs to motor neurons from the rectified electromyogram},
+	journal = {The Journal of Physiology},
+	volume = {591},
+	number = {10},
+	pages = {2403-2418},
+	doi = {https://doi.org/10.1113/jphysiol.2012.246082},
+	url = {https://physoc.onlinelibrary.wiley.com/doi/abs/10.1113/jphysiol.2012.246082},
+	eprint = {https://physoc.onlinelibrary.wiley.com/doi/pdf/10.1113/jphysiol.2012.246082},
+	abstract = {Key points •  Oscillatory drives at the input of a pool of motor neurons are transmitted to the motor neuron output (neural drive to the muscle) in an approximately linear way if these inputs are common to all motor neurons. •  The neural drive to the muscle is transformed in the EMG signal that can be thus used to extract information on the oscillatory inputs to motor neurons. •  The transmission of oscillatory inputs is closer to a linear transmission for the raw or for the rectified EMG depending on the energy of the raw and rectified motor unit action potentials at the input frequency and on the degree of amplitude cancellation. •  Amplitude cancellation negatively influences the effectiveness of EMG rectification in identifying with linear methods oscillatory inputs to motor neurons, so that rectification is preferable over the raw EMG only when the degree of cancellation is low. Abstract  Oscillatory common inputs of cortical or peripheral origin can be identified from the motor neuron output with coherence analysis. Linear transmission is possible despite the motor neuron non-linearity because the same input is sent commonly to several neurons. Because of the linear transmission, common input components to motor neurons can be investigated from the surface EMG, for example by EEG–EMG or EMG–EMG coherence. In these studies, there is an open debate on the utility and appropriateness of EMG rectification. The present study addresses this issue using an analytical, simulation and experimental approach. The main novel theoretical contribution that we report is that the spectra of both the rectified and the raw EMG contain input spectral components to motor neurons. However, they differ by the contribution of amplitude cancellation which influences the rectified EMG spectrum when extracting common oscillatory inputs. Therefore, the degree of amplitude cancellation has an impact on the effectiveness of EMG rectification in extracting input spectral peaks. The theoretical predictions were exactly confirmed by realistic simulations of a pool of motor neurons innervating a muscle in a cylindrical volume conductor of EMG generation and by experiments conducted on the first dorsal interosseous and the abductor pollicis brevis muscles of seven healthy subjects during pinching. It was concluded that when the contraction level is relatively low, EMG rectification may be preferable for identifying common inputs to motor neurons, especially when the energy of the action potentials in the low frequency range is low. Nonetheless, different levels of cancellation across conditions influence the relative estimates of the degree of linear transmission of oscillatory inputs to motor neurons when using the rectified EMG.},
+	year = {2013}
 }
 
 @article{fridlund_guidelines_1986,
-	title = {Guidelines for {Human} {Electromyographic} {Research}},
-	volume = {23},
-	issn = {1469-8986},
-	url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8986.1986.tb00676.x},
-	doi = {10.1111/j.1469-8986.1986.tb00676.x},
-	language = {en},
-	number = {5},
-	urldate = {2024-04-30},
-	journal = {Psychophysiology},
-	author = {Fridlund, Alan J. and Cacioppo, John T.},
-	year = {1986},
-	note = {\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1469-8986.1986.tb00676.x},
-	keywords = {Apparatus, Biofeedback, Electromyography, Electrophysiological recording, Experimental design, Facial expression, Facial muscles, Instrumentation, Muscles, Statistical analysis},
-	pages = {567--589},
-	file = {Full Text PDF:C\:\\Users\\willi\\Zotero\\storage\\H64S2N83\\Fridlund and Cacioppo - 1986 - Guidelines for Human Electromyographic Research.pdf:application/pdf;Snapshot:C\:\\Users\\willi\\Zotero\\storage\\NLWTMFVK\\j.1469-8986.1986.tb00676.html:text/html},
+author = {Fridlund, Alan J. and Cacioppo, John T.},
+title = {Guidelines for Human Electromyographic Research},
+journal = {Psychophysiology},
+volume = {23},
+number = {5},
+pages = {567-589},
+keywords = {Apparatus, Biofeedback, Electromyography, Electrophysiological recording, Experimental design, Facial expression, Facial muscles, Muscles, Instrumentation, Statistical analysis},
+doi = {https://doi.org/10.1111/j.1469-8986.1986.tb00676.x},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8986.1986.tb00676.x},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1469-8986.1986.tb00676.x},
+abstract = {ABSTRACT Guidelines are proposed for the collection, analysis, and description of electromyographic (EMG) data. The guidelines cover technological issues in EMG recording, social aspects of EMG experimentation, and limits to inferences that can be drawn in EMG research. An atlas is proposed for facial EMG electrode placements, and standard EMG terminology is suggested.},
+year = {1986}
 }
 
 @Inbook{gabrieli_pysiology_2020,
-	author="Gabrieli, Giulio
-	and Azhari, Atiqah
-	and Esposito, Gianluca",
-	editor="Esposito, Anna
-	and Faundez-Zanuy, Marcos
-	and Morabito, Francesco Carlo
-	and Pasero, Eros",
+	author="Gabrieli, Giulio and Azhari, Atiqah and Esposito, Gianluca",
+	editor="Esposito, Anna and Faundez-Zanuy, Marcos and Morabito, Francesco Carlo and Pasero, Eros",
 	title="PySiology: A Python Package for Physiological Feature Extraction",
 	bookTitle="Neural Approaches to Dynamics of Signal Exchanges",
 	year="2020",
@@ -115,64 +200,85 @@
 	url="https://doi.org/10.1007/978-981-13-8950-4_35"
 }
 
-@misc{greene_peakaffectds_2022,
-	title = {{PeakAffectDS}},
-	url = {https://zenodo.org/records/6403363},
-	doi = {10.5281/zenodo.6403363},
-	language = {eng},
-	urldate = {2024-04-30},
-	publisher = {Zenodo},
-	author = {Greene, Nick and Livingstone, Steven R. and Szymanski, Lech},
-	month = mar,
+@dataset{greene_peakaffectds_2022,
+  author       = {Greene, Nick and Livingstone, Steven R. and Szymanski, Lech},
+  title        = {PeakAffectDS},
+  month        = mar,
+  year         = 2022,
+  publisher    = {Zenodo},
+  version      = {1.0},
+  doi          = {10.5281/zenodo.6403363},
+  url          = {https://doi.org/10.5281/zenodo.6403363},
+}
+
+@article{jarrah_density_2022,
+	title = {High-density surface EMG signal quality enhancement via optimized filtering technique for amputees’ motion intent characterization towards intuitive prostheses control},
+	journal = {Biomedical Signal Processing and Control},
+	volume = {74},
+	pages = {103497},
 	year = {2022},
-	keywords = {dataset, deep learning, emotion, machine learning, physiology},
+	issn = {1746-8094},
+	doi = {https://doi.org/10.1016/j.bspc.2022.103497},
+	url = {https://www.sciencedirect.com/science/article/pii/S1746809422000192},
+	author = {Yazan Ali Jarrah and Mojisola Grace Asogbon and Oluwarotimi Williams Samuel and Xin Wang and Mingxing Zhu and Ejay Nsugbe and Shixiong Chen and Guanglin Li},
+	keywords = {Electromyogram, Pattern recognition, Wiener filtering, Hampel filtering, 1D-Median filtering, Upper limb prostheses}
 }
 
-@article{hegedus_adaptation_2020,
-	title = {Adaptation of {Fatigue} {Affected} {Changes} in {Muscle} {EMG} {Frequency} {Characteristics} for the {Determination} of {Training} {Load} in {Physical} {Therapy} for {Cancer} {Patients}},
-	volume = {26},
-	issn = {1532-2807},
-	url = {https://doi.org/10.1007/s12253-019-00668-3},
-	doi = {10.1007/s12253-019-00668-3},
-	language = {en},
-	number = {2},
-	urldate = {2024-04-30},
-	journal = {Pathology \& Oncology Research},
-	author = {Hegedus, Adam and Trzaskoma, Lukasz and Soldos, Peter and Tuza, Kornelia and Katona, Peter and Greger, Zsolt and Zsarnoczky-Dulhazi, Fanni and Kopper, Bence},
-	month = apr,
-	year = {2020},
-	keywords = {Cancer treatment, physical rehabilitation, neuromuscular fatigue, Isometric, Motor unit activation},
-	pages = {1129--1135},
+@Article{hegedus_adaptation_2020,
+	author={Hegedus, Adam and Trzaskoma, Lukasz and Soldos, Peter and Tuza, Kornelia and Katona, Peter and Greger, Zsolt and Zsarnoczky-Dulhazi, Fanni and Kopper, Bence},
+	title={Adaptation of Fatigue Affected Changes in Muscle EMG Frequency Characteristics for the Determination of Training Load in Physical Therapy for Cancer Patients},
+	journal={Pathology {\&} Oncology Research},
+	year={2020},
+	month={Apr},
+	day={01},
+	volume={26},
+	number={2},
+	pages={1129-1135},
+	abstract={Cancer patients often experience loss in body weight and also a decrease in muscle mass, which results in the reduction of physical activity and mobilization of the patient. To decelerate the loss of muscle mass, as part of the cancer treatment patients frequently undergo physical therapy and considering the physical capabilities of the patients, with moderate loads. Moreover, frequent studies also observed for cancer patients, together with the decrease in muscle mass a shift into fast-twitch muscle fibers from slow-twitch fibers. The aim of our study therefore was to determine how motor fibers behave under moderate isometric load executed until total exhaustion. 11 university students (G1), and 14 elite athletes (G2) participated in the study. 65{\%} of the maximal voluntary contraction (MVC) was determined for the biceps brachii muscle, and with this load holding a weight, participants had to sustain a 90 deg. isometric elbow flexion in a standing posture until complete fatigue occurred. EMG activity for the biceps brachii muscle was measured and frequency analysis was performed. 3 windows were determined in the fatiguing protocol: the first (W1), middle (W2), and last (W3) 5 s, and also frequency analysis for MVC was performed (MAX) between 0 and 260 Hz with 20 Hz wide frequency bands. The results indicate, that as the protocol progressed in time and the effect of fatigue increased (from W1 to W3) the activity of low frequency muscle fibers significantly increased (0-40 Hz) while activity of high frequency muscle fibers (60-260 Hz) significantly decreased for G1 and G2 groups identically. We can conclude, that training applied with constant moderate tension as fatigue increases will result in the increased activation of the lower frequency slow--twitch muscle fibers, but the increase of fatigue in the lower frequency fibers will not result in the increase in the activation level of the higher frequency fast-twitch fibers. Consequently, because as slow-twitch fibers are being used at moderate loads and even when fatigue occurs in these fibers the fast-twitch fibers will not work, higher muscle loads are needed if the aim is to activate fast-twitch fibers. Considering the shift into fast-twitch muscle fibers from slow-twitch fibers for cancer patients, in some cases if the patient's age and physical status allows during the physical treatment, higher loads and consequently higher levels of activation might be beneficial for the retardment of loss concerning the fast-twitch fiber mass.},
+	issn={1532-2807},
+	doi={10.1007/s12253-019-00668-3},
+	url={https://doi.org/10.1007/s12253-019-00668-3}
 }
 
-@article{koelstra_deap_2012,
-	title = {{DEAP}: {A} {Database} for {Emotion} {Analysis} ;{Using} {Physiological} {Signals}},
-	volume = {3},
-	issn = {1949-3045},
-	shorttitle = {{DEAP}},
-	url = {https://ieeexplore.ieee.org/abstract/document/5871728},
-	doi = {10.1109/T-AFFC.2011.15},
-	abstract = {We present a multimodal data set for the analysis of human affective states. The electroencephalogram (EEG) and peripheral physiological signals of 32 participants were recorded as each watched 40 one-minute long excerpts of music videos. Participants rated each video in terms of the levels of arousal, valence, like/dislike, dominance, and familiarity. For 22 of the 32 participants, frontal face video was also recorded. A novel method for stimuli selection is proposed using retrieval by affective tags from the last.fm website, video highlight detection, and an online assessment tool. An extensive analysis of the participants' ratings during the experiment is presented. Correlates between the EEG signal frequencies and the participants' ratings are investigated. Methods and results are presented for single-trial classification of arousal, valence, and like/dislike ratings using the modalities of EEG, peripheral physiological signals, and multimedia content analysis. Finally, decision fusion of the classification results from different modalities is performed. The data set is made publicly available and we encourage other researchers to use it for testing their own affective state estimation methods.},
-	number = {1},
-	urldate = {2024-04-30},
-	journal = {IEEE Transactions on Affective Computing},
-	author = {Koelstra, Sander and Muhl, Christian and Soleymani, Mohammad and Lee, Jong-Seok and Yazdani, Ashkan and Ebrahimi, Touradj and Pun, Thierry and Nijholt, Anton and Patras, Ioannis},
-	month = jan,
-	year = {2012},
-	note = {Conference Name: IEEE Transactions on Affective Computing},
-	keywords = {affective computing., Databases, EEG, Electroencephalography, Emotion classification, Face, Motion pictures, Multimedia communication, pattern classification, physiological signals, signal processing, Videos, Visualization},
-	pages = {18--31},
+@article{jas_autoreject_2017,
+	title = {Autoreject: Automated artifact rejection for MEG and EEG data},
+	journal = {NeuroImage},
+	volume = {159},
+	pages = {417-429},
+	year = {2017},
+	issn = {1053-8119},
+	doi = {https://doi.org/10.1016/j.neuroimage.2017.06.030},
+	url = {https://www.sciencedirect.com/science/article/pii/S1053811917305013},
+	author = {Mainak Jas and Denis A. Engemann and Yousra Bekhti and Federico Raimondo and Alexandre Gramfort},
+	keywords = {Magnetoencephalography (MEG), Electroencephalogram (EEG), Preprocessing, Statistical learning, Cross-validation, Automated analysis, Human Connectome Project (HCP)},
+	abstract = {We present an automated algorithm for unified rejection and repair of bad trials in magnetoencephalography (MEG) and electroencephalography (EEG) signals. Our method capitalizes on cross-validation in conjunction with a robust evaluation metric to estimate the optimal peak-to-peak threshold – a quantity commonly used for identifying bad trials in M/EEG. This approach is then extended to a more sophisticated algorithm which estimates this threshold for each sensor yielding trial-wise bad sensors. Depending on the number of bad sensors, the trial is then repaired by interpolation or by excluding it from subsequent analysis. All steps of the algorithm are fully automated thus lending itself to the name Autoreject. In order to assess the practical significance of the algorithm, we conducted extensive validation and comparisons with state-of-the-art methods on four public datasets containing MEG and EEG recordings from more than 200 subjects. The comparisons include purely qualitative efforts as well as quantitatively benchmarking against human supervised and semi-automated preprocessing pipelines. The algorithm allowed us to automate the preprocessing of MEG data from the Human Connectome Project (HCP) going up to the computation of the evoked responses. The automated nature of our method minimizes the burden of human inspection, hence supporting scalability and reliability demanded by data analysis in modern neuroscience.}
 }
 
-@article{lindstrom1977electromyographic,
-  title={An electromyographic index for localized muscle fatigue},
-  doi = {10.1152/jappl.1977.43.4.750},
-  author={Lindstrom, L\_ and Kadefors, ROLAND and Petersen, INGEMAR},
-  journal={Journal of applied physiology},
-  volume={43},
-  number={4},
-  pages={750--754},
-  year={1977}
+@ARTICLE{koelstra_deap_2012,
+  author={Koelstra, Sander and Muhl, Christian and Soleymani, Mohammad and Lee, Jong-Seok and Yazdani, Ashkan and Ebrahimi, Touradj and Pun, Thierry and Nijholt, Anton and Patras, Ioannis},
+  journal={IEEE Transactions on Affective Computing}, 
+  title={DEAP: A Database for Emotion Analysis ;Using Physiological Signals}, 
+  year={2012},
+  volume={3},
+  number={1},
+  pages={18-31},
+  keywords={Videos;Databases;Electroencephalography;Motion pictures;Multimedia communication;Visualization;Face;Emotion classification;EEG;physiological signals;signal processing;pattern classification;affective computing.},
+  doi={10.1109/T-AFFC.2011.15}
+}
+
+@article{lindstrom_emg_1977,
+	author = {Lindstrom, L. and Kadefors, R. and Petersen, I.},
+	title = {An electromyographic index for localized muscle fatigue},
+	journal = {Journal of Applied Physiology},
+	volume = {43},
+	number = {4},
+	pages = {750-754},
+	year = {1977},
+	doi = {10.1152/jappl.1977.43.4.750},
+	note ={PMID: 583632},
+	URL = {https://doi.org/10.1152/jappl.1977.43.4.750},
+	eprint = {https://doi.org/10.1152/jappl.1977.43.4.750},
+    abstract = { A new method for objective quantification of localized muscle fatigue is described. The method is based on power spectrum analysis of myoelectric signals obtained from the fatigued muscle. It permits real-time investigations and yields statistically based criteria for the occurrence of fatigue. The findings are interpreted in terms of muscle action potential conduction velocity changes and rate of the fatigue development. }
 }
 
 @article{livingstone_deficits_2016,
@@ -209,6 +315,19 @@
 	pages = {1689--1696},
 }
 
+@article{mcclelland_inconsistent_2014,
+	author = {McClelland, Verity M. and Cvetkovic, Zoran and Mills, Kerry R.},
+	title = {Inconsistent effects of EMG rectification on coherence analysis},
+	journal = {The Journal of Physiology},
+	volume = {592},
+	number = {1},
+	pages = {249-250},
+	doi = {https://doi.org/10.1113/jphysiol.2013.265181},
+	url = {https://physoc.onlinelibrary.wiley.com/doi/abs/10.1113/jphysiol.2013.265181},
+	eprint = {https://physoc.onlinelibrary.wiley.com/doi/pdf/10.1113/jphysiol.2013.265181},
+	year = {2014}
+}
+
 @article{mcmanus_analysis_2020,
 	title = {Analysis and {Biophysics} of {Surface} {EMG} for {Physiotherapists} and {Kinesiologists}: {Toward} a {Common} {Language} {With} {Rehabilitation} {Engineers}},
 	volume = {11},
@@ -226,55 +345,137 @@
 	keywords = {clinical application, Kinesiology, Physiotherapy, Rehabilitation, Surface Electromography, tutorial},
 }
 
-@misc{mermaidjs,
-  title        = {{Mermaid.js}: Generation of diagrams and flowcharts from text},
-  author       = {Sveidqvist, Knut and the Mermaid Contributors},
-  howpublished = {\url{https://mermaid-js.github.io}},
-  note         = {Version 11.6.x, accessed April 2025}
+@Article{munteanu_quantifying_2016,
+	AUTHOR = {Munteanu, C. and Negrea, C. and Echim, M. and Mursula, K.},
+	TITLE = {Effect of data gaps: comparison of different spectral \hack{\break} analysis methods},
+	JOURNAL = {Annales Geophysicae},
+	VOLUME = {34},
+	YEAR = {2016},
+	NUMBER = {4},
+	PAGES = {437--449},
+	URL = {https://angeo.copernicus.org/articles/34/437/2016/},
+	DOI = {10.5194/angeo-34-437-2016}
 }
 
-@article{phinyomark2009novel,
-  title={A novel feature extraction for robust EMG pattern recognition},
-  doi = {10.48550/arXiv.0912.3973},
-  author={Phinyomark, Angkoon and Limsakul, Chusak and Phukpattaranont, Pornchai},
-  journal={arXiv preprint arXiv:0912.3973},
-  year={2009}
+@article{neto_rectification_2010,
+	author = {Neto, Osmar Pinto and Christou, Evangelos A.},
+	title = {Rectification of the EMG Signal Impairs the Identification of Oscillatory Input to the Muscle},
+	journal = {Journal of Neurophysiology},
+	volume = {103},
+	number = {2},
+	pages = {1093-1103},
+	year = {2010},
+	doi = {10.1152/jn.00792.2009},
+	note ={PMID: 20032241},
+	URL = {https://doi.org/10.1152/jn.00792.2009},
+	eprint = {https://doi.org/10.1152/jn.00792.2009},
+	abstract = { Rectification of EMG signals is a common processing step used when performing electroencephalographic–electromyographic (EEG–EMG) coherence and EMG–EMG coherence. It is well known, however, that EMG rectification alters the power spectrum of the recorded EMG signal (interference EMG). The purpose of this study was to determine whether rectification of the EMG signal influences the capability of capturing the oscillatory input to a single EMG signal and the common oscillations between two EMG signals. Several EMG signals were reconstructed from experimentally recorded EMG signals from the surface of the first dorsal interosseus muscle and were manipulated to have an oscillatory input or common input (for pairs of reconstructed EMG signals) at various frequency bands (in Hz: 0–12, 12–30, 30–50, 50–100, 100–150, 150–200, 200–250, 250–300, and 300–400), one at a time. The absolute integral and normalized integral of power, peak power, and peak coherence (for pairs of EMG signals) were quantified from each frequency band. The power spectrum of the interference EMG accurately detected the changes to the oscillatory input to the reconstructed EMG signal, whereas the power spectrum of the rectified EMG did not. Similarly, the EMG–EMG coherence between two interference EMG signals accurately detected the common input to the pairs of reconstructed EMG signals, whereas the EMG–EMG coherence between two rectified EMG signals did not. The frequency band from 12 to 30 Hz in the power spectrum of the rectified EMG and the EMG–EMG coherence between two rectified signals was influenced by the input from 100 to 150 Hz but not from the input from 12 to 30 Hz. The study concludes that the power spectrum of the EMG and EMG–EMG coherence should be performed on interference EMG signals and not on rectified EMG signals because rectification impairs the identification of the oscillatory input to a single EMG signal and the common oscillatory input between two EMG signals. }
 }
 
-@article{sato_emotional_2021,
-	title = {Emotional valence sensing using a wearable facial {EMG} device},
-	volume = {11},
-	copyright = {2021 The Author(s)},
-	issn = {2045-2322},
-	url = {https://www.nature.com/articles/s41598-021-85163-z},
-	doi = {10.1038/s41598-021-85163-z},
-	language = {en},
-	number = {1},
-	urldate = {2024-04-30},
-	journal = {Scientific Reports},
-	author = {Sato, Wataru and Murata, Koichi and Uraoka, Yasuyuki and Shibata, Kazuaki and Yoshikawa, Sakiko and Furuta, Masafumi},
-	month = mar,
-	year = {2021},
-	note = {Publisher: Nature Publishing Group},
-	keywords = {Human behaviour, Neurophysiology},
-	pages = {5757},
+@article{pearson_hampel_2016,
+	author={Pearson, Ronald K.
+	and Neuvo, Yrj{\"o}
+	and Astola, Jaakko
+	and Gabbouj, Moncef},
+	title={Generalized Hampel Filters},
+	journal={EURASIP Journal on Advances in Signal Processing},
+	year={2016},
+	month={Aug},
+	day={05},
+	volume={2016},
+	number={1},
+	pages={87},
+	abstract={The standard median filter based on a symmetric moving window has only one tuning parameter: the window width. Despite this limitation, this filter has proven extremely useful and has motivated a number of extensions: weighted median filters, recursive median filters, and various cascade structures. The Hampel filter is a member of the class of decsion filters that replaces the central value in the data window with the median if it lies far enough from the median to be deemed an outlier. This filter depends on both the window width and an additional tuning parameter t, reducing to the median filter when t=0, so it may be regarded as another median filter extension. This paper adopts this view, defining and exploring the class of generalized Hampel filters obtained by applying the median filter extensions listed above: weighted Hampel filters, recursive Hampel filters, and their cascades. An important concept introduced here is that of an implosion sequence, a signal for which generalized Hampel filter performance is independent of the threshold parameter t. These sequences are important because the added flexibility of the generalized Hampel filters offers no practical advantage for implosion sequences. Partial characterization results are presented for these sequences, as are useful relationships between root sequences for generalized Hampel filters and their median-based counterparts. To illustrate the performance of this filter class, two examples are considered: one is simulation-based, providing a basis for quantitative evaluation of signal recovery performance as a function of t, while the other is a sequence of monthly Italian industrial production index values that exhibits glaring outliers.},
+	issn={1687-6180},
+	doi={10.1186/s13634-016-0383-6},
+	url={https://doi.org/10.1186/s13634-016-0383-6}
 }
 
-@inproceedings{schmidt_introducing_2018,
+@misc{phinyomark_novel_2009,
+      title={A Novel Feature Extraction for Robust EMG Pattern Recognition}, 
+      author={Angkoon Phinyomark and Chusak Limsakul and Pornchai Phukpattaranont},
+      year={2009},
+      eprint={0912.3973},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/0912.3973}, 
+}
+
+@article{rutkowska_optimal_2024,
+  title={Optimal processing of surface facial EMG to identify emotional expressions: A data-driven approach},
+  url= "https://doi.org/10.3758/s13428-024-02421-4", 
+  doi={10.3758/s13428-024-02421-4},
+  author={Rutkowska, Joanna M and Ghilardi, Tommaso and Vacaru, Stefania V and van Schaik, Johanna E and Meyer, Marlene and Hunnius, Sabine and Oostenveld, Robert},
+  journal={Behavior Research Methods},
+  volume={56},
+  number={7},
+  pages={7331--7344},
+  year={2024},
+  publisher={Springer}
+}
+
+@ARTICLE{sato_emotional_2021,
+  title    = "Emotional valence sensing using a wearable facial {EMG} device",
+  url      = "https://doi.org/10.1038/s41598-021-85163-z", 
+  doi      = "10.1038/s41598-021-85163-z",
+  author   = "Sato, Wataru and Murata, Koichi and Uraoka, Yasuyuki and Shibata,
+              Kazuaki and Yoshikawa, Sakiko and Furuta, Masafumi",
+  abstract = "Emotion sensing using physiological signals in real-life
+              situations can be practically valuable. Previous studies have
+              developed wearable devices that record autonomic nervous system
+              activity, which reflects emotional arousal. However, no study
+              determined whether emotional valence can be assessed using
+              wearable devices. To this end, we developed a wearable device to
+              record facial electromyography (EMG) from the corrugator
+              supercilii (CS) and zygomatic major (ZM) muscles. To validate the
+              device, in Experiment 1, we used a traditional wired device and
+              our wearable device, to record participants' facial EMG while
+              they were viewing emotional films. Participants viewed the films
+              again and continuously rated their recalled subjective valence
+              during the first viewing. The facial EMG signals recorded using
+              both wired and wearable devices showed that CS and ZM activities
+              were, respectively, negatively and positively correlated with
+              continuous valence ratings. In Experiment 2, we used the wearable
+              device to record participants' facial EMG while they were playing
+              Wii Bowling games and assessed their cued-recall continuous
+              valence ratings. CS and ZM activities were correlated negatively
+              and positively, respectively, with continuous valence ratings.
+              These data suggest the possibility that facial EMG signals
+              recorded by a wearable device can be used to assess subjective
+              emotional valence in future naturalistic studies.",
+  journal  = "Scientific Reports",
+  volume   =  11,
+  number   =  1,
+  pages    = "5757",
+  month    =  mar,
+  year     =  2021
+}
+
+@inproceedings{schmidt_wesad_2018,
+	author = {Schmidt, Philip and Reiss, Attila and Duerichen, Robert and Marberger, Claus and Van Laerhoven, Kristof},
+	title = {Introducing WESAD, a Multimodal Dataset for Wearable Stress and Affect Detection},
+	year = {2018},
+	isbn = {9781450356923},
+	publisher = {Association for Computing Machinery},
 	address = {New York, NY, USA},
-	series = {{ICMI} '18},
-	title = {Introducing {WESAD}, a {Multimodal} {Dataset} for {Wearable} {Stress} and {Affect} {Detection}},
-	isbn = {978-1-4503-5692-3},
 	url = {https://doi.org/10.1145/3242969.3242985},
 	doi = {10.1145/3242969.3242985},
-	urldate = {2024-04-30},
-	booktitle = {Proceedings of the 20th {ACM} {International} {Conference} on {Multimodal} {Interaction}},
-	publisher = {Association for Computing Machinery},
-	author = {Schmidt, Philip and Reiss, Attila and Duerichen, Robert and Marberger, Claus and Van Laerhoven, Kristof},
-	month = oct,
-	year = {2018},
-	keywords = {affective computing, benchmark, emotion recognition, multimodal dataset, sensor fusion, stress detection, user study},
+	abstract = {Affect recognition aims to detect a person's affective state based on observables, with the goal to e.g. improve human-computer interaction. Long-term stress is known to have severe implications on wellbeing, which call for continuous and automated stress monitoring systems. However, the affective computing community lacks commonly used standard datasets for wearable stress detection which a) provide multimodal high-quality data, and b) include multiple affective states. Therefore, we introduce WESAD, a new publicly available dataset for wearable stress and affect detection. This multimodal dataset features physiological and motion data, recorded from both a wrist- and a chest-worn device, of 15 subjects during a lab study. The following sensor modalities are included: blood volume pulse, electrocardiogram, electrodermal activity, electromyogram, respiration, body temperature, and three-axis acceleration. Moreover, the dataset bridges the gap between previous lab studies on stress and emotions, by containing three different affective states (neutral, stress, amusement). In addition, self-reports of the subjects, which were obtained using several established questionnaires, are contained in the dataset. Furthermore, a benchmark is created on the dataset, using well-known features and standard machine learning methods. Considering the three-class classification problem ( baseline vs. stress vs. amusement ), we achieved classification accuracies of up to 80\%,. In the binary case ( stress vs. non-stress ), accuracies of up to 93\%, were reached. Finally, we provide a detailed analysis and comparison of the two device locations ( chest vs. wrist ) as well as the different sensor modalities.},
+	booktitle = {Proceedings of the 20th ACM International Conference on Multimodal Interaction},
 	pages = {400--408},
+	numpages = {9},
+	keywords = {user study, stress detection, sensor fusion, multimodal dataset, emotion recognition, benchmark, affective computing},
+	location = {Boulder, CO, USA},
+	series = {ICMI '18}
+}
+
+@misc{scipy_pchip_2025,
+  author       = {{SciPy Community}},
+  title        = {PchipInterpolator — SciPy v1.16.2 Manual},
+  year         = {2025},
+  howpublished = {\url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.PchipInterpolator.html}},
+  url          = {https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.PchipInterpolator.html},
+  note         = {Accessed 2025-09-26}
 }
 
 @article{sharma_dataset_2019,
@@ -296,39 +497,61 @@
 	pages = {196},
 }
 
-@software{sjak-shie_physiodata_2022,
-	title = {{PhysioData} {Toolbox}},
-	url = {https://physiodatatoolbox.leidenuniv.nl/},
-	urldate = {2024-07-15},
-	author = {Sjak-Shie},
-	version = {0.6.3},
-	year = {2022},
+@ARTICLE{shin_relationship_2021,
+	title    = "Relationship between gait quality measures and modular
+				neuromuscular control parameters in chronic post-stroke
+				individuals",
+	url      = "https://doi.org/10.1186/s12984-021-00860-0",
+	doi		 = {10.1186/s12984-021-00860-0},
+	author   = "Shin, Sung Yul and Kim, Yusung and Jayaraman, Arun and Park,
+				Hyung-Soon",
+	abstract = "Recent evidence suggests that disinhibition and/or
+				hyperexcitation of the brainstem descending pathways and
+				intraspinal motor network diffuse spastic synergistic activation
+				patterns after stroke. This results in simplified or merged
+				muscle sets (i.e., muscle modules or synergies) compared to
+				non-impaired individuals and this leads to poor walking
+				performance. However, the relations of how these neuromuscular
+				deficits influence gait quality (e.g., symmetry or natural
+				walking patterns) are still unclear. The objective of this
+				exploratory study was to investigate the relations of modular
+				neuromuscular framework and gait quality measures in chronic
+				stroke individuals.",
+	journal  = "Journal of NeuroEngineering and Rehabilitation",
+	volume   =  18,
+	number   =  1,
+	pages    = "58",
+	month    =  apr,
+	year     =  2021
 }
 
-@article{soleymani_toolbox_2017,
-	title = {Toolbox for {Emotional} {feature} extraction from {Physiological} signals ({TEAP})},
-	volume = {4},
-	issn = {2297-198X},
-	url = {https://www.frontiersin.org/articles/10.3389/fict.2017.00001},
-	doi = {10.3389/fict.2017.00001},
-	language = {English},
-	urldate = {2024-04-30},
-	journal = {Frontiers in ICT},
-	author = {Soleymani, Mohammad and Villaro-Dixon, Frank and Pun, Thierry and Chanel, Guillaume},
-	month = feb,
-	year = {2017},
-	note = {Publisher: Frontiers},
-	keywords = {Affective Computing, code:matlab, code:octave, Electroencephalogram, Emotions, physiological signals, Signal processing, Toolbox},
+@misc{noauthor_physiodata_nodate,
+	title = {PhysioData Toolbox (Version 0.7.0)},
+	url = {https://physiodatatoolbox.leidenuniv.nl/},
+	author = "Sjak-Shie, Elio E.",
+	language = {en-US},
+	urldate = {2025-10-20},
+	journal = {PhysioData Toolbox},
+}
+
+@ARTICLE{soleymani_toolbox_2017,
+	AUTHOR={Soleymani, Mohammad  and Villaro-Dixon, Frank  and Pun, Thierry  and Chanel, Guillaume },
+	TITLE={Toolbox for Emotional feAture extraction from Physiological signals (TEAP)},
+	JOURNAL={Frontiers in ICT},
+	VOLUME={Volume 4 - 2017},
+	YEAR={2017},
+	URL={https://www.frontiersin.org/journals/ict/articles/10.3389/fict.2017.00001},
+	DOI={10.3389/fict.2017.00001},
+	ISSN={2297-198X},
+	ABSTRACT={Physiological response is an important component of an emotional episode. In this paper, we introduce a Toolbox for Emotional feAture Extraction from Physiological signals (TEAP). This open  source toolbox can preprocess and calculate emotionally relevant features from multiple physiological signals, namely, electroencephalogram (EEG), galvanic skin response (GSR), electromyogram (EMG), skin temperature, respiration pattern and blood volume pulse. The features from this toolbox are tested on two publicly available databases, i.e., MAHNOB-HCI and DEAP. We demonstrated that we achieve similar performance to the original work with the features from this toolbox. The toolbox is implemented in MATLAB and is also compatible with Octave.  We hope this toolbox to be further developed and accelerate research in affective physiological signal analysis.}
 }
 
 @article{stepp_surface_2012,
-	title = {Surface {Electromyography} for {Speech} and {Swallowing} {Systems}: {Measurement}, {Analysis}, and {Interpretation}},
+	title = {Surface Electromyography for Speech and Swallowing Systems: Measurement, Analysis, and Interpretation},
 	volume = {55},
-	shorttitle = {Surface {Electromyography} for {Speech} and {Swallowing} {Systems}},
 	url = {https://pubs.asha.org/doi/abs/10.1044/1092-4388%282011/11-0214%29},
 	doi = {10.1044/1092-4388(2011/11-0214)},
 	number = {4},
-	urldate = {2024-04-30},
 	journal = {Journal of Speech, Language, and Hearing Research},
 	author = {Stepp, Cara E.},
 	month = aug,
@@ -339,18 +562,17 @@
 }
 
 @article{tamietto_unseen_2009,
+	author = {Marco Tamietto  and Lorys Castelli  and Sergio Vighetti  and Paola Perozzo  and Giuliano Geminiani  and Lawrence Weiskrantz  and Beatrice de Gelder },
 	title = {Unseen facial and bodily expressions trigger fast emotional reactions},
-	volume = {106},
-	url = {https://www.pnas.org/doi/abs/10.1073/pnas.0908994106},
-	doi = {10.1073/pnas.0908994106},
-	number = {42},
-	urldate = {2024-04-30},
 	journal = {Proceedings of the National Academy of Sciences},
-	author = {Tamietto, Marco and Castelli, Lorys and Vighetti, Sergio and Perozzo, Paola and Geminiani, Giuliano and Weiskrantz, Lawrence and de Gelder, Beatrice},
-	month = oct,
+	volume = {106},
+	number = {42},
+	pages = {17661-17666},
 	year = {2009},
-	note = {Publisher: Proceedings of the National Academy of Sciences},
-	pages = {17661--17666},
+	doi = {10.1073/pnas.0908994106},
+	URL = {https://www.pnas.org/doi/abs/10.1073/pnas.0908994106},
+	eprint = {https://www.pnas.org/doi/pdf/10.1073/pnas.0908994106},
+	abstract = {The spontaneous tendency to synchronize our facial expressions with those of others is often termed emotional contagion. It is unclear, however, whether emotional contagion depends on visual awareness of the eliciting stimulus and which processes underlie the unfolding of expressive reactions in the observer. It has been suggested either that emotional contagion is driven by motor imitation (i.e., mimicry), or that it is one observable aspect of the emotional state arising when we see the corresponding emotion in others. Emotional contagion reactions to different classes of consciously seen and “unseen” stimuli were compared by presenting pictures of facial or bodily expressions either to the intact or blind visual field of two patients with unilateral destruction of the visual cortex and ensuing phenomenal blindness. Facial reactions were recorded using electromyography, and arousal responses were measured with pupil dilatation. Passive exposure to unseen expressions evoked faster facial reactions and higher arousal compared with seen stimuli, therefore indicating that emotional contagion occurs also when the triggering stimulus cannot be consciously perceived because of cortical blindness. Furthermore, stimuli that are very different in their visual characteristics, such as facial and bodily gestures, induced highly similar expressive responses. This shows that the patients did not simply imitate the motor pattern observed in the stimuli, but resonated to their affective meaning. Emotional contagion thus represents an instance of truly affective reactions that may be mediated by visual pathways of old evolutionary origin bypassing cortical vision while still providing a cornerstone for emotion communication and affect sharing.}
 }
 
 @article{tkach_study_2010,
@@ -370,45 +592,42 @@
 	pages = {21},
 }
 
-@article{van1983changes,
-  title={Changes in electromyogram power spectra of facial and jaw-elevator muscles during fatigue},
-  doi = {10.1152/jappl.1983.54.1.51},
-  author={Van Boxtel, A and Goudswaard, P and Van der Molen, GM and Van Den Bosch, WE},
-  journal={Journal of Applied Physiology},
-  volume={54},
-  number={1},
-  pages={51--58},
-  year={1983}
+@article{vanboxtel_changes_1983,
+	author = {van Boxtel, A. and Goudswaard, P. and van der Molen, G. M. and van den Bosch, W. E.},
+	title = {Changes in electromyogram power spectra of facial and jaw-elevator muscles during fatigue},
+	journal = {Journal of Applied Physiology},
+	volume = {54},
+	number = {1},
+	pages = {51-58},
+	year = {1983},
+	doi = {10.1152/jappl.1983.54.1.51},
+	note = {PMID: 6826422},
+	URL = {https://doi.org/10.1152/jappl.1983.54.1.51},
+	eprint = {https://doi.org/10.1152/jappl.1983.54.1.51},
+	abstract = { Endurance and changes in electromyogram (EMG) power spectra were investigated during a fatiguing static contraction at 50\% of the maximum EMG amplitude in two jaw-elevator muscles (masseter and temporalis) and five facial muscles (frontalis, corrugator supercilii, zygomaticus major, orbicularis oris, and buccinator). Relatively high endurance was found in orbicularis oris, frontalis, and corrugator supercilii muscles; intermediate endurance was found in zygomaticus major, buccinator, and temporalis muscles; and low endurance was found in the masseter muscle. The last muscle showed a relatively fast linear decrease of the median frequency of the power spectrum. The other muscles showed a much slower, exponential decrease. The median frequency appeared to reflect reliably the changes in the shape of the power spectra during fatigue. Large differences between the shape of power spectra of different muscles in the unfatigued state were found. These, however, were unrelated to endurance and degree of spectral shift during fatigue. }
 }
 
-@misc{vitepress,
-  title        = {{VitePress}: Vite \& Vue powered static-site generator},
-  author       = {You, Evan and the VitePress Contributors},
-  howpublished = {\url{https://vitepress.dev}},
-  note         = {1.6.3, accessed April 2025}
+@ARTICLE{welch_psd_1967,
+  author={Welch, P.},
+  journal={IEEE Transactions on Audio and Electroacoustics}, 
+  title={The use of fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms}, 
+  year={1967},
+  volume={15},
+  number={2},
+  pages={70-73},
+  keywords={Fast Fourier transforms;Testing;Fourier transforms;Shape;Aging;Time measurement;Demodulation;Stochastic processes;Reactive power},
+  doi={10.1109/TAU.1967.1161901}
 }
 
-@article{virtanen_scipy_2020,
-  title={SciPy 1.0: fundamental algorithms for scientific computing in Python},
-  author={Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E and Haberland, Matt and Reddy, Tyler and Cournapeau, David and Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and Bright, Jonathan and others},
-  journal={Nature methods},
-  volume={17},
-  number={3},
-  pages={261--272},
-  year={2020},
-  publisher={Nature Publishing Group US New York}
+@INPROCEEDINGS{zhang_biovid_2016,
+  author={Zhang, Lin and Walter, Steffen and Xueyao Ma and Werner, Philipp and Al-Hamadi, Ayoub and Traue, Harald C. and Gruss, Sascha},
+  booktitle={2016 IEEE Symposium Series on Computational Intelligence (SSCI)}, 
+  title={“BioVid Emo DB”: A multimodal database for emotion analyses validated by subjective ratings}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Films;Databases;Cameras;Streaming media;Electrodes;Data mining;Skin;database;data mining;emotion recognition;film clips;discrete emotions},
+  doi={10.1109/SSCI.2016.7849931}
 }
 
-@inproceedings{zhang_biovid_2016,
-	title = {“{BioVid} {Emo} {DB}”: {A} multimodal database for emotion analyses validated by subjective ratings},
-	shorttitle = {“{BioVid} {Emo} {DB}”},
-	url = {https://ieeexplore.ieee.org/abstract/document/7849931},
-	doi = {10.1109/SSCI.2016.7849931},
-	urldate = {2024-04-30},
-	booktitle = {2016 {IEEE} {Symposium} {Series} on {Computational} {Intelligence} ({SSCI})},
-	author = {Zhang, Lin and Walter, Steffen and Ma, Xueyao and Werner, Philipp and Al-Hamadi, Ayoub and Traue, Harald C. and Gruss, Sascha},
-	month = dec,
-	year = {2016},
-	keywords = {Cameras, data mining, Data mining, database, Databases, discrete emotions, Electrodes, emotion recognition, film clips, Films, Skin, Streaming media},
-	pages = {1--6},
-}
