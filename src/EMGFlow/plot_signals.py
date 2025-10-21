@@ -28,7 +28,7 @@ A collection of functions for plotting data.
 # =============================================================================
 #
 
-def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True):
+def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0, units:str='mV', file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True):
     """
     Generate a Shiny dashboard of different processing stages for a given
     column of signal data.
@@ -45,9 +45,11 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
         'make_paths' function.
     column_name : str
         The column of the signals to display in the visualization.
-    units : str
+    sampling_rate : float, optional
+        The sampling rate of 'Signal'. The default is 1000.0.
+    units : str, optional
         Units to use for the y axis of the plot, should be the same units used
-        for the values in 'column_name'.
+        for the values in 'column_name'. The default is 'mV'.
     file_ext : str, optional
         File extension for files to read. Only visualizes files with this
         extension. The default is 'csv'.
@@ -118,7 +120,8 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
                 ui.input_select('sig_type', 'Signal Displayed:', choices=['All']+names),
                 ui.input_select('file_type', 'File:', choices=df['File']),
                 ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1])
+                ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1]),
+                ui.input_checkbox('use_psd', 'Show Spectrum', value=False)
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
@@ -137,6 +140,7 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
         def update_x_slider():
             filename = input.file_type()
             column = input.sig_type()
+            use_psd = input.use_psd()
         
             if column == 'All':
                 min_x = float('inf')
@@ -147,10 +151,18 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
                 for file_loc in list(df.loc[filename])[1:]:
                     data = read_file_type(file_loc, file_ext)
                     
-                    min_x = min(min_x, data['Time'].min())
-                    max_x = max(max_x, data['Time'].max())
-                    min_y = min(min_y, data[column_name].min())
-                    max_y = max(max_y, data[column_name].max())
+                    if not use_psd:
+                        x_val = data['Time']
+                        y_val = data[column_name]
+                    else:
+                        PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate)
+                        x_val = PSD['Frequency']
+                        y_val = PSD['Power']
+                    
+                    min_x = min(min_x, x_val.min())
+                    max_x = max(max_x, x_val.max())
+                    min_y = min(min_y, y_val.min())
+                    max_y = max(max_y, y_val.max())
                     # Round the x and y-axis to 2 decimal places
                     min_x = np.floor(min_x * 100) / 100
                     max_x = np.ceil(max_x * 100) / 100
@@ -160,10 +172,19 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
             else:
                 file_location = df.loc[filename][column]
                 data = read_file_type(file_location, file_ext)
-                max_x = data['Time'].max()
-                min_x = data['Time'].min()
-                max_y = data[column_name].max()
-                min_y = data[column_name].min()
+                
+                if not use_psd:
+                    x_val = data['Time']
+                    y_val = data[column_name]
+                else:
+                    PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate)
+                    x_val = PSD['Frequency']
+                    y_val = PSD['Power']
+                
+                max_x = x_val.max()
+                min_x = x_val.min()
+                max_y = y_val.max()
+                min_y = y_val.min()
                 # Round the x and y-axis to 2 decimal places
                 min_x = np.floor(min_x * 100) / 100
                 max_x = np.ceil(max_x * 100) / 100
@@ -181,7 +202,7 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
             column = input.sig_type()
             x_min, x_max = input.x_range()  # Get slider values
             y_min, y_max = input.y_range()
-
+            use_psd = input.use_psd()
             
             # Plot data
             fig, ax = plt.subplots()
@@ -196,7 +217,11 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
                     if column_name not in list(sigDF.columns.values):
                         raise Exception("Column " + str(column_name) + " not in Signal " + str(filename))
                     
-                    ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
+                    if not use_psd:
+                        ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
+                    else:
+                        PSD = emg_to_psd(sigDF, column_name, sampling_rate)
+                        ax.plot(PSD['Frequency'], PSD['Power'], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
                 if show_legend:
@@ -213,12 +238,22 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
                 # Get colour data
                 i = names.index(column)
                 # Plot file
-                ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
+                if not use_psd:
+                    ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
+                else:
+                    PSD = emg_to_psd(sigDF, column_name, sampling_rate)
+                    ax.plot(PSD['Frequency'], PSD['Power'], color=colours[i], alpha=0.5, linewidth=1)
                 
             ax.set_xlim(x_min, x_max)
             ax.set_ylim(y_min, y_max)
-            ax.set_ylabel('Voltage (mV)')
-            ax.set_xlabel('Time (s)')
+            
+            if not use_psd:
+                ax.set_ylabel('Voltage (' + units + ')')
+                ax.set_xlabel('Time (s)')
+            else:
+                ax.set_ylabel('Power (Normalized)')
+                ax.set_xlabel('Frequency (Hz)')
+                
             ax.set_title(column_name)
             
             return fig
