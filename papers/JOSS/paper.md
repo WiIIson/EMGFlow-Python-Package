@@ -17,7 +17,7 @@ authors:
 affiliations:
   - index: 1
     name: Department of Computer Science, Ontario Tech University, Oshawa, Canada
-date: 18 October 2025
+date: 24 October 2025
 bibliography: paper.bib
 ---
 
@@ -95,7 +95,7 @@ notch_main = [(50, 5)]
 muscles = ['EMG_zyg', 'EMG_cor']
 
 # Step 1. Apply notch filter to all files in 1_raw, writing output to 2_notch
-EMGFlow.notch_filter_signals(path_names['Raw'], path_names['Notch'], muscles, sampling_rate, notch_main)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], muscles, sampling_rate, notch_main)
 ```
 
 _EMGFlow_ preserves the raw directory structure and mirrors it at each pipeline stage. All preprocessing functions accept an optional regular expression to target specific files. In Step 1b, we apply an additional notch filter at 150 Hz (the 3rd harmonic) only to files in subfolder `/01`.
@@ -106,7 +106,7 @@ notch_custom = [(150, 25)]
 path_pattern = '^01/'
 
 # Step 1b. Apply custom notch filter all to files in subfolder "/01"
-EMGFlow.notch_filter_signals(path_names['Notch'], path_names['Notch'], muscles, sampling_rate, notch_custom, expression=path_pattern)
+EMGFlow.notch_filter_signals(path_names['notch'], path_names['notch'], muscles, sampling_rate, notch_custom, expression=path_pattern)
 ```
 
 ## Interference Attenuation
@@ -118,10 +118,10 @@ Surface EMG is susceptible to multiple sources of interference that affect the s
 passband_edges = [20, 450]
 
 # Step 2. Apply band-pass filter
-EMGFlow.bandpass_filter_signals(path_names['Notch'], path_names['Bandpass'], muscles, sampling_rate, passband_edges)
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], muscles, sampling_rate, passband_edges)
 
 # Step 3. Apply full-wave rectifier
-EMGFlow.rectify_signals(path_names['Bandpass'], path_names['FWR'], muscles)
+EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'], muscles)
 ```
 
 Signal artefacts are another source of contamination, and span a diverse range of phenomeneon including thermal noise, eyeblinks, and random noise bursts [@boyer_reducing_2023]. These can be mitigated with `screen_artefacts()`, which applies a Hampel filter (default), or Wiener filter, both reported as robust denoisers [@allen_hampel_2009; @bhowmik_outlier_2017; @jarrah_density_2022]. Because artefact profiles vary across projects, we recommend visual inspectection with the the interactive dashboard to tune `n_sigma` (Hampel) and `window_ms` [@bhowmik_outlier_2017; @pearson_hampel_2016]. In Step 4 we target `/02/sample_data_04.csv` which contains an artificial, band-limited noise pulse, and copy other files forward untouched.
@@ -130,7 +130,7 @@ Signal artefacts are another source of contamination, and span a diverse range o
 screen_pattern = r'^02/sample_data_04\.csv$'
 
 # Step 4. Apply hampel artefact filter to 02/sample_data_04.csv
-EMGFlow.screen_artefact_signals(path_names['FWR'], path_names['Screened'], muscles, sampling_rate, expression=screen_pattern, copy_unmatched=True)
+EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], muscles, sampling_rate, expression=screen_pattern, copy_unmatched=True)
 ```
 
 Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properites desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artifically injected gaps with PCHIP.
@@ -139,15 +139,15 @@ In Step 6, optional smoothing removes residual high-frequency noise before featu
 
 ```python
 # Step 5. Fill missing data
-EMGFlow.fill_missing_signals(path_names['Screened'], path_names['Filled'], muscles, sampling_rate)
+EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], muscles, sampling_rate)
 
 # Step 6. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['Filled'], path_names['Smooth'], muscles, sampling_rate)
+EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], muscles, sampling_rate)
 ```
 
 ## An Interactive Dashboard
 
-_EMGFlow_ includes a Shiny dashboard to visualize preprocessing effects. Pipeline steps can be shown overlaid or individually, and files are selectable via a dropdown. Below we generate a dashboard for the Zygomaticus major channel.
+_EMGFlow_ includes a Shiny dashboard to visualize preprocessing effects. Pipeline steps can be shown overlaid or individually, and files are selectable via a dropdown. The dashboard lets you toggle between the amplitude time-series view and an optional spectral view that displays the signal’s Power Spectral Density (PSD). The PSD highlights mains peaks and harmonics for selecting notch frequency (f0) and Q; the time-series reveals transients and drift to set passband edges and confirm filtering preserves the waveform. Below we generate a dashboard for the Zygomaticus major channel.
 
 ```python
 # Column and measurement units to plot
@@ -177,7 +177,7 @@ We conclude Example 2 by extracting features and previewing the first rows.
 ```python
 
 # Step 7. Extract features and save results in "Features.csv"
-df = EMGFlow.extract_features(path_names['Filled'], sampling_rate)
+df = EMGFlow.extract_features(path_names['filled'], sampling_rate)
 
 # Inspect features
 df.head()
@@ -201,7 +201,7 @@ The set of 18 time-domain features include  statistical moments (mean, variance,
 
 The 15 frequency-domain features characterise power-spectrum shape and distribution. Median frequency [@phinyomark_novel_2009] tracks changes in conduction velocity, and is muscle fatigue assessments [@vanboxtel_changes_1983; @lindstrom_emg_1977; @mcmanus_analysis_2020]. Standard measures include spectral centroid, flatness, entropy, and roll-off. We also introduce Twitch Ratio, adapted from speech analysis [@eyben_geneva_2016], defined as the ratio of upper- to lower-band energy with a 60 Hz boundary between slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
 
-Spectral features are computed by converting the Step 2 band-limited signal into a Power Spectral Density (PSD). To avoid discarding otherwise valid Welch frames due to isolated dropouts, we perform constrained interpolation for micro-gaps <5 samples (≈2.5–5 ms at 1–2 kHz) and leave longer gaps as NaN so affected frames are rejected [@jas_autoreject_2017]. This limits interpolation bias, which increases with gap size and density [@clifford_quantifying_2005; @munteanu_quantifying_2016]. We do not apply Steps 3–6 before PSD: rectification is non-linear and distorts spectra [@farina_identification_2013; @mcclelland_inconsistent_2014; @neto_rectification_2010]; artefact-replacement filters can violate stationarity assumptions for FFT-based PSD; and smoothing suppresses high-frequency content. We estimate PSD with Welch’s method using Hann windows, 50% overlap, and rejection of segments with remaining invalid samples, and mean averaging of retained spectra to form a long-term spectrum [@welch_psd_1967].
+Spectral features are computed by converting the Step 2 band-limited signal into a PSD. To avoid discarding otherwise valid Welch frames due to isolated dropouts, we perform constrained interpolation for micro-gaps <5 samples (≈2.5–5 ms at 1–2 kHz) and leave longer gaps as NaN so affected frames are rejected [@jas_autoreject_2017]. This limits interpolation bias, which increases with gap size and density [@clifford_quantifying_2005; @munteanu_quantifying_2016]. We do not apply Steps 3–6 before PSD: rectification is non-linear and distorts spectra [@farina_identification_2013; @mcclelland_inconsistent_2014; @neto_rectification_2010]; artefact-replacement filters can violate stationarity assumptions for FFT-based PSD; and smoothing suppresses high-frequency content. We estimate PSD with Welch’s method using Hann windows, 50% overlap, and rejection of segments with remaining invalid samples, and mean averaging of retained spectra to form a long-term spectrum [@welch_psd_1967].
 
 ### Missing Data Reporting
 
