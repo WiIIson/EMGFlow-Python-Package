@@ -34,7 +34,7 @@ passband_edges = [20, 450]
 column_names = ['EMG_zyg', 'EMG_cor']
 
 # 1. Apply notch filters
-EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_main)
 
 # 2. Apply bandpass filter
 EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
