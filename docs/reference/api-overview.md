@@ -23,7 +23,7 @@ mindmap
 
 These functions provide helper methods for accessing files, as well as functions for creating an EMG workflow filestructure.
 
-`make_paths` is the beginning of the EMG processing pipeline. It generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys "Raw", "Notch", "Bandpass", "FWR", "Screened", "Filled", "Smooth" and "Feature" - each for a different stage of processing. This dictionary is passed to many of the processing functions. If you have your own file structure you want to use instead, you can create your own dictionary to use instead, manually setting the locations of the paths under these keys.
+`make_paths` is the beginning of the EMG processing pipeline. It generates folders for storing EMG data, and returns a dictionary with the locations of these folders. These locations are accessed under the keys 'raw', 'notch', 'bandpass', 'fwr', 'screened', 'filled', 'smoothed' and 'feature' - each for a different stage of processing. This dictionary is passed to many of the processing functions. If you have your own file structure you want to use instead, you can create your own dictionary to use instead, manually setting the locations of the paths under these keys.
 
 `make_sample_data` provides built-in data to test out a data processing pipeline. It writes EMG data files to the "Raw" directory of a provided dictionary.
 

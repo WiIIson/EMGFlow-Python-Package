@@ -49,7 +49,7 @@ EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], colum
 EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], column_names, sampling_rate)
 
 # 6. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], column_names, sampling_rate)
+EMGFlow.smooth_signals(path_names['filled'], path_names['smoothed'], column_names, sampling_rate)
 
 # 7. Extract features
 df = EMGFlow.extract_features(path_names, column_names, sampling_rate)
@@ -189,11 +189,11 @@ column_names = ['EMG_zyg', 'EMG_cor']
 # Preprocess signals
 EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], column_names, sampling_rate, notch_vals)
 EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], column_names, sampling_rate, passband_edges)
-EMGFlow.rectify_signals(path_names['bandpass'], path_names['smooth'], column_names)
+EMGFlow.rectify_signals(path_names['bandpass'], path_names['smoothed'], column_names)
 
 # Map locations of files to process
 file_dirs_b = EMGFlow.map_files(path_names['bandpass'])
-file_dirs_s = EMGFlow.map_files(path_names['smooth'])
+file_dirs_s = EMGFlow.map_files(path_names['smoothed'])
 
 # List of measures to extract
 measureNames = [

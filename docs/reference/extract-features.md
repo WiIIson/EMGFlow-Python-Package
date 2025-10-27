@@ -60,11 +60,11 @@ Each extracted feature is available as its own function for easy use.
 
 Extracts features from signals by running a series of feature extraction functions and saving the outputs to a feature file.
 
-The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'smooth' and 'bandpass' paths. The 'smooth' step is optional, if it was not used, data is searched for in the following order: 'smooth' -> 'filled' -> 'fwr'.
+The input and output locations are controlled by the `path_names` dictionary. The input data is taken from the 'smoothed' and 'bandpass' paths. The 'smoothed' step is optional, if it was not used, data is searched for in the following order: 'smoothed' -> 'filled' -> 'fwr'.
 
-All files within these folders and subfolders are assumed to be valid data if they match the provided file extension, and the optional regular expression. Files of the same name should exist in both the 'smooth'/'filled'/'fwr' and 'bandpass' folders, being the same file at different stages in processing pipeline.
+All files within these folders and subfolders are assumed to be valid data if they match the provided file extension, and the optional regular expression. Files of the same name should exist in both the 'smoothed'/'filled'/'fwr' and 'bandpass' folders, being the same file at different stages in processing pipeline.
 
-The 'smooth'/'filled'/'fwr' path is used to calculate time-series features, while the 'bandpass' path is used to calculate spectral features.
+The 'smoothed'/'filled'/'fwr' path is used to calculate time-series features, while the 'bandpass' path is used to calculate spectral features.
 
 Columns of these files that begin with 'mask\_' are assumed to be NaN mask columns, and are ignored unless specified in `column_names`.
 
@@ -104,9 +104,9 @@ A warning is raised if `expression` does not match with any files in the folders
 
 An exception is raised if 'bandpass', 'fwr' or 'feature' are not keys of the `path_names` dictionary provided.
 
-An exception is raised if the 'bandpass' and 'smooth'/'filled'/'fwr' filepaths do not contain the same files.
+An exception is raised if the 'bandpass' and 'smoothed'/'filled'/'fwr' filepaths do not contain the same files.
 
-An exception is raised if a file cannot not be read in the 'bandpass' or 'smooth'/'filled'/'fwr' filepaths.
+An exception is raised if a file cannot not be read in the 'bandpass' or 'smoothed'/'filled'/'fwr' filepaths.
 
 An exception is raised if a file does not contain one of the columns from `column_names`.
 
@@ -129,7 +129,7 @@ column_names = ['EMG_zyg', 'EMG_cor']
 sampling_rate = 2000
 
 # Extracts all features from the files in the 'Bandpass' path and the 'Filled'
-# path. If the 'Filled' path was empty, it would use 'Smooth' instead. Assumes
+# path. If the 'Filled' path was empty, it would use 'smoothed' instead. Assumes
 # the same files are in both paths.
 features = EMGFlow.extract_features(path_names, column_names, sampling_rate)
 ```
