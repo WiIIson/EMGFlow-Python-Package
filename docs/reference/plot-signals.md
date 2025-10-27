@@ -20,12 +20,12 @@ mindmap
 
 Generate a Shiny dashboard of different processing stages for a given column of signal data.
 
-Uses a `path_names` filepath dictionary (see `make_paths`). Has a side bar menu to navigate the file and stage being displayed.
+Uses a `path_names` filepath dictionary (see `make_paths`). Has a side bar menu to navigate the file and stage being displayed. There is an option to view the data as raw signals, or as a Power Spectrum Density plot.
 
 The function ignores the 'feature' filepath. The remaining filepaths are tested for files, and included if found.
 
 ```python
-def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True)
+def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0, units:str='mV', file_ext:str='csv', use_mask:bool=False, show_legend:bool=True, auto_run:bool=True)
 ```
 
 **Parameters:**
@@ -35,6 +35,9 @@ def plot_dashboard(path_names:dict, column_name:str, units:str, file_ext:str='cs
 
 `column_name` : str
 - The column of the signals to display in the visualization.
+
+`sampling_rate` : float, optional (1000.0)
+- The sampling rate for all signal data being plotted. The default is 1000.0.
 
 `units` : str
 - Units to use for the y axis of the plot, should be the same units used for the values in 'column_name'.
