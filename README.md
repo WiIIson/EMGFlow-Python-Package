@@ -6,24 +6,24 @@
 [![Downloads](https://static.pepy.tech/badge/EMGFlow/month)](https://pepy.tech/project/EMGFlow)
 [![Downloads](https://static.pepy.tech/badge/EMGFlow)](https://pepy.tech/project/EMGFlow)
 
-The open workflow for EMG signal processing and feature extraction.
+A Python package for preprocessing and feature extraction of surface electromyography (sEMG) signals.
 
-**EMGFlow** is a Python package for researchers and clinicians to engage in signal processing. EMGFlow provides a broad range of functions to meet your EMG signal processing needs, without prescribing a specific workflow. EMGFlow follows open standards of data processing, such as CSV files and Pandas data frames to allow easy integration. With functions to extract 33 different features according to your needs, EMGFlow provides a uniquely deep feature extraction.
+_EMGFlow_ streamlines end-to-end sEMG analysis for research and clinical workflows. It is designed for batch processing of large datasets typical in machine learning, extracting a comprehensive set of 33 time- and frequency-domain features. The package uses Pandas DataFrames throughout for interoperability and supports flexible file selection with regular expressions. An interactive dashboard visualises signals at each preprocessing stage to aid decisions.
 
-EMGFlow also includes an easy method for producing detailed graphs of EMG signals in large quantities.
+_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view:
 
-The simple navigation menu allows you to switch between which files you see as well as which layers are overlayed:
 ![Example 1](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/EMGFlow_GUI.webp?raw=true)
 
 ## Statement Of Need
 
-While several packages exist for processing physiological and neurological signals, support for surface electromyography (sEMG) has remained limited. Many packages lack a comprehensive set of features that can be extracted from sEMG data, leaving researchers to use a patchwork of tools. Other packages are orientated around event detection in individual recordings and use GUI-based workflow that requires greater manual intervention. While this design works well for single person recordings, it complicates the extraction of features from large datasets, such as those common to machine learning.
+Although several packages process physiological and neurological signals, support for sEMG has remained limited. Many lack a comprehensive feature set for sEMG, forcing researchers to use a patchwork of tools. Others focus on event detection with GUI-centric workflows that suit continuous recordings of a single participant, but complicate batch feature extraction common in machine learning.
 
-The EMGFlow package – a portmanteau of EMG and Workflow - fills this gap. Our package provides a flexible pipeline for the extraction of a wide range of sEMG features, with a scalable design that is suited to the processing of large datasets.
+_EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flexible pipeline for extracting a wide range of sEMG features, with a scalable design suited for large datasets.
 
 ## Example
 
 As a quick example, the following will create a feature file, and create a plot of the "EMG_zyg" column:
+
 ```python
 import EMGFlow as ef
 
@@ -62,20 +62,22 @@ Examples:
 ## Installation
 
 EMGFlow can be installed from PyPI:
+
 ```python
 pip install EMGFlow
 ```
 
 Once installed, the package can be loaded as follows:
+
 ```python
 import EMGFlow
 ```
 
-Project dependencies can be seen [here](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/pyproject.toml).
+Project dependencies can be seen in the [build file](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/pyproject.toml).
 
 ## Contributions
 
-Contributions and community guidelines can be seen [here](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/.github/CONTRIBUTING.md).
+Contributions and community guidelines can be seen the [contributing guide](https://github.com/WiIIson/EMGFlow-Python-Package/blob/main/.github/CONTRIBUTING.md).
 
 ## Citations
 
