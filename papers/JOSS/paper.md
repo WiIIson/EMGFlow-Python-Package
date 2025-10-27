@@ -43,7 +43,7 @@ _EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flex
 
 # Comparison to Other Packages
 
-Compared to existing toolkits, _EMGFlow_ provides a broader, sEMG-specific library of 33 features [@bizzego_pyphysio_2019; @bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. Its dashboard visualises batch-processed files rather than single recordings, enabling inspection of preprocessing effects across datasets [@gabrieli_pysiology_2020]. Adjustable filters and smoothing support support international mains standards (50 vs 60 Hz), a subtle detail some packages omit.
+Compared to existing toolkits, _EMGFlow_ provides a broader, sEMG-specific library of 33 features [@bizzego_pyphysio_2019; @bota_biosppy_2024; @makowski_neurokit2_2021; @sjak-shie_physiodata_2022; @soleymani_toolbox_2017]. Its dashboard visualises batch-processed files rather than single recordings, enabling inspection of preprocessing effects across datasets [@gabrieli_pysiology_2020]. Adjustable filters and smoothing support international mains standards (50 vs 60 Hz), a subtle detail some packages omit.
 
 # Features
 
@@ -57,7 +57,7 @@ Extracting features from large datasets is fundamental in machine learning and q
 Example 1 demonstrates end-to-end preprocessing and feature extraction. We create project paths with `make_paths()` and load bundled sample data with `make_sample_data()` (adapted from PeakAffectDS [@greene_peakaffectds_2022]). Next, we run automated preprocessing via `clean_signals()` using sensible, literature-based defaults, and then write a plaintext CSV of 33 features per file with `extract_features()`.
 
 ```python
-# %% Example 1: Quickstart (full pipeline)
+# %% Example 1: Quick start (full pipeline)
 import EMGFlow
 
 # Create project paths
@@ -66,8 +66,8 @@ path_names = EMGFlow.make_paths()
 # Load sample data
 EMGFlow.make_sample_data(path_names)
 
-# Preprocess signals (sample data recorded at 50 Hz mains)
-EMGFlow.clean_signals(path_names, sampling_rate=2000)
+# Preprocess signals
+EMGFlow.clean_signals(path_names, sampling_rate=2000, notch_f0=50)
 
 # Extract features to disk "Features.csv"
 EMGFlow.extract_features(path_names, sampling_rate=2000)
@@ -75,7 +75,7 @@ EMGFlow.extract_features(path_names, sampling_rate=2000)
 
 ## Tailored Preprocessing
 
-Example 2 shows how advanced users can tailor low-level preprocessing. After setup, Step 1  applies a notch filter to remove AC mains interference. Most functions use common sense defaults, which can be modified task-wide or for select cases. For instance, the sample data were recorded in New Zealand (200-240 VAC 50Hz), so we set the notch frequency and quality factor accordingly.
+Example 2 shows how advanced users can tailor low-level preprocessing. After setup, Step 1 applies a notch filter to remove AC mains interference. Most functions use common sense defaults, which can be modified task-wide or for select cases. For instance, the sample data were recorded in New Zealand (200-240 VAC 50Hz), so we set the notch frequency and quality factor accordingly.
 
 ```python
 # %% Example 2: Tailored preprocessing
@@ -124,16 +124,16 @@ EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], mus
 EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'], muscles)
 ```
 
-Signal artefacts are another source of contamination, and span a diverse range of phenomeneon including thermal noise, eyeblinks, and random noise bursts [@boyer_reducing_2023]. These can be mitigated with `screen_artefacts()`, which applies a Hampel filter (default), or Wiener filter, both reported as robust denoisers [@allen_hampel_2009; @bhowmik_outlier_2017; @jarrah_density_2022]. Because artefact profiles vary across projects, we recommend visual inspectection with the the interactive dashboard to tune `n_sigma` (Hampel) and `window_ms` [@bhowmik_outlier_2017; @pearson_hampel_2016]. In Step 4 we target `/02/sample_data_04.csv` which contains an artificial, band-limited noise pulse, and copy other files forward untouched.
+Signal artefacts are another source of contamination and span a diverse range of phenomenon including thermal noise, eyeblinks, and random noise bursts [@boyer_reducing_2023]. These can be mitigated with `screen_artefacts()`, which applies a Hampel filter (default), or Wiener filter, both reported as robust denoisers [@allen_hampel_2009; @bhowmik_outlier_2017; @jarrah_density_2022]. Because artefact profiles vary across projects, we recommend visual inspectection with the interactive dashboard to tune `n_sigma` (Hampel) and `window_ms` [@bhowmik_outlier_2017; @pearson_hampel_2016]. In Step 4 we target `/02/sample_data_04.csv` which contains an artificial, band-limited noise pulse, and copy other files forward untouched.
 
 ```python
 screen_pattern = r'^02/sample_data_04\.csv$'
 
-# Step 4. Apply hampel artefact filter to 02/sample_data_04.csv
+# Step 4. Apply Hampel artefact filter to 02/sample_data_04.csv
 EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], muscles, sampling_rate, expression=screen_pattern, copy_unmatched=True)
 ```
 
-Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properites desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artifically injected gaps with PCHIP.
+Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properites desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artificially injected gaps with PCHIP.
 
 In Step 6, optional smoothing removes residual high-frequency noise before feature extraction. The default smoother RMS, equal to the square root of the total power, estimates signal amplitude and is commonly used in sEMG [@mcmanus_analysis_2020]. Boxcar, Gaussian, and LOESS alternatives are also provided.
 
@@ -147,7 +147,7 @@ EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], muscles, samp
 
 ## An Interactive Dashboard
 
-_EMGFlow_ includes a Shiny dashboard to visualize preprocessing effects. Pipeline steps can be shown overlaid or individually, and files are selectable via a dropdown. The dashboard lets you toggle between the amplitude time-series view and an optional spectral view that displays the signal’s Power Spectral Density (PSD). The PSD highlights mains peaks and harmonics for selecting notch frequency (f0) and Q; the time-series reveals transients and drift to set passband edges and confirm filtering preserves the waveform. Below we generate a dashboard for the Zygomaticus major channel.
+_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view that displays the Power Spectral Density (PSD). The amplitude view exposes transients and drift, guiding selection of passband edges and confirming that filtering preserves waveform shape. The PSD highlights mains peaks and harmonics, guiding the choice of notch parameters (f0, Q). Below we generate a dashboard for the Zygomaticus major channel.
 
 ```python
 # Column and measurement units to plot
@@ -199,7 +199,7 @@ The set of 18 time-domain features include  statistical moments (mean, variance,
 
 ### Spectral Feature Extraction
 
-The 15 frequency-domain features characterise power-spectrum shape and distribution. Median frequency [@phinyomark_novel_2009] tracks changes in conduction velocity, and is muscle fatigue assessments [@vanboxtel_changes_1983; @lindstrom_emg_1977; @mcmanus_analysis_2020]. Standard measures include spectral centroid, flatness, entropy, and roll-off. We also introduce Twitch Ratio, adapted from speech analysis [@eyben_geneva_2016], defined as the ratio of upper- to lower-band energy with a 60 Hz boundary between slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
+The 15 frequency-domain features characterise power-spectrum shape and distribution. Median frequency [@phinyomark_novel_2009] tracks changes in conduction velocity and is used in muscle fatigue assessments [@vanboxtel_changes_1983; @lindstrom_emg_1977; @mcmanus_analysis_2020]. Standard measures include spectral centroid, flatness, entropy, and roll-off. We also introduce Twitch Ratio, adapted from speech analysis [@eyben_geneva_2016], defined as the ratio of upper- to lower-band energy with a 60 Hz boundary between slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
 
 Spectral features are computed by converting the Step 2 band-limited signal into a PSD. To avoid discarding otherwise valid Welch frames due to isolated dropouts, we perform constrained interpolation for micro-gaps <5 samples (≈2.5–5 ms at 1–2 kHz) and leave longer gaps as NaN so affected frames are rejected [@jas_autoreject_2017]. This limits interpolation bias, which increases with gap size and density [@clifford_quantifying_2005; @munteanu_quantifying_2016]. We do not apply Steps 3–6 before PSD: rectification is non-linear and distorts spectra [@farina_identification_2013; @mcclelland_inconsistent_2014; @neto_rectification_2010]; artefact-replacement filters can violate stationarity assumptions for FFT-based PSD; and smoothing suppresses high-frequency content. We estimate PSD with Welch’s method using Hann windows, 50% overlap, and rejection of segments with remaining invalid samples, and mean averaging of retained spectra to form a long-term spectrum [@welch_psd_1967].
 
@@ -227,6 +227,6 @@ We acknowledge the support of the Natural Sciences and Engineering Research Coun
 
 # Author contributions
 
-S.R.L. conceptualised the project. W.L.C. and S.R.L. designed the toolbox functionality. W.L.C. wrote the toolbox code and maintains the Github repository. W.L.C. and S.R.L. maintain the documentation website. S.R.L prepared manuscript figures; W.L.C. prepared repository and documentation figures. S.R.L and W.L.C. prepared the manuscript and approved the final version.
+S.R.L. conceptualised the project. W.L.C. and S.R.L. designed the toolbox functionality. W.L.C. wrote the toolbox code and maintains the GitHub repository. W.L.C. and S.R.L. maintain the documentation website. S.R.L prepared manuscript figures; W.L.C. prepared repository and documentation figures. S.R.L and W.L.C. prepared the manuscript and approved the final version.
 
 # References
