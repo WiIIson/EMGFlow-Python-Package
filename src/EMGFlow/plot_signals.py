@@ -46,7 +46,8 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
     column_name : str
         The column of the signals to display in the visualization.
     sampling_rate : float, optional
-        The sampling rate of 'Signal'. The default is 1000.0.
+        The sampling rate for all signal data being plotted. The default is
+        1000.0.
     units : str, optional
         Units to use for the y axis of the plot, should be the same units used
         for the values in 'column_name'. The default is 'mV'.
