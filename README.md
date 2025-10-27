@@ -37,7 +37,7 @@ ef.make_sample_data(path_names)
 ef.clean_signals(path_names, sampling_rate=2000, notch_f0=50)
 
 # Plot data on the "EMG_zyg" column
-ef.plot_dashboard(path_names, 'EMG_zyg', 'mV')
+ef.plot_dashboard(path_names, 'EMG_zyg', sampling_rate=2000)
 
 # Extract features and save results in "Features.csv" in feature_path
 df = ef.extract_features(path_names, sampling_rate=2000)
@@ -82,9 +82,9 @@ Contributions and community guidelines can be seen [here](https://github.com/WiI
 This package can be cited as follows:
 
 ```bibtex
-@software{Conley_EMGFlow_2024,
+@software{Conley_EMGFlow_2025,
   author = {Conley, William and Livingstone, Steven R},
-  month = {09},
+  month = {10},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
   version = {1.1.1},
