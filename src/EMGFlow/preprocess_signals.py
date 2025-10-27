@@ -2064,7 +2064,7 @@ def clean_signals(path_names:dict, column_names=None, sampling_rate:float=1000.0
         An exception is raised if 'raw', 'notch', 'bandpass', or 'fwr' are not
         keys of the 'path_names' dictionary provided.
     Exception
-        An exception is raised if 'screened', 'filled', or 'smooth' are not
+        An exception is raised if 'screened', 'filled', or 'smoothed' are not
         keys of the 'path_names' dictionary provided if the associated
         parameter is set to True
 
@@ -2119,9 +2119,9 @@ def clean_signals(path_names:dict, column_names=None, sampling_rate:float=1000.0
         last = 'filled'
     
     if do_smooth:
-        if 'smooth' not in path_names:
-            raise Exception("'smooth' path not detected in provided dictionary ('path_names').")
-        smooth_signals(path_names[last], path_names['smooth'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
+        if 'smoothed' not in path_names:
+            raise Exception("'smoothed' path not detected in provided dictionary ('path_names').")
+        smooth_signals(path_names[last], path_names['smoothed'], column_names=column_names, sampling_rate=sampling_rate, file_ext=file_ext)
     
     return
 

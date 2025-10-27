@@ -130,7 +130,7 @@ def make_paths(root:str=None, raw:str=None):
         'fwr':os.path.join(root, '4_fwr'),
         'screened':os.path.join(root, '5_screened'),
         'filled':os.path.join(root, '6_filled'),
-        'smooth':os.path.join(root, '7_smoothed'),
+        'smoothed':os.path.join(root, '7_smoothed'),
         'feature':os.path.join(root, '8_feature')
     }
     

@@ -251,7 +251,7 @@ class TestSimple(unittest.TestCase):
         column_names = ['EMG_zyg', 'EMG_cor']
         EMGFlow.notch_filter_signals(pathNames['raw'], pathNames['notch'], column_names, samplingRate, [(50, 5)])
         EMGFlow.bandpass_filter_signals(pathNames['notch'], pathNames['bandpass'], column_names, samplingRate, (20, 140))
-        EMGFlow.smooth_signals(pathNames['bandpass'], pathNames['smooth'], column_names, samplingRate)
+        EMGFlow.smooth_signals(pathNames['bandpass'], pathNames['smoothed'], column_names, samplingRate)
         EMGFlow.extract_features(pathNames, column_names, samplingRate)
         self.assertTrue(os.path.exists(os.path.join(pathNames['feature'], 'Features.csv')))
 

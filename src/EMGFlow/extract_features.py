@@ -1142,17 +1142,17 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
     functions and saving the outputs to a feature file.
     
     The input and output locations are controlled by the 'path_names'
-    dictionary. The input data is taken from the 'Smooth' and 'bandpass' paths.
-    The 'smooth' step is optional, if it was not used, data is searched for in
+    dictionary. The input data is taken from the 'smoothed' and 'bandpass' paths.
+    The 'smoothed' step is optional, if it was not used, data is searched for in
     the following order: 'smooth' -> 'filled' -> 'fwr'.
     
     All files within these folders and subfolders are assumed to be valid data
     if they match the provided file extension, and the optional regular
     expression. Files of the same name should exist in both the
-    'smooth'/'filled'/'fwr' and 'bandpass' folders, being the same file at
+    'smoothed'/'filled'/'fwr' and 'bandpass' folders, being the same file at
     different stages in processing pipeline.
 
-    The 'smooth'/'filled'/'fwr' path is used to calculate time-series features,
+    The 'smoothed'/'filled'/'fwr' path is used to calculate time-series features,
     while the 'bandpass' path is used to calculate spectral features.
 
     Columns of these files that begin with 'mask_' are assumed to be NaN mask
@@ -1196,11 +1196,11 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
         An exception is raised if 'bandpass', 'fwr' or 'feature' are not keys
         of the 'path_names' dictionary provided.
     Exception
-        An exception is raised if the 'bandpass' and 'smooth'/'filled'/'fwr'
+        An exception is raised if the 'bandpass' and 'smoothed'/'filled'/'fwr'
         filepaths do not contain the same files.
     Exception
         An exception is raised if a file cannot not be read in the 'bandpass'
-        or 'smooth'/'filled'/'fwr' filepaths.
+        or 'smoothed'/'filled'/'fwr' filepaths.
     Exception
         An exception is raised if a file does not contain one of the columns
         from 'column_names'.
@@ -1241,9 +1241,9 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
     file_dirs_b = map_files(path_names['bandpass'], file_ext=file_ext, expression=expression)
     
     try:
-        file_dirs_s = map_files(path_names['smooth'], file_ext=file_ext, expression=expression)
+        file_dirs_s = map_files(path_names['smoothed'], file_ext=file_ext, expression=expression)
         if (len(file_dirs_s)) != (len(file_dirs_b)):
-            raise Exception('Smooth files not detected...')
+            raise Exception('Smoothed files not detected...')
     except:
         try:
             file_dirs_s = map_files(path_names['filled'], file_ext=file_ext, expression=expression)
@@ -1252,7 +1252,7 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
         except:
             file_dirs_s = map_files(path_names['fwr'], file_ext=file_ext, expression=expression)
             if (len(file_dirs_s)) != (len(file_dirs_b)):
-                raise Exception('Data not detected in "smooth", "filled" and "fwr" paths. Feature extraction could not be completed.')
+                raise Exception('Data not detected in "smoothed", "filled" and "fwr" paths. Feature extraction could not be completed.')
             
     
     if len(file_dirs_b) == 0 or len(file_dirs_s) == 0:
@@ -1330,7 +1330,7 @@ def extract_features(path_names:dict, column_names=None, sampling_rate:float=100
             if column_name not in list(data_b.columns.values):
                 raise Exception("Bandpass file " + str(file) + " does not contain column " + str(column_name))
             if column_name not in list(data_s.columns.values):
-                raise Exception("Smooth file " + str(file) + " does not contain column " + str(column_name))
+                raise Exception("Smoothed file " + str(file) + " does not contain column " + str(column_name))
             
             # Calculate ID
             if short_name:
