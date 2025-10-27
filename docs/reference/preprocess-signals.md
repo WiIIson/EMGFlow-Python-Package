@@ -177,7 +177,7 @@ def clean_signals(path_names:dict, column_names=None, sampling_rate:float=1000.0
 
 An exception is raised if 'raw', 'notch', 'bandpass', or 'fwr' are not keys of the `path_names` dictionary provided.
 
-An exception is raised if 'screened', 'filled', or 'smooth' are not keys of the `path_names` dictionary provided if the associated parameter is set to True.
+An exception is raised if 'screened', 'filled', or 'smoothed' are not keys of the `path_names` dictionary provided if the associated parameter is set to True.
 
 An exception is raised if a column from `column_names` is less than or equal to 0.
 
@@ -608,8 +608,8 @@ sampling_rate = 2000
 window_ms = 120
 
 # Apply smoothing filter with window size 20 to all files in the 'Bandpass'
-# path and write the output to the 'Smooth' path.
-EMGFlow.smooth_filter_signals(path_names['Bandpass'], path_names['Smooth'], column_names, sampling_rate, window_ms=window_ms)
+# path and write the output to the 'smoothed' path.
+EMGFlow.smooth_filter_signals(path_names['bandpass'], path_names['smoothed'], column_names, sampling_rate, window_ms=window_ms)
 ```
 
 
