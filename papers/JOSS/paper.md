@@ -175,19 +175,18 @@ After preprocessing, files are ready for feature extraction. Surface EMG records
 We conclude Example 2 by extracting features and previewing the first rows.
 
 ```python
-
 # Step 7. Extract features and save results in "Features.csv"
-df = EMGFlow.extract_features(path_names['filled'], sampling_rate)
+df = EMGFlow.extract_features(path_names, muscles, sampling_rate)
 
 # Inspect features
-df.head()
+df.round(4).head()
 
 """
                File_Path  EMG_zyg_Min  ...  EMG_cor_SB  EMG_cor_Spectral_PCT_Missing
-0  01/sample_data_01.csv     0.002749  ...  554.486830                        0.0050
-1  01/sample_data_02.csv     0.004991  ...  376.469454                        0.0002
-3  02/sample_data_03.csv     0.000116  ... 2061.730123                        0.0153 
-4  02/sample_data_04.csv     0.002417  ... 1016.772414                        0.0000 
+0  01/sample_data_01.csv       0.0031  ...    543.1803                        0.0050
+1  01/sample_data_02.csv       0.0050  ...    346.9988                        0.0002
+3  02/sample_data_03.csv       0.0001  ...   2183.3999                        0.0153 
+4  02/sample_data_04.csv       0.0024  ...   1051.9444                        0.0000 
 
 [4 rows x 71 columns]
 """
