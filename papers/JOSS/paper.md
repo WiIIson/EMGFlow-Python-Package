@@ -95,7 +95,8 @@ notch_main = [(50, 5)]
 muscles = ['EMG_zyg', 'EMG_cor']
 
 # Step 1. Apply notch filter to all files in 1_raw, writing output to 2_notch
-EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'], muscles, sampling_rate, notch_main)
+EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'],
+                              muscles, sampling_rate, notch_main)
 ```
 
 _EMGFlow_ preserves the raw directory structure and mirrors it at each pipeline stage. All preprocessing functions accept an optional regular expression to target specific files. In Step 1b, we apply an additional notch filter at 150 Hz (the 3rd harmonic) only to files in subfolder `/01`.
@@ -106,7 +107,9 @@ notch_custom = [(150, 25)]
 path_pattern = '^01/'
 
 # Step 1b. Apply custom notch filter all to files in subfolder "/01"
-EMGFlow.notch_filter_signals(path_names['notch'], path_names['notch'], muscles, sampling_rate, notch_custom, expression=path_pattern)
+EMGFlow.notch_filter_signals(path_names['notch'], path_names['notch'], 
+                             muscles, sampling_rate, notch_custom, 
+                             expression=path_pattern)
 ```
 
 ## Interference Attenuation
@@ -118,7 +121,8 @@ Surface EMG is susceptible to multiple sources of interference that affect the s
 passband_edges = [20, 450]
 
 # Step 2. Apply band-pass filter
-EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'], muscles, sampling_rate, passband_edges)
+EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'],
+                                muscles, sampling_rate, passband_edges)
 
 # Step 3. Apply full-wave rectifier
 EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'], muscles)
@@ -130,7 +134,9 @@ Signal artefacts are another source of contamination and span a diverse range of
 screen_pattern = r'^02/sample_data_04\.csv$'
 
 # Step 4. Apply Hampel artefact filter to 02/sample_data_04.csv
-EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], muscles, sampling_rate, expression=screen_pattern, copy_unmatched=True)
+EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'], 
+                                muscles, sampling_rate, 
+                                expression=screen_pattern, copy_unmatched=True)
 ```
 
 Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properites desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artificially injected gaps with PCHIP.
@@ -139,10 +145,12 @@ In Step 6, optional smoothing removes residual high-frequency noise before featu
 
 ```python
 # Step 5. Fill missing data
-EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], muscles, sampling_rate)
+EMGFlow.fill_missing_signals(path_names['screened'], path_names['filled'], 
+                             muscles, sampling_rate)
 
 # Step 6. Apply smoothing filter
-EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], muscles, sampling_rate)
+EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'], 
+                       muscles, sampling_rate)
 ```
 
 ## An Interactive Dashboard
