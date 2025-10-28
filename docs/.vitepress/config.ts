@@ -43,6 +43,7 @@ export default withMermaid({
           { text: 'Preprocess Signals', link: '/reference/preprocess-signals' },
           { text: 'Plot Signals', link: '/reference/plot-signals' },
           { text: 'Extract Features', link: '/reference/extract-features' },
+          { text: 'Testing', link: '/reference/testing', }
         ]
       },
 
