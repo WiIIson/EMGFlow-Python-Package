@@ -193,8 +193,8 @@ df.round(4).head()
                File_Path  EMG_zyg_Min  ...  EMG_cor_SB  EMG_cor_Spectral_PCT_Missing
 0  01/sample_data_01.csv       0.0031  ...    543.1803                        0.0050
 1  01/sample_data_02.csv       0.0050  ...    346.9988                        0.0002
-3  02/sample_data_03.csv       0.0001  ...   2183.3999                        0.0153 
-4  02/sample_data_04.csv       0.0024  ...   1051.9444                        0.0000 
+2  02/sample_data_03.csv       0.0001  ...   2183.3999                        0.0153 
+3  02/sample_data_04.csv       0.0024  ...   1051.9444                        0.0000 
 
 [4 rows x 71 columns]
 """
@@ -216,13 +216,13 @@ _EMGFlow_ reports the percentage of missing data in the final temporal and spect
 
 # Documentation and Testing
 
-The documentation site ([https://wiiison.github.io/EMGFlow-Python-Package](https://wiiison.github.io/EMGFlow-Python-Package)) is built with VitePress and provides a Quick-Start tutorial, an example gallery from minimal to advanced pipelines, an API reference with executable snippets, and a detailed catalogue of all mathematical feature definitions. Mermaid.js mind-maps give a high-level overview of module structure.
+The documentation site ([https://wiiison.github.io/EMGFlow-Python-Package](https://wiiison.github.io/EMGFlow-Python-Package)) is built with VitePress. It provides a Quick-Start, an example gallery from minimal to advanced pipelines, an API reference with executable snippets, and a detailed catalogue of all mathematical feature definitions. Mermaid diagrams give a high-level view of the module structure.
 
-Code reliability is enforced via an automated _unittest_ suite runs on every GitHub commit through continuous integration.
+Code reliability is enforced via an automated _unittest_ suite run on every commit via GitHub Actions. The same tests can be executed locally; instructions and examples are provided on the documentation site. This ensures that changes remain reliable across platforms.
 
 # Community Guidelines
 
-Contributions are welcome via issues or pull requests. Suggestions for features, usage tips, and questions can also be raised through direct discussions with the maintainers.
+Contributions are welcome via issues or pull requests. Suggestions for features, usage tips, and questions can also be raised through GitHub Discussions.
 
 # Declaration of Generative AI and AI-Assisted Technologies in the Writing Process
 
