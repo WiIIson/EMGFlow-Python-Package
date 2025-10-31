@@ -96,7 +96,7 @@ muscles = ['EMG_zyg', 'EMG_cor']
 
 # Step 1. Apply notch filter to all files in 1_raw, writing output to 2_notch
 EMGFlow.notch_filter_signals(path_names['raw'], path_names['notch'],
-                              muscles, sampling_rate, notch_main)
+                             muscles, sampling_rate, notch_main)
 ```
 
 _EMGFlow_ preserves the raw directory structure and mirrors it at each pipeline stage. All preprocessing functions accept an optional regular expression to target specific files. In Step 1b, we apply an additional notch filter at 150 Hz (the 3rd harmonic) only to files in subfolder `/01`.
