@@ -8,7 +8,7 @@ _EMGFlow_ is an open-source Python package for preprocessing and extracting feat
 
 <div class="tip custom-block" style="padding-top: 8px">
 
-Want to see it in action? Skip to the [Quickstart](processing-steps).
+Want to see it in action? Skip to the [Quickstart](getting-started#quickstart).
 
 </div>
 

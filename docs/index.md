@@ -15,7 +15,7 @@ hero:
       link: /guide/what-is-emgflow
     - theme: alt
       text: Getting Started
-      link: /guide/processing-steps
+      link: /guide/getting-started
     - theme: alt
       text: GitHub
       link: https://github.com/WiIIson/EMGFlow-Python-Package

@@ -1,4 +1,4 @@
-# Processing Steps
+# Getting Started
 
 ## Download
 
@@ -8,7 +8,7 @@ EMGFlow can be installed from PyPI:
 pip install EMGFlow
 ```
 
-## Quick example
+## Quickstart
 
 _EMGFlow_ extracts a comprehensive set of 33 statistical features from sEMG signals, achieved with only a few lines of code:
 
