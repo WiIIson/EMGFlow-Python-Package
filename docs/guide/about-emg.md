@@ -4,24 +4,19 @@
 
 Surface electromyography (sEMG) is a non-invasive technique that quantifies
 muscle activity by recording voltages at the skin overlying a muscle, as
-illustrated in Figure 1.
-
-![sEMG signal](/figures/about_1.png)  
-_Figure 1. Example sEMG signal recording. Reproduced from McManus, De Vito, & Lowery, 2020._
-
-Voluntary movement arises from muscle contraction: motoneuron discharges
+illustrated in Figure 1A. Voluntary movement arises from muscle contraction: motoneuron discharges
 activate groups of fibers (motor units), generating motor‐unit action
 potentials (MUAPs) that propagate along the fibers with a characteristic
-conduction velocity, as illustrated in Figure 2.
-
-![sEMG signal](/figures/about_2.png)  
-_Figure 2. (B) Motor unit action potential, and (D) Relationship between MUAP duration and muscle fibre conduction velocity. Reproduced from McManus, De Vito, & Lowery, 2020._
+conduction velocity, as illustrated in Figure 1B.
 
 Each discharge produces a brief force twitch; the superposition of many
 twitches over time yields sustained force for actions such as lifting or
 smiling (McManus, De Vito, & Lowery, 2020; De Luca, 2008). sEMG captures the
 resulting voltage time series from which quantitative features are extracted
 (Fridlund & Cacioppo, 1986).
+
+![sEMG signal](/figures/about_1.png)  
+_Figure 1. (A) Example sEMG signal recording. (B) Motor unit action potential, and (C) Relationship between MUAP duration and muscle fibre conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020._
 
 ## EMG Signal Processing Overview
 
