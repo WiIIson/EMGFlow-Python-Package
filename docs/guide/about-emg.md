@@ -32,11 +32,11 @@ EMG signal processing converts raw voltage time series into interpretable repres
   parameters (`f0`, `Q`) and to verify that the chosen passband matches the
   target physiology.
 
-Figure 3 illustrates how these views work together during preprocessing.
+Figure 2 illustrates how these views work together during preprocessing.
 Panels A–D show the same signal segment before and after filtering in both the
 time and frequency domains.
 
-![time-frequency sEMG](/figures/about_3.png)  
+![time-frequency sEMG](/figures/about_2.png)  
 _Figure 3. Time and PSD views of the same sEMG segment. A) Raw time-series
 shows drift and periodic contamination. B) Raw PSD shows mains peaks and
 overall bandwidth. C) After notch and bandpass filtering, the time-series is
