@@ -7,7 +7,7 @@ muscle activity by recording voltages at the skin overlying a muscle, as
 illustrated in Figure 1A. Voluntary movement arises from muscle contraction: motoneuron discharges
 activate groups of fibers (motor units), generating motor‐unit action
 potentials (MUAPs) that propagate along the fibers with a characteristic
-conduction velocity, as illustrated in Figure 1B.
+conduction velocity, as illustrated in Figure 1B-C.
 
 Each discharge produces a brief force twitch; the superposition of many
 twitches over time yields sustained force for actions such as lifting or
