@@ -15,14 +15,12 @@ smiling (McManus, De Vito, & Lowery, 2020; De Luca, 2008). sEMG captures the
 resulting voltage time series from which quantitative features are extracted
 (Fridlund & Cacioppo, 1986).
 
-<figure style="text-align:center">
-  <img src="/figures/about_1.png"
-       alt="sEMG signal"
-       style="max-width:600px;width:100%;height:auto;">
+<figure class="figure figure--md"">
+  <img src="/figures/about_1.png" alt="sEMG signal">
   <figcaption>
-    <strong>Figure 1.</strong> (A) Example sEMG signal recording. (B) Motor unit action
+    <em>Figure 1. (A) Example sEMG signal recording. (B) Motor unit action
     potential, and (C) Relationship between MUAP duration and muscle fibre
-    conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.
+    conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.</em>
   </figcaption>
 </figure>
 
@@ -44,12 +42,17 @@ Figure 2 illustrates how these views work together during preprocessing.
 Panels A–D show the same signal segment before and after filtering in both the
 time and frequency domains.
 
-![time-frequency sEMG](/figures/about_2.png)  
-**Figure 2**. Time and PSD views of the same sEMG segment. A) Raw time-series
-shows drift and periodic contamination. B) Raw PSD shows mains peaks and
-overall bandwidth. C) After notch and bandpass filtering, the time-series is
-cleaned; the rectified-RMS envelope (thin line) provides amplitude over time.
-D) Filtered PSD confirms removal of mains peaks and a defined passband.
+<figure class="figure figure--md">
+  <img src="/figures/about_2.png"
+       alt="Time and PSD views of the same sEMG segment (raw and filtered)">
+  <figcaption>
+    Figure 2. Time and PSD views of the same sEMG segment. A) Raw time-series
+    shows drift and periodic contamination. B) Raw PSD shows mains peaks and
+    overall bandwidth. C) After notch and bandpass filtering, the time-series is
+    cleaned; the rectified-RMS envelope (thin line) provides amplitude over time.
+    D) Filtered PSD confirms removal of mains peaks and a defined passband.
+  </figcaption>
+</figure>
 
 ### How to read Figure 2
 

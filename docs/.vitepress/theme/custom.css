@@ -40,3 +40,27 @@
     width: 50px; /* Adjust the width as needed */
     height: auto; /* Keep aspect ratio */
   }
+
+/* ---- Figures (site-wide) ------------------------------------------------- */
+.vp-doc figure.figure { 
+  margin: 0; 
+}
+
+/* Center image only; keep caption left-aligned and italic */
+.vp-doc figure.figure img {
+  display: block;
+  margin: 0 auto;            /* centers image */
+  width: 100%;
+  height: auto;
+  max-width: 600px;          /* default max width */
+}
+
+.vp-doc figure.figure figcaption {
+  font-style: italic;
+  text-align: left;
+  margin-top: 0.25rem;
+}
+
+/* Optional size variants */
+.vp-doc figure.figure--md img { max-width: 800px; }
+.vp-doc figure.figure--lg img { max-width: 1000px; }
