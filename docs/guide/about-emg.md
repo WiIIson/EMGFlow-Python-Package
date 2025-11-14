@@ -15,8 +15,16 @@ smiling (McManus, De Vito, & Lowery, 2020; De Luca, 2008). sEMG captures the
 resulting voltage time series from which quantitative features are extracted
 (Fridlund & Cacioppo, 1986).
 
-![sEMG signal](/figures/about_1.png)  
-_Figure 1. (A) Example sEMG signal recording. (B) Motor unit action potential, and (C) Relationship between MUAP duration and muscle fibre conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020._
+<figure style="text-align:center">
+  <img src="/figures/about_1.png"
+       alt="sEMG signal"
+       style="max-width:600px;width:100%;height:auto;">
+  <figcaption>
+    <strong>Figure 1.</strong> (A) Example sEMG signal recording. (B) Motor unit action
+    potential, and (C) Relationship between MUAP duration and muscle fibre
+    conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.
+  </figcaption>
+</figure>
 
 ## EMG Signal Processing Overview
 
@@ -37,13 +45,13 @@ Panels A–D show the same signal segment before and after filtering in both the
 time and frequency domains.
 
 ![time-frequency sEMG](/figures/about_2.png)  
-_Figure 3. Time and PSD views of the same sEMG segment. A) Raw time-series
+**Figure 2**. Time and PSD views of the same sEMG segment. A) Raw time-series
 shows drift and periodic contamination. B) Raw PSD shows mains peaks and
 overall bandwidth. C) After notch and bandpass filtering, the time-series is
 cleaned; the rectified-RMS envelope (thin line) provides amplitude over time.
-D) Filtered PSD confirms removal of mains peaks and a defined passband._
+D) Filtered PSD confirms removal of mains peaks and a defined passband.
 
-### How to read Figure 3
+### How to read Figure 2
 
 - **A) Raw time series (time domain).** Inspect for low-frequency drift,
   motion artefacts, clipping, and bursts. Use this panel to choose passband
