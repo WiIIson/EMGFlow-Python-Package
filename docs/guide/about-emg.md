@@ -20,7 +20,7 @@ resulting voltage time series from which quantitative features are extracted
   <figcaption>
     Figure 1. (A) Example sEMG signal recording. (B) Motor unit action
     potential, and (C) Relationship between MUAP duration and muscle fibre
-    conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.</em>
+    conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.
   </figcaption>
 </figure>
 
