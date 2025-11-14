@@ -33,5 +33,10 @@ df = ef.extract_features(path_names, sampling_rate=2000)
 
 ## EMGFlow Pipeline Processing Steps
 
- ![Pipeline processing steps](/figures/figure1.png)
- _Figure 1. An overview of the processing pipeline._
+<figure class="figure figure--md">
+  <img src="/figures/figure1.png"
+       alt="An overview of the processing pipeline.">
+  <figcaption>
+    Figure 1. An overview of the processing pipeline.
+  </figcaption>
+</figure>

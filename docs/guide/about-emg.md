@@ -15,10 +15,10 @@ smiling (McManus, De Vito, & Lowery, 2020; De Luca, 2008). sEMG captures the
 resulting voltage time series from which quantitative features are extracted
 (Fridlund & Cacioppo, 1986).
 
-<figure class="figure figure--md"">
+<figure class="figure figure--sm"">
   <img src="/figures/about_1.png" alt="sEMG signal">
   <figcaption>
-    <em>Figure 1. (A) Example sEMG signal recording. (B) Motor unit action
+    Figure 1. (A) Example sEMG signal recording. (B) Motor unit action
     potential, and (C) Relationship between MUAP duration and muscle fibre
     conduction velocity. Adapted from McManus, De Vito, & Lowery, 2020.</em>
   </figcaption>
