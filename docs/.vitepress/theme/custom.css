@@ -62,5 +62,14 @@
 }
 
 /* Optional size variants */
+.vp-doc figure.figure--sm img { max-width: 500px; }
 .vp-doc figure.figure--md img { max-width: 800px; }
 .vp-doc figure.figure--lg img { max-width: 1000px; }
+
+/* ---- Table captions (site-wide) ----------------------------------------- */
+.vp-doc p.table-caption {
+  font-style: italic;
+  text-align: left;
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+}

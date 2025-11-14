@@ -26,9 +26,7 @@ _EMGFlow_, a portmanteau of EMG and Workflow, fills this gap by providing a flex
 | Documentation | https://wiiison.github.io/EMGFlow-Python-Package |
 | PyPI installation | `pip install EMGFlow` |
 
-<figcaption>
-    Table 1: _EMGFlow_ package metadata.
-</figcaption>
+<p class="table-caption"><em>Table 1. <i>EMGFlow</i> package metadata.</em></p>
 
 ## Use cases
 
