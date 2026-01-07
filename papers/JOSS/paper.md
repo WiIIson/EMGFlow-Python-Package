@@ -224,9 +224,16 @@ Code reliability is enforced via an automated _unittest_ suite run on every comm
 
 Contributions are welcome via issues or pull requests. Suggestions for features, usage tips, and questions can also be raised through GitHub Discussions.
 
-# Declaration of Generative AI and AI-Assisted Technologies in the Writing Process
+# AI Usage Disclosure
 
-During preparation, the authors used GPT-5 to edit a final draft of the manuscript for flow, tone, and grammatical correctness. The authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
+**Source code**
+All EMGFlow source code and test cases were written manually by the authors.
+
+**Manuscript**
+The authors used GPT-5 to edit a final draft of the manuscript for flow, tone, and grammatical correctness. The authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
+
+**Documentation**
+The documentation website was created manually by the authors. The authors used GPT-5 to edit the "About electromyography" page. The authors reviewed and edited the content of this page and take full responsibility for the content of the page. All remaining documentation content was written manually by the authors.
 
 # Acknowledgements
 
