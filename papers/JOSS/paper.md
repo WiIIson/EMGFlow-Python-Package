@@ -56,6 +56,8 @@ Extracting features from large datasets is fundamental in machine learning and q
 
 Example 1 demonstrates end-to-end preprocessing and feature extraction. We create project paths with `make_paths()` and load bundled sample data with `make_sample_data()` (adapted from PeakAffectDS [@greene_peakaffectds_2022]). Next, we run automated preprocessing via `clean_signals()` using sensible, literature-based defaults, and then write a plaintext CSV of 33 features per file with `extract_features()`.
 
+\pagebreak
+
 ```python
 # %% Example 1: Quick start (full pipeline)
 import EMGFlow
