@@ -165,7 +165,7 @@ show_muscle = 'EMG_zyg'
 units = 'mV'
 
 # Plot data for the "EMG_zyg" column
-EMGFlow.plot_dashboard(path_names, show_muscle, units)
+EMGFlow.plot_dashboard(path_names, show_muscle, sampling_rate, units)
 ```
 
 ![Figure 2](figure2.png)
