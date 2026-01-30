@@ -182,7 +182,7 @@ After preprocessing, files are ready for feature extraction. Surface EMG records
 
 **Table 2:** Features extracted from sEMG signals.
 
-We conclude Example 2 by extracting features and previewing the first rows.
+We conclude Example 2 by extracting features, previewing the first rows, and outputting package metadata.
 
 ```python
 # Step 7. Extract features and save results in "Features.csv"
@@ -199,6 +199,13 @@ df.round(4).head()
 3  02/sample_data_04.csv       0.0024  ...   1051.9444                        0.0000 
 
 [4 rows x 71 columns]
+"""
+
+# Get package version
+EMGFlow.package_version()
+
+"""
+EMGFlow 1.1.2
 """
 ```
 
