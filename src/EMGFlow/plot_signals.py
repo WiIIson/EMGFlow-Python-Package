@@ -1,5 +1,5 @@
+import asyncio
 import os
-import re
 import matplotlib.pyplot as plt
 import threading
 import uvicorn
@@ -13,8 +13,6 @@ nest_asyncio.apply()
 
 from .access_files import *
 from .preprocess_signals import emg_to_psd
-
-_SERVER_HANDLE = {'server': None, 'thread': None}
 
 #
 # =============================================================================
@@ -122,11 +120,12 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                 ui.input_select('file_type', 'File:', choices=df['File']),
                 ui.input_slider('x_range', 'X-Axis Range:', min=0, max=1, value=[0, 1]),
                 ui.input_slider('y_range', 'Y-Axis Range:', min=0, max=1, value=[0, 1]),
-                ui.input_checkbox('use_psd', 'Show Spectrum', value=False)
+                ui.input_checkbox('use_psd', 'Show PSD', value=False),
+                ui.input_action_button('stop', 'Stop Dashboard', style="background-color: #007bc2; color: white; border-color: #007bc2;")
             ),
             ui.card(
                 ui.output_plot('plt_signal'),
-            ),
+            )
         ),
     )
     
@@ -156,7 +155,7 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                         x_val = data['Time']
                         y_val = data[column_name]
                     else:
-                        PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate)
+                        PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate, normalize=False)
                         x_val = PSD['Frequency']
                         y_val = PSD['Power']
                     
@@ -164,11 +163,14 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                     max_x = max(max_x, x_val.max())
                     min_y = min(min_y, y_val.min())
                     max_y = max(max_y, y_val.max())
-                    # Round the x and y-axis to 2 decimal places
-                    min_x = np.floor(min_x * 100) / 100
-                    max_x = np.ceil(max_x * 100) / 100
-                    min_y = np.floor(min_y * 100) / 100
-                    max_y = np.ceil(max_y * 100) / 100
+                
+                # Zoom out by 5% of diff(max, min)
+                zoom_x = abs(max_x - min_x) * 0.05
+                zoom_y = abs(max_y - min_y) * 0.05
+                min_x -= zoom_x
+                max_x += zoom_x
+                min_y -= zoom_y
+                max_y += zoom_y
                     
             else:
                 file_location = df.loc[filename][column]
@@ -178,7 +180,7 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                     x_val = data['Time']
                     y_val = data[column_name]
                 else:
-                    PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate)
+                    PSD = emg_to_psd(data, column_name, sampling_rate=sampling_rate, normalize=False)
                     x_val = PSD['Frequency']
                     y_val = PSD['Power']
                 
@@ -186,14 +188,19 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                 min_x = x_val.min()
                 max_y = y_val.max()
                 min_y = y_val.min()
-                # Round the x and y-axis to 2 decimal places
-                min_x = np.floor(min_x * 100) / 100
-                max_x = np.ceil(max_x * 100) / 100
-                min_y = np.floor(min_y * 100) / 100
-                max_y = np.ceil(max_y * 100) / 100
+                # Zoom out by 5% of diff(max, min)
+                zoom_x = abs(max_x - min_x) * 0.05
+                zoom_y = abs(max_y - min_y) * 0.05
+                min_x -= zoom_x
+                max_x += zoom_x
+                min_y -= zoom_y
+                max_y += zoom_y
+
+            y_step = abs(max_y - min_y) / 100
+            x_step = abs(max_x - min_x) / 100
         
-            ui.update_slider("x_range", min=min_x, max=max_x, value=[min_x, max_x])
-            ui.update_slider("y_range", min=min_y, max=max_y, value=[min_y, max_y])
+            ui.update_slider("x_range", min=min_x, max=max_x, value=[min_x, max_x], step=x_step)
+            ui.update_slider("y_range", min=min_y, max=max_y, value=[min_y, max_y], step=y_step)
 
 
         
@@ -221,7 +228,7 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                     if not use_psd:
                         ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
                     else:
-                        PSD = emg_to_psd(sigDF, column_name, sampling_rate)
+                        PSD = emg_to_psd(sigDF, column_name, sampling_rate, normalize=False)
                         ax.plot(PSD['Frequency'], PSD['Power'], color=colours[i], alpha=0.5, linewidth=1)
                     
                 # Set legend for multiple plots
@@ -242,7 +249,7 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                 if not use_psd:
                     ax.plot(sigDF['Time'], sigDF[column_name], color=colours[i], alpha=0.5, linewidth=1)
                 else:
-                    PSD = emg_to_psd(sigDF, column_name, sampling_rate)
+                    PSD = emg_to_psd(sigDF, column_name, sampling_rate, normalize=False)
                     ax.plot(PSD['Frequency'], PSD['Power'], color=colours[i], alpha=0.5, linewidth=1)
                 
             ax.set_xlim(x_min, x_max)
@@ -252,33 +259,31 @@ def plot_dashboard(path_names:dict, column_name:str, sampling_rate:float=1000.0,
                 ax.set_ylabel('Voltage (' + units + ')')
                 ax.set_xlabel('Time (s)')
             else:
-                ax.set_ylabel('Power (Normalized)')
+                ax.set_ylabel('Power (dH/Hz)')
                 ax.set_xlabel('Frequency (Hz)')
                 
             ax.set_title(column_name)
             
             return fig
-                
-        def _close_tab():
-            srv = _SERVER_HANDLE.get('server')
-            if srv is not None:
-                srv.should_exit = True # Tell loop to stop
         
-        session.on_ended(_close_tab)
+        @reactive.effect
+        @reactive.event(input.stop)
+        async def shutdown_app():
+            ui.update_action_button('stop', label='Terminated', disabled=True)
+            ui.notification_show('Dashboard stopped', duration=None, type='warning', close_button=False)
+            os._exit(0)
     
     app = App(app_ui, server)
     
     if auto_run:
-        host, port = "127.0.0.1", "8000"
+        host, port = "127.0.0.1", 8000
         url = f"http://{host}:{port}"
+
+        def run_server():
+            uvicorn.run(app, host=host, port=port)
         
-        config = uvicorn.Config(app, host=host, port=port, log_level="warning", reload=False)
-        server = uvicorn.Server(config)
-        
-        _SERVER_HANDLE['server'] = server
-        t = threading.Thread(target=server.run, daemon=True)
-        _SERVER_HANDLE['thread'] = t
-        t.start()
+        thread = threading.Thread(target=run_server)
+        thread.start()
         
         webbrowser.open(url)
         return
