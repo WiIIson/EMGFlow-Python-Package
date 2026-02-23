@@ -15,7 +15,7 @@ smiling (McManus, De Vito, & Lowery, 2020; De Luca, 2008). sEMG captures the
 resulting voltage time series from which quantitative features are extracted
 (Fridlund & Cacioppo, 1986).
 
-<figure class="figure figure--sm"">
+<figure class="figure figure--sm">
   <img src="/figures/about_1.png" alt="sEMG signal">
   <figcaption>
     Figure 1. (A) Example sEMG signal recording. (B) Motor unit action
@@ -113,9 +113,9 @@ The sampling rate (`sampling_rate`) defines how many samples are recorded per
 second. When `Time` is absent or irregular, the sampling rate specifies the
 temporal spacing for analysis.
 
-### Power Spectral Density (PSD)
+### Power Spectral Density
 
-A PSD DataFrame represents the frequency-domain view of an EMG signal obtained
+A Power Spectral Density (PSD) DataFrame represents the frequency-domain view of an EMG signal obtained
 via Fourier analysis. EMGFlow computes PSDs using Welch’s method—overlapped,
 windowed averaging, typically with a Hann window—to produce stable spectral
 estimates that complement the time-series view (LDS Group, 2003).
