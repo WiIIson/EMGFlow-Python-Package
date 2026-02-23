@@ -84,13 +84,13 @@ Contributions and community guidelines can be seen the [contributing guide](http
 This package can be cited as follows:
 
 ```bibtex
-@software{Conley_EMGFlow_2025,
+@software{Conley_EMGFlow_2026,
   author = {Conley, William and Livingstone, Steven R},
-  month = {10},
+  month = {02},
   title = {{EMGFlow Package}},
   url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.1.1},
-  year = {2025},
+  version = {1.1.2},
+  year = {2026},
   note = "{\tt william@cconley.ca}"
 }
 ```

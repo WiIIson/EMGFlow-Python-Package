@@ -6,3 +6,4 @@ tqdm==4.66.4
 shiny==0.9.0
 nest-asyncio==1.6.0
 importlib-resources==6.5.2
+uvicorn==0.41.0

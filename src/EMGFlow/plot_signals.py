@@ -1,4 +1,3 @@
-import asyncio
 import os
 import matplotlib.pyplot as plt
 import threading

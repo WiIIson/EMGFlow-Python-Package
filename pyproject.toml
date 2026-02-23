@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "EMGFlow"
-version = "1.1.1"
+version = "1.1.2"
 description = "A general EMG processing and feature extraction package."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,7 +23,8 @@ dependencies = [
     "tqdm",
     "shiny",
     "nest-asyncio",
-    "importlib-resources"
+    "importlib-resources",
+    "uvicorn"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
