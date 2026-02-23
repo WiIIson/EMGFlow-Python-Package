@@ -157,7 +157,7 @@ EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'],
 
 ## An Interactive Dashboard
 
-_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view that displays the Power Spectral Density (PSD). The amplitude view exposes transients and drift, guiding selection of passband edges and confirming that filtering preserves waveform shape. The PSD highlights mains peaks and harmonics, guiding the choice of notch parameters (f0, Q). Below we generate a dashboard for the Zygomaticus major channel.
+_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view that displays the Power Spectral Density (PSD). The amplitude view exposes transients and drift, guiding selection of passband edges and confirming that filtering preserves waveform shape. The PSD highlights mains peaks and harmonics, guiding the choice of notch parameters (f0, Q). Below we generate a dashboard for the Zygomaticus major channel. When we have finished inspecting the signals, we click ‘Stop Dashboard’ to shut down the dashboard server and end the interactive session so that the analysis pipeline can proceed.
 
 ```python
 # Column and measurement units to plot
@@ -207,6 +207,9 @@ EMGFlow.package_version()
 """
 EMGFlow 1.1.2
 """
+
+# Get package citation
+# EMGFlow.package_citation()
 ```
 
 ### Temporal Feature Extraction
