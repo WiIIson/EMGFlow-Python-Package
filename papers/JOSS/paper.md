@@ -1,5 +1,5 @@
 ---
-title: "EMGFlow: A Python package for pre-processing and feature extraction of electromyographic signals"
+title: "EMGFlow: A Python package for preprocessing and feature extraction of electromyographic signals"
 tags:
   - Biosignals
   - Physiology
