@@ -130,7 +130,7 @@ EMGFlow.bandpass_filter_signals(path_names['notch'], path_names['bandpass'],
 EMGFlow.rectify_signals(path_names['bandpass'], path_names['fwr'], muscles)
 ```
 
-Signal artefacts are another source of contamination and span a diverse range of phenomenon including thermal noise, eyeblinks, and random noise bursts [@boyer_reducing_2023]. These can be mitigated with `screen_artefacts()`, which applies a Hampel filter (default), or Wiener filter, both reported as robust denoisers [@allen_hampel_2009; @bhowmik_outlier_2017; @jarrah_density_2022]. Because artefact profiles vary across projects, we recommend visual inspectection with the interactive dashboard to tune `n_sigma` (Hampel) and `window_ms` [@bhowmik_outlier_2017; @pearson_hampel_2016]. In Step 4 we target `/02/sample_data_04.csv` which contains an artificial, band-limited noise pulse, and copy other files forward untouched.
+Signal artefacts are another source of contamination and span a diverse range of phenomena, including thermal noise, eyeblinks, and random noise bursts [@boyer_reducing_2023]. These can be mitigated with `screen_artefacts()`, which applies a Hampel filter (default), or Wiener filter, both reported as robust denoisers [@allen_hampel_2009; @bhowmik_outlier_2017; @jarrah_density_2022]. Because artefact profiles vary across projects, we recommend visual inspection with the interactive dashboard to tune `n_sigma` (Hampel) and `window_ms` [@bhowmik_outlier_2017; @pearson_hampel_2016]. In Step 4, we target `/02/sample_data_04.csv`, which contains an artificial, band-limited noise pulse, and copy other files forward untouched.
 
 ```python
 screen_pattern = r'^02/sample_data_04\.csv$'
@@ -141,7 +141,7 @@ EMGFlow.screen_artefact_signals(path_names['fwr'], path_names['screened'],
                                 expression=screen_pattern, copy_unmatched=True)
 ```
 
-Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properites desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artificially injected gaps with PCHIP.
+Missing data consisting of brief gaps or `NaN`s can be filled with `fill_missing_signals()`, which defaults to Piecewise Cubic Hermite Interpolating Polynomial (`method=pchip`). PCHIP is shape-preserving, monotonicity-respecting, and avoids overshoot - properties desirable for sEMG [@scipy_pchip_2025]. Cubic spline is also available [@shin_relationship_2021]. In Step 5, we address artificially injected gaps with PCHIP.
 
 In Step 6, optional smoothing removes residual high-frequency noise before feature extraction. The default smoother RMS, equal to the square root of the total power, estimates signal amplitude and is commonly used in sEMG [@mcmanus_analysis_2020]. Boxcar, Gaussian, and LOESS alternatives are also provided.
 
@@ -157,7 +157,7 @@ EMGFlow.smooth_signals(path_names['filled'], path_names['smooth'],
 
 ## An Interactive Dashboard
 
-_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view that displays the Power Spectral Density (PSD). The amplitude view exposes transients and drift, guiding selection of passband edges and confirming that filtering preserves waveform shape. The PSD highlights mains peaks and harmonics, guiding the choice of notch parameters (f0, Q). Below we generate a dashboard for the Zygomaticus major channel. When we have finished inspecting the signals, we click ‘Stop Dashboard’ to shut down the dashboard server and end the interactive session so that the analysis pipeline can proceed.
+_EMGFlow_ includes a Shiny dashboard for visualising preprocessing effects. Pipeline steps can be overlaid or shown individually, and files are selected from a drop-down menu. A checkbox toggles between a time-domain amplitude view and a spectral view that displays the Power Spectral Density (PSD). The amplitude view exposes transients and drift, guiding selection of passband edges and confirming that filtering preserves waveform shape. The PSD highlights main peaks and harmonics, guiding the choice of notch parameters (f0, Q). Below, we generate a dashboard for the Zygomaticus major channel. When we have finished inspecting the signals, we click ‘Stop Dashboard’ to shut down the dashboard server and end the interactive session so that the analysis pipeline can proceed.
 
 ```python
 # Column and measurement units to plot
@@ -173,7 +173,7 @@ EMGFlow.plot_dashboard(path_names, show_muscle, sampling_rate, units)
 
 ## An Extensive Feature Library
 
-After preprocessing, files are ready for feature extraction. Surface EMG records voltage differences at the skin arising from the summed motor-unit action potentials [@fridlund_guidelines_1986], yielding an interference signal whose amplitude (time domain) and spectrum (frequency domain) reflect motor-unit recruitment, discharge rates, and muscle-fiber conduction velocity [@mcmanus_analysis_2020; @de_luca_practicum_2008]. _EMGFlow_ extracts 33 features across time and frequency domains, as listed in Table 2.
+After preprocessing, the files are ready for feature extraction. Surface EMG records voltage differences at the skin arising from the summed motor-unit action potentials [@fridlund_guidelines_1986], yielding an interference signal whose amplitude (time domain) and spectrum (frequency domain) reflect motor-unit recruitment, discharge rates, and muscle-fiber conduction velocity [@mcmanus_analysis_2020; @de_luca_practicum_2008]. _EMGFlow_ extracts 33 features across time and frequency domains, as listed in Table 2.
 
 | Domain | Feature |
 |:-------|:--------|
@@ -214,17 +214,17 @@ EMGFlow 1.1.2
 
 ### Temporal Feature Extraction
 
-The set of 18 time-domain features include  statistical moments (mean, variance, skew, kurtosis) and sEMG-specific measures. Examples include Willison amplitude, a proxy for motor unit firing that counts threshold crossings, and log-detector, an estimator of muscle force [@tkach_study_2010]. Time-domain features can be computed after the first three preprocessing steps (notch, band-pass, rectify); Steps 4-6 are optional.
+The set of 18 time-domain features includes statistical moments (mean, variance, skew, kurtosis) and sEMG-specific measures. Examples include Willison amplitude, a proxy for motor unit firing that counts threshold crossings, and log-detector, an estimator of muscle force [@tkach_study_2010]. Time-domain features can be computed after the first three preprocessing steps (notch, band-pass, rectify); Steps 4-6 are optional.
 
 ### Spectral Feature Extraction
 
-The 15 frequency-domain features characterise power-spectrum shape and distribution. Median frequency [@phinyomark_novel_2009] tracks changes in conduction velocity and is used in muscle fatigue assessments [@vanboxtel_changes_1983; @lindstrom_emg_1977; @mcmanus_analysis_2020]. Standard measures include spectral centroid, flatness, entropy, and roll-off. We also introduce Twitch Ratio, adapted from speech analysis [@eyben_geneva_2016], defined as the ratio of upper- to lower-band energy with a 60 Hz boundary between slow- and fast-twitch muscles fibres [@hegedus_adaptation_2020].
+The 15 frequency-domain features characterise power-spectrum shape and distribution. Median frequency [@phinyomark_novel_2009] tracks changes in conduction velocity and is used in muscle fatigue assessments [@vanboxtel_changes_1983; @lindstrom_emg_1977; @mcmanus_analysis_2020]. Standard measures include spectral centroid, flatness, entropy, and roll-off. We also introduce Twitch Ratio, adapted from speech analysis [@eyben_geneva_2016], defined as the ratio of upper- to lower-band energy with a 60 Hz boundary between slow- and fast-twitch muscle fibres [@hegedus_adaptation_2020].
 
-Spectral features are computed by converting the Step 2 band-limited signal into a PSD. To avoid discarding otherwise valid Welch frames due to isolated dropouts, we perform constrained interpolation for micro-gaps <5 samples (≈2.5–5 ms at 1–2 kHz) and leave longer gaps as NaN so affected frames are rejected [@jas_autoreject_2017]. This limits interpolation bias, which increases with gap size and density [@clifford_quantifying_2005; @munteanu_quantifying_2016]. We do not apply Steps 3–6 before PSD: rectification is non-linear and distorts spectra [@farina_identification_2013; @mcclelland_inconsistent_2014; @neto_rectification_2010]; artefact-replacement filters can violate stationarity assumptions for FFT-based PSD; and smoothing suppresses high-frequency content. We estimate PSD with Welch’s method using Hann windows, 50% overlap, and rejection of segments with remaining invalid samples, and mean averaging of retained spectra to form a long-term spectrum [@welch_psd_1967].
+Spectral features are computed by converting the Step 2 band-limited signal into a PSD. To avoid discarding otherwise valid Welch frames due to isolated dropouts, we perform constrained interpolation for micro-gaps <5 samples (≈2.5–5 ms at 1–2 kHz) and leave longer gaps as NaN, so affected frames are rejected [@jas_autoreject_2017]. This limits interpolation bias, which increases with gap size and density [@clifford_quantifying_2005; @munteanu_quantifying_2016]. We do not apply Steps 3–6 before PSD: rectification is non-linear and distorts spectra [@farina_identification_2013; @mcclelland_inconsistent_2014; @neto_rectification_2010]; artefact-replacement filters can violate stationarity assumptions for FFT-based PSD; and smoothing suppresses high-frequency content. We estimate PSD with Welch’s method using Hann windows, 50% overlap, and rejection of segments with remaining invalid samples, and mean averaging of retained spectra to form a long-term spectrum [@welch_psd_1967].
 
 ### Missing Data Reporting
 
-_EMGFlow_ reports the percentage of missing data in the final temporal and spectral series as `_Temporal_PCT_Missing` and `_Spectral_PCT_Missing` in the extracted feature DataFrame, enabling downstream exclusion critera where appropriate.
+_EMGFlow_ reports the percentage of missing data in the final temporal and spectral series as `_Temporal_PCT_Missing` and `_Spectral_PCT_Missing` in the extracted feature DataFrame, enabling downstream exclusion criteria where appropriate.
 
 # Documentation and Testing
 
