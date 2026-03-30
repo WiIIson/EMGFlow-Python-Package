@@ -316,7 +316,7 @@ def map_files(in_path:str, file_ext:str='csv', expression:str=None, base:str=Non
             file_dirs.update(subDir)
         
         # Record the file path (from base to current folder) and absolute path
-        elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.match(expression, fileName)!=None)):
+        elif (file[-len(file_ext):] == file_ext) and ((expression is None) or (re.search(expression, fileName)!=None)):
             file_dirs[fileName] = new_path
             
     return file_dirs
