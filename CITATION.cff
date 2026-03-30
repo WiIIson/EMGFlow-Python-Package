@@ -1,13 +1,38 @@
-cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+cff-version: "1.2.0"
 authors:
-- family-names: "Conley"
-  given-names: "William"
-  email: "william@cconley.ca"
-  website: http://wconley.ca
-- family-names: "Livingstone"
-  given-names: "Steven"
-title: "EMGFlow Package"
-version: 1.1.2
-date-released: 2024-03-11
-url: "https://github.com/WiIIson/EMGFlow-Python-Package"
+- family-names: Conley
+  given-names: William L.
+  orcid: "https://orcid.org/0009-0001-7454-1286"
+- family-names: Livingstone
+  given-names: Steven R.
+  orcid: "https://orcid.org/0000-0002-6364-6410"
+contact:
+- family-names: Conley
+  given-names: William L.
+  orcid: "https://orcid.org/0009-0001-7454-1286"
+doi: 10.5281/zenodo.18748950
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Conley
+    given-names: William L.
+    orcid: "https://orcid.org/0009-0001-7454-1286"
+  - family-names: Livingstone
+    given-names: Steven R.
+    orcid: "https://orcid.org/0000-0002-6364-6410"
+  date-published: 2026-03-30
+  doi: 10.21105/joss.07696
+  issn: 2475-9066
+  issue: 119
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 7696
+  title: "EMGFlow: A Python package for preprocessing and feature
+    extraction of electromyographic signals"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.07696"
+  volume: 11
+title: "EMGFlow: A Python package for preprocessing and feature
+  extraction of electromyographic signals"
