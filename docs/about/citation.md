@@ -4,20 +4,23 @@
 
 The **main publication** is under review at the Journal of Open Source Software, which you may cite as:
 
-- Conley, W. L., & Livingstone, S. R. (under review). EMGFlow: A Python package for pre-processing and feature extraction of electromyographic signals. Journal of Open Source Software. [[PDF]](https://raw.githubusercontent.com/openjournals/joss-papers/joss.07696/joss.07696/10.21105.joss.07696.pdf)
+- [Conley, W. L.](people/conley_wl.md)Conley, W. W., & [Livingstone, S. R.](people/livingstone_sr.md) (2026). EMGFlow: A Python package for preprocessing and feature extraction of electromyographic signals, 11(119), 7696. [[pdf]](https://www.theoj.org/joss-papers/joss.07696/10.21105.joss.07696.pdf) [[doi]](https://doi.org/10.21105/joss.07696)
 
 ## Software
 
 This software package can be cited as follows:
 
 ```bibtex
-@software{Conley_EMGFlow_2026,
-  author = {Conley, William and Livingstone, Steven R},
-  month = {02},
-  title = {{EMGFlow Package}},
-  url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.1.2},
-  year = {2026},
-  note = "{\tt william@cconley.ca}"
+@article{Conley2026, 
+  doi = {10.21105/joss.07696}, 
+  url = {https://doi.org/10.21105/joss.07696}, 
+  year = {2026}, 
+  publisher = {The Open Journal}, 
+  volume = {11}, 
+  number = {119}, 
+  pages = {7696}, 
+  author = {Conley, William L. and Livingstone, Steven R.}, 
+  title = {EMGFlow: A Python package for preprocessing and feature extraction of electromyographic signals}, 
+  journal = {Journal of Open Source Software}
 }
 ```
