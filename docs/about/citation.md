@@ -2,13 +2,9 @@
 
 ## Main publication
 
-The **main publication** is under review at the Journal of Open Source Software, which you may cite as:
-
 - [Conley, W. L.](people/conley_wl.md)Conley, W. W., & [Livingstone, S. R.](people/livingstone_sr.md) (2026). EMGFlow: A Python package for preprocessing and feature extraction of electromyographic signals, 11(119), 7696. [[pdf]](https://www.theoj.org/joss-papers/joss.07696/10.21105.joss.07696.pdf) [[doi]](https://doi.org/10.21105/joss.07696)
 
-## Software
-
-This software package can be cited as follows:
+## Bibtex citation
 
 ```bibtex
 @article{Conley2026, 
