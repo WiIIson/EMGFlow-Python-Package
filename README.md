@@ -84,14 +84,17 @@ Contributions and community guidelines can be seen the [contributing guide](http
 This package can be cited as follows:
 
 ```bibtex
-@software{Conley_EMGFlow_2026,
-  author = {Conley, William and Livingstone, Steven R},
-  month = {02},
-  title = {{EMGFlow Package}},
-  url = {https://github.com/WiIIson/EMGFlow-Python-Package},
-  version = {1.1.2},
-  year = {2026},
-  note = "{\tt william@cconley.ca}"
+@article{Conley2026, 
+  doi = {10.21105/joss.07696}, 
+  url = {https://doi.org/10.21105/joss.07696}, 
+  year = {2026}, 
+  publisher = {The Open Journal}, 
+  volume = {11}, 
+  number = {119}, 
+  pages = {7696}, 
+  author = {Conley, William L. and Livingstone, Steven R.}, 
+  title = {EMGFlow: A Python package for preprocessing and feature extraction of electromyographic signals}, 
+  journal = {Journal of Open Source Software} 
 }
 ```
 
