@@ -145,4 +145,5 @@ cython_debug/
 
 # EMGFlow
 Other_Work
-EMGFlow-Package/dist
+EMGFlow-Package/dist.DS_Store
+**/.DS_Store
