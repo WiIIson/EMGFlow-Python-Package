@@ -104,7 +104,7 @@ You can also use the `EMGFlow.package_citation()` function to print the citation
 
 ## ADSL
 
-<img src="ADSL.png"  width="100" height="110">
+<img src="https://raw.githubusercontent.com/WiIIson/EMGFlow-Python-Package/main/ADSL.png"  width="100" height="110">
 
 EMGFlow is part of the Affective Data Science Lab (ADSL) suite of workflow-oriented biosignal processing packages.
 - [ADSL GitHub](https://github.com/affectivedatascience)
