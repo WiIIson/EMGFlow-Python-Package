@@ -101,3 +101,11 @@ This package can be cited as follows:
 If you are using a different version of EMGFlow, change the `version` tag to the version you are using.
 
 You can also use the `EMGFlow.package_citation()` function to print the citation for the version of EMGFlow you are using, or use the `EMGFlow.package_version()` function to view the package version you are using.
+
+## ADSL
+
+<img src="https://raw.githubusercontent.com/WiIIson/EMGFlow-Python-Package/refs/heads/main/ADSL.png"  width="100" height="110">
+
+EMGFlow is part of the Affective Data Science Lab (ADSL) suite of workflow-oriented biosignal processing packages.
+- [ADSL GitHub](https://github.com/affectivedatascience)
+- [ADSL Homepage](https://affectivedatascience.com/)
