@@ -653,22 +653,23 @@ def bandpass_filter_signals(in_path:str, out_path:str, column_names=None, sampli
 # =============================================================================
 #
 
-def apply_rectify(Signal:pd.DataFrame, column_name:str):
+def apply_rectify(Signal:pd.DataFrame, column_name):
     """
-    Apply a Full Wave Rectifier (FWR) to a column of 'Signal'.
+    Apply a Full Wave Rectifier (FWR) to columns of 'Signal'.
 
     Parameters
     ----------
     Signal : pd.DataFrame
         A Pandas dataframe containing a 'Time' column, and additional columns
         for signal data.
-    column_name : str
-        The column of 'Signal' the FWR filter is applied to.
+    column_name : str or list-str
+        The column or list of columns of 'Signal' the FWR filter is applied to.
 
     Raises
     ------
     Exception
-        An exception is raised if 'column_name' is not a column of 'Signal'.
+        An exception is raised if a column from 'column_name' is not a column
+        of 'Signal'.
 
     Returns
     -------
@@ -677,12 +678,19 @@ def apply_rectify(Signal:pd.DataFrame, column_name:str):
 
     """
     
-    # An exception is raised if 'column_name' is not a column of 'Signal'.
-    if column_name not in list(Signal.columns.values):
-        raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
+    if isinstance(column_name, str):
+        column_names = [column_name]
+    else:
+        column_names = column_name
+    
+    # An exception is raised if a column from 'column_name' is not a column of
+    # 'Signal'.
+    for column_name in column_names:
+        if column_name not in list(Signal.columns.values):
+            raise Exception("Column '" + str(column_name) + "' not found in 'Signal'.")
     
     fwr_Signal = Signal.copy().reset_index(drop=True)
-    fwr_Signal[column_name] = np.abs(fwr_Signal[column_name])
+    fwr_Signal[column_names] = np.abs(fwr_Signal[column_names])
     
     return fwr_Signal
 
@@ -772,9 +780,9 @@ def rectify_signals(in_path:str, out_path:str, column_names=None, expression:str
                 column_names = list(data.columns)
                 column_names = [column_name for column_name in column_names if column_name != 'Time' and not column_name.startswith('mask_')]
               
-            # Apply filter to columns
-            for column_name in column_names:
-                data = apply_rectify(data, column_name)
+            # Apply all columns at once to avoid copying the full dataframe
+            # once per column.
+            data = apply_rectify(data, column_names)
             
             # Construct out path
             out_file = out_path + file_dirs[file][len(in_path):]

@@ -58,6 +58,16 @@ class TestSimple(unittest.TestCase):
         SSignal = EMGFlow.apply_rectify(Signal, 'EMG_zyg')
         self.assertIsInstance(SSignal, pd.DataFrame)
     
+    def test_apply_rectify_multiple_columns(self):
+        pathNames = EMGFlow.make_paths()
+        filePath = os.path.join(pathNames['raw'], '01', 'sample_data_01.csv')
+        Signal = EMGFlow.read_file_type(filePath, 'csv')
+        original = Signal.copy()
+        SSignal = EMGFlow.apply_rectify(Signal, ['EMG_zyg', 'EMG_cor'])
+        self.assertIsInstance(SSignal, pd.DataFrame)
+        self.assertTrue((SSignal[['EMG_zyg', 'EMG_cor']].dropna() >= 0).all().all())
+        pd.testing.assert_frame_equal(Signal, original)
+    
     def test_rectify_signals(self):
         pathNames = EMGFlow.make_paths()
         EMGFlow.rectify_signals(pathNames['raw'], pathNames['fwr'])
